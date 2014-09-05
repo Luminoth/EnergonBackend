@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Data.SQLite;
 
 namespace EnergonSoftware.Database
@@ -15,7 +16,7 @@ namespace EnergonSoftware.Database
     {
         public static void CreateDatabase(DatabaseDriver driver, string url)
         {
-            Console.WriteLine("Creating " + driver + " database at " + url + "...");
+            Trace.WriteLine("Creating " + driver + " database at " + url + "...");
             switch(driver)
             {
             case DatabaseDriver.SQLite:
@@ -77,7 +78,7 @@ namespace EnergonSoftware.Database
         public void Open()
         {
             lock(_lock) {
-                Console.WriteLine("Opening " + Driver + " database connection to " + Url + "...");
+                Trace.WriteLine("Opening " + Driver + " database connection to " + Url + "...");
                 _connection.Open();
             }
         }
@@ -85,7 +86,7 @@ namespace EnergonSoftware.Database
         public void Close()
         {
             lock(_lock) {
-                Console.WriteLine("Closing " + Driver + " database connection to " + Url + "...");
+                Trace.WriteLine("Closing " + Driver + " database connection to " + Url + "...");
                 _connection.Close();
             }
         }
@@ -95,7 +96,7 @@ namespace EnergonSoftware.Database
             DbCommand command = _connection.CreateCommand();
             command.CommandText = commandText;
 
-            Console.WriteLine("Built command: " + command.CommandText);
+            Trace.WriteLine("Built command: " + command.CommandText);
             return command;
         }
 
@@ -110,7 +111,7 @@ namespace EnergonSoftware.Database
 
         public void AddParameter(DbCommand command, string name, object value)
         {
-            Console.WriteLine("Adding parameter " + name + "=" + value);
+            Trace.WriteLine("Adding parameter " + name + "=" + value);
 
             DbParameter param = command.CreateParameter();
             param.ParameterName = name;

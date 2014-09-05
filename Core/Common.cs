@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Diagnostics;
 using System.IO;
 
 namespace EnergonSoftware.Core
@@ -21,7 +21,7 @@ namespace EnergonSoftware.Core
 
         public static void InitFilesystem()
         {
-            Console.WriteLine("Initializing filesystem...");
+            Trace.WriteLine("Initializing filesystem...");
             Directory.CreateDirectory(ConfDir);
             Directory.CreateDirectory(DataDir);
         }

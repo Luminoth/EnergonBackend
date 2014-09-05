@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -135,7 +136,7 @@ namespace EnergonSoftware.Database
 
         public void Create(DatabaseConnection connection)
         {
-            Console.WriteLine("Creating table " + Name + "...");
+            Trace.WriteLine("Creating table " + Name + "...");
 
             StringBuilder create = new StringBuilder("CREATE TABLE " + _name);
             create.Append("(");
