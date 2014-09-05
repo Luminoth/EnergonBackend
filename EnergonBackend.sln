@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{B8CF252F-2FBC-4D35-90A9-C0ADF2B0B9E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authenticator", "Authenticator\Authenticator.csproj", "{031FDC5B-A885-4FD2-B9D8-F086DFFAE632}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{B8CF252F-2FBC-4D35-90A9-C0ADF2B0B9E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8CF252F-2FBC-4D35-90A9-C0ADF2B0B9E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8CF252F-2FBC-4D35-90A9-C0ADF2B0B9E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{031FDC5B-A885-4FD2-B9D8-F086DFFAE632}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{031FDC5B-A885-4FD2-B9D8-F086DFFAE632}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{031FDC5B-A885-4FD2-B9D8-F086DFFAE632}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{031FDC5B-A885-4FD2-B9D8-F086DFFAE632}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Core")]
+[assembly: AssemblyTitle("Authenticator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Energon Software")]
-[assembly: AssemblyProduct("Core")]
+[assembly: AssemblyProduct("Authenticator")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ca47ed38-ba86-4f0e-a3cb-5df0c0b73269")]
+[assembly: Guid("41c7f681-94fe-4a9f-a66e-c200aaf44112")]
 
 // Version information for an assembly consists of the following four values:
 //
