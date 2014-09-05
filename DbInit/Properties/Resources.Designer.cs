@@ -59,5 +59,23 @@ namespace EnergonSoftware.DbInit.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Initialize.
+        /// </summary>
+        public static string ButtonInitialize {
+            get {
+                return ResourceManager.GetString("ButtonInitialize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Database Initializer.
+        /// </summary>
+        public static string MainWindowTitle {
+            get {
+                return ResourceManager.GetString("MainWindowTitle", resourceCulture);
+            }
+        }
     }
 }
