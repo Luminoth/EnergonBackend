@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authenticator", "Authenticator\Authenticator.csproj", "{031FDC5B-A885-4FD2-B9D8-F086DFFAE632}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbInit", "DbInit\DbInit.csproj", "{FD88AC1C-A7F6-4465-B0D7-CEF61B3970BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "Database\Database.csproj", "{9821A7A5-8136-4863-AB09-BD5C7E1A6606}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{031FDC5B-A885-4FD2-B9D8-F086DFFAE632}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{031FDC5B-A885-4FD2-B9D8-F086DFFAE632}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{031FDC5B-A885-4FD2-B9D8-F086DFFAE632}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD88AC1C-A7F6-4465-B0D7-CEF61B3970BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD88AC1C-A7F6-4465-B0D7-CEF61B3970BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD88AC1C-A7F6-4465-B0D7-CEF61B3970BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD88AC1C-A7F6-4465-B0D7-CEF61B3970BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9821A7A5-8136-4863-AB09-BD5C7E1A6606}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9821A7A5-8136-4863-AB09-BD5C7E1A6606}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9821A7A5-8136-4863-AB09-BD5C7E1A6606}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9821A7A5-8136-4863-AB09-BD5C7E1A6606}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
