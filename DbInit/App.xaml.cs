@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows;
+
+using log4net;
+using log4net.Config;
 
 using EnergonSoftware.Core;
 
@@ -11,16 +13,17 @@ namespace EnergonSoftware.DbInit
     /// </summary>
     public partial class App : Application
     {
-        public static void InitializeDatabases()
-        {
-            Trace.WriteLine("Initializing databases...");
-        }
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(Application));
 
         private void ConfigureLogging()
         {
-            Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
-            Trace.Listeners.Add(new TextWriterTraceListener("DbInit.log", "DbInit"));
-            Trace.AutoFlush = true;
+            XmlConfigurator.Configure();
+        }
+
+
+        public void InitializeDatabases()
+        {
+            _logger.Info("Initializing databases...");
         }
 
 #region Event Handlers

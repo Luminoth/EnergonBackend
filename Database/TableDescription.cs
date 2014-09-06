@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
+
+using log4net;
 
 namespace EnergonSoftware.Database
 {
@@ -114,6 +115,8 @@ namespace EnergonSoftware.Database
 
     public sealed class TableDescription
     {
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(TableDescription));
+
         private string _name;
         private Dictionary<string, ColumnDescription> _columns = new Dictionary<string, ColumnDescription>();
         private List<string> _primaryKeys = new List<string>();
@@ -136,7 +139,7 @@ namespace EnergonSoftware.Database
 
         public void Create(DatabaseConnection connection)
         {
-            Trace.WriteLine("Creating table " + Name + "...");
+            _logger.Info("Creating table " + Name + "...");
 
             StringBuilder create = new StringBuilder("CREATE TABLE " + _name);
             create.Append("(");

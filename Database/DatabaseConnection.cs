@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Diagnostics;
 using System.Data.SQLite;
+
+using log4net;
 
 namespace EnergonSoftware.Database
 {
@@ -14,9 +15,11 @@ namespace EnergonSoftware.Database
 
     public class DatabaseConnection : IDisposable
     {
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(DatabaseConnection));
+
         public static void CreateDatabase(DatabaseDriver driver, string url)
         {
-            Trace.WriteLine("Creating " + driver + " database at " + url + "...");
+            _logger.Info("Creating " + driver + " database at " + url + "...");
             switch(driver)
             {
             case DatabaseDriver.SQLite:
@@ -78,7 +81,7 @@ namespace EnergonSoftware.Database
         public void Open()
         {
             lock(_lock) {
-                Trace.WriteLine("Opening " + Driver + " database connection to " + Url + "...");
+                _logger.Debug("Opening " + Driver + " database connection to " + Url + "...");
                 _connection.Open();
             }
         }
@@ -86,7 +89,7 @@ namespace EnergonSoftware.Database
         public void Close()
         {
             lock(_lock) {
-                Trace.WriteLine("Closing " + Driver + " database connection to " + Url + "...");
+                _logger.Debug("Closing " + Driver + " database connection to " + Url + "...");
                 _connection.Close();
             }
         }
@@ -96,7 +99,7 @@ namespace EnergonSoftware.Database
             DbCommand command = _connection.CreateCommand();
             command.CommandText = commandText;
 
-            Trace.WriteLine("Built command: " + command.CommandText);
+            _logger.Debug("Built command: " + command.CommandText);
             return command;
         }
 
@@ -111,7 +114,7 @@ namespace EnergonSoftware.Database
 
         public void AddParameter(DbCommand command, string name, object value)
         {
-            Trace.WriteLine("Adding parameter " + name + "=" + value);
+            _logger.Debug("Adding parameter " + name + "=" + value);
 
             DbParameter param = command.CreateParameter();
             param.ParameterName = name;

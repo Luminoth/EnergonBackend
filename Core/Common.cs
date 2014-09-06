@@ -1,10 +1,13 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
+
+using log4net;
 
 namespace EnergonSoftware.Core
 {
     public static class Common
     {
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(Common));
+
 #region Auth Properties
         public const int AUTH_VERSION = 2;
         public const string DEFAULT_AUTH_REALM = "energonsoftware";
@@ -21,7 +24,7 @@ namespace EnergonSoftware.Core
 
         public static void InitFilesystem()
         {
-            Trace.WriteLine("Initializing filesystem...");
+            _logger.Info("Initializing filesystem...");
             Directory.CreateDirectory(ConfDir);
             Directory.CreateDirectory(DataDir);
         }

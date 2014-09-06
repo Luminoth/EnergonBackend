@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows;
 
 namespace EnergonSoftware.DbInit
@@ -9,24 +8,12 @@ namespace EnergonSoftware.DbInit
     /// </summary>
     public partial class MainWindow : Window
     {
-        private class OutputTraceListener : TraceListener
+        public static void AppendOutputText(string text)
         {
-            public OutputTraceListener()
+            Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-            }
-
-            public override void Write(string message)
-            {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    ((MainWindow)Application.Current.MainWindow).OutputText.AppendText(message);
-                }));
-            }
-
-            public override void WriteLine(string message)
-            {
-                Write(message + Environment.NewLine);
-            }
+                ((MainWindow)Application.Current.MainWindow).OutputText.AppendText(text);
+            }));
         }
 
         public static void SetStatusBarText(string text)
@@ -41,7 +28,6 @@ namespace EnergonSoftware.DbInit
         {
             InitializeComponent();
 
-            Trace.Listeners.Add(new OutputTraceListener());
             SetStatusBarText("Waiting...");
         }
 
@@ -60,7 +46,7 @@ namespace EnergonSoftware.DbInit
 
         public void ButtonInitialize_Click(object sender, RoutedEventArgs e)
         {
-            App.InitializeDatabases();
+            ((App)(Application.Current)).InitializeDatabases();
         }
 #endregion
     }
