@@ -10,6 +10,10 @@ namespace EnergonSoftware.DbInit
     {
         public static void AppendOutputText(string text)
         {
+            if(null == Application.Current.MainWindow) {
+                return;
+            }
+
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
                 ((MainWindow)Application.Current.MainWindow).OutputText.AppendText(text);
@@ -18,6 +22,10 @@ namespace EnergonSoftware.DbInit
 
         public static void SetStatusBarText(string text)
         {
+            if(null == Application.Current.MainWindow) {
+                return;
+            }
+
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
                 ((MainWindow)Application.Current.MainWindow).StatusBarText.Text = text;
@@ -46,7 +54,7 @@ namespace EnergonSoftware.DbInit
 
         public void ButtonInitialize_Click(object sender, RoutedEventArgs e)
         {
-            ((App)(Application.Current)).InitializeDatabases();
+            App.InitializeDatabases();
         }
 #endregion
     }

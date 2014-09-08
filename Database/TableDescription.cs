@@ -40,11 +40,11 @@ namespace EnergonSoftware.Database
             return "";
         }
 
-        private static string DatabaseTypeString(DatabaseDriver driver, DatabaseType type)
+        private static string DatabaseTypeString(string providerName, DatabaseType type)
         {
-            switch(driver)
+            switch(providerName)
             {
-            case DatabaseDriver.SQLite:
+            case "System.Data.SQLite":
                 return SQLiteDatabaseTypeString(type);
             }
             return "";
@@ -97,9 +97,9 @@ namespace EnergonSoftware.Database
             }
         }
 
-        public string ToString(DatabaseDriver driver)
+        public string ToString(string providerName)
         {
-            StringBuilder builder = new StringBuilder(Name + " " + DatabaseTypeString(driver, Type));
+            StringBuilder builder = new StringBuilder(Name + " " + DatabaseTypeString(providerName, Type));
 
             if(PrimaryKey || HasForeignKey || !Nullable) {
                 builder.Append(" NOT NULL");
@@ -143,7 +143,7 @@ namespace EnergonSoftware.Database
 
             StringBuilder create = new StringBuilder("CREATE TABLE " + _name);
             create.Append("(");
-            create.Append(string.Join(", ", _columns.Values.Select(c => c.ToString(connection.Driver))));
+            create.Append(string.Join(", ", _columns.Values.Select(c => c.ToString(connection.ConnectionSettings.ProviderName))));
             if(_primaryKeys.Count > 0) {
                 create.Append(", PRIMARY KEY(" + string.Join(", ", _primaryKeys) + ")");
             }

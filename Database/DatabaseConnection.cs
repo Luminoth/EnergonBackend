@@ -1,45 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.ComponentModel;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Data.SQLite;
 
 using log4net;
 
 namespace EnergonSoftware.Database
 {
-    public enum DatabaseDriver
-    {
-        None,
-        SQLite,
-    }
-
     public class DatabaseConnection : IDisposable
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(DatabaseConnection));
 
-        public static void CreateDatabase(DatabaseDriver driver, string url)
+        public static string ParseDataSource(ConnectionStringSettings connectionSettings)
         {
-            _logger.Info("Creating " + driver + " database at " + url + "...");
-            switch(driver)
+            DbProviderFactory providerFactory = DbProviderFactories.GetFactory(connectionSettings.ProviderName);
+
+            DbConnectionStringBuilder builder = providerFactory.CreateConnectionStringBuilder();
+            builder.ConnectionString = connectionSettings.ConnectionString;
+            return (string)builder["Data Source"];
+        }
+
+        public static bool CreateDatabase(ConnectionStringSettings connectionSettings)
+        {
+            string dataSource = ParseDataSource(connectionSettings);
+
+            _logger.Info("Creating " + connectionSettings.ProviderName + " database at " + dataSource + "...");
+            switch(connectionSettings.ProviderName)
             {
-            case DatabaseDriver.SQLite:
-                SQLiteConnection.CreateFile(url);
-                break;
+            case "System.Data.SQLite":
+                SQLiteConnection.CreateFile(dataSource);
+                return true;
             }
+
+            return false;
         }
 
         private object _lock = new object();
 
-        private DatabaseDriver _driver = DatabaseDriver.None;
-        private string _url = "";
-        private int _maxPoolSize = 10;
-
+        private ConnectionStringSettings _connectionSettings;
         private DbConnection _connection;
 
-        public DatabaseDriver Driver { get { return _driver; } }
-        public string Url { get { return _url; } }
-        public int MaxPoolSize { get { return _maxPoolSize; } }
-
+        public ConnectionStringSettings ConnectionSettings { get { return _connectionSettings; } }
         public DbConnection Connection { get { return _connection; } }
 
         public long LastInsertRowId
@@ -47,9 +51,9 @@ namespace EnergonSoftware.Database
             get
             {
                 lock(_lock) {
-                    switch(Driver)
+                    switch(ConnectionSettings.ProviderName)
                     {
-                    case DatabaseDriver.SQLite:
+                    case "System.Data.SQLite":
                         return ((SQLiteConnection)_connection).LastInsertRowId;
                     }
                     return -1;
@@ -57,20 +61,14 @@ namespace EnergonSoftware.Database
             }
         }
 
-        public DatabaseConnection(DatabaseDriver driver, string url, int maxPoolSize)
+        public DatabaseConnection(ConnectionStringSettings connectionSettings)
         {
-            _driver = driver;
-            _url = url;
-            _maxPoolSize = maxPoolSize;
+            _connectionSettings = connectionSettings;
 
-            switch(Driver)
-            {
-            case DatabaseDriver.SQLite:
-                _connection = new SQLiteConnection("Data Source=" + Url + ";Pooling=True;Max Pool Size=" + MaxPoolSize);
-                break;
-            default:
-                throw new Exception("Unsupported database driver: " + Driver);
-            }
+            DbProviderFactory providerFactory = DbProviderFactories.GetFactory(connectionSettings.ProviderName);
+
+            _connection = providerFactory.CreateConnection();
+            _connection.ConnectionString = connectionSettings.ConnectionString;
         }
 
         public void Dispose()
@@ -81,7 +79,7 @@ namespace EnergonSoftware.Database
         public void Open()
         {
             lock(_lock) {
-                _logger.Debug("Opening " + Driver + " database connection to " + Url + "...");
+                _logger.Debug("Opening " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
                 _connection.Open();
             }
         }
@@ -89,7 +87,7 @@ namespace EnergonSoftware.Database
         public void Close()
         {
             lock(_lock) {
-                _logger.Debug("Closing " + Driver + " database connection to " + Url + "...");
+                _logger.Debug("Closing " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
                 _connection.Close();
             }
         }
