@@ -18,7 +18,7 @@ namespace EnergonSoftware.DbInit
     /// </summary>
     public partial class App : Application
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(Application));
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(App));
 
         private void ConfigureLogging()
         {
