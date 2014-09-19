@@ -8,36 +8,20 @@ namespace EnergonSoftware.Launcher
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static void SetStatusBarText(string text)
-        {
-            if(null == Application.Current.MainWindow) {
-                return;
-            }
-
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                ((MainWindow)Application.Current.MainWindow).StatusBarText.Text = text;
-            }));
-        }
-
         public MainWindow()
         {
             InitializeComponent();
 
-            SetStatusBarText("Waiting...");
+            //DataContext = ClientApiWrapper.Instance;
         }
 
-#region Event Handlers
-        public void MenuFileExit_Click(object sender, RoutedEventArgs e)
+#region UI Helpers
+        private void OnError(string message, string title)
         {
-            Close();
-        }
-
-        public void MenuHelpAbout_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show(this, EnergonSoftware.Launcher.Properties.Resources.MainWindowTitle,
-                "About " + EnergonSoftware.Launcher.Properties.Resources.MainWindowTitle,
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                MessageBox.Show(this, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }));
         }
 #endregion
     }

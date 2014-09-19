@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using System.Windows.Interop;
 
 using log4net;
 using log4net.Config;
@@ -21,11 +23,31 @@ namespace EnergonSoftware.Launcher
         }
 #endregion
 
+#region UI Helpers
+        private void OnError(string message, string title)
+        {
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                MessageBox.Show(Application.Current.MainWindow, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }));
+        }
+#endregion
+
 #region Event Handlers
-        private void Application_Startup(object sender, StartupEventArgs e)
+        private void OnApplicationStartup(object sender, StartupEventArgs e)
         {
             ConfigureLogging();
             Common.InitFilesystem();
+
+            /*ClientApi.Instance.Init(Configuration.Instance.MinWorkerThreads, Configuration.Instance.MaxWorkerThreads);
+            ClientApi.Instance.OnDisconnect += OnDisconnect;*/
+
+            ComponentDispatcher.ThreadIdle += OnIdle;
+        }
+
+        private void OnIdle(object sender, EventArgs evt)
+        {
+            //ClientApi.Instance.Run();
         }
 #endregion
     }
