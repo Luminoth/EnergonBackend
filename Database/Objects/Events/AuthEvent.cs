@@ -3,7 +3,7 @@ using System.Data.Common;
 
 namespace EnergonSoftware.Database.Objects.Events
 {
-    public enum LoginEventType
+    public enum AuthEventType
     {
         Request,
         Begin,
@@ -11,9 +11,9 @@ namespace EnergonSoftware.Database.Objects.Events
         Failure,
     }
 
-    public sealed class LoginEvent : Event
+    public sealed class AuthEvent : Event
     {
-        private static TableDescription LOGIN_EVENTS_TABLE = new TableDescription("events_login",
+        private static TableDescription AUTH_EVENTS_TABLE = new TableDescription("events_authenticate",
             new List<ColumnDescription>
             {
                 { new ColumnDescription("id", DatabaseType.Integer).SetPrimaryKey() },
@@ -26,25 +26,25 @@ namespace EnergonSoftware.Database.Objects.Events
 
         public static void CreateTable(DatabaseConnection connection)
         {
-            LOGIN_EVENTS_TABLE.Create(connection);
+            AUTH_EVENTS_TABLE.Create(connection);
         }
 
-        private LoginEventType _type;
+        private AuthEventType _type;
         private string _account;
         private string _origin;
 
-        public LoginEventType Type { get { return _type; } }
+        public AuthEventType Type { get { return _type; } }
         public string Account { get { return _account; } set { _account = value; _dirty = true; } }
         public string Origin { get { return _origin; } set { _origin = value; _dirty = true; } }
 
-        public LoginEvent(LoginEventType type)
+        public AuthEvent(AuthEventType type)
         {
             _type = type;
         }
 
         public override void Insert(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("INSERT INTO " + LOGIN_EVENTS_TABLE.Name
+            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AUTH_EVENTS_TABLE.Name
                 + "(timestamp, type, origin, account)"
                 + " VALUES(@timestamp, @type, @origin, @account)"))
             {
@@ -59,7 +59,7 @@ namespace EnergonSoftware.Database.Objects.Events
 
         public override string ToString()
         {
-            return "LoginEvent(id: " + Id + ", timestamp: " + Timestamp + ", type: " + Type + ", origin: " + Origin + ", account: " + Account + ")";
+            return "AuthEvent(id: " + Id + ", timestamp: " + Timestamp + ", type: " + Type + ", origin: " + Origin + ", account: " + Account + ")";
         }
     }
 }

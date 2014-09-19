@@ -14,10 +14,12 @@ namespace EnergonSoftware.Launcher
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(App));
 
+#region Initialization
         private void ConfigureLogging()
         {
             XmlConfigurator.Configure();
         }
+#endregion
 
 #region Event Handlers
         private void Application_Startup(object sender, StartupEventArgs e)

@@ -54,7 +54,7 @@ namespace EnergonSoftware.DbInit
 
         public void ButtonInitialize_Click(object sender, RoutedEventArgs e)
         {
-            App.InitializeDatabases();
+            App.InitializeDatabase();
         }
 #endregion
     }

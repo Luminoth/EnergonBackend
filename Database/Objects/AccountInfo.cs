@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Text;
 
 using EnergonSoftware.Core;
+using EnergonSoftware.Core.Overmind;
 using EnergonSoftware.Core.Util.Crypt;
 
 namespace EnergonSoftware.Database.Objects
@@ -30,7 +31,7 @@ namespace EnergonSoftware.Database.Objects
             ACCOUNTS_TABLE.Create(connection);
         }
 
-        /*public static List<Friend> ReadFriends(DatabaseConnection connection, long accountId)
+        public static List<Friend> ReadFriends(DatabaseConnection connection, long accountId)
         {
             List<Friend> friends = new List<Friend>();
 
@@ -50,7 +51,7 @@ namespace EnergonSoftware.Database.Objects
             }
 
             return friends;
-        }*/
+        }
 
 #region Cleanliness
         private bool _dirty = false;
@@ -69,7 +70,7 @@ namespace EnergonSoftware.Database.Objects
         private string _passwordMD5;
         private string _passwordSHA512;
         private string _sessionid;
-        //private Status _status = Status.Offline;
+        private Status _status = Status.Offline;
 
         public long Id { get { return _id; } }
         public bool Valid { get { return _id > 0; } }
@@ -84,7 +85,7 @@ namespace EnergonSoftware.Database.Objects
 
         public string SessionId { get { return _sessionid; } set { _sessionid = value; _dirty = true; } }
 
-        //public Status Status { get { return _status; } set { _status = value; _dirty = true; } }
+        public Status Status { get { return _status; } set { _status = value; _dirty = true; } }
 
         public AccountInfo()
         {
@@ -144,20 +145,20 @@ namespace EnergonSoftware.Database.Objects
                 _sessionid = reader.GetString(ACCOUNTS_TABLE["sessionid"].Id);
             }
 
-            //_status = (Status)reader.GetInt32(ACCOUNTS_TABLE["status"].Id);
+            _status = (Status)reader.GetInt32(ACCOUNTS_TABLE["status"].Id);
         }
 
         public void Insert(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("INSERT INTO " + ACCOUNTS_TABLE.Name
-                + "(active, username" + ", passwordMD5" + ", passwordSHA512" + /*, status*/")"
-                + " VALUES(@active, @username" + ", @passwordMD5" + ", @passwordSHA512" + /*, @status*/")"))
+                + "(active, username" + ", passwordMD5" + ", passwordSHA512" + ", status)"
+                + " VALUES(@active, @username" + ", @passwordMD5" + ", @passwordSHA512" + ", @status)"))
             {
                 connection.AddParameter(command, "active", Active);
                 connection.AddParameter(command, "username", Username);
                 connection.AddParameter(command, "passwordMD5", PasswordMD5);
                 connection.AddParameter(command, "passwordSHA512", PasswordSHA512);
-                //connection.AddParameter(command, "status", Status);
+                connection.AddParameter(command, "status", Status);
                 command.ExecuteNonQuery();
                 _id = connection.LastInsertRowId;
             }
@@ -170,7 +171,7 @@ namespace EnergonSoftware.Database.Objects
             {
                 connection.AddParameter(command, "active", Active);
                 connection.AddParameter(command, "sessionid", SessionId);
-                //connection.AddParameter(command, "status", Status);
+                connection.AddParameter(command, "status", Status);
                 connection.AddParameter(command, "id", Id);
                 command.ExecuteNonQuery();
             }
@@ -189,7 +190,7 @@ namespace EnergonSoftware.Database.Objects
         {
             return "Account(id: " + Id + ", active: " + Active
                 + ", username: " + Username + ", passwordMD5: " + PasswordMD5 + ", passwordSHA512: " + PasswordSHA512
-                + ", sessionid: " + SessionId /*+ ", status: " + Status*/ + ")";
+                + ", sessionid: " + SessionId + ", status: " + Status + ")";
         }
     }
 }

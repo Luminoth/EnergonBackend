@@ -5,23 +5,18 @@ using EnergonSoftware.Core.Messages.Formatter;
 
 namespace EnergonSoftware.Core.Messages
 {
-    public enum MessageType
-    {
-        None,
-    }
-
     public interface IMessage : IMessageSerializable
     {
-        MessageType Type { get; }
+        string Type { get; }
     }
 
     public static class MessageFactory
     {
-        public static IMessage CreateMessage(MessageType type)
+        public static IMessage CreateMessage(string type)
         {
             switch(type)
             {
-            case MessageType.None:
+            default:
                 return null;
             }
             throw new MessageException("Unsupported message type: " + type);

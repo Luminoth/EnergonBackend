@@ -20,19 +20,37 @@ namespace EnergonSoftware.DbInit
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(App));
 
+#region Initialization
         private void ConfigureLogging()
         {
             XmlConfigurator.Configure();
         }
 
-        private static DatabaseConnection AcquireDatabaseConnection(ConnectionStringSettings connectionSettings)
+        public static bool InitializeDatabase()
         {
-            DatabaseConnection connection = new DatabaseConnection(connectionSettings);
-            connection.Open();
+            ConnectionStringSettings connectionSettings = ConfigurationManager.ConnectionStrings["energonsoftware"];
 
-            return connection;
+            _logger.Info("Creating database...");
+            if(!CreateDatabase(connectionSettings)) {
+                _logger.Error("Failed to create database!");
+                return false;
+            }
+
+            _logger.Info("Populating database...");
+            using(DatabaseConnection connection = AcquireDatabaseConnection(connectionSettings)) {
+                CreateEventsTables(connection);
+
+                CreateAccountsTables(connection);
+                InsertAccountsData(connection);
+                VerifyAccountsData(connection);
+            }
+
+            return true;
         }
+#endregion
 
+#region Database
+        // TODO: this kind of assumes we're using SQLite and we shouldn't do that
         private static bool CreateDatabase(ConnectionStringSettings connectionSettings)
         {
             string dataSource = DatabaseConnection.ParseDataSource(connectionSettings);
@@ -45,11 +63,25 @@ namespace EnergonSoftware.DbInit
             return DatabaseConnection.CreateDatabase(connectionSettings);
         }
 
-        private static void CreateAccountsTables(DatabaseConnection connection)
+        private static DatabaseConnection AcquireDatabaseConnection(ConnectionStringSettings connectionSettings)
+        {
+            DatabaseConnection connection = new DatabaseConnection(connectionSettings);
+            connection.Open();
+            return connection;
+        }
+#endregion
+
+#region Events Table
+        private static void CreateEventsTables(DatabaseConnection connection)
         {
             _logger.Info("Creating event tables...");
-            LoginEvent.CreateTable(connection);
+            AuthEvent.CreateTable(connection);
+        }
+#endregion
 
+#region Accounts Table
+        private static void CreateAccountsTables(DatabaseConnection connection)
+        {
             _logger.Info("Creating account tables...");
             AccountInfo.CreateTable(connection);
             AccountFriend.CreateTable(connection);
@@ -59,17 +91,20 @@ namespace EnergonSoftware.DbInit
         {
             _logger.Info("Inserting account data...");
 
+            string authRealm = ConfigurationManager.AppSettings["authRealm"];
+            _logger.Debug("Using authRealm='" + authRealm + "'");
+
             AccountInfo shaneAccount = new AccountInfo();
             shaneAccount.Active = true;
             shaneAccount.Username = "shane";
-            shaneAccount.SetPassword(Common.DEFAULT_AUTH_REALM, "password");
+            shaneAccount.SetPassword(authRealm, "password");
             shaneAccount.Insert(connection);
             _logger.Info("Inserted new account: " + shaneAccount);
 
             AccountInfo testAccount1 = new AccountInfo();
             testAccount1.Active = true;
             testAccount1.Username = "test1";
-            testAccount1.SetPassword(Common.DEFAULT_AUTH_REALM, "password");
+            testAccount1.SetPassword(authRealm, "password");
             testAccount1.Insert(connection);
             _logger.Info("Inserted new account: " + testAccount1);
 
@@ -88,35 +123,7 @@ namespace EnergonSoftware.DbInit
             account.Read(connection);
             _logger.Info("Read account: " + account);
         }
-
-        private static bool InitializeAccountsDatabase()
-        {
-            ConnectionStringSettings connectionSettings = ConfigurationManager.ConnectionStrings["accounts"];
-
-            _logger.Info("Creating accounts database...");
-            if(!CreateDatabase(connectionSettings)) {
-                _logger.Error("Failed to create accounts database!");
-                return false;
-            }
-
-            _logger.Info("Populating accounts database...");
-            using(DatabaseConnection accountConnection = AcquireDatabaseConnection(connectionSettings)) {
-                CreateAccountsTables(accountConnection);
-                InsertAccountsData(accountConnection);
-                VerifyAccountsData(accountConnection);
-            }
-
-            return true;
-        }
-
-        public static bool InitializeDatabases()
-        {
-            if(!InitializeAccountsDatabase()) {
-                return false;
-            }
-
-            return true;
-        }
+#endregion
 
 #region Event Handlers
         private void Application_Startup(object sender, StartupEventArgs e)
