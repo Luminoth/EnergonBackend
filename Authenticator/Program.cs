@@ -51,6 +51,8 @@ namespace EnergonSoftware.Authenticator
 
             while(!ServerState.Instance.Quit) {
                 try {
+                    ServerState.Instance.Poll();
+
                     SessionManager.Instance.PollAndRun();
                     SessionManager.Instance.Cleanup();
                 } catch(Exception e) {

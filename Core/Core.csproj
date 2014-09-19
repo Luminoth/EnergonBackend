@@ -61,7 +61,7 @@
     <Compile Include="Net\BufferedSocketReader.cs" />
     <Compile Include="Net\NetUtil.cs" />
     <Compile Include="Net\NetworkMessage.cs" />
-    <Compile Include="Overmind\Friend.cs" />
+    <Compile Include="Account\Friend.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\Crypt\AES.cs" />
     <Compile Include="Util\Crypt\Digest.cs" />

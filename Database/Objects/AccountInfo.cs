@@ -4,7 +4,7 @@ using System.Data.Common;
 using System.Text;
 
 using EnergonSoftware.Core;
-using EnergonSoftware.Core.Overmind;
+using EnergonSoftware.Core.Account;
 using EnergonSoftware.Core.Util.Crypt;
 
 namespace EnergonSoftware.Database.Objects

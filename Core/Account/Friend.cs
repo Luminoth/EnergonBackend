@@ -3,7 +3,7 @@ using System.IO;
 
 using EnergonSoftware.Core.Messages.Formatter;
 
-namespace EnergonSoftware.Core.Overmind
+namespace EnergonSoftware.Core.Account
 {
     public enum Status
     {

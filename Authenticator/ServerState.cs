@@ -10,6 +10,7 @@ using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Database;
+using EnergonSoftware.Authenticator.Net;
 
 namespace EnergonSoftware.Authenticator
 {
@@ -21,6 +22,8 @@ namespace EnergonSoftware.Authenticator
 #endregion
 
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ServerState));
+
+        private object _lock = new object();
 
         public volatile bool Quit = false;
 
@@ -50,6 +53,22 @@ namespace EnergonSoftware.Authenticator
             _logger.Info("Closing listen sockets...");
             _listenSockets.ForEach(s => s.Close());
             _listenSockets.Clear();
+        }
+
+        private void PollListenSocket(Socket socket)
+        {
+            if(socket.Poll(100, SelectMode.SelectRead)) {
+                Socket remote = socket.Accept();
+                _logger.Info("New connection from " + remote.RemoteEndPoint);
+                SessionManager.Instance.AddSession(remote);
+            }
+        }
+
+        public void Poll()
+        {
+            lock(_lock) {
+                _listenSockets.ForEach(s => PollListenSocket(s));
+            }
         }
 #endregion
 
