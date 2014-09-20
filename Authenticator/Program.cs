@@ -29,10 +29,10 @@ namespace EnergonSoftware.Authenticator
 
             int workerThreads,ioThreads;
             ThreadPool.GetMinThreads(out workerThreads, out ioThreads);
-            ThreadPool.SetMinThreads(Convert.ToInt32(ConfigurationManager.AppSettings["minWorkerThreads"]), ioThreads);
+            ThreadPool.SetMinThreads(Int32.Parse(ConfigurationManager.AppSettings["minWorkerThreads"]), ioThreads);
 
             ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
-            ThreadPool.SetMaxThreads(Convert.ToInt32(ConfigurationManager.AppSettings[",axWorkerThreads"]), ioThreads);
+            ThreadPool.SetMaxThreads(Int32.Parse(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
 
             return true;
         }

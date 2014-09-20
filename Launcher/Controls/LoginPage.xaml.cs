@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Net.Sockets;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,7 +15,7 @@ namespace EnergonSoftware.Launcher.Controls
         {
             InitializeComponent();
 
-            //DataContext = ClientApiWrapper.Instance;
+            DataContext = ClientState.Instance;
         }
 
 #region UI Helpers
@@ -34,11 +35,11 @@ namespace EnergonSoftware.Launcher.Controls
             }));
         }
 
-        private void BeginLogin()
+        private void BeginAuth()
         {
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                //ClientApi.Instance.BeginLogin(Username.Text, Password.Password);
+                ClientState.Instance.BeginAuth(Username.Text, Password.Password);
             }));
         }
 #endregion
@@ -46,9 +47,9 @@ namespace EnergonSoftware.Launcher.Controls
 #region Event Handlers
         private void OnLogin(object sender, RoutedEventArgs evt)
         {
-            /*ClientApi.Instance.OnConnectFailed += OnConnectFailed;
-            ClientApi.Instance.OnConnectSuccess += OnConnectSuccess;
-            ClientApi.Instance.ConnectAsync(Configuration.Instance.Host, Configuration.Instance.Port);*/
+            ClientState.Instance.OnConnectFailed += OnConnectFailed;
+            ClientState.Instance.OnConnectSuccess += OnConnectSuccess;
+            ClientState.Instance.ConnectAsync(ConfigurationManager.AppSettings["authHost"], Int32.Parse(ConfigurationManager.AppSettings["authPort"]));
         }
 
         private void OnConnectFailed(SocketError error)
@@ -59,18 +60,18 @@ namespace EnergonSoftware.Launcher.Controls
 
         private void OnConnectSuccess()
         {
-            /*ClientApi.Instance.OnLoginFailed += OnLoginFailed;
-            ClientApi.Instance.OnLoginSuccess += OnLoginSuccess;*/
-            BeginLogin();
+            ClientState.Instance.OnAuthFailed += OnAuthFailed;
+            ClientState.Instance.OnAuthSuccess += OnAuthSuccess;
+            BeginAuth();
         }
 
-        private void OnLoginFailed(string reason)
+        private void OnAuthFailed(string reason)
         {
             ClearPassword();
             OnError("Authentication failed: " + reason, "Authentication Failed");
         }
 
-        private void OnLoginSuccess()
+        private void OnAuthSuccess()
         {
             ClearPassword();
         }

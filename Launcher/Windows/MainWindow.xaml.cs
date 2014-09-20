@@ -12,7 +12,7 @@ namespace EnergonSoftware.Launcher
         {
             InitializeComponent();
 
-            //DataContext = ClientApiWrapper.Instance;
+            DataContext = ClientState.Instance;
         }
 
 #region UI Helpers

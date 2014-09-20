@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Configuration;
+using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 
@@ -39,15 +41,26 @@ namespace EnergonSoftware.Launcher
             ConfigureLogging();
             Common.InitFilesystem();
 
-            /*ClientApi.Instance.Init(Configuration.Instance.MinWorkerThreads, Configuration.Instance.MaxWorkerThreads);
-            ClientApi.Instance.OnDisconnect += OnDisconnect;*/
+            int workerThreads,ioThreads;
+            ThreadPool.GetMinThreads(out workerThreads, out ioThreads);
+            ThreadPool.SetMinThreads(Int32.Parse(ConfigurationManager.AppSettings["minWorkerThreads"]), ioThreads);
+
+            ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
+            ThreadPool.SetMaxThreads(Int32.Parse(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
+
+            ClientState.Instance.OnDisconnect += OnDisconnect;
 
             ComponentDispatcher.ThreadIdle += OnIdle;
         }
 
         private void OnIdle(object sender, EventArgs evt)
         {
-            //ClientApi.Instance.Run();
+            ClientState.Instance.Run();
+        }
+
+        private void OnDisconnect()
+        {
+            OnError("Server Disconnected!", "Disconnected!");
         }
 #endregion
     }
