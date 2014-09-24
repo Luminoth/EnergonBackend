@@ -24,7 +24,7 @@ namespace EnergonSoftware.Launcher
         Authenticated,
     }
 
-    sealed class ClientState
+    sealed class ClientState : ClientApi, INotifyPropertyChanged
     {
 #region Singleton
         private static ClientState _instance = new ClientState();
@@ -34,17 +34,6 @@ namespace EnergonSoftware.Launcher
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ClientState));
 
         private object _lock = new object();
-
-#region Network Events
-        public delegate void OnConnectSuccessHandler();
-        public event OnConnectSuccessHandler OnConnectSuccess;
-        
-        public delegate void OnConnectFailedHandler(SocketError error);
-        public event OnConnectFailedHandler OnConnectFailed;
-
-        public delegate void OnDisconnectHandler();
-        public event OnDisconnectHandler OnDisconnect;
-#endregion
 
 #region Authentication Events
         public delegate void OnAuthSuccessHandler();
@@ -56,31 +45,6 @@ namespace EnergonSoftware.Launcher
 
         public delegate void OnLogoutHandler();
         public event OnLogoutHandler OnLogout;
-
-#region Network Properties
-        private volatile bool _connecting = false;
-        private volatile string _host;
-        private volatile Socket _socket;
-        private volatile BufferedSocketReader _reader;
-        private volatile IMessageFormatter _formatter = new BinaryMessageFormatter();
-
-        public string Host { get { return _host; } }
-
-        public bool Connecting
-        {
-            get { return _connecting; }
-            private set
-            {
-                lock(_lock) {
-                    _connecting = value;
-                    NotifyPropertyChanged("Connecting");
-                    NotifyPropertyChanged("Connected");
-                }
-            } 
-        }
-
-        public bool Connected { get { return null != _socket && _socket.Connected; } }
-#endregion
 
 #region Authentication Properties
         private volatile AuthenticationStage _authStage = AuthenticationStage.NotAuthenticated;
@@ -109,127 +73,8 @@ namespace EnergonSoftware.Launcher
 #endregion
 
 #region UI Helpers
+        public bool NotAuthenticated { get { return !Authenticated; } }
         public bool CanLogin { get { return !Connecting && !Connected && !Authenticating && !Authenticated; } }
-#endregion
-
-#region Network Methods
-        private void OnConnectAsyncFailed(SocketError error)
-        {
-            lock(_lock) {
-                _logger.Error("Connect failed: " + error);
-
-                _host = null;
-                Connecting = false;
-            }
-
-            if(null != OnConnectFailed) {
-                OnConnectFailed(error);
-            }
-
-            OnConnectFailed = null;
-            OnConnectSuccess = null;
-        }
-
-        private void OnConnectAsyncSuccess(Socket socket)
-        {
-            lock(_lock) {
-                _logger.Info("Connected to " + socket.RemoteEndPoint);
-
-                _socket = socket;
-                _reader = new BufferedSocketReader(_socket);
-                Connecting = false;
-            }
-
-            if(null != OnConnectSuccess) {
-                OnConnectSuccess();
-            }
-
-            OnConnectFailed = null;
-            OnConnectSuccess = null;
-        }
-
-        public void ConnectAsync(string host, int port)
-        {
-            lock(_lock) {
-                Disconnect();
-
-                _host = host;
-                _logger.Info("Connecting to " + Host + ":" + port + "...");
-
-                Connecting = true;
-            }
-
-            AsyncConnectEventArgs args = new AsyncConnectEventArgs();
-            args.OnConnectFailed += OnConnectAsyncFailed;
-            args.OnConnectSuccess += OnConnectAsyncSuccess;
-            NetUtil.ConnectAsync(host, port, args);
-        }
-
-        public void Disconnect()
-        {
-            if(null != _socket) {
-                lock(_lock) {
-                    _logger.Info("Disconnecting...");
-                    _socket.Shutdown(SocketShutdown.Both);
-                    _socket.Disconnect(false);
-                    _socket.Close();
-                    _socket = null;
-                    _reader = null;
-                }
-
-                if(null != OnDisconnect) {
-                    OnDisconnect();
-                }
-            }
-
-            lock(_lock) {
-                _host = null;
-                Connecting = false;
-                AuthStage = AuthenticationStage.NotAuthenticated;
-            }
-        }
-
-        private bool Poll()
-        {
-            if(!Connected) {
-                return false;
-            }
-
-            lock(_lock) {
-                // TODO: this needs to be a while loop
-                try {
-                    if(_socket.Poll(100, SelectMode.SelectRead)) {
-                        int len = _reader.Read();
-                        if(0 == len) {
-                            Error("End of stream!");
-                            return false;
-                        }
-                        _logger.Debug("Read " + len + " bytes");
-                    }
-                } catch(SocketException e) {
-                    Error(e);
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public void SendMessage(IMessage message)
-        {
-            if(!Connected) {
-                return;
-            }
-
-            NetworkMessage packet = new NetworkMessage();	
-            packet.Payload = message;
-
-            byte[] bytes = packet.Serialize(_formatter);
-            lock(_lock) {
-                _logger.Debug("Sending " + bytes.Length + " bytes");
-                _socket.Send(bytes);
-            }
-        }
 #endregion
 
 #region Authentication Methods
@@ -277,7 +122,7 @@ namespace EnergonSoftware.Launcher
             lock(_lock) {
                 // TODO: this needs to be a while loop
                 try {
-                    NetworkMessage message = NetworkMessage.Parse(_reader.Buffer, _formatter);
+                    NetworkMessage message = NetworkMessage.Parse(Reader.Buffer, Formatter);
                     if(null != message) {
                         _logger.Debug("Parsed message type: " + message.Payload.Type);
                         MessageHandler.HandleMessage(message.Payload);
@@ -303,22 +148,13 @@ namespace EnergonSoftware.Launcher
             //Ping();
         }
 
-        public void Error(string error)
-        {
-            _logger.Error("Encountered an error: " + error);
-            Disconnect();
-        }
-
-        public void Error(Exception error)
-        {
-            Error(error.Message);
-        }
-
 #region Property Notifier
         public void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if("Authenticated".Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
                 NotifyPropertyChanged("NotAuthenticated");
+            } else if("FriendCount".Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
+                NotifyPropertyChanged("FriendButtonText");
             }
 
             NotifyPropertyChanged("CanLogin");
@@ -336,6 +172,7 @@ namespace EnergonSoftware.Launcher
 
         private ClientState()
         {
+            ApiPropertyChanged += OnPropertyChanged;
         }
     }
 }

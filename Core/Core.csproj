@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth.cs" />
+    <Compile Include="ClientApi.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="Configuration\ListenAddressConfiguration.cs" />
     <Compile Include="Messages\Auth\AuthMessage.cs" />
