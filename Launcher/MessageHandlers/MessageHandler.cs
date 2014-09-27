@@ -2,6 +2,9 @@
 using System.Threading;
 
 using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Messages.Auth;
+
+using EnergonSoftware.Launcher.MessageHandlers.Auth;
 
 namespace EnergonSoftware.Launcher.MessageHandlers
 {
@@ -28,6 +31,9 @@ namespace EnergonSoftware.Launcher.MessageHandlers
 
         static MessageHandler()
         {
+            Handlers[ChallengeMessage.MESSAGE_TYPE] = new ChallengeMessageHandler();
+            Handlers[FailureMessage.MESSAGE_TYPE] = new FailureMessageHandler();
+            Handlers[SuccessMessage.MESSAGE_TYPE] = new SuccessMessageHandler();
         }
 
         internal static void HandleMessage(IMessage message)

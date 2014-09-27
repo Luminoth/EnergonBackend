@@ -6,7 +6,8 @@ namespace EnergonSoftware.Core.Messages.Auth
 {
     public sealed class SuccessMessage : IMessage
     {
-        public string Type { get { return "success"; } }
+        public const string MESSAGE_TYPE = "success";
+        public string Type { get { return MESSAGE_TYPE; } }
 
         public string SessionId = "";
 

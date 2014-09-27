@@ -7,7 +7,8 @@ namespace EnergonSoftware.Core.Messages.Auth
 {
     public sealed class AuthMessage : IMessage
     {
-        public string Type { get { return "auth"; } }
+        public const string MESSAGE_TYPE = "auth";
+        public string Type { get { return MESSAGE_TYPE; } }
 
         public int Version = Common.AUTH_VERSION;
         public AuthType MechanismType = AuthType.DigestSHA512;

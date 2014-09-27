@@ -28,12 +28,13 @@ namespace EnergonSoftware.Core
         public event OnDisconnectHandler OnDisconnect;
 #endregion
 
+        public delegate void OnErrorHandler(string error);
+        public event OnErrorHandler OnError;
+
 #region Network Properties
         private volatile bool _connecting = false;
         private volatile string _host;
-        private volatile Socket _socket;
-        private volatile BufferedSocketReader _reader;
-        private volatile IMessageFormatter _formatter = new BinaryMessageFormatter();
+        private volatile SocketState _socketState = new SocketState();
 
         public bool Connecting
         {
@@ -47,14 +48,17 @@ namespace EnergonSoftware.Core
                 }
             } 
         }
+        public bool Connected { get { return _socketState.Connected; } }
 
-        public bool Connected { get { return null != _socket && _socket.Connected; } }
+        public string Host { get { return _host; } private set { _host = value; } }
 
-        public string Host { get { return _host; } }
+        private Socket Socket { get { return _socketState.Socket; } set { _socketState.Socket = value; } }
 
-        public BufferedSocketReader Reader { get { return _reader; } }
-        public IMessageFormatter Formatter { get { return _formatter; } }
+        public BufferedSocketReader Reader { get { return _socketState.Reader; } }
 #endregion
+
+        private string _ticket;
+        public string Ticket { get { return _ticket; } protected set { _ticket = value; } }
 
 #region Network Methods
         private void OnConnectAsyncFailed(SocketError error)
@@ -62,7 +66,7 @@ namespace EnergonSoftware.Core
             lock(_lock) {
                 _logger.Error("Connect failed: " + error);
 
-                _host = null;
+                Host = null;
                 Connecting = false;
             }
 
@@ -79,8 +83,7 @@ namespace EnergonSoftware.Core
             lock(_lock) {
                 _logger.Info("Connected to " + socket.RemoteEndPoint);
 
-                _socket = socket;
-                _reader = new BufferedSocketReader(_socket);
+                Socket = socket;
                 Connecting = false;
             }
 
@@ -97,7 +100,7 @@ namespace EnergonSoftware.Core
             lock(_lock) {
                 Disconnect();
 
-                _host = host;
+                Host = host;
                 _logger.Info("Connecting to " + Host + ":" + port + "...");
 
                 Connecting = true;
@@ -106,19 +109,15 @@ namespace EnergonSoftware.Core
             AsyncConnectEventArgs args = new AsyncConnectEventArgs();
             args.OnConnectFailed += OnConnectAsyncFailed;
             args.OnConnectSuccess += OnConnectAsyncSuccess;
-            NetUtil.ConnectAsync(host, port, args);
+            NetUtil.ConnectAsync(Host, port, args);
         }
 
         public void Disconnect()
         {
-            if(null != _socket) {
+            if(_socketState.HasSocket) {
                 lock(_lock) {
                     _logger.Info("Disconnecting...");
-                    _socket.Shutdown(SocketShutdown.Both);
-                    _socket.Disconnect(false);
-                    _socket.Close();
-                    _socket = null;
-                    _reader = null;
+                    _socketState.ShutdownAndClose(false);
                 }
 
                 if(null != OnDisconnect) {
@@ -127,7 +126,7 @@ namespace EnergonSoftware.Core
             }
 
             lock(_lock) {
-                _host = null;
+                Host = null;
                 Connecting = false;
             }
         }
@@ -141,8 +140,8 @@ namespace EnergonSoftware.Core
             lock(_lock) {
                 // TODO: this needs to be a while loop
                 try {
-                    if(_socket.Poll(100, SelectMode.SelectRead)) {
-                        int len = _reader.Read();
+                    if(Socket.Poll(100, SelectMode.SelectRead)) {
+                        int len = Reader.Read();
                         if(0 == len) {
                             Error("End of stream!");
                             return false;
@@ -158,7 +157,7 @@ namespace EnergonSoftware.Core
             return true;
         }
 
-        public void SendMessage(IMessage message)
+        public void SendMessage(IMessage message, IMessageFormatter formatter)
         {
             if(!Connected) {
                 return;
@@ -167,21 +166,23 @@ namespace EnergonSoftware.Core
             NetworkMessage packet = new NetworkMessage();	
             packet.Payload = message;
 
-            byte[] bytes = packet.Serialize(_formatter);
+            byte[] bytes = packet.Serialize(formatter);
             lock(_lock) {
                 _logger.Debug("Sending " + bytes.Length + " bytes");
-                _socket.Send(bytes);
+                Socket.Send(bytes);
             }
         }
 #endregion
 
-        protected void Error(string error)
+        public void Error(string error)
         {
             _logger.Error("Encountered an error: " + error);
             Disconnect();
+
+            OnError(error);
         }
 
-        protected void Error(Exception error)
+        public void Error(Exception error)
         {
             Error(error.Message);
         }

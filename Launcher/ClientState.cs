@@ -46,11 +46,15 @@ namespace EnergonSoftware.Launcher
         public delegate void OnLogoutHandler();
         public event OnLogoutHandler OnLogout;
 
+        private IMessageFormatter _formatter = new BinaryMessageFormatter();
+
 #region Authentication Properties
         private volatile AuthenticationStage _authStage = AuthenticationStage.NotAuthenticated;
 
         private volatile string _username;
         private volatile string _password;
+
+        private volatile string _rspAuth;
 
         internal AuthenticationStage AuthStage
         {
@@ -70,6 +74,8 @@ namespace EnergonSoftware.Launcher
 
         public string Username { get { return _username; } }
         internal string Password { get { return _password; } }
+
+        internal string RspAuth { get { return _rspAuth; } set { _rspAuth = value; } }
 #endregion
 
 #region UI Helpers
@@ -78,29 +84,90 @@ namespace EnergonSoftware.Launcher
 #endregion
 
 #region Authentication Methods
-        public void BeginAuth(string username, string password)
+        internal void BeginAuth(string username, string password)
         {
             lock(_lock) {
                 Logout();
 
                 _username = username;
                 _password = password;
-                _logger.Info("Authenticating as " + Username + "...");
+                _logger.Info("Authenticating as user '" + Username + "'...");
 
                 AuthMessage message = new AuthMessage();
                 message.MechanismType = AuthType.DigestSHA512;
-                SendMessage(message);
+                SendMessage(message, _formatter);
 
                 AuthStage = AuthenticationStage.Begin;
             }
         }
 
+        internal void AuthResponse(string response)
+        {
+            ResponseMessage message = new ResponseMessage();
+            message.Response = response;
+            SendMessage(message, _formatter);
+
+            lock(_lock) {
+                AuthStage = AuthenticationStage.Challenge;
+            }
+        }
+
+        internal void AuthFinalize()
+        {
+            ResponseMessage response = new ResponseMessage();
+            SendMessage(response, _formatter);
+
+            lock(_lock) {
+                AuthStage = AuthenticationStage.Finalize;
+            }
+        }
+
+        internal void AuthSuccess(string ticket)
+        {
+            lock(_lock) {
+                _logger.Info("Authentication successful!");
+                _logger.Debug("Ticket=" + ticket);
+                Ticket = ticket;
+
+                _password = null;
+                _rspAuth = null;
+
+                AuthStage = AuthenticationStage.Authenticated;
+            }
+
+            if(null != OnAuthSuccess) {
+                OnAuthSuccess();
+            }
+
+            OnAuthSuccess = null;
+            OnAuthFailed = null;
+        }
+
+        internal void AuthFailed(string reason)
+        {
+            lock(_lock) {
+                _logger.Warn("Authentication failed: " + reason);
+
+                _password = null;
+                _rspAuth = null;
+
+                AuthStage = AuthenticationStage.NotAuthenticated;
+            }
+
+            if(null != OnAuthFailed) {
+                OnAuthFailed(reason);
+            }
+
+            OnAuthSuccess = null;
+            OnAuthFailed = null;
+        }
+
         public void Logout()
         {
-            /*lock(_lock) {
-                _logging.Info("Logging out...");
-                LogoutMessage message = new LogoutMessage();
-                SendMessage(message);
+            lock(_lock) {
+                _logger.Info("Logging out...");
+                /*LogoutMessage message = new LogoutMessage();
+                SendMessage(message);*/
 
                 if(null != OnLogout) {
                     OnLogout();
@@ -110,10 +177,10 @@ namespace EnergonSoftware.Launcher
                 _username = null;
                 _password = null;
                 _rspAuth = null;
-                _sessionid = null;
+                Ticket = null;
 
-                _account = new Account();
-            }*/
+                //_account = new Account();
+            }
         }
 #endregion
 
@@ -122,7 +189,7 @@ namespace EnergonSoftware.Launcher
             lock(_lock) {
                 // TODO: this needs to be a while loop
                 try {
-                    NetworkMessage message = NetworkMessage.Parse(Reader.Buffer, Formatter);
+                    NetworkMessage message = NetworkMessage.Parse(Reader.Buffer, _formatter);
                     if(null != message) {
                         _logger.Debug("Parsed message type: " + message.Payload.Type);
                         MessageHandler.HandleMessage(message.Payload);

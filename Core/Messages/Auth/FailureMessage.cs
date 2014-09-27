@@ -6,7 +6,8 @@ namespace EnergonSoftware.Core.Messages.Auth
 {
     public sealed class FailureMessage : IMessage
     {
-        public string Type { get { return "failure"; } }
+        public const string MESSAGE_TYPE = "failure";
+        public string Type { get { return MESSAGE_TYPE; } }
 
         public string Reason = "";
 

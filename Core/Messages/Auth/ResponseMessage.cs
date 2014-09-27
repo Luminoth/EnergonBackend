@@ -6,7 +6,8 @@ namespace EnergonSoftware.Core.Messages.Auth
 {
     public sealed class ResponseMessage : IMessage
     {
-        public string Type { get { return "response"; } }
+        public const string MESSAGE_TYPE = "response";
+        public string Type { get { return MESSAGE_TYPE; } }
 
         public string Response = "";
 

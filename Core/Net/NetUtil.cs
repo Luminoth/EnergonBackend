@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
 
@@ -57,8 +58,14 @@ namespace EnergonSoftware.Core.Net
 
         public static Socket Connect(string host, int port)
         {
+            bool useIPv6 = Boolean.Parse(ConfigurationManager.AppSettings["useIPv6"]);
+
             IPHostEntry hostEntry = Dns.GetHostEntry(host);
             foreach(IPAddress address in hostEntry.AddressList) {
+                if(AddressFamily.InterNetwork != address.AddressFamily && (AddressFamily.InterNetworkV6 != address.AddressFamily || useIPv6)) {
+                    continue;
+                }
+
                 EndPoint endPoint = new IPEndPoint(address, port);
                 Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 try {
@@ -108,14 +115,33 @@ namespace EnergonSoftware.Core.Net
 
         public static bool ConnectAsync(string host, int port, AsyncConnectEventArgs args)
         {
+            bool useIPv6 = Boolean.Parse(ConfigurationManager.AppSettings["useIPv6"]);
             IPHostEntry hostEntry = Dns.GetHostEntry(host);
+
+            int idx = -1;
+            for(int i=0; i<hostEntry.AddressList.Length; ++i) {
+                IPAddress address = hostEntry.AddressList[i];
+                if(AddressFamily.InterNetwork == address.AddressFamily) {
+                    idx = i;
+                    break;
+                } else if(useIPv6 && AddressFamily.InterNetworkV6 == address.AddressFamily) {
+                    idx = i;
+                    break;
+                }
+            }
+
+            if(idx < 0) {
+                args.ConnectFailed(SocketError.AddressFamilyNotSupported);
+                return false;
+            }
 
             AsyncConnectContext context = new AsyncConnectContext();
             context.EventHandler = args;
             context.AddressList = hostEntry.AddressList;
-            context.CurrentAddressIdx = 0;
+            context.CurrentAddressIdx = idx;
             context.Port = port;
 
+            // TODO: try other addresses if this fails!
             if(!DoConnectAsync(context)) {
                 context.EventHandler.ConnectFailed(SocketError.HostNotFound);
                 return false;

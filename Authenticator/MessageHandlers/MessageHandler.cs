@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Authenticator.Net;
 
@@ -34,8 +35,8 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 
         static MessageHandler()
         {
-            Handlers["auth"] = new AuthMessageHandler();
-            Handlers["response"] = new ResponseMessageHandler();
+            Handlers[AuthMessage.MESSAGE_TYPE] = new AuthMessageHandler();
+            Handlers[ResponseMessage.MESSAGE_TYPE] = new ResponseMessageHandler();
         }
 
         public static void HandleMessage(IMessage message, Session session)

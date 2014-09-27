@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.Serialization;
 
+using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
 
 namespace EnergonSoftware.Core.Messages
@@ -16,6 +17,16 @@ namespace EnergonSoftware.Core.Messages
         {
             switch(type)
             {
+            case AuthMessage.MESSAGE_TYPE:
+                return new AuthMessage();
+            case ChallengeMessage.MESSAGE_TYPE:
+                return new ChallengeMessage();
+            case FailureMessage.MESSAGE_TYPE:
+                return new FailureMessage();
+            case ResponseMessage.MESSAGE_TYPE:
+                return new ResponseMessage();
+            case SuccessMessage.MESSAGE_TYPE:
+                return new SuccessMessage();
             default:
                 return null;
             }

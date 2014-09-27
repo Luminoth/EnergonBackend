@@ -49,6 +49,7 @@ namespace EnergonSoftware.Launcher
             ThreadPool.SetMaxThreads(Int32.Parse(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
 
             ClientState.Instance.OnDisconnect += OnDisconnect;
+            ClientState.Instance.OnError += OnError;
 
             ComponentDispatcher.ThreadIdle += OnIdle;
         }
@@ -61,6 +62,11 @@ namespace EnergonSoftware.Launcher
         private void OnDisconnect()
         {
             OnError("Server Disconnected!", "Disconnected!");
+        }
+
+        private void OnError(string error)
+        {
+            OnError(error, "Error");
         }
 #endregion
     }

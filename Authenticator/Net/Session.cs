@@ -35,12 +35,14 @@ namespace EnergonSoftware.Authenticator.Net
         private object _lock = new object();
 
 #region Network Properties
-        private volatile Socket _socket;
-        private volatile BufferedSocketReader _reader;
+        private volatile SocketState _socketState;
         private volatile IMessageFormatter _formatter = new BinaryMessageFormatter();
 
-        public EndPoint RemoteEndpoint { get { return _socket.RemoteEndPoint; } }
-        public bool Connected { get { return _socket.Connected; } }
+        private Socket Socket { get { return _socketState.Socket; } }
+        private BufferedSocketReader Reader { get { return _socketState.Reader; } }
+
+        public EndPoint RemoteEndpoint { get { return Socket.RemoteEndPoint; } }
+        public bool Connected { get { return _socketState.Connected; } }
 
         public bool TimedOut
         {
@@ -50,17 +52,18 @@ namespace EnergonSoftware.Authenticator.Net
                 if(timeout < 0) {
                     return false;
                 }
-                return Time.CurrentTimeMs >= (_reader.LastMessageTime + timeout);
+                return Time.CurrentTimeMs >= (Reader.LastMessageTime + timeout);
             }
         }
 #endregion
 
 #region Auth Properties
+        private volatile AuthType _authType = AuthType.None;
         private volatile bool _authenticating = false;
         private volatile bool _authenticated = false;
 
-        public volatile AuthType AuthType = AuthType.None;
-        public volatile Nonce AuthNonce;
+        public AuthType AuthType { get { return _authType; } set { _authType = value; } }
+        public Nonce AuthNonce { get; set; }
 
         public bool Authenticating { get { return Connected && _authenticating; } }
         public bool Authenticated { get { return Connected && _authenticated; } }
@@ -72,15 +75,14 @@ namespace EnergonSoftware.Authenticator.Net
         public Session(Socket socket)
         {
             _id = NextId;
-            _socket = socket;
-            _reader = new BufferedSocketReader(_socket);
+            _socketState = new SocketState(socket);
         }
 
         public void Run()
         {
             lock(_lock) {
                 try {
-                    NetworkMessage message = NetworkMessage.Parse(_reader.Buffer, _formatter);
+                    NetworkMessage message = NetworkMessage.Parse(Reader.Buffer, _formatter);
                     if(null != message) {
                         _logger.Debug("Session " + Id + " parsed message type: " + message.Payload.Type);
                         MessageHandler.HandleMessage(message.Payload, this);
@@ -108,9 +110,7 @@ namespace EnergonSoftware.Authenticator.Net
             lock(_lock) {
                 if(Connected) {
                     _logger.Info("Session " + Id + " disconnecting...");
-                    _socket.Shutdown(SocketShutdown.Both);
-                    _socket.Disconnect(true);
-                    _socket.Close();
+                    _socketState.ShutdownAndClose(true);
                 }
 
                 _authenticated = false;
@@ -125,8 +125,8 @@ namespace EnergonSoftware.Authenticator.Net
 
             lock(_lock) {
                 try {
-                    if(_socket.Poll(100, SelectMode.SelectRead)) {
-                        int len = _reader.Read();
+                    if(Socket.Poll(100, SelectMode.SelectRead)) {
+                        int len = Reader.Read();
                         if(0 == len) {
                             Error("End of stream!");
                             return;
@@ -151,7 +151,7 @@ namespace EnergonSoftware.Authenticator.Net
             byte[] bytes = packet.Serialize(_formatter);
             lock(_lock) {
                 _logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
-                _socket.Send(bytes);
+                Socket.Send(bytes);
             }
         }
 #endregion

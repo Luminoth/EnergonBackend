@@ -6,7 +6,8 @@ namespace EnergonSoftware.Core.Messages.Auth
 {
     public sealed class ChallengeMessage : IMessage
     {
-        public string Type { get { return "challenge"; } }
+        public const string MESSAGE_TYPE = "challenge";
+        public string Type { get { return MESSAGE_TYPE; } }
 
         public string Challenge = "";
 
