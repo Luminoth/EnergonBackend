@@ -7,17 +7,11 @@ namespace EnergonSoftware.Core.Util
     [Serializable]
     public sealed class Nonce
     {
-        private string _realm;
-        private int _expiry;
-        private string _nonce;
-        private string _nonceHash;
-        private long _creationTime;
-
-        public string Realm { get { return _realm; } }
-        public int ExpiryMS { get { return _expiry; } }
-        public string NonceValue { get { return _nonce; } }
-        public string NonceHash { get { return _nonceHash; } }
-        public long CreationTime { get { return _creationTime; } }
+        public string Realm { get; private set; }
+        public int ExpiryMS { get; private set; }
+        public string NonceValue { get; private set; }
+        public string NonceHash { get; private set; }
+        public long CreationTime { get; private set; }
         public bool Expired
         {
             get
@@ -31,22 +25,22 @@ namespace EnergonSoftware.Core.Util
 
         public Nonce(string realm, int expiry)
         {
-            _realm = realm;
-            _expiry = expiry;
-            _creationTime = Time.CurrentTimeMs;
-            _nonce = CreationTime + ":" + Realm;
-            _nonceHash = new SHA512().HashHex(NonceValue);
+            Realm = realm;
+            ExpiryMS = expiry;
+            CreationTime = Time.CurrentTimeMs;
+            NonceValue = CreationTime + ":" + Realm;
+            NonceHash = new SHA512().HashHex(NonceValue);
         }
 
         public Nonce(string realm, string nonce, int expiry)
         {
-            _realm = realm;
-            _expiry = expiry;
-            _nonce = nonce;
-            _nonceHash = new SHA512().HashHex(NonceValue);
+            Realm = realm;
+            ExpiryMS = expiry;
+            NonceValue = nonce;
+            NonceHash = new SHA512().HashHex(NonceValue);
 
             int idx = NonceValue.IndexOf(":");
-            _creationTime = int.Parse(NonceValue.Substring(0, idx));
+            CreationTime = int.Parse(NonceValue.Substring(0, idx));
         }
     }
 }

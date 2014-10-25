@@ -39,7 +39,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 string nc = "00000001";
                 string digestURI = realm + "/" + ClientState.Instance.Host;
 
-                _logger.Debug("Authenticating " + ClientState.Instance.Username + ":" + realm + ":" + ClientState.Instance.Password);
+                _logger.Debug("Authenticating " + ClientState.Instance.Username + ":" + realm + ":***");
                 string passwordHash = new SHA512().DigestPassword(
                     ClientState.Instance.Username,
                     realm,

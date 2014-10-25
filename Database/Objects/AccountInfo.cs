@@ -54,9 +54,7 @@ namespace EnergonSoftware.Database.Objects
         }
 
 #region Cleanliness
-        private bool _dirty = false;
-
-        public bool Dirty { get { return _dirty; } set { _dirty = value; } }
+        public bool Dirty { get; set; }
 
         public void Clean()
         {
@@ -64,49 +62,47 @@ namespace EnergonSoftware.Database.Objects
         }
 #endregion
 
-        private long _id = -1;
+        public long Id { get; private set; }
+        public bool Valid { get { return Id > 0; } }
+
         private bool _active = false;
-        private string _username;
-        private string _passwordMD5;
-        private string _passwordSHA512;
-        private string _sessionid;
-        private Status _status = Status.Offline;
-
-        public long Id { get { return _id; } }
-        public bool Valid { get { return _id > 0; } }
-
-        public bool Active { get { return _active; } set { _active = value; _dirty = true; } }
+        public bool Active { get { return _active; } set { _active = value; Dirty = true; } }
 
         // NOTE: changing the username invalidates the password digest!
-        public string Username { get { return _username; } set { _username = value; _dirty = true; } }
+        private string _username;
+        public string Username { get { return _username; } set { _username = value; Dirty = true; } }
 
-        public string PasswordMD5 { get { return _passwordMD5; } }
-        public string PasswordSHA512 { get { return _passwordSHA512; } }
+        public string PasswordMD5 { get; private set; }
+        public string PasswordSHA512 { get; private set; }
 
-        public string SessionId { get { return _sessionid; } set { _sessionid = value; _dirty = true; } }
+        private string _sessionid;
+        public string SessionId { get { return _sessionid; } set { _sessionid = value; Dirty = true; } }
 
-        public Status Status { get { return _status; } set { _status = value; _dirty = true; } }
+        private Status _status = Status.Offline;
+        public Status Status { get { return _status; } set { _status = value; Dirty = true; } }
 
         public AccountInfo()
         {
+            Id = -1;
         }
 
         public AccountInfo(long id)
         {
-            _id = id;
+            Id = id;
         }
 
         public AccountInfo(string username)
         {
+            Id = -1;
             _username = username;
         }
 
         public void SetPassword(string realm, string password)
         {
-            _passwordMD5 = new MD5().DigestPassword(Username, realm, password);
-            _passwordSHA512 = new SHA512().DigestPassword(Username, realm, password);
+            PasswordMD5 = new MD5().DigestPassword(Username, realm, password);
+            PasswordSHA512 = new SHA512().DigestPassword(Username, realm, password);
 
-            _dirty = true;
+            Dirty = true;
         }
 
         public bool Read(DatabaseConnection connection)
@@ -135,11 +131,11 @@ namespace EnergonSoftware.Database.Objects
 
         public void Load(DbDataReader reader)
         {
-            _id = reader.GetInt32(ACCOUNTS_TABLE["id"].Id);
+            Id = reader.GetInt32(ACCOUNTS_TABLE["id"].Id);
             _active = reader.GetBoolean(ACCOUNTS_TABLE["active"].Id);
             _username = reader.GetString(ACCOUNTS_TABLE["username"].Id);
-            _passwordMD5 = reader.GetString(ACCOUNTS_TABLE["passwordMD5"].Id);
-            _passwordSHA512 = reader.GetString(ACCOUNTS_TABLE["passwordSHA512"].Id);
+            PasswordMD5 = reader.GetString(ACCOUNTS_TABLE["passwordMD5"].Id);
+            PasswordSHA512 = reader.GetString(ACCOUNTS_TABLE["passwordSHA512"].Id);
 
             if(!reader.IsDBNull(ACCOUNTS_TABLE["sessionid"].Id)) {
                 _sessionid = reader.GetString(ACCOUNTS_TABLE["sessionid"].Id);
@@ -160,7 +156,7 @@ namespace EnergonSoftware.Database.Objects
                 connection.AddParameter(command, "passwordSHA512", PasswordSHA512);
                 connection.AddParameter(command, "status", Status);
                 command.ExecuteNonQuery();
-                _id = connection.LastInsertRowId;
+                Id = connection.LastInsertRowId;
             }
         }
 

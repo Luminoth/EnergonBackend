@@ -6,13 +6,12 @@ namespace EnergonSoftware.Core.Net
     {
 #region Socket Properties
         private Socket _socket;
-
         public Socket Socket
         {
             get { return _socket; }
             set {
                 _socket = value;
-                _reader = null == _socket ? null : new BufferedSocketReader(_socket);
+                Reader = null == _socket ? null : new BufferedSocketReader(_socket);
             }
         }
         public bool HasSocket { get { return null != _socket; } }
@@ -20,11 +19,7 @@ namespace EnergonSoftware.Core.Net
         public bool Connected { get { return HasSocket && Socket.Connected; } }
 #endregion
 
-#region Reader Properties
-        private BufferedSocketReader _reader;
-
-        public BufferedSocketReader Reader { get { return _reader; } }
-#endregion
+        public BufferedSocketReader Reader { get; private set; }
 
         public SocketState()
         {

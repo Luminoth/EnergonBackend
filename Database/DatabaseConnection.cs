@@ -40,11 +40,8 @@ namespace EnergonSoftware.Database
 
         private object _lock = new object();
 
-        private ConnectionStringSettings _connectionSettings;
-        private DbConnection _connection;
-
-        public ConnectionStringSettings ConnectionSettings { get { return _connectionSettings; } }
-        public DbConnection Connection { get { return _connection; } }
+        public ConnectionStringSettings ConnectionSettings { get; private set; }
+        public DbConnection Connection { get; private set; }
 
         public long LastInsertRowId
         {
@@ -54,7 +51,7 @@ namespace EnergonSoftware.Database
                     switch(ConnectionSettings.ProviderName)
                     {
                     case "System.Data.SQLite":
-                        return ((SQLiteConnection)_connection).LastInsertRowId;
+                        return ((SQLiteConnection)Connection).LastInsertRowId;
                     }
                     return -1;
                 }
@@ -63,24 +60,24 @@ namespace EnergonSoftware.Database
 
         public DatabaseConnection(ConnectionStringSettings connectionSettings)
         {
-            _connectionSettings = connectionSettings;
+            ConnectionSettings = connectionSettings;
 
             DbProviderFactory providerFactory = DbProviderFactories.GetFactory(connectionSettings.ProviderName);
 
-            _connection = providerFactory.CreateConnection();
-            _connection.ConnectionString = connectionSettings.ConnectionString;
+            Connection = providerFactory.CreateConnection();
+            Connection.ConnectionString = connectionSettings.ConnectionString;
         }
 
         public void Dispose()
         {
-            _connection.Dispose();
+            Connection.Dispose();
         }
 
         public void Open()
         {
             lock(_lock) {
                 _logger.Debug("Opening " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
-                _connection.Open();
+                Connection.Open();
             }
         }
 
@@ -88,13 +85,13 @@ namespace EnergonSoftware.Database
         {
             lock(_lock) {
                 _logger.Debug("Closing " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
-                _connection.Close();
+                Connection.Close();
             }
         }
 
         public DbCommand BuildCommand(string commandText)
         {
-            DbCommand command = _connection.CreateCommand();
+            DbCommand command = Connection.CreateCommand();
             command.CommandText = commandText;
 
             _logger.Debug("Built command: " + command.CommandText);

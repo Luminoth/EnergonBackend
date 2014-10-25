@@ -17,6 +17,8 @@ namespace EnergonSoftware.Core.Messages
         {
             switch(type)
             {
+            case "null":
+                return null;
             case AuthMessage.MESSAGE_TYPE:
                 return new AuthMessage();
             case ChallengeMessage.MESSAGE_TYPE:
@@ -27,8 +29,6 @@ namespace EnergonSoftware.Core.Messages
                 return new ResponseMessage();
             case SuccessMessage.MESSAGE_TYPE:
                 return new SuccessMessage();
-            default:
-                return null;
             }
             throw new MessageException("Unsupported message type: " + type);
         }

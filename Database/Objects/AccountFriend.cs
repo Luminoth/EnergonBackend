@@ -32,9 +32,7 @@ namespace EnergonSoftware.Database.Objects
         }
 
 #region Cleanliness
-        private bool _dirty = false;
-
-        public bool Dirty { get { return _dirty; } set { _dirty = value; } }
+        public bool Dirty { get; set; }
 
         public void Clean()
         {
@@ -43,10 +41,10 @@ namespace EnergonSoftware.Database.Objects
 #endregion
 
         private long _account = -1;
-        private long _friend = -1;
+        public long Account { get { return _account; } set { _account = value; Dirty = true; } }
 
-        public long Account { get { return _account; } set { _account = value; _dirty = true; } }
-        public long Friend { get { return _friend; } set { _friend = value; _dirty = true; } }
+        private long _friend = -1;
+        public long Friend { get { return _friend; } set { _friend = value; Dirty = true; } }
 
         public AccountFriend()
         {

@@ -29,20 +29,18 @@ namespace EnergonSoftware.Authenticator.Net
         private static int NextId { get { return ++_nextId; } }
 #endregion
 
-        private int _id = -1;
-        public int Id { get { return _id; } }
-
         private object _lock = new object();
+
+        public int Id { get; private set; }
 
 #region Network Properties
         private volatile SocketState _socketState;
-        private volatile IMessageFormatter _formatter = new BinaryMessageFormatter();
-
         private Socket Socket { get { return _socketState.Socket; } }
-        private BufferedSocketReader Reader { get { return _socketState.Reader; } }
-
         public EndPoint RemoteEndpoint { get { return Socket.RemoteEndPoint; } }
         public bool Connected { get { return _socketState.Connected; } }
+        private BufferedSocketReader Reader { get { return _socketState.Reader; } }
+
+        private volatile IMessageFormatter _formatter = new BinaryMessageFormatter();
 
         public bool TimedOut
         {
@@ -58,23 +56,24 @@ namespace EnergonSoftware.Authenticator.Net
 #endregion
 
 #region Auth Properties
-        private volatile AuthType _authType = AuthType.None;
+        public AuthType AuthType = AuthType.None;
+        public Nonce AuthNonce;
+
         private volatile bool _authenticating = false;
-        private volatile bool _authenticated = false;
-
-        public AuthType AuthType { get { return _authType; } set { _authType = value; } }
-        public Nonce AuthNonce { get; set; }
-
         public bool Authenticating { get { return Connected && _authenticating; } }
+
+        private volatile bool _authenticated = false;
         public bool Authenticated { get { return Connected && _authenticated; } }
 #endregion
 
-        private volatile AccountInfo _accountInfo;
-        public AccountInfo AccountInfo { get { return _accountInfo; } }
+#region Account Properties
+        public AccountInfo AccountInfo { get; private set; }
+#endregion
 
         public Session(Socket socket)
         {
-            _id = NextId;
+            Id = NextId;
+
             _socketState = new SocketState(socket);
         }
 
@@ -175,7 +174,7 @@ namespace EnergonSoftware.Authenticator.Net
             SendMessage(message);
 
             lock(_lock) {
-                _accountInfo = accountInfo;
+                AccountInfo = accountInfo;
                 _authenticated = true;
             }
         }
@@ -205,7 +204,7 @@ namespace EnergonSoftware.Authenticator.Net
             lock(_lock) {
                 _authenticating = false;
                 _authenticating = false;
-                _accountInfo = null;
+                AccountInfo = null;
             }
             Disconnect();
         }

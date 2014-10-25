@@ -33,9 +33,6 @@ namespace EnergonSoftware.Core
 
 #region Network Properties
         private volatile bool _connecting = false;
-        private volatile string _host;
-        private volatile SocketState _socketState = new SocketState();
-
         public bool Connecting
         {
             get { return _connecting; }
@@ -50,15 +47,14 @@ namespace EnergonSoftware.Core
         }
         public bool Connected { get { return _socketState.Connected; } }
 
-        public string Host { get { return _host; } private set { _host = value; } }
+        public string Host { get; private set; }
 
+        private volatile SocketState _socketState = new SocketState();
         private Socket Socket { get { return _socketState.Socket; } set { _socketState.Socket = value; } }
-
         public BufferedSocketReader Reader { get { return _socketState.Reader; } }
 #endregion
 
-        private string _ticket;
-        public string Ticket { get { return _ticket; } protected set { _ticket = value; } }
+        public string Ticket { get; protected set; }
 
 #region Network Methods
         private void OnConnectAsyncFailed(SocketError error)

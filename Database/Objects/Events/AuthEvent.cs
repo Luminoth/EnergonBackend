@@ -29,17 +29,17 @@ namespace EnergonSoftware.Database.Objects.Events
             AUTH_EVENTS_TABLE.Create(connection);
         }
 
-        private AuthEventType _type;
-        private string _account;
-        private string _origin;
+        public AuthEventType Type { get; private set; }
 
-        public AuthEventType Type { get { return _type; } }
-        public string Account { get { return _account; } set { _account = value; _dirty = true; } }
-        public string Origin { get { return _origin; } set { _origin = value; _dirty = true; } }
+        private string _account;
+        public string Account { get { return _account; } set { _account = value; Dirty = true; } }
+
+        private string _origin;
+        public string Origin { get { return _origin; } set { _origin = value; Dirty = true; } }
 
         public AuthEvent(AuthEventType type)
         {
-            _type = type;
+            Type = type;
         }
 
         public override void Insert(DatabaseConnection connection)
@@ -53,7 +53,7 @@ namespace EnergonSoftware.Database.Objects.Events
                 connection.AddParameter(command, "origin", Origin);
                 connection.AddParameter(command, "account", Account);
                 command.ExecuteNonQuery();
-                _id = connection.LastInsertRowId;
+                Id = connection.LastInsertRowId;
             }
         }
 

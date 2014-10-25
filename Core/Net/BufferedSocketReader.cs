@@ -11,11 +11,12 @@ namespace EnergonSoftware.Core.Net
     public class BufferedSocketReader
     {
         private Socket _socket;
-        private MemoryBuffer _buffer = new MemoryBuffer();
-        public long _lastMessageTime = Time.CurrentTimeMs;
-
         public Socket Socket { get { return _socket; } }
+
+        private MemoryBuffer _buffer = new MemoryBuffer();
         public MemoryBuffer Buffer { get { return _buffer; } }
+
+        public long _lastMessageTime = Time.CurrentTimeMs;
         public long LastMessageTime { get { return _lastMessageTime; } }
 
         public BufferedSocketReader(Socket socket)

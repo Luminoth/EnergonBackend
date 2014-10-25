@@ -11,16 +11,13 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 {
     internal sealed class MessageHandlerContext
     {
-        private volatile Session _session;
-        private volatile IMessage _message;
-
-        public Session Session { get { return _session; } }
-        public IMessage Message { get { return _message; } }
+        public Session Session { get; private set; }
+        public IMessage Message { get; private set; }
 
         public MessageHandlerContext(Session session, IMessage message)
         {
-            _session = session;
-            _message = message;
+            Session = session;
+            Message = message;
         }
     }
 

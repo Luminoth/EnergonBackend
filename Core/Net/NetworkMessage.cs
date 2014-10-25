@@ -42,15 +42,13 @@ namespace EnergonSoftware.Core.Net
             return packet;
         }
 
-        private int _id;
-
-        public int Id { get { return _id; } }
+        public int Id { get; private set; }
         public IMessage Payload;
         public bool HasPayload { get { return null != Payload; } }
 
         public NetworkMessage()
         {
-            _id = NextId;
+            Id = NextId;
         }
 
         public byte[] Serialize(IMessageFormatter formatter)
@@ -85,12 +83,12 @@ namespace EnergonSoftware.Core.Net
         // throws MessageException if deserialization failed
         public bool DeSerialize(MemoryBuffer buffer, IMessageFormatter formatter)
         {
-            _id = formatter.ReadInt(buffer.Stream);
+            Id = formatter.ReadInt(buffer.Buffer);
 
-            string type = formatter.ReadString(buffer.Stream);
+            string type = formatter.ReadString(buffer.Buffer);
             Payload = MessageFactory.CreateMessage(type);
 
-            int payloadLength = formatter.ReadInt(buffer.Stream);
+            int payloadLength = formatter.ReadInt(buffer.Buffer);
             if(payloadLength > MAX_PAYLOAD_SIZE) {
                 throw new MessageException("Invalid packet payload length: " + payloadLength);
             }
@@ -102,7 +100,7 @@ namespace EnergonSoftware.Core.Net
 
             if(null != Payload) {
                 try {
-                    Payload.DeSerialize(buffer.Stream, formatter);
+                    Payload.DeSerialize(buffer.Buffer, formatter);
                 } catch(Exception e) {
                     throw new MessageException("Exception while deserializing payload", e);
                 }

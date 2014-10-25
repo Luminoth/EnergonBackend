@@ -8,15 +8,10 @@ namespace EnergonSoftware.Core.Util
 {
     public sealed class SessionId
     {
-        private string _secret;
-        private int _expiry;
-        private string _sessionId;
-        private long _creationTime;
-
-        public string Secret { get { return _secret; } }
-        public int ExpiryMS { get { return _expiry; } }
-        public string SessionID { get { return _sessionId; } }
-        public long CreationTime { get { return _creationTime; } }
+        public string Secret { get; private set; }
+        public int ExpiryMS { get; private set; }
+        public string SessionID { get; private set; }
+        public long CreationTime { get; private set; }
         public bool Expired
         {
             get
@@ -30,9 +25,9 @@ namespace EnergonSoftware.Core.Util
 
         public SessionId(string secret, int expiry=-1)
         {
-            _secret = secret;
-            _expiry = expiry;
-            _creationTime = Time.CurrentTimeMs;
+            Secret = secret;
+            ExpiryMS = expiry;
+            CreationTime = Time.CurrentTimeMs;
 
             Random random = new Random();
             long salt1 = random.Next(10000);
@@ -45,7 +40,7 @@ namespace EnergonSoftware.Core.Util
             using(Aes aes = Aes.Create()) {
                 encrypted = AES.Encrypt(passwordHash, aes.Key, aes.IV);
             }
-            _sessionId = Convert.ToBase64String(encrypted);
+            SessionID = Convert.ToBase64String(encrypted);
         }
 
         public SessionId(string password, string sessionId, int expiry=-1)

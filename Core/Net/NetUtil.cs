@@ -62,7 +62,7 @@ namespace EnergonSoftware.Core.Net
 
             IPHostEntry hostEntry = Dns.GetHostEntry(host);
             foreach(IPAddress address in hostEntry.AddressList) {
-                if(AddressFamily.InterNetwork != address.AddressFamily && (AddressFamily.InterNetworkV6 != address.AddressFamily || useIPv6)) {
+                if(AddressFamily.InterNetwork != address.AddressFamily && (AddressFamily.InterNetworkV6 != address.AddressFamily || !useIPv6)) {
                     continue;
                 }
 
@@ -124,7 +124,7 @@ namespace EnergonSoftware.Core.Net
                 if(AddressFamily.InterNetwork == address.AddressFamily) {
                     idx = i;
                     break;
-                } else if(useIPv6 && AddressFamily.InterNetworkV6 == address.AddressFamily) {
+                } else if(AddressFamily.InterNetworkV6 == address.AddressFamily && useIPv6) {
                     idx = i;
                     break;
                 }
@@ -141,7 +141,6 @@ namespace EnergonSoftware.Core.Net
             context.CurrentAddressIdx = idx;
             context.Port = port;
 
-            // TODO: try other addresses if this fails!
             if(!DoConnectAsync(context)) {
                 context.EventHandler.ConnectFailed(SocketError.HostNotFound);
                 return false;

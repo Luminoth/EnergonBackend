@@ -51,11 +51,6 @@ namespace EnergonSoftware.Launcher
 #region Authentication Properties
         private volatile AuthenticationStage _authStage = AuthenticationStage.NotAuthenticated;
 
-        private volatile string _username;
-        private volatile string _password;
-
-        private volatile string _rspAuth;
-
         internal AuthenticationStage AuthStage
         {
             get { return _authStage; }
@@ -72,10 +67,10 @@ namespace EnergonSoftware.Launcher
         public bool Authenticating { get { return AuthStage > AuthenticationStage.NotAuthenticated && AuthStage < AuthenticationStage.Authenticated; } }
         public bool Authenticated { get { return AuthenticationStage.Authenticated == AuthStage; } }
 
-        public string Username { get { return _username; } }
-        internal string Password { get { return _password; } }
+        public string Username { get; private set; }
+        internal string Password { get; private set; }
 
-        internal string RspAuth { get { return _rspAuth; } set { _rspAuth = value; } }
+        internal string RspAuth { get; set; }
 #endregion
 
 #region UI Helpers
@@ -89,8 +84,8 @@ namespace EnergonSoftware.Launcher
             lock(_lock) {
                 Logout();
 
-                _username = username;
-                _password = password;
+                Username = username;
+                Password = password;
                 _logger.Info("Authenticating as user '" + Username + "'...");
 
                 AuthMessage message = new AuthMessage();
@@ -129,8 +124,8 @@ namespace EnergonSoftware.Launcher
                 _logger.Debug("Ticket=" + ticket);
                 Ticket = ticket;
 
-                _password = null;
-                _rspAuth = null;
+                Password = null;
+                RspAuth = null;
 
                 AuthStage = AuthenticationStage.Authenticated;
             }
@@ -148,8 +143,8 @@ namespace EnergonSoftware.Launcher
             lock(_lock) {
                 _logger.Warn("Authentication failed: " + reason);
 
-                _password = null;
-                _rspAuth = null;
+                Password = null;
+                RspAuth = null;
 
                 AuthStage = AuthenticationStage.NotAuthenticated;
             }
@@ -174,9 +169,9 @@ namespace EnergonSoftware.Launcher
                 }
 
                 AuthStage = AuthenticationStage.NotAuthenticated;
-                _username = null;
-                _password = null;
-                _rspAuth = null;
+                Username = null;
+                Password = null;
+                RspAuth = null;
                 Ticket = null;
 
                 //_account = new Account();

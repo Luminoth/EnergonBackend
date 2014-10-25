@@ -50,37 +50,35 @@ namespace EnergonSoftware.Database
             return "";
         }
 
-        private string _name;
-        private DatabaseType _type;
-        private bool _primaryKey = false;
-        private bool _nullable = true;
         private Tuple<string, string> _references;
 
         public int Id;
         public TableDescription Table;
-        public string Name { get { return _name; } }
-        public DatabaseType Type { get { return _type; } }
-        public bool PrimaryKey { get { return _primaryKey; } }
-        public bool Nullable { get { return _nullable; } }
+        public string Name { get; private set; }
+        public DatabaseType Type { get; private set; }
+        public bool PrimaryKey { get; private set; }
+        public bool Nullable { get; private set; }
 
         public bool HasForeignKey { get { return null != _references; } }
         public Tuple<string, string> References { get { return _references; } }
 
         public ColumnDescription(string name, DatabaseType type)
         {
-            _name = name;
-            _type = type;
+            Name = name;
+            Type = type;
+            PrimaryKey = false;
+            Nullable = true;
         }
 
         public ColumnDescription SetPrimaryKey()
         {
-            _primaryKey = true;
+            PrimaryKey = true;
             return this;
         }
 
         public ColumnDescription SetNotNull()
         {
-            _nullable = false;
+            Nullable = false;
             return this;
         }
 
@@ -117,17 +115,15 @@ namespace EnergonSoftware.Database
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(TableDescription));
 
-        private string _name;
         private Dictionary<string, ColumnDescription> _columns = new Dictionary<string, ColumnDescription>();
         private List<string> _primaryKeys = new List<string>();
 
-        public string Name { get { return _name; } }
-        //public Dictionary<string, ColumnDescription> Columns { get { return _columns; } }
+        public string Name { get; private set; }
         public ColumnDescription this[string key] { get { return _columns[key]; } }
 
         public TableDescription(string name, List<ColumnDescription> columns)
         {
-            _name = name;
+            Name = name;
             for(int i=0; i<columns.Count; ++i) {
                 ColumnDescription column = columns[i];
                 column.Id = i;
@@ -141,7 +137,7 @@ namespace EnergonSoftware.Database
         {
             _logger.Info("Creating table " + Name + "...");
 
-            StringBuilder create = new StringBuilder("CREATE TABLE " + _name);
+            StringBuilder create = new StringBuilder("CREATE TABLE " + Name);
             create.Append("(");
             create.Append(string.Join(", ", _columns.Values.Select(c => c.ToString(connection.ConnectionSettings.ProviderName))));
             if(_primaryKeys.Count > 0) {

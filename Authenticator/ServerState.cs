@@ -30,7 +30,7 @@ namespace EnergonSoftware.Authenticator
 #region Network Properties
         private List<Socket> _listenSockets = new List<Socket>();
 
-        private volatile IMessageFormatter _formatter = new BinaryMessageFormatter();
+        private IMessageFormatter _formatter = new BinaryMessageFormatter();
 #endregion
 
 #region Network Methods

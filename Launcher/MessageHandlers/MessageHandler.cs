@@ -10,13 +10,11 @@ namespace EnergonSoftware.Launcher.MessageHandlers
 {
     internal sealed class MessageHandlerContext
     {
-        private volatile IMessage _message;
-
-        public IMessage Message { get { return _message; } }
+        public IMessage Message { get; private set; }
 
         public MessageHandlerContext(IMessage message)
         {
-            _message = message;
+            Message = message;
         }
     }
 

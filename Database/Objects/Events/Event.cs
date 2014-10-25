@@ -7,9 +7,7 @@ namespace EnergonSoftware.Database.Objects.Events
     public abstract class Event : IDatabaseObject
     {
 #region Cleanliness
-        protected bool _dirty = false;
-
-        public bool Dirty { get { return _dirty; } set { _dirty = value; } }
+        public bool Dirty { get; set; }
 
         public void Clean()
         {
@@ -17,14 +15,12 @@ namespace EnergonSoftware.Database.Objects.Events
         }
 #endregion
 
-        protected long _id = -1;
-        private long _timestamp = Time.CurrentTimeMs;
-
-        public long Id { get { return _id; } }
-        public long Timestamp { get { return _timestamp; } }
+        public long Id { get; protected set; }
+        public long Timestamp { get; protected set; }
 
         public Event()
         {
+            Timestamp = Time.CurrentTimeMs;
         }
 
         public bool Read(DatabaseConnection connection)

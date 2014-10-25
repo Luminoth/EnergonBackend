@@ -17,6 +17,7 @@ namespace EnergonSoftware.Core
         public static string BinDir { get { return Path.Combine(HomeDir, "bin"); } }
         public static string ConfDir { get { return Path.Combine(HomeDir, "etc"); } }
         public static string DataDir { get { return Path.Combine(HomeDir, "share"); } }
+        public static string LogDir { get { return Path.Combine(HomeDir, "var"); } }
 
         public static void InitFilesystem()
         {
@@ -24,6 +25,7 @@ namespace EnergonSoftware.Core
             Directory.CreateDirectory(BinDir);
             Directory.CreateDirectory(ConfDir);
             Directory.CreateDirectory(DataDir);
+            Directory.CreateDirectory(LogDir);
         }
     }
 }
