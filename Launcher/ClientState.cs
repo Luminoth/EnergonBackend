@@ -35,6 +35,13 @@ namespace EnergonSoftware.Launcher
 
         private object _lock = new object();
 
+#region Notification Properties
+        public const string NOTIFY_AUTHENTICATING = "Authenticating";
+        public const string NOTIFY_AUTHENTICATED = "Authenticated";
+        public const string NOTIFY_NOT_AUTHENTICATED = "NotAuthenticated";
+        public const string NOTIFY_CAN_LOGIN = "CanLogin";
+#endregion
+
 #region Authentication Events
         public delegate void OnAuthSuccessHandler();
         public event OnAuthSuccessHandler OnAuthSuccess;
@@ -58,8 +65,11 @@ namespace EnergonSoftware.Launcher
             {
                 lock(_lock) {
                     _authStage = value;
-                    NotifyPropertyChanged("Authenticating");
-                    NotifyPropertyChanged("Authenticated");
+
+                    NotifyPropertyChanged(NOTIFY_AUTHENTICATING);
+                    NotifyPropertyChanged(NOTIFY_AUTHENTICATED);
+                    NotifyPropertyChanged(NOTIFY_NOT_AUTHENTICATED);
+                    NotifyPropertyChanged(NOTIFY_CAN_LOGIN);
                 }
             }
         }
@@ -213,14 +223,17 @@ namespace EnergonSoftware.Launcher
 #region Property Notifier
         public void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if("Authenticated".Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
-                NotifyPropertyChanged("NotAuthenticated");
-                NotifyPropertyChanged("CanLogin");
-            }
+            // pass on the API notifications
+            NotifyPropertyChanged(e.PropertyName);
+
+            // have to push this notification
+            // in case the connecting properties change
+            // TODO: wrap this in an if statement
+            NotifyPropertyChanged(NOTIFY_CAN_LOGIN);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] string property=null)
+        private void NotifyPropertyChanged(/*[CallerMemberName]*/ string property/*=null*/)
         {
             if(null != PropertyChanged) {
                 PropertyChanged(this, new PropertyChangedEventArgs(property));
@@ -230,8 +243,8 @@ namespace EnergonSoftware.Launcher
 
         private ClientState()
         {
+            // watch for API notifications
             ApiPropertyChanged += OnPropertyChanged;
-            PropertyChanged += OnPropertyChanged;
         }
     }
 }

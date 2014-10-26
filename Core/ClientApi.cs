@@ -17,6 +17,11 @@ namespace EnergonSoftware.Core
 
         private object _lock = new object();
 
+#region Notification Properties
+        public const string NOTIFY_CONNECTING = "Connecting";
+        public const string NOTIFY_CONNECTED = "Connected";
+#endregion
+
 #region Network Events
         public delegate void OnConnectSuccessHandler();
         public event OnConnectSuccessHandler OnConnectSuccess;
@@ -40,8 +45,8 @@ namespace EnergonSoftware.Core
             {
                 lock(_lock) {
                     _connecting = value;
-                    NotifyPropertyChanged("Connecting");
-                    NotifyPropertyChanged("Connected");
+                    NotifyPropertyChanged(NOTIFY_CONNECTING);
+                    NotifyPropertyChanged(NOTIFY_CONNECTED);
                 }
             } 
         }
