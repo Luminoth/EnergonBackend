@@ -215,12 +215,8 @@ namespace EnergonSoftware.Launcher
         {
             if("Authenticated".Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
                 NotifyPropertyChanged("NotAuthenticated");
-            } else if("FriendCount".Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
-                NotifyPropertyChanged("FriendButtonText");
+                NotifyPropertyChanged("CanLogin");
             }
-
-            NotifyPropertyChanged("CanLogin");
-            NotifyPropertyChanged(e.PropertyName);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -235,6 +231,7 @@ namespace EnergonSoftware.Launcher
         private ClientState()
         {
             ApiPropertyChanged += OnPropertyChanged;
+            PropertyChanged += OnPropertyChanged;
         }
     }
 }
