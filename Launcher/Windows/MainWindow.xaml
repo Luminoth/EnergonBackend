@@ -19,5 +19,6 @@
         </Grid.ColumnDefinitions>
 
         <launchercontrols:LoginPage Grid.Row="0" Grid.Column="0" Margin="5" Visibility="{Binding NotAuthenticated, Converter={StaticResource BoolToVis}}" />
+        <launchercontrols:MainPage Grid.Row="1" Grid.Column="0" Margin="5" Visibility="{Binding Authenticated, Converter={StaticResource BoolToVis}}" />
     </Grid>
 </Window>

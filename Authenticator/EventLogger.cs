@@ -47,6 +47,7 @@ namespace EnergonSoftware.Authenticator
             LogEvent(evt);
         }
 
+        // TODO: move this to a base class
         private void LogEvent(Event evt)
         {
             _logger.Debug("Logging event: " + evt);
