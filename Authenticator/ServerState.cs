@@ -34,9 +34,14 @@ namespace EnergonSoftware.Authenticator
 #endregion
 
 #region Network Methods
-        public void CreateSockets()
+        public bool CreateSockets()
         {
             ListenAddressesConfigurationSection config = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("listenAddresses");
+            if(null == config || config.ListenAddresses.Count < 1) {
+                _logger.Error("No configured listen addresses!");
+                return false;
+            }
+
             foreach(ListenAddressConfigurationElement listenAddress in config.ListenAddresses) {
                 IPEndPoint endpoint = new IPEndPoint(listenAddress.IPAddress, listenAddress.Port);
                 _logger.Info("Listening on endpoint " + endpoint + "...");
@@ -46,6 +51,8 @@ namespace EnergonSoftware.Authenticator
                 socket.Listen(Int32.Parse(ConfigurationManager.AppSettings["socketBacklog"]));
                 _listenSockets.Add(socket);
             }
+
+            return true;
         }
 
         public void CloseSockets()

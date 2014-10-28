@@ -25,7 +25,9 @@ namespace EnergonSoftware.Authenticator
                 ServerState.Instance.Quit = true;
             };
 
-            ServerState.Instance.CreateSockets();
+            if(!ServerState.Instance.CreateSockets()) {
+                return false;
+            }
 
             int workerThreads,ioThreads;
             ThreadPool.GetMinThreads(out workerThreads, out ioThreads);
