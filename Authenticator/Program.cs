@@ -25,6 +25,10 @@ namespace EnergonSoftware.Authenticator
                 ServerState.Instance.Quit = true;
             };
 
+            if(!InstanceNotifier.Instance.CreateSockets()) {
+                return false;
+            }
+
             if(!ServerState.Instance.CreateSockets()) {
                 return false;
             }
@@ -45,6 +49,7 @@ namespace EnergonSoftware.Authenticator
 
             ServerState.Instance.CloseSockets();
             SessionManager.Instance.CloseAll();
+            InstanceNotifier.Instance.CloseSockets();
         }
 
         private static void Run()
@@ -53,6 +58,7 @@ namespace EnergonSoftware.Authenticator
 
             while(!ServerState.Instance.Quit) {
                 try {
+                    InstanceNotifier.Instance.Poll();
                     ServerState.Instance.Poll();
 
                     SessionManager.Instance.PollAndRun();

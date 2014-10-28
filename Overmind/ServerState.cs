@@ -21,8 +21,6 @@ namespace EnergonSoftware.Overmind
 
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ServerState));
 
-        private object _lock = new object();
-
         public volatile bool Quit = false;
 
 #region Network Properties
@@ -40,14 +38,16 @@ namespace EnergonSoftware.Overmind
                 return false;
             }
 
-            foreach(ListenAddressConfigurationElement listenAddress in config.ListenAddresses) {
-                IPEndPoint endpoint = new IPEndPoint(listenAddress.IPAddress, listenAddress.Port);
-                _logger.Info("Listening on endpoint " + endpoint + "...");
+            lock(_listenSockets) {
+                foreach(ListenAddressConfigurationElement listenAddress in config.ListenAddresses) {
+                    IPEndPoint endpoint = new IPEndPoint(listenAddress.IPAddress, listenAddress.Port);
+                    _logger.Info("Overmind listening on endpoint " + endpoint + "...");
 
-                Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                socket.Bind(endpoint);
-                socket.Listen(Int32.Parse(ConfigurationManager.AppSettings["socketBacklog"]));
-                _listenSockets.Add(socket);
+                    Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    socket.Bind(endpoint);
+                    socket.Listen(Int32.Parse(ConfigurationManager.AppSettings["socketBacklog"]));
+                    _listenSockets.Add(socket);
+                }
             }
 
             return true;
@@ -55,9 +55,11 @@ namespace EnergonSoftware.Overmind
 
         public void CloseSockets()
         {
-            _logger.Info("Closing listen sockets...");
-            _listenSockets.ForEach(s => s.Close());
-            _listenSockets.Clear();
+            _logger.Info("Closing overmind listen sockets...");
+            lock(_listenSockets) {
+                _listenSockets.ForEach(s => s.Close());
+                _listenSockets.Clear();
+            }
         }
 
         private void PollListenSocket(Socket socket)
@@ -71,7 +73,7 @@ namespace EnergonSoftware.Overmind
 
         public void Poll()
         {
-            lock(_lock) {
+            lock(_listenSockets) {
                 _listenSockets.ForEach(s => PollListenSocket(s));
             }
         }

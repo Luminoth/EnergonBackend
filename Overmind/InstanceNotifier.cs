@@ -8,22 +8,18 @@ using log4net;
 
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Messages.Formatter;
-using EnergonSoftware.Core.Net;
-using EnergonSoftware.Database;
-using EnergonSoftware.Authenticator.Net;
+using EnergonSoftware.Core.Util;
 
-namespace EnergonSoftware.Authenticator
+namespace EnergonSoftware.Overmind
 {
-    sealed class ServerState
+    sealed class InstanceNotifier
     {
 #region Singleton
-        private static ServerState _instance = new ServerState();
-        public static ServerState Instance { get { return _instance; } }
+        private static InstanceNotifier _instance = new InstanceNotifier();
+        public static InstanceNotifier Instance { get { return _instance; } }
 #endregion
 
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(ServerState));
-
-        public volatile bool Quit = false;
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(InstanceNotifier));
 
 #region Network Properties
         private List<Socket> _listenSockets = new List<Socket>();
@@ -34,16 +30,16 @@ namespace EnergonSoftware.Authenticator
 #region Network Methods
         public bool CreateSockets()
         {
-            ListenAddressesConfigurationSection config = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("listenAddresses");
+            ListenAddressesConfigurationSection config = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("instanceNotifierAddresses");
             if(null == config || config.ListenAddresses.Count < 1) {
-                _logger.Error("No configured listen addresses!");
+                _logger.Error("No configured instance notifier addresses!");
                 return false;
             }
 
             lock(_listenSockets) {
                 foreach(ListenAddressConfigurationElement listenAddress in config.ListenAddresses) {
                     IPEndPoint endpoint = new IPEndPoint(listenAddress.IPAddress, listenAddress.Port);
-                    _logger.Info("Authenticator listening on endpoint " + endpoint + "...");
+                    _logger.Info("Instance notifier listening on endpoint " + endpoint + "...");
 
                     Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                     socket.Bind(endpoint);
@@ -57,7 +53,7 @@ namespace EnergonSoftware.Authenticator
 
         public void CloseSockets()
         {
-            _logger.Info("Closing authenticator listen sockets...");
+            _logger.Info("Closing instance notifier listen sockets...");
             lock(_listenSockets) {
                 _listenSockets.ForEach(s => s.Close());
                 _listenSockets.Clear();
@@ -67,9 +63,7 @@ namespace EnergonSoftware.Authenticator
         private void PollListenSocket(Socket socket)
         {
             if(socket.Poll(100, SelectMode.SelectRead)) {
-                Socket remote = socket.Accept();
-                _logger.Info("New connection from " + remote.RemoteEndPoint);
-                SessionManager.Instance.AddSession(remote);
+                // TODO: do something
             }
         }
 
@@ -81,16 +75,7 @@ namespace EnergonSoftware.Authenticator
         }
 #endregion
 
-#region Database Methods
-        public DatabaseConnection AcquireDatabaseConnection()
-        {
-            DatabaseConnection connection = new DatabaseConnection(ConfigurationManager.ConnectionStrings["energonsoftware"]);
-            connection.Open();
-            return connection;
-        }
-#endregion
-
-        private ServerState()
+        private InstanceNotifier()
         {
         }
     }
