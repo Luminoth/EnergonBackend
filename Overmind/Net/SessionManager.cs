@@ -3,7 +3,7 @@ using System.Net.Sockets;
 
 using log4net;
 
-namespace EnergonSoftware.Authenticator.Net
+namespace EnergonSoftware.Overmind.Net
 {
     sealed class SessionManager
     {

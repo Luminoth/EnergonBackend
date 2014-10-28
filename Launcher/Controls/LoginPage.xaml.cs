@@ -45,6 +45,7 @@ namespace EnergonSoftware.Launcher.Controls
 #endregion
 
 #region Event Handlers
+        // TODO: move these ClientState
         private void OnLogin(object sender, RoutedEventArgs evt)
         {
             ClientState.Instance.OnConnectFailed += OnConnectFailed;
@@ -74,6 +75,7 @@ namespace EnergonSoftware.Launcher.Controls
         private void OnAuthSuccess()
         {
             ClearPassword();
+            // TODO: connect to the overmind
         }
 #endregion
     }

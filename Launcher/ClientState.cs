@@ -44,6 +44,7 @@ namespace EnergonSoftware.Launcher
 
 #region Network Properties
         public int AuthSocketId { get; /*private*/ set; }
+        public int OvermindSocketId { get; /*private*/ set; }
 #endregion
 
 #region Authentication Events

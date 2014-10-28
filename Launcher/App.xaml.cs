@@ -58,7 +58,9 @@ namespace EnergonSoftware.Launcher
         {
             ClientState.Instance.Run();
         }
+#endregion
 
+        // TODO: move these into ClientState
         private void OnDisconnect(int socketId)
         {
             if(socketId == ClientState.Instance.AuthSocketId && !ClientState.Instance.Authenticated) {
@@ -70,6 +72,5 @@ namespace EnergonSoftware.Launcher
         {
             OnError(error, "Socket Error");
         }
-#endregion
     }
 }

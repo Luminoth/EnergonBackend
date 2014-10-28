@@ -2,11 +2,9 @@
 using System.Threading;
 
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Auth;
-using EnergonSoftware.Core.Util;
-using EnergonSoftware.Authenticator.Net;
+using EnergonSoftware.Overmind.Net;
 
-namespace EnergonSoftware.Authenticator.MessageHandlers
+namespace EnergonSoftware.Overmind.MessageHandlers
 {
     internal sealed class MessageHandlerContext
     {
@@ -31,8 +29,6 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 
         static MessageHandler()
         {
-            Handlers[AuthMessage.MESSAGE_TYPE] = new AuthMessageHandler();
-            Handlers[ResponseMessage.MESSAGE_TYPE] = new ResponseMessageHandler();
         }
 
         public static void HandleMessage(IMessage message, Session session)
