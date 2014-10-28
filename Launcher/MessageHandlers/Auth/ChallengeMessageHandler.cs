@@ -37,7 +37,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 string realm = values["realm"].Trim(new char[]{'"'});
                 Nonce cnonce = new Nonce(realm, -1);
                 string nc = "00000001";
-                string digestURI = realm + "/" + ClientState.Instance.Host;
+                string digestURI = realm + "/" + ClientState.Instance.GetSocketState(ClientState.Instance.AuthSocketId).Host;
 
                 _logger.Debug("Authenticating " + ClientState.Instance.Username + ":" + realm + ":***");
                 string passwordHash = new SHA512().DigestPassword(

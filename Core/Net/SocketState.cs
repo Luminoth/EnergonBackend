@@ -4,7 +4,20 @@ namespace EnergonSoftware.Core.Net
 {
     public sealed class SocketState
     {
+#region Id Generator
+        private static int _nextId = 0;
+        private static int NextId { get { return ++_nextId; } }
+#endregion
+
+        public int Id { get; private set; }
+
 #region Socket Properties
+        // NOTE: these are not maintained by the socket state
+        // they're just caller storage when needed
+        public string Host { get; set; }
+        public int Port { get; set; }
+        public bool Connecting { get; set; }
+
         private Socket _socket;
         public Socket Socket
         {
@@ -23,10 +36,12 @@ namespace EnergonSoftware.Core.Net
 
         public SocketState()
         {
+            Id = NextId;
         }
 
         public SocketState(Socket socket)
         {
+            Id = NextId;
             Socket = socket;
         }
 
@@ -39,6 +54,14 @@ namespace EnergonSoftware.Core.Net
             Socket.Shutdown(SocketShutdown.Both);
             Socket.Disconnect(reuseSocket);
             Socket.Close();
+        }
+
+        public void Reset()
+        {
+            Host = null;
+            Port = 0;
+            Connecting = false;
+
             Socket = null;
         }
     }

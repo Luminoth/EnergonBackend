@@ -49,7 +49,7 @@ namespace EnergonSoftware.Launcher
             ThreadPool.SetMaxThreads(Int32.Parse(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
 
             ClientState.Instance.OnDisconnect += OnDisconnect;
-            ClientState.Instance.OnError += OnError;
+            ClientState.Instance.OnSocketError += OnSocketError;
 
             ComponentDispatcher.ThreadIdle += OnIdle;
         }
@@ -59,14 +59,16 @@ namespace EnergonSoftware.Launcher
             ClientState.Instance.Run();
         }
 
-        private void OnDisconnect()
+        private void OnDisconnect(int socketId)
         {
-            OnError("Server Disconnected!", "Disconnected!");
+            if(socketId == ClientState.Instance.AuthSocketId && !ClientState.Instance.Authenticated) {
+                OnError("Auth Server Disconnected!", "Disconnected!");
+            }
         }
 
-        private void OnError(string error)
+        private void OnSocketError(int socketId, string error)
         {
-            OnError(error, "Error");
+            OnError(error, "Socket Error");
         }
 #endregion
     }

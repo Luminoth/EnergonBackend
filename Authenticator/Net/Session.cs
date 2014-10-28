@@ -34,13 +34,11 @@ namespace EnergonSoftware.Authenticator.Net
         public int Id { get; private set; }
 
 #region Network Properties
-        private volatile SocketState _socketState;
-        private Socket Socket { get { return _socketState.Socket; } }
-        public EndPoint RemoteEndpoint { get { return Socket.RemoteEndPoint; } }
-        public bool Connected { get { return _socketState.Connected; } }
+        private SocketState _socketState;
+        public Socket Socket { get { return _socketState.Socket; } }
         private BufferedSocketReader Reader { get { return _socketState.Reader; } }
 
-        private volatile IMessageFormatter _formatter = new BinaryMessageFormatter();
+        private IMessageFormatter _formatter = new BinaryMessageFormatter();
 
         public bool TimedOut
         {
@@ -56,14 +54,11 @@ namespace EnergonSoftware.Authenticator.Net
 #endregion
 
 #region Auth Properties
-        public AuthType AuthType = AuthType.None;
-        public Nonce AuthNonce;
+        public AuthType AuthType { get; set; }
+        public Nonce AuthNonce { get; set; }
 
-        private volatile bool _authenticating = false;
-        public bool Authenticating { get { return Connected && _authenticating; } }
-
-        private volatile bool _authenticated = false;
-        public bool Authenticated { get { return Connected && _authenticated; } }
+        public bool Authenticating { get; set; }
+        public bool Authenticated { get; set; }
 #endregion
 
 #region Account Properties
@@ -73,6 +68,7 @@ namespace EnergonSoftware.Authenticator.Net
         public Session(Socket socket)
         {
             Id = NextId;
+            AuthType = AuthType.None;
 
             _socketState = new SocketState(socket);
         }
@@ -107,18 +103,18 @@ namespace EnergonSoftware.Authenticator.Net
         public void Disconnect()
         {
             lock(_lock) {
-                if(Connected) {
+                if(Socket.Connected) {
                     _logger.Info("Session " + Id + " disconnecting...");
                     _socketState.ShutdownAndClose(true);
                 }
 
-                _authenticated = false;
+                Authenticated = false;
             }
         }
 
         public void Poll()
         {
-            if(!Connected) {
+            if(!Socket.Connected) {
                 return;
             }
 
@@ -140,7 +136,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public void SendMessage(IMessage message)
         {
-            if(!Connected) {
+            if(!Socket.Connected) {
                 return;
             }
 
@@ -162,8 +158,8 @@ namespace EnergonSoftware.Authenticator.Net
             SendMessage(message);
 
             lock(_lock) {
-                _authenticating = true;
-                _authenticated = false;
+                Authenticating = true;
+                Authenticated = false;
             }
         }
 
@@ -175,13 +171,13 @@ namespace EnergonSoftware.Authenticator.Net
 
             lock(_lock) {
                 AccountInfo = accountInfo;
-                _authenticated = true;
+                Authenticated = true;
             }
         }
 
         public void Success(string sessionid)
         {
-            EventLogger.Instance.SuccessEvent(RemoteEndpoint.ToString(), AccountInfo.Username);
+            EventLogger.Instance.SuccessEvent(Socket.RemoteEndPoint.ToString(), AccountInfo.Username);
 
             SuccessMessage message = new SuccessMessage();
             message.SessionId = sessionid;
@@ -189,21 +185,22 @@ namespace EnergonSoftware.Authenticator.Net
 
             lock(_lock) {
                 AccountInfo.SessionId = sessionid;
-                _authenticating = false;
+                Authenticating = false;
             }
+            Disconnect();
         }
 
         public void Failure(string reason=null)
         {
-            EventLogger.Instance.SuccessEvent(RemoteEndpoint.ToString(), null == AccountInfo ? null : AccountInfo.Username);
+            EventLogger.Instance.SuccessEvent(Socket.RemoteEndPoint.ToString(), null == AccountInfo ? null : AccountInfo.Username);
 
             FailureMessage message = new FailureMessage();
             message.Reason = reason;
             SendMessage(message);
 
             lock(_lock) {
-                _authenticating = false;
-                _authenticating = false;
+                Authenticating = false;
+                Authenticating = false;
                 AccountInfo = null;
             }
             Disconnect();

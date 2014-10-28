@@ -49,16 +49,16 @@ namespace EnergonSoftware.Launcher.Controls
         {
             ClientState.Instance.OnConnectFailed += OnConnectFailed;
             ClientState.Instance.OnConnectSuccess += OnConnectSuccess;
-            ClientState.Instance.ConnectAsync(ConfigurationManager.AppSettings["authHost"], Int32.Parse(ConfigurationManager.AppSettings["authPort"]));
+            ClientState.Instance.AuthSocketId = ClientState.Instance.ConnectAsync(ConfigurationManager.AppSettings["authHost"], Int32.Parse(ConfigurationManager.AppSettings["authPort"]));
         }
 
-        private void OnConnectFailed(SocketError error)
+        private void OnConnectFailed(int socketId, SocketError error)
         {
             ClearPassword();
             OnError("Failed to connect to the server: " + error, "Connection Failed");
         }
 
-        private void OnConnectSuccess()
+        private void OnConnectSuccess(int socketId)
         {
             ClientState.Instance.OnAuthFailed += OnAuthFailed;
             ClientState.Instance.OnAuthSuccess += OnAuthSuccess;

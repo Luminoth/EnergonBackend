@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
@@ -15,142 +16,167 @@ namespace EnergonSoftware.Core
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ClientApi));
 
-        private object _lock = new object();
-
-#region Notification Properties
-        public const string NOTIFY_CONNECTING = "Connecting";
-        public const string NOTIFY_CONNECTED = "Connected";
-#endregion
-
 #region Network Events
-        public delegate void OnConnectSuccessHandler();
+        public delegate void OnConnectSuccessHandler(int socketId);
         public event OnConnectSuccessHandler OnConnectSuccess;
         
-        public delegate void OnConnectFailedHandler(SocketError error);
+        public delegate void OnConnectFailedHandler(int socketId, SocketError error);
         public event OnConnectFailedHandler OnConnectFailed;
 
-        public delegate void OnDisconnectHandler();
+        public delegate void OnDisconnectHandler(int socketId);
         public event OnDisconnectHandler OnDisconnect;
 #endregion
+
+        public delegate void OnSocketErrorHandler(int socketId, string error);
+        public event OnSocketErrorHandler OnSocketError;
 
         public delegate void OnErrorHandler(string error);
         public event OnErrorHandler OnError;
 
 #region Network Properties
-        private volatile bool _connecting = false;
-        public bool Connecting
-        {
-            get { return _connecting; }
-            private set
-            {
-                lock(_lock) {
-                    _connecting = value;
-                    NotifyPropertyChanged(NOTIFY_CONNECTING);
-                    NotifyPropertyChanged(NOTIFY_CONNECTED);
-                }
-            } 
-        }
-        public bool Connected { get { return _socketState.Connected; } }
-
-        public string Host { get; private set; }
-
-        private volatile SocketState _socketState = new SocketState();
-        private Socket Socket { get { return _socketState.Socket; } set { _socketState.Socket = value; } }
-        public BufferedSocketReader Reader { get { return _socketState.Reader; } }
+        private Dictionary<int, SocketState> _sockets = new Dictionary<int,SocketState>();
 #endregion
 
         public string Ticket { get; protected set; }
 
 #region Network Methods
-        private void OnConnectAsyncFailed(SocketError error)
+        public SocketState GetSocketState(int socketId)
         {
-            lock(_lock) {
-                _logger.Error("Connect failed: " + error);
+            if(!_sockets.ContainsKey(socketId)) {
+                return null;
+            }
+            return _sockets[socketId];
+        }
 
-                Host = null;
-                Connecting = false;
+        public BufferedSocketReader GetSocketReader(int socketId)
+        {
+            if(!_sockets.ContainsKey(socketId)) {
+                return null;
+            }
+            return _sockets[socketId].Reader;
+        }
+
+        private void OnConnectAsyncFailed(int socketId, SocketError error)
+        {
+            _logger.Error("Socket " + socketId + " connect failed: " + error);
+
+            SocketState socketState = null;
+            lock(_sockets) {
+                socketState = GetSocketState(socketId);
+                _sockets.Remove(socketId);
+            }
+
+            if(null == socketState) {
+                _logger.Error("No such socket for connect failed: " + socketId);
+                return;
+            }
+
+            lock(socketState) {
+                socketState.Reset();
             }
 
             if(null != OnConnectFailed) {
-                OnConnectFailed(error);
+                OnConnectFailed(socketId, error);
             }
-
-            OnConnectFailed = null;
-            OnConnectSuccess = null;
         }
 
-        private void OnConnectAsyncSuccess(Socket socket)
+        private void OnConnectAsyncSuccess(int socketId, Socket socket)
         {
-            lock(_lock) {
-                _logger.Info("Connected to " + socket.RemoteEndPoint);
+            _logger.Info("Connected socket " + socketId + " to " + socket.RemoteEndPoint);
 
-                Socket = socket;
-                Connecting = false;
+            SocketState socketState = null;
+            lock(_sockets) {
+                socketState = GetSocketState(socketId);
             }
+
+            if(null == socketState) {
+                _logger.Error("No such socket for connect success: " + socketId);
+                return;
+            }
+
+            socketState.Socket = socket;
+            socketState.Connecting = false;
 
             if(null != OnConnectSuccess) {
-                OnConnectSuccess();
+                OnConnectSuccess(socketId);
             }
-
-            OnConnectFailed = null;
-            OnConnectSuccess = null;
         }
 
-        public void ConnectAsync(string host, int port)
+        public int  ConnectAsync(string host, int port)
         {
-            lock(_lock) {
-                Disconnect();
-
-                Host = host;
-                _logger.Info("Connecting to " + Host + ":" + port + "...");
-
-                Connecting = true;
+            SocketState state = new SocketState();
+            state.Host = host;
+            state.Port = port;
+            state.Connecting = true;
+            lock(_sockets) {
+                // TODO: handle overwrites?
+                _sockets[state.Id] = state;
             }
 
-            AsyncConnectEventArgs args = new AsyncConnectEventArgs();
+            _logger.Info("Connecting to " + host + ":" + port + " with socket " + state.Id + "...");
+
+            AsyncConnectEventArgs args = new AsyncConnectEventArgs(state.Id);
             args.OnConnectFailed += OnConnectAsyncFailed;
             args.OnConnectSuccess += OnConnectAsyncSuccess;
-            NetUtil.ConnectAsync(Host, port, args);
+            NetUtil.ConnectAsync(host, port, args);
+
+            return state.Id;
         }
 
-        public void Disconnect()
+        public void Disconnect(int socketId)
         {
-            if(_socketState.HasSocket) {
-                lock(_lock) {
-                    _logger.Info("Disconnecting...");
-                    _socketState.ShutdownAndClose(false);
+            SocketState socketState = null;
+            lock(_sockets) {
+                socketState = GetSocketState(socketId);
+                _sockets.Remove(socketId);
+            }
+
+            if(null == socketState) {
+                _logger.Error("No such socket for disconnect: " + socketId);
+                return;
+            }
+
+            if(socketState.HasSocket) {
+                lock(socketState) {
+                    _logger.Info("Disconnecting socket " + socketState.Id + "...");
+                    socketState.ShutdownAndClose(false);
                 }
 
                 if(null != OnDisconnect) {
-                    OnDisconnect();
+                    OnDisconnect(socketId);
                 }
-            }
-
-            lock(_lock) {
-                Host = null;
-                Connecting = false;
             }
         }
 
-        public bool Poll()
+        public bool Poll(int socketId)
         {
-            if(!Connected) {
+            SocketState socketState = null;
+            lock(_sockets) {
+                socketState = GetSocketState(socketId);
+            }
+
+            if(null == socketState) {
+                _logger.Error("No such socket for poll: " + socketId);
                 return false;
             }
 
-            lock(_lock) {
+            if(!socketState.Connected) {
+                return false;
+            }
+
+            lock(socketState) {
                 // TODO: this needs to be a while loop
                 try {
-                    if(Socket.Poll(100, SelectMode.SelectRead)) {
-                        int len = Reader.Read();
+                    if(socketState.Socket.Poll(100, SelectMode.SelectRead)) {
+                        int len = socketState.Reader.Read();
                         if(0 == len) {
-                            Error("End of stream!");
+                            SocketError(socketId, "End of stream!");
                             return false;
                         }
                         _logger.Debug("Read " + len + " bytes");
                     }
                 } catch(SocketException e) {
-                    Error(e);
+                    SocketError(socketId, e);
                     return false;
                 }
             }
@@ -158,9 +184,19 @@ namespace EnergonSoftware.Core
             return true;
         }
 
-        public void SendMessage(IMessage message, IMessageFormatter formatter)
+        public void SendMessage(int socketId, IMessage message, IMessageFormatter formatter)
         {
-            if(!Connected) {
+            SocketState socketState = null;
+            lock(_sockets) {
+                socketState = GetSocketState(socketId);
+            }
+
+            if(null == socketState) {
+                _logger.Error("No such socket for sending: " + socketId);
+                return;
+            }
+
+            if(!socketState.Connected) {
                 return;
             }
 
@@ -168,18 +204,29 @@ namespace EnergonSoftware.Core
             packet.Payload = message;
 
             byte[] bytes = packet.Serialize(formatter);
-            lock(_lock) {
-                _logger.Debug("Sending " + bytes.Length + " bytes");
-                Socket.Send(bytes);
+            lock(socketState) {
+                _logger.Debug("Socket " + socketId + " sending " + bytes.Length + " bytes");
+                socketState.Socket.Send(bytes);
             }
         }
 #endregion
 
+        public void SocketError(int socketId, string error)
+        {
+            _logger.Error("Socket " + socketId + " encountered an error: " + error);
+            Disconnect(socketId);
+
+            OnSocketError(socketId, error);
+        }
+
+        public void SocketError(int socketId, Exception error)
+        {
+            SocketError(socketId, error.Message);
+        }
+
         public void Error(string error)
         {
             _logger.Error("Encountered an error: " + error);
-            Disconnect();
-
             OnError(error);
         }
 

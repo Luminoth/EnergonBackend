@@ -42,6 +42,10 @@ namespace EnergonSoftware.Launcher
         public const string NOTIFY_CAN_LOGIN = "CanLogin";
 #endregion
 
+#region Network Properties
+        public int AuthSocketId { get; /*private*/ set; }
+#endregion
+
 #region Authentication Events
         public delegate void OnAuthSuccessHandler();
         public event OnAuthSuccessHandler OnAuthSuccess;
@@ -49,9 +53,6 @@ namespace EnergonSoftware.Launcher
         public delegate void OnAuthFailedHandler(string reason);
         public event OnAuthFailedHandler OnAuthFailed;
 #endregion
-
-        public delegate void OnLogoutHandler();
-        public event OnLogoutHandler OnLogout;
 
         private IMessageFormatter _formatter = new BinaryMessageFormatter();
 
@@ -85,22 +86,24 @@ namespace EnergonSoftware.Launcher
 
 #region UI Helpers
         public bool NotAuthenticated { get { return !Authenticated; } }
-        public bool CanLogin { get { return !Connecting && !Connected && !Authenticating && !Authenticated; } }
+        public bool CanLogin { get { return !Authenticating && !Authenticated; } }
 #endregion
 
 #region Authentication Methods
         internal void BeginAuth(string username, string password)
         {
-            lock(_lock) {
-                Logout();
+            if(AuthSocketId < 0) {
+                return;
+            }
 
+            lock(_lock) {
                 Username = username;
                 Password = password;
                 _logger.Info("Authenticating as user '" + Username + "'...");
 
                 AuthMessage message = new AuthMessage();
                 message.MechanismType = AuthType.DigestSHA512;
-                SendMessage(message, _formatter);
+                SendMessage(AuthSocketId, message, _formatter);
 
                 AuthStage = AuthenticationStage.Begin;
             }
@@ -108,9 +111,13 @@ namespace EnergonSoftware.Launcher
 
         internal void AuthResponse(string response)
         {
+            if(AuthSocketId < 0) {
+                return;
+            }
+
             ResponseMessage message = new ResponseMessage();
             message.Response = response;
-            SendMessage(message, _formatter);
+            SendMessage(AuthSocketId, message, _formatter);
 
             lock(_lock) {
                 AuthStage = AuthenticationStage.Challenge;
@@ -119,8 +126,12 @@ namespace EnergonSoftware.Launcher
 
         internal void AuthFinalize()
         {
+            if(AuthSocketId < 0) {
+                return;
+            }
+
             ResponseMessage response = new ResponseMessage();
-            SendMessage(response, _formatter);
+            SendMessage(AuthSocketId, response, _formatter);
 
             lock(_lock) {
                 AuthStage = AuthenticationStage.Finalize;
@@ -131,6 +142,7 @@ namespace EnergonSoftware.Launcher
         {
             lock(_lock) {
                 _logger.Info("Authentication successful!");
+
                 _logger.Debug("Ticket=" + ticket);
                 Ticket = ticket;
 
@@ -144,6 +156,9 @@ namespace EnergonSoftware.Launcher
                 OnAuthSuccess();
             }
 
+            Disconnect(AuthSocketId);
+            AuthSocketId = -1;
+
             OnAuthSuccess = null;
             OnAuthFailed = null;
         }
@@ -152,6 +167,8 @@ namespace EnergonSoftware.Launcher
         {
             lock(_lock) {
                 _logger.Warn("Authentication failed: " + reason);
+
+                Ticket = null;
 
                 Password = null;
                 RspAuth = null;
@@ -163,38 +180,20 @@ namespace EnergonSoftware.Launcher
                 OnAuthFailed(reason);
             }
 
+            Disconnect(AuthSocketId);
+            AuthSocketId = -1;
+
             OnAuthSuccess = null;
             OnAuthFailed = null;
         }
-
-        public void Logout()
-        {
-            lock(_lock) {
-                _logger.Info("Logging out...");
-                /*LogoutMessage message = new LogoutMessage();
-                SendMessage(message);*/
-
-                if(null != OnLogout) {
-                    OnLogout();
-                }
-
-                AuthStage = AuthenticationStage.NotAuthenticated;
-                Username = null;
-                Password = null;
-                RspAuth = null;
-                Ticket = null;
-
-                //_account = new Account();
-            }
-        }
 #endregion
 
-        private bool HandleMessages()
+        private bool HandleAuthMessages()
         {
             lock(_lock) {
                 // TODO: this needs to be a while loop
                 try {
-                    NetworkMessage message = NetworkMessage.Parse(Reader.Buffer, _formatter);
+                    NetworkMessage message = NetworkMessage.Parse(GetSocketReader(AuthSocketId).Buffer, _formatter);
                     if(null != message) {
                         _logger.Debug("Parsed message type: " + message.Payload.Type);
                         MessageHandler.HandleMessage(message.Payload);
@@ -205,6 +204,28 @@ namespace EnergonSoftware.Launcher
                 }
                 return true;
             }
+        }
+
+        private bool HandleMessages()
+        {
+            if(AuthSocketId > 0) {
+                if(!HandleAuthMessages()) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool Poll()
+        {
+            if(AuthSocketId > 0) {
+                if(!Poll(AuthSocketId)) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public void Run()

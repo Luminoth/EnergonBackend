@@ -52,8 +52,8 @@ namespace EnergonSoftware.Database
 
         private Tuple<string, string> _references;
 
-        public int Id;
-        public TableDescription Table;
+        public int Id { get; set; }
+        public TableDescription Table { get; set; }
         public string Name { get; private set; }
         public DatabaseType Type { get; private set; }
         public bool PrimaryKey { get; private set; }

@@ -8,28 +8,31 @@ namespace EnergonSoftware.Core.Net
     public sealed class AsyncConnectEventArgs
     {
 #region Events
-        public delegate void OnConnectSuccessHandler(Socket socket);
+        public delegate void OnConnectSuccessHandler(int id, Socket socket);
         public event OnConnectSuccessHandler OnConnectSuccess;
         
-        public delegate void OnConnectFailedHandler(SocketError error);
+        public delegate void OnConnectFailedHandler(int id, SocketError error);
         public event OnConnectFailedHandler OnConnectFailed;
 #endregion
 
-        public AsyncConnectEventArgs()
+        public int Id { get; private set; }
+
+        public AsyncConnectEventArgs(int id)
         {
+            Id = id;
         }
 
         public void ConnectSuccess(Socket socket)
         {
             if(null != OnConnectSuccess) {
-                OnConnectSuccess(socket);
+                OnConnectSuccess(Id, socket);
             }
         }
 
         public void ConnectFailed(SocketError error)
         {
             if(null != OnConnectFailed) {
-                OnConnectFailed(error);
+                OnConnectFailed(Id, error);
             }
         }
     }

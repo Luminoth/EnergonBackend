@@ -50,7 +50,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
         {
             MessageHandlerContext ctx = (MessageHandlerContext)context;
 
-            EventLogger.Instance.RequestEvent(ctx.Session.RemoteEndpoint.ToString());
+            EventLogger.Instance.RequestEvent(ctx.Session.Socket.RemoteEndPoint.ToString());
             if(ctx.Session.Authenticated || ctx.Session.Authenticating) {
                 ctx.Session.Failure("Already Authenticating");
                 return;

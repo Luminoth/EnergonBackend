@@ -106,7 +106,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 
             try {
                 string username = values["username"].Trim(new char[]{'"'});
-                EventLogger.Instance.BeginEvent(ctx.Session.RemoteEndpoint.ToString(), username);
+                EventLogger.Instance.BeginEvent(ctx.Session.Socket.RemoteEndPoint.ToString(), username);
 
                 string charset = values["charset"].Trim(new char[]{'"'});
                 if(!"utf-8".Equals(charset, StringComparison.InvariantCultureIgnoreCase)) {

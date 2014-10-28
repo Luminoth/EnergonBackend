@@ -43,7 +43,7 @@ namespace EnergonSoftware.Core.Net
         }
 
         public int Id { get; private set; }
-        public IMessage Payload;
+        public IMessage Payload { get; set; }
         public bool HasPayload { get { return null != Payload; } }
 
         public NetworkMessage()

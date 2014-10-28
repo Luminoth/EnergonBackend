@@ -26,7 +26,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public void Cleanup()
         {
-            int count = _sessions.RemoveAll(s => !s.Connected);
+            int count = _sessions.RemoveAll(s => !s.Socket.Connected);
             if(count > 0) {
                 _logger.Info("Removed " + count + " disconnected sessions");
             }
@@ -42,7 +42,7 @@ namespace EnergonSoftware.Authenticator.Net
                 return;
             }
 
-            if(session.Connected) {
+            if(session.Socket.Connected) {
                 session.Run();
             }
         }
