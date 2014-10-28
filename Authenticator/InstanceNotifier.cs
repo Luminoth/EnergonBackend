@@ -79,7 +79,7 @@ namespace EnergonSoftware.Authenticator
         {
         }
 
-        public void Authenticated(string username, SessionId sessionId, EndPoint endpoint)
+        public void Authenticated(string username, string sessionId, EndPoint endpoint)
         {
         }
 

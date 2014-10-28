@@ -14,6 +14,7 @@ using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
+using EnergonSoftware.Database;
 using EnergonSoftware.Database.Objects;
 using EnergonSoftware.Database.Objects.Events;
 using EnergonSoftware.Authenticator.MessageHandlers;
@@ -153,40 +154,51 @@ namespace EnergonSoftware.Authenticator.Net
 
         public void Challenge(string challenge)
         {
-            ChallengeMessage message = new ChallengeMessage();
-            message.Challenge = Convert.ToBase64String(Encoding.UTF8.GetBytes(challenge));
-            SendMessage(message);
-
             lock(_lock) {
                 Authenticating = true;
                 Authenticated = false;
             }
+
+            ChallengeMessage message = new ChallengeMessage();
+            message.Challenge = Convert.ToBase64String(Encoding.UTF8.GetBytes(challenge));
+            SendMessage(message);
         }
 
         public void Challenge(string challenge, AccountInfo accountInfo)
         {
-            ChallengeMessage message = new ChallengeMessage();
-            message.Challenge = Convert.ToBase64String(Encoding.UTF8.GetBytes(challenge));
-            SendMessage(message);
+            InstanceNotifier.Instance.Authenticating(accountInfo.Username, Socket.RemoteEndPoint);
 
             lock(_lock) {
                 AccountInfo = accountInfo;
                 Authenticated = true;
             }
+
+            ChallengeMessage message = new ChallengeMessage();
+            message.Challenge = Convert.ToBase64String(Encoding.UTF8.GetBytes(challenge));
+            SendMessage(message);
         }
 
         public void Success(string sessionid)
         {
+            InstanceNotifier.Instance.Authenticated(AccountInfo.Username, sessionid, Socket.RemoteEndPoint);
             EventLogger.Instance.SuccessEvent(Socket.RemoteEndPoint, AccountInfo.Username);
+
+            lock(_lock) {
+                Authenticating = false;
+                Authenticated = true;
+
+                AccountInfo.SessionId = sessionid;
+                AccountInfo.SessionEndPoint = Socket.RemoteEndPoint.ToString();
+
+                using(DatabaseConnection connection = ServerState.Instance.AcquireDatabaseConnection()) {
+                    AccountInfo.Update(connection);
+                }
+            }
 
             SuccessMessage message = new SuccessMessage();
             message.SessionId = sessionid;
             SendMessage(message);
 
-            lock(_lock) {
-                AccountInfo.SessionId = sessionid;
-                Authenticating = false;
-            }
             Disconnect();
         }
 
@@ -194,15 +206,21 @@ namespace EnergonSoftware.Authenticator.Net
         {
             EventLogger.Instance.SuccessEvent(Socket.RemoteEndPoint, null == AccountInfo ? null : AccountInfo.Username);
 
+            lock(_lock) {
+                Authenticating = false;
+                Authenticated = false;
+
+                // NOTE: we don't update the database here because this
+                // might be a malicious login attempt against an account
+                // that is already using a legitimate ticket
+
+                AccountInfo = null;
+            }
+
             FailureMessage message = new FailureMessage();
             message.Reason = reason;
             SendMessage(message);
 
-            lock(_lock) {
-                Authenticating = false;
-                Authenticating = false;
-                AccountInfo = null;
-            }
             Disconnect();
         }
     }
