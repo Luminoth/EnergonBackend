@@ -19,6 +19,7 @@ namespace EnergonSoftware.Database.Objects
                 { new ColumnDescription("username", DatabaseType.Text).SetNotNull() },
                 { new ColumnDescription("passwordMD5", DatabaseType.Text).SetNotNull() },
                 { new ColumnDescription("passwordSHA512", DatabaseType.Text).SetNotNull() },
+                { new ColumnDescription("sessionEndPoint", DatabaseType.Text) },
                 { new ColumnDescription("sessionid", DatabaseType.Text) },
                 { new ColumnDescription("status", DatabaseType.Integer) },
             }
@@ -74,6 +75,9 @@ namespace EnergonSoftware.Database.Objects
 
         public string PasswordMD5 { get; private set; }
         public string PasswordSHA512 { get; private set; }
+
+        private string _sessionEndPoint;
+        public string SessionEndPoint { get { return _sessionEndPoint; } set { _sessionEndPoint = value; Dirty = true; } }
 
         private string _sessionid;
         public string SessionId { get { return _sessionid; } set { _sessionid = value; Dirty = true; } }
@@ -137,6 +141,10 @@ namespace EnergonSoftware.Database.Objects
             PasswordMD5 = reader.GetString(ACCOUNTS_TABLE["passwordMD5"].Id);
             PasswordSHA512 = reader.GetString(ACCOUNTS_TABLE["passwordSHA512"].Id);
 
+            if(!reader.IsDBNull(ACCOUNTS_TABLE["sessionEndPoint"].Id)) {
+                _sessionEndPoint = reader.GetString(ACCOUNTS_TABLE["sessionEndPoint"].Id);
+            }
+
             if(!reader.IsDBNull(ACCOUNTS_TABLE["sessionid"].Id)) {
                 _sessionid = reader.GetString(ACCOUNTS_TABLE["sessionid"].Id);
             }
@@ -163,9 +171,10 @@ namespace EnergonSoftware.Database.Objects
         public void Update(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("UPDATE " + ACCOUNTS_TABLE.Name
-                + " SET active=@active, sessionid=@sessionid, status=@status WHERE id=@id"))
+                + " SET active=@active, sessionEndPoint=@sessionEndPoint, sessionid=@sessionid, status=@status WHERE id=@id"))
             {
                 connection.AddParameter(command, "active", Active);
+                connection.AddParameter(command, "sessionEndPoint", SessionEndPoint);
                 connection.AddParameter(command, "sessionid", SessionId);
                 connection.AddParameter(command, "status", Status);
                 connection.AddParameter(command, "id", Id);
@@ -186,7 +195,7 @@ namespace EnergonSoftware.Database.Objects
         {
             return "Account(id: " + Id + ", active: " + Active
                 + ", username: " + Username + ", passwordMD5: " + PasswordMD5 + ", passwordSHA512: " + PasswordSHA512
-                + ", sessionid: " + SessionId + ", status: " + Status + ")";
+                + ", sessionEndPoint: " + SessionEndPoint + ", sessionid: " + SessionId + ", status: " + Status + ")";
         }
     }
 }

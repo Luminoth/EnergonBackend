@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EventLogger.cs" />
+    <Compile Include="InstanceNotifier.cs" />
     <Compile Include="MessageHandlers\AuthMessageHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandler.cs" />
     <Compile Include="MessageHandlers\ResponseMessageHandler.cs" />

@@ -177,7 +177,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public void Success(string sessionid)
         {
-            EventLogger.Instance.SuccessEvent(Socket.RemoteEndPoint.ToString(), AccountInfo.Username);
+            EventLogger.Instance.SuccessEvent(Socket.RemoteEndPoint, AccountInfo.Username);
 
             SuccessMessage message = new SuccessMessage();
             message.SessionId = sessionid;
@@ -192,7 +192,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public void Failure(string reason=null)
         {
-            EventLogger.Instance.SuccessEvent(Socket.RemoteEndPoint.ToString(), null == AccountInfo ? null : AccountInfo.Username);
+            EventLogger.Instance.SuccessEvent(Socket.RemoteEndPoint, null == AccountInfo ? null : AccountInfo.Username);
 
             FailureMessage message = new FailureMessage();
             message.Reason = reason;

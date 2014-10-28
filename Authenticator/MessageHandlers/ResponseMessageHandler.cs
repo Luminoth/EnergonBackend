@@ -23,15 +23,21 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
         {
         }
 
+// TODO: handle the case of a user authenticating a second time
+
         private void CompleteAuthentication(Session session)
         {
             SessionId sessionid = new SessionId(ConfigurationManager.AppSettings["sessionSecret"]);
             _logger.Info("Session " + session.Id + " generated sessionid '" + sessionid.SessionID + "' for account '" + session.AccountInfo.Username + "'");
             session.Success(sessionid.SessionID);
+
+            InstanceNotifier.Instance.Authenticated(session.AccountInfo.Username, sessionid, session.Socket.RemoteEndPoint);
         }
 
         private void Authenticate(string username, string nonce, string cnonce, string nc, string qop, string digestURI, string response, Session session)
         {
+            InstanceNotifier.Instance.Authenticating(username, session.Socket.RemoteEndPoint);
+
             AccountInfo account = new AccountInfo(username);
             using(DatabaseConnection connection = ServerState.Instance.AcquireDatabaseConnection()) {
                 if(!account.Read(connection)) {
@@ -106,7 +112,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 
             try {
                 string username = values["username"].Trim(new char[]{'"'});
-                EventLogger.Instance.BeginEvent(ctx.Session.Socket.RemoteEndPoint.ToString(), username);
+                EventLogger.Instance.BeginEvent(ctx.Session.Socket.RemoteEndPoint, username);
 
                 string charset = values["charset"].Trim(new char[]{'"'});
                 if(!"utf-8".Equals(charset, StringComparison.InvariantCultureIgnoreCase)) {

@@ -150,5 +150,20 @@ namespace EnergonSoftware.Core.Net
             }
             return true;
         }
+
+        public static bool CompareEndPoints(string a, EndPoint b)
+        {
+            string[] aParts = a.Split(new char[] {':'}, StringSplitOptions.RemoveEmptyEntries);
+            if(aParts.Length < 1) {
+                return false;
+            }
+
+            string[] bParts = b.ToString().Split(new char[] {':'}, StringSplitOptions.RemoveEmptyEntries);
+            if(bParts.Length < 1) {
+                return false;
+            }
+
+            return aParts[0].Equals(bParts[0], StringComparison.InvariantCultureIgnoreCase);
+        }
     }
 }

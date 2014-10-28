@@ -102,7 +102,7 @@ namespace EnergonSoftware.Core
             }
         }
 
-        public int  ConnectAsync(string host, int port)
+        public int ConnectAsync(string host, int port)
         {
             SocketState state = new SocketState();
             state.Host = host;

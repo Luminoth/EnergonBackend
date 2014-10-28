@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 
 using log4net;
 
@@ -7,7 +8,7 @@ using EnergonSoftware.Database.Objects.Events;
 
 namespace EnergonSoftware.Authenticator
 {
-    public sealed class EventLogger
+    sealed class EventLogger
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(EventLogger));
 
@@ -16,33 +17,33 @@ namespace EnergonSoftware.Authenticator
         public static EventLogger Instance { get { return _instance; } }
 #endregion
 
-        public void RequestEvent(string origin)
+        public void RequestEvent(EndPoint origin)
         {
             AuthEvent evt = new AuthEvent(AuthEventType.Request);
-            evt.Origin = origin;
+            evt.Origin = origin.ToString();
             LogEvent(evt);
         }
 
-        public void BeginEvent(string origin, string username)
+        public void BeginEvent(EndPoint origin, string username)
         {
             AuthEvent evt = new AuthEvent(AuthEventType.Begin);
-            evt.Origin = origin;
+            evt.Origin = origin.ToString();
             evt.Account = username;
             LogEvent(evt);
         }
 
-        public void SuccessEvent(string origin, string username)
+        public void SuccessEvent(EndPoint origin, string username)
         {
             AuthEvent evt = new AuthEvent(AuthEventType.Success);
-            evt.Origin = origin;
+            evt.Origin = origin.ToString();
             evt.Account = username;
             LogEvent(evt);
         }
 
-        public void FailedEvent(string origin, string username)
+        public void FailedEvent(EndPoint origin, string username)
         {
             AuthEvent evt = new AuthEvent(AuthEventType.Failure);
-            evt.Origin = origin;
+            evt.Origin = origin.ToString();
             evt.Account = username;
             LogEvent(evt);
         }
