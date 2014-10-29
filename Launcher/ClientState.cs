@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Configuration;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 
@@ -43,8 +44,8 @@ namespace EnergonSoftware.Launcher
 #endregion
 
 #region Network Properties
-        public int AuthSocketId { get; /*private*/ set; }
-        public int OvermindSocketId { get; /*private*/ set; }
+        public int AuthSocketId { get; private set; }
+        public int OvermindSocketId { get; private set; }
 #endregion
 
 #region Authentication Events
@@ -79,8 +80,11 @@ namespace EnergonSoftware.Launcher
         public bool Authenticating { get { return AuthStage > AuthenticationStage.NotAuthenticated && AuthStage < AuthenticationStage.Authenticated; } }
         public bool Authenticated { get { return AuthenticationStage.Authenticated == AuthStage; } }
 
-        public string Username { get; private set; }
-        internal string Password { get; private set; }
+        private string _username;
+        public string Username { get { return _username; } set { _username = value; NotifyPropertyChanged("Username"); } }
+
+        private string _password;
+        public string Password { get { return _password; } set { _password = value; NotifyPropertyChanged("Password"); } }
 
         internal string RspAuth { get; set; }
 #endregion
@@ -90,16 +94,35 @@ namespace EnergonSoftware.Launcher
         public bool CanLogin { get { return !Authenticating && !Authenticated; } }
 #endregion
 
-#region Authentication Methods
-        internal void BeginAuth(string username, string password)
+#region Network Methods
+        private void OnConnectFailedCallback(int socketId, SocketError error)
         {
-            if(AuthSocketId < 0) {
-                return;
+            if(AuthSocketId == socketId) {
+                AuthFailed("Failed to connect to the server: " + error);
             }
+        }
 
+        private void OnConnectSuccessCallback(int socketId)
+        {
+            if(AuthSocketId == socketId) {
+                BeginAuth();
+            }
+        }
+#endregion
+
+#region Authentication Methods
+        // TODO: this is silly, don't pass the password in here
+        // should use a more "proper" way of querying for it
+        internal void AuthConnect(string password)
+        {
+            Password = password;
+
+            AuthSocketId = ConnectAsync(ConfigurationManager.AppSettings["authHost"], Int32.Parse(ConfigurationManager.AppSettings["authPort"]));
+        }
+
+        private void BeginAuth()
+        {
             lock(_lock) {
-                Username = username;
-                Password = password;
                 _logger.Info("Authenticating as user '" + Username + "'...");
 
                 AuthMessage message = new AuthMessage();
@@ -112,10 +135,6 @@ namespace EnergonSoftware.Launcher
 
         internal void AuthResponse(string response)
         {
-            if(AuthSocketId < 0) {
-                return;
-            }
-
             ResponseMessage message = new ResponseMessage();
             message.Response = response;
             SendMessage(AuthSocketId, message, _formatter);
@@ -127,10 +146,6 @@ namespace EnergonSoftware.Launcher
 
         internal void AuthFinalize()
         {
-            if(AuthSocketId < 0) {
-                return;
-            }
-
             ResponseMessage response = new ResponseMessage();
             SendMessage(AuthSocketId, response, _formatter);
 
@@ -159,9 +174,6 @@ namespace EnergonSoftware.Launcher
 
             Disconnect(AuthSocketId);
             AuthSocketId = -1;
-
-            OnAuthSuccess = null;
-            OnAuthFailed = null;
         }
 
         internal void AuthFailed(string reason)
@@ -183,9 +195,6 @@ namespace EnergonSoftware.Launcher
 
             Disconnect(AuthSocketId);
             AuthSocketId = -1;
-
-            OnAuthSuccess = null;
-            OnAuthFailed = null;
         }
 #endregion
 
@@ -267,6 +276,9 @@ namespace EnergonSoftware.Launcher
         {
             // watch for API notifications
             ApiPropertyChanged += OnPropertyChanged;
+
+            OnConnectFailed += OnConnectFailedCallback;
+            OnConnectSuccess += OnConnectSuccessCallback;
         }
     }
 }

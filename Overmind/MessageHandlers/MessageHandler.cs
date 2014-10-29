@@ -2,6 +2,7 @@
 using System.Threading;
 
 using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Messages.Overmind;
 using EnergonSoftware.Overmind.Net;
 
 namespace EnergonSoftware.Overmind.MessageHandlers
@@ -29,6 +30,7 @@ namespace EnergonSoftware.Overmind.MessageHandlers
 
         static MessageHandler()
         {
+            Handlers[LoginMessage.MESSAGE_TYPE] = new LoginMessageHandler();
         }
 
         public static void HandleMessage(IMessage message, Session session)

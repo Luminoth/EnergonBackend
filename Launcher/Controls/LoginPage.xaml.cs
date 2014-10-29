@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Net.Sockets;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +15,9 @@ namespace EnergonSoftware.Launcher.Controls
             InitializeComponent();
 
             DataContext = ClientState.Instance;
+
+            ClientState.Instance.OnAuthFailed += OnAuthFailedCallback;
+            ClientState.Instance.OnAuthSuccess += OnAuthSuccessCallback;
         }
 
 #region UI Helpers
@@ -39,43 +41,26 @@ namespace EnergonSoftware.Launcher.Controls
         {
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                ClientState.Instance.BeginAuth(Username.Text, Password.Password);
+                ClientState.Instance.AuthConnect(Password.Password);
             }));
         }
 #endregion
 
 #region Event Handlers
-        // TODO: move these ClientState
         private void OnLogin(object sender, RoutedEventArgs evt)
         {
-            ClientState.Instance.OnConnectFailed += OnConnectFailed;
-            ClientState.Instance.OnConnectSuccess += OnConnectSuccess;
-            ClientState.Instance.AuthSocketId = ClientState.Instance.ConnectAsync(ConfigurationManager.AppSettings["authHost"], Int32.Parse(ConfigurationManager.AppSettings["authPort"]));
-        }
-
-        private void OnConnectFailed(int socketId, SocketError error)
-        {
-            ClearPassword();
-            OnError("Failed to connect to the server: " + error, "Connection Failed");
-        }
-
-        private void OnConnectSuccess(int socketId)
-        {
-            ClientState.Instance.OnAuthFailed += OnAuthFailed;
-            ClientState.Instance.OnAuthSuccess += OnAuthSuccess;
             BeginAuth();
         }
 
-        private void OnAuthFailed(string reason)
+        private void OnAuthFailedCallback(string reason)
         {
             ClearPassword();
             OnError("Authentication failed: " + reason, "Authentication Failed");
         }
 
-        private void OnAuthSuccess()
+        private void OnAuthSuccessCallback()
         {
             ClearPassword();
-            // TODO: connect to the overmind
         }
 #endregion
     }

@@ -56,7 +56,7 @@ namespace EnergonSoftware.Core
             return _sockets[socketId].Reader;
         }
 
-        private void OnConnectAsyncFailed(int socketId, SocketError error)
+        private void OnConnectAsyncFailedCallback(int socketId, SocketError error)
         {
             _logger.Error("Socket " + socketId + " connect failed: " + error);
 
@@ -80,7 +80,7 @@ namespace EnergonSoftware.Core
             }
         }
 
-        private void OnConnectAsyncSuccess(int socketId, Socket socket)
+        private void OnConnectAsyncSuccessCallback(int socketId, Socket socket)
         {
             _logger.Info("Connected socket " + socketId + " to " + socket.RemoteEndPoint);
 
@@ -116,8 +116,8 @@ namespace EnergonSoftware.Core
             _logger.Info("Connecting to " + host + ":" + port + " with socket " + state.Id + "...");
 
             AsyncConnectEventArgs args = new AsyncConnectEventArgs(state.Id);
-            args.OnConnectFailed += OnConnectAsyncFailed;
-            args.OnConnectSuccess += OnConnectAsyncSuccess;
+            args.OnConnectFailed += OnConnectAsyncFailedCallback;
+            args.OnConnectSuccess += OnConnectAsyncSuccessCallback;
             NetUtil.ConnectAsync(host, port, args);
 
             return state.Id;

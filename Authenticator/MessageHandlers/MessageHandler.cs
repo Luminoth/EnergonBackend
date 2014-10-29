@@ -3,7 +3,6 @@ using System.Threading;
 
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
-using EnergonSoftware.Core.Util;
 using EnergonSoftware.Authenticator.Net;
 
 namespace EnergonSoftware.Authenticator.MessageHandlers

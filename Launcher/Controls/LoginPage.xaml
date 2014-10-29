@@ -18,7 +18,7 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static launcherprops:Resources.UsernameLabel}" />
-        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Width="100" Name="Username" IsEnabled="{Binding CanLogin}" />
+        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Width="100" Name="Username" IsEnabled="{Binding CanLogin}" Text="{Binding Username}" />
 
         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"  Text="{x:Static launcherprops:Resources.PasswordLabel}" />
         <PasswordBox Grid.Row="1" Grid.Column="1" Margin="5" Width="100" Name="Password" IsEnabled="{Binding CanLogin}" />

@@ -59,6 +59,7 @@
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessageException.cs" />
     <Compile Include="Messages\MessageHandlerException.cs" />
+    <Compile Include="Messages\Overmind\LoginMessage.cs" />
     <Compile Include="Net\BufferedSocketReader.cs" />
     <Compile Include="Net\NetUtil.cs" />
     <Compile Include="Net\NetworkMessage.cs" />
