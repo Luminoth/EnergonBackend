@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System;
 
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Overmind;
@@ -19,29 +18,33 @@ namespace EnergonSoftware.Overmind.MessageHandlers
         }
     }
 
-    interface IMessageHandler
+    internal abstract class MessageHandler
     {
-        void HandleMessage(object context);
-    }
-
-    static class MessageHandler
-    {
-        public static Dictionary<string, IMessageHandler> Handlers = new Dictionary<string,IMessageHandler>();
-
-        static MessageHandler()
+        public static MessageHandler Create(string type)
         {
-            Handlers[LoginMessage.MESSAGE_TYPE] = new LoginMessageHandler();
-        }
-
-        public static void HandleMessage(IMessage message, Session session)
-        {
-            IMessageHandler handler = null;
-            try {
-                handler = Handlers[message.Type];
-            } catch(KeyNotFoundException) {
-                throw new MessageHandlerException("Unsupported message type: " + message.Type);
+            switch(type)
+            {
+            case LoginMessage.MESSAGE_TYPE:
+                return new LoginMessageHandler();
             }
-            ThreadPool.QueueUserWorkItem(handler.HandleMessage, new MessageHandlerContext(session, message));
+            throw new MessageHandlerException("Unsupported message type: " + type);
         }
+
+        public bool Finished { get; set; }
+
+        public void HandleMessage(object context)
+        {
+            MessageHandlerContext ctx = (MessageHandlerContext)context;
+
+            Finished = false;
+            try {
+                OnHandleMessage(context);
+            } catch(Exception e) {
+                ctx.Session.Error(e);
+            }
+            Finished = true;
+        }
+
+        protected abstract void OnHandleMessage(object context);
     }
 }

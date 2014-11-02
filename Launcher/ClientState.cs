@@ -1,8 +1,9 @@
 ﻿using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 using log4net;
 
@@ -10,6 +11,7 @@ using EnergonSoftware.Core;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Overmind;
 using EnergonSoftware.Core.Net;
 
 using EnergonSoftware.Launcher.MessageHandlers;
@@ -25,7 +27,7 @@ namespace EnergonSoftware.Launcher
         Authenticated,
     }
 
-    sealed class ClientState : ClientApi, INotifyPropertyChanged
+    sealed class ClientState : ClientApi
     {
 #region Singleton
         private static ClientState _instance = new ClientState();
@@ -35,13 +37,6 @@ namespace EnergonSoftware.Launcher
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ClientState));
 
         private object _lock = new object();
-
-#region Notification Properties
-        public const string NOTIFY_AUTHENTICATING = "Authenticating";
-        public const string NOTIFY_AUTHENTICATED = "Authenticated";
-        public const string NOTIFY_NOT_AUTHENTICATED = "NotAuthenticated";
-        public const string NOTIFY_CAN_LOGIN = "CanLogin";
-#endregion
 
 #region Network Properties
         public int AuthSocketId { get; private set; }
@@ -56,24 +51,29 @@ namespace EnergonSoftware.Launcher
         public event OnAuthFailedHandler OnAuthFailed;
 #endregion
 
+#region Login Events
+        public delegate void OnLoginSuccessHandler();
+        public event OnLoginSuccessHandler OnLoginSuccess;
+
+        public delegate void OnLoginFailedHandler(string reason);
+        public event OnLoginFailedHandler OnLoginFailed;
+#endregion
+
+#region Message properties
+        private Dictionary<int, Queue<IMessage>> _messages = new Dictionary<int,Queue<IMessage>>();
+        private Dictionary<int, MessageHandler> _currentMessageHandlers = new Dictionary<int,MessageHandler>();
         private IMessageFormatter _formatter = new BinaryMessageFormatter();
+#endregion
 
 #region Authentication Properties
-        private volatile AuthenticationStage _authStage = AuthenticationStage.NotAuthenticated;
-
+        private AuthenticationStage _authStage = AuthenticationStage.NotAuthenticated;
         internal AuthenticationStage AuthStage
         {
             get { return _authStage; }
-            private set
-            {
-                lock(_lock) {
-                    _authStage = value;
-
-                    NotifyPropertyChanged(NOTIFY_AUTHENTICATING);
-                    NotifyPropertyChanged(NOTIFY_AUTHENTICATED);
-                    NotifyPropertyChanged(NOTIFY_NOT_AUTHENTICATED);
-                    NotifyPropertyChanged(NOTIFY_CAN_LOGIN);
-                }
+            set {
+                _authStage = value;
+                NotifyPropertyChanged("Authenticating");
+                NotifyPropertyChanged("Authenticated");
             }
         }
 
@@ -89,16 +89,66 @@ namespace EnergonSoftware.Launcher
         internal string RspAuth { get; set; }
 #endregion
 
-#region UI Helpers
-        public bool NotAuthenticated { get { return !Authenticated; } }
-        public bool CanLogin { get { return !Authenticating && !Authenticated; } }
+#region Login Properties
+        private bool _loggedIn = false;
+        public bool LoggedIn
+        {
+            get { return _loggedIn; }
+            set {
+                _loggedIn = value;
+                NotifyPropertyChanged("LoggedIn");
+                NotifyPropertyChanged("NotLoggedIn");
+            }
+        }
 #endregion
+
+#region UI Helpers
+        private bool _loggingIn = false;
+        public bool LoggingIn
+        {
+            get { return _loggingIn; }
+            set {
+                _loggingIn = value;
+                NotifyPropertyChanged("LoggingIn");
+                NotifyPropertyChanged("CanLogin");
+            }
+        }
+
+        public bool CanLogin { get { return !LoggingIn && !LoggedIn; } }
+        public bool NotLoggedIn { get { return !LoggedIn; } }
+#endregion
+
+        private void OnSocketErrorCallback(int socketId, string error)
+        {
+            if(socketId == AuthSocketId) {
+                Disconnect(AuthSocketId);
+            } else if(socketId == OvermindSocketId) {
+                Disconnect(OvermindSocketId);
+            }
+        }
+
+        private void OnDisconnectCallback(int socketId)
+        {
+            if(socketId == AuthSocketId) {
+                if(!Authenticated) {
+                    Error("Auth server disconnected!");
+                }
+                AuthSocketId = -1;
+            } else if(socketId == OvermindSocketId) {
+                Error("Overmind disconnected!");
+                OvermindSocketId = -1;
+            } else {
+                Error("Server disconnected!");
+            }
+        }
 
 #region Network Methods
         private void OnConnectFailedCallback(int socketId, SocketError error)
         {
             if(AuthSocketId == socketId) {
-                AuthFailed("Failed to connect to the server: " + error);
+                AuthFailed("Failed to connect to the authentication server: " + error);
+            } else if(OvermindSocketId == socketId) {
+                LoginFailed("Failed to connect to the overmind server: " + error);
             }
         }
 
@@ -106,6 +156,8 @@ namespace EnergonSoftware.Launcher
         {
             if(AuthSocketId == socketId) {
                 BeginAuth();
+            } else if(OvermindSocketId == socketId) {
+                Login();
             }
         }
 #endregion
@@ -115,16 +167,18 @@ namespace EnergonSoftware.Launcher
         // should use a more "proper" way of querying for it
         internal void AuthConnect(string password)
         {
-            Password = password;
+            lock(_lock) {
+                Password = password;
 
-            AuthSocketId = ConnectAsync(ConfigurationManager.AppSettings["authHost"], Int32.Parse(ConfigurationManager.AppSettings["authPort"]));
+                AuthSocketId = ConnectAsync(ConfigurationManager.AppSettings["authHost"], Int32.Parse(ConfigurationManager.AppSettings["authPort"]));
+            }
         }
 
         private void BeginAuth()
         {
-            lock(_lock) {
-                _logger.Info("Authenticating as user '" + Username + "'...");
+            _logger.Info("Authenticating as user '" + Username + "'...");
 
+            lock(_lock) {
                 AuthMessage message = new AuthMessage();
                 message.MechanismType = AuthType.DigestSHA512;
                 SendMessage(AuthSocketId, message, _formatter);
@@ -135,150 +189,212 @@ namespace EnergonSoftware.Launcher
 
         internal void AuthResponse(string response)
         {
-            ResponseMessage message = new ResponseMessage();
-            message.Response = response;
-            SendMessage(AuthSocketId, message, _formatter);
-
             lock(_lock) {
+                ResponseMessage message = new ResponseMessage();
+                message.Response = response;
+                SendMessage(AuthSocketId, message, _formatter);
+
                 AuthStage = AuthenticationStage.Challenge;
             }
         }
 
         internal void AuthFinalize()
         {
-            ResponseMessage response = new ResponseMessage();
-            SendMessage(AuthSocketId, response, _formatter);
-
             lock(_lock) {
+                ResponseMessage response = new ResponseMessage();
+                SendMessage(AuthSocketId, response, _formatter);
+
                 AuthStage = AuthenticationStage.Finalize;
             }
         }
 
         internal void AuthSuccess(string ticket)
         {
-            lock(_lock) {
-                _logger.Info("Authentication successful!");
+            _logger.Info("Authentication successful!");
+            _logger.Debug("Ticket=" + ticket);
 
-                _logger.Debug("Ticket=" + ticket);
+            lock(_lock) {
                 Ticket = ticket;
 
                 Password = null;
                 RspAuth = null;
 
                 AuthStage = AuthenticationStage.Authenticated;
-            }
 
-            if(null != OnAuthSuccess) {
-                OnAuthSuccess();
-            }
+                if(null != OnAuthSuccess) {
+                    OnAuthSuccess();
+                }
 
-            Disconnect(AuthSocketId);
-            AuthSocketId = -1;
+                Disconnect(AuthSocketId);
+                AuthSocketId = -1;
+            }
         }
 
         internal void AuthFailed(string reason)
         {
+            _logger.Warn("Authentication failed: " + reason);
+
             lock(_lock) {
-                _logger.Warn("Authentication failed: " + reason);
+                Reset();
 
-                Ticket = null;
+                if(null != OnAuthFailed) {
+                    OnAuthFailed(reason);
+                }
 
-                Password = null;
-                RspAuth = null;
-
-                AuthStage = AuthenticationStage.NotAuthenticated;
+                Disconnect(AuthSocketId);
+                AuthSocketId = -1;
             }
-
-            if(null != OnAuthFailed) {
-                OnAuthFailed(reason);
-            }
-
-            Disconnect(AuthSocketId);
-            AuthSocketId = -1;
         }
 #endregion
 
-        private bool HandleAuthMessages()
+#region Overmind Methods
+        internal void OvermindConnect()
         {
             lock(_lock) {
-                // TODO: this needs to be a while loop
+                OvermindSocketId = ConnectAsync(ConfigurationManager.AppSettings["overmindHost"], Int32.Parse(ConfigurationManager.AppSettings["overmindPort"]));
+            }
+        }
+
+        private void Login()
+        {
+            _logger.Info("Logging in...");
+
+            lock(_lock) {
+                LoginMessage message = new LoginMessage();
+                message.Username = Username;
+                message.Ticket = Ticket;
+                SendMessage(OvermindSocketId, message, _formatter);
+            }
+        }
+
+        internal void LoginSuccess()
+        {
+            _logger.Info("Login successful!");
+
+            lock(_lock) {
+                LoggedIn = true;
+
+                if(null != OnLoginSuccess) {
+                    OnLoginSuccess();
+                }
+            }
+        }
+
+        internal void LoginFailed(string reason)
+        {
+            _logger.Warn("Login failed: " + reason);
+
+            lock(_lock) {
+                Reset();
+
+                if(null != OnLoginFailed) {
+                    OnLoginFailed(reason);
+                }
+
+                Disconnect(OvermindSocketId);
+                OvermindSocketId = -1;
+            }
+        }
+
+        private void Ping()
+        {
+            lock(_lock) {
+                /*PingMessage message = new PingMessage();
+                SendMessage(OvermindSocketId, message, _formatter);*/
+            }
+        }
+#endregion
+
+        private void HandleMessages(int socketId)
+        {
+            if(socketId < 1) {
+                return;
+            }
+
+            BufferedSocketReader reader = GetSocketReader(socketId);
+            if(null == reader) {
+                return;
+            }
+
+            if(!_messages.ContainsKey(socketId)) {
+                _messages[socketId]  = new Queue<IMessage>();
+            }
+
+            lock(_lock) {
                 try {
-                    NetworkMessage message = NetworkMessage.Parse(GetSocketReader(AuthSocketId).Buffer, _formatter);
-                    if(null != message) {
-                        _logger.Debug("Parsed message type: " + message.Payload.Type);
-                        MessageHandler.HandleMessage(message.Payload);
+                    // cleanup the current message handler
+                    if(_currentMessageHandlers.ContainsKey(socketId) && _currentMessageHandlers[socketId].Finished) {
+                        _currentMessageHandlers.Remove(socketId);
                     }
+
+                    // read off the data buffer and queue any complete messages
+                    NetworkMessage message = NetworkMessage.Parse(reader.Buffer, _formatter);
+                    while(null != message) {
+                        _logger.Debug("Parsed message type: " + message.Payload.Type);
+                        _messages[socketId].Enqueue(message.Payload);
+                        message = NetworkMessage.Parse(reader.Buffer, _formatter);
+                    }
+
+                    // handle the next message if we can
+                    if(!_currentMessageHandlers.ContainsKey(socketId) && _messages[socketId].Count > 0) {
+                        IMessage nextMessage = _messages[socketId].Dequeue();
+
+                        MessageHandler handler = MessageHandler.Create(nextMessage.Type);
+                        if(null != handler) {
+                            _currentMessageHandlers[socketId] = handler;
+                            ThreadPool.QueueUserWorkItem(_currentMessageHandlers[socketId].HandleMessage, new MessageHandlerContext(nextMessage));
+                        }
+                    }
+
+                    // TODO: we need a way to say "hey, this handler is taking WAY too long,
+                    // dump an error and kill the session"
                 } catch(Exception e) {
                     Error(e);
-                    return false;
                 }
-                return true;
+                return;
             }
         }
 
-        private bool HandleMessages()
+        private void HandleMessages()
         {
-            if(AuthSocketId > 0) {
-                if(!HandleAuthMessages()) {
-                    return false;
-                }
-            }
-
-            return true;
+            HandleMessages(AuthSocketId);
+            HandleMessages(OvermindSocketId);
         }
 
-        private bool Poll()
+        private void Poll()
         {
-            if(AuthSocketId > 0) {
-                if(!Poll(AuthSocketId)) {
-                    return false;
-                }
-            }
-
-            return true;
+            Poll(AuthSocketId);
+            Poll(OvermindSocketId);
         }
 
         public void Run()
         {
-            if(!Poll()) {
-                return;
-            }
+            Poll();
 
-            if(!HandleMessages()) {
-                return;
-            }
+            HandleMessages();
 
-            //Ping();
+            Ping();
         }
 
-#region Property Notifier
-        public void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Reset()
         {
-            // pass on the API notifications
-            NotifyPropertyChanged(e.PropertyName);
+            AuthStage = AuthenticationStage.NotAuthenticated;
+            Ticket = null;
+            Password = null;
+            RspAuth = null;
 
-            // have to push this notification
-            // in case the connecting properties change
-            // TODO: wrap this in an if statement
-            NotifyPropertyChanged(NOTIFY_CAN_LOGIN);
+            LoggingIn = false;
+            LoggedIn = false;
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(/*[CallerMemberName]*/ string property/*=null*/)
-        {
-            if(null != PropertyChanged) {
-                PropertyChanged(this, new PropertyChangedEventArgs(property));
-            }
-        }
-#endregion
 
         private ClientState()
         {
-            // watch for API notifications
-            ApiPropertyChanged += OnPropertyChanged;
+            OnSocketError += OnSocketErrorCallback;
 
             OnConnectFailed += OnConnectFailedCallback;
             OnConnectSuccess += OnConnectSuccessCallback;
+
+            OnDisconnect += OnDisconnectCallback;
         }
     }
 }

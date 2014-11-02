@@ -18,6 +18,9 @@ namespace EnergonSoftware.Launcher.Controls
 
             ClientState.Instance.OnAuthFailed += OnAuthFailedCallback;
             ClientState.Instance.OnAuthSuccess += OnAuthSuccessCallback;
+
+            ClientState.Instance.OnLoginFailed += OnLoginFailedCallback;
+            ClientState.Instance.OnLoginSuccess += OnLoginSuccessCallback;
         }
 
 #region UI Helpers
@@ -28,39 +31,42 @@ namespace EnergonSoftware.Launcher.Controls
                 Password.Password = "";
             }));
         }
-
-        private void OnError(string message, string title)
-        {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                MessageBox.Show(Application.Current.MainWindow, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
-            }));
-        }
-
-        private void BeginAuth()
-        {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                ClientState.Instance.AuthConnect(Password.Password);
-            }));
-        }
 #endregion
 
 #region Event Handlers
         private void OnLogin(object sender, RoutedEventArgs evt)
         {
-            BeginAuth();
+            ClientState.Instance.LoggingIn = true;
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                ClientState.Instance.AuthConnect(Password.Password);
+            }));
         }
 
         private void OnAuthFailedCallback(string reason)
         {
             ClearPassword();
-            OnError("Authentication failed: " + reason, "Authentication Failed");
+            ((App)Application.Current).OnError("Authentication failed: " + reason, "Authentication Failed");
+            ClientState.Instance.LoggingIn = false;
         }
 
         private void OnAuthSuccessCallback()
         {
             ClearPassword();
+            ClientState.Instance.OvermindConnect();
+            ClientState.Instance.LoggingIn = false;
+        }
+
+        private void OnLoginFailedCallback(string reason)
+        {
+            ((App)Application.Current).OnError("Login failed: " + reason, "Login Failed");
+            ClientState.Instance.LoggingIn = false;
+        }
+
+        private void OnLoginSuccessCallback()
+        {
+            ClientState.Instance.LoggingIn = false;
+// TODO
         }
 #endregion
     }

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Configuration;
 using System.Net.Sockets;
+using System.Threading;
 
 using log4net;
 
@@ -45,6 +47,11 @@ namespace EnergonSoftware.Overmind.Net
         }
 #endregion
 
+#region Message properties
+        private ConcurrentQueue<IMessage> _messages = new ConcurrentQueue<IMessage>();
+        private MessageHandler _currentMessageHandler;
+#endregion
+
         public Session(Socket socket)
         {
             Id = NextId;
@@ -56,11 +63,30 @@ namespace EnergonSoftware.Overmind.Net
         {
             lock(_lock) {
                 try {
-                    NetworkMessage message = NetworkMessage.Parse(Reader.Buffer, _formatter);
-                    if(null != message) {
-                        _logger.Debug("Session " + Id + " parsed message type: " + message.Payload.Type);
-                        MessageHandler.HandleMessage(message.Payload, this);
+                    // cleanup the current message handler
+                    if(null != _currentMessageHandler && _currentMessageHandler.Finished) {
+                        _currentMessageHandler = null;
                     }
+
+                    // read off the data buffer and queue any complete messages
+                    NetworkMessage message = NetworkMessage.Parse(Reader.Buffer, _formatter);
+                    while(null != message) {
+                        _logger.Debug("Session " + Id + " parsed message type: " + message.Payload.Type);
+                        _messages.Enqueue(message.Payload);
+                        message = NetworkMessage.Parse(Reader.Buffer, _formatter);
+                    }
+
+                    // handle the next message if we can
+                    IMessage nextMessage;
+                    if(null == _currentMessageHandler && _messages.TryDequeue(out nextMessage)) {
+                        _currentMessageHandler = MessageHandler.Create(nextMessage.Type);
+                        if(null != _currentMessageHandler) {
+                            ThreadPool.QueueUserWorkItem(_currentMessageHandler.HandleMessage, new MessageHandlerContext(this, nextMessage));
+                        }
+                    }
+
+                    // TODO: we need a way to say "hey, this handler is taking WAY too long,
+                    // dump an error and kill the session"
                 } catch(Exception e) {
                     Error(e);
                 }
@@ -105,7 +131,7 @@ namespace EnergonSoftware.Overmind.Net
                         }
                         _logger.Debug("Session " + Id + " read " + len + " bytes");
                     }
-                } catch(SocketException e) {
+                } catch(Exception e) {
                     Error(e);
                 }
             }

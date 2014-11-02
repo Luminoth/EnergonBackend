@@ -35,10 +35,10 @@ namespace EnergonSoftware.Overmind
 
             int workerThreads,ioThreads;
             ThreadPool.GetMinThreads(out workerThreads, out ioThreads);
-            ThreadPool.SetMinThreads(Int32.Parse(ConfigurationManager.AppSettings["minWorkerThreads"]), ioThreads);
+            ThreadPool.SetMinThreads(Convert.ToInt32(ConfigurationManager.AppSettings["minWorkerThreads"]), ioThreads);
 
             ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
-            ThreadPool.SetMaxThreads(Int32.Parse(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
+            ThreadPool.SetMaxThreads(Convert.ToInt32(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
 
             return true;
         }
@@ -68,7 +68,7 @@ namespace EnergonSoftware.Overmind
                     ServerState.Instance.Quit = true;
                 }
 
-                Thread.Sleep(1);
+                Thread.Sleep(0);
             }
         }
 
@@ -77,7 +77,7 @@ namespace EnergonSoftware.Overmind
             ConfigureLogging();
 
             try {
-                _logger.Info("Authenticator spinning up...");
+                _logger.Info("Overmind spinning up...");
                 if(!Init()) {
                     Cleanup();
                     return;

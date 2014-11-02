@@ -3,13 +3,13 @@ using EnergonSoftware.Core.Messages.Auth;
 
 namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 {
-    internal sealed class FailureMessageHandler : IMessageHandler
+    internal sealed class FailureMessageHandler : MessageHandler
     {
         internal FailureMessageHandler()
         {
         }
 
-        public void HandleMessage(object context)
+        protected override void OnHandleMessage(object context)
         {
             MessageHandlerContext ctx = (MessageHandlerContext)context;
             FailureMessage failure = (FailureMessage)ctx.Message;

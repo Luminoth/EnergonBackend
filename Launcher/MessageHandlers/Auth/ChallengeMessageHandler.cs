@@ -11,7 +11,7 @@ using EnergonSoftware.Core.Util.Crypt;
 
 namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 {
-    internal sealed class ChallengeMessageHandler : IMessageHandler
+    internal sealed class ChallengeMessageHandler : MessageHandler
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ChallengeMessageHandler));
 
@@ -91,7 +91,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             }
         }
 
-        public void HandleMessage(object context)
+        protected override void OnHandleMessage(object context)
         {
             MessageHandlerContext ctx = (MessageHandlerContext)context;
             ChallengeMessage challenge = (ChallengeMessage)ctx.Message;

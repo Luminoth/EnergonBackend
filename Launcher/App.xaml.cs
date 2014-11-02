@@ -18,6 +18,29 @@ namespace EnergonSoftware.Launcher
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(App));
 
+        private static volatile bool _quit = false;
+        private static Thread _idleThread;
+
+        public static void Quit()
+        {
+            _logger.Info("Quitting...");
+            _quit = true;
+            if(null != _idleThread) {
+                _logger.Info("Waiting for idle thread to stop...");
+                _idleThread.Join();
+            }
+            _logger.Info("Goodbye!");
+        }
+
+        private static void OnIdle()
+        {
+            _logger.Info("**Idle mark**");
+            while(!_quit) {
+                ClientState.Instance.Run();
+                Thread.Sleep(0);
+            }
+        }
+
 #region Initialization
         private void ConfigureLogging()
         {
@@ -26,7 +49,7 @@ namespace EnergonSoftware.Launcher
 #endregion
 
 #region UI Helpers
-        private void OnError(string message, string title)
+        public void OnError(string message, string title)
         {
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
@@ -48,29 +71,19 @@ namespace EnergonSoftware.Launcher
             ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
             ThreadPool.SetMaxThreads(Int32.Parse(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
 
-            ClientState.Instance.OnDisconnect += OnDisconnectCallback;
-            ClientState.Instance.OnSocketError += OnSocketErrorCallback;
+            ClientState.Instance.OnError += OnErrorCallback;
 
-            ComponentDispatcher.ThreadIdle += OnIdle;
-        }
-
-        private void OnIdle(object sender, EventArgs evt)
-        {
-            ClientState.Instance.Run();
+            // have to run this in a separate thread
+            // so that we don't lock up the UI
+            _logger.Info("Starting idle thread...");
+            _idleThread = new Thread(new ThreadStart(OnIdle));
+            _idleThread.Start();
         }
 #endregion
 
-        // TODO: move these into ClientState
-        private void OnDisconnectCallback(int socketId)
+        private void OnErrorCallback(string error)
         {
-            if(socketId == ClientState.Instance.AuthSocketId && !ClientState.Instance.Authenticated) {
-                OnError("Auth Server Disconnected!", "Disconnected!");
-            }
-        }
-
-        private void OnSocketErrorCallback(int socketId, string error)
-        {
-            OnError(error, "Socket Error");
+            OnError(error, "Error!");
         }
     }
 }

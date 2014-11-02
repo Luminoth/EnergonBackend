@@ -12,7 +12,7 @@ using EnergonSoftware.Core.Net;
 
 namespace EnergonSoftware.Core
 {
-    public class ClientApi
+    public class ClientApi : INotifyPropertyChanged
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ClientApi));
 
@@ -40,20 +40,29 @@ namespace EnergonSoftware.Core
         public string Ticket { get; protected set; }
 
 #region Network Methods
+        public bool HasSocketState(int socketId)
+        {
+            return _sockets.ContainsKey(socketId);
+        }
+
         public SocketState GetSocketState(int socketId)
         {
-            if(!_sockets.ContainsKey(socketId)) {
-                return null;
+            lock(_sockets) {
+                if(!HasSocketState(socketId)) {
+                    return null;
+                }
+                return _sockets[socketId];
             }
-            return _sockets[socketId];
         }
 
         public BufferedSocketReader GetSocketReader(int socketId)
         {
-            if(!_sockets.ContainsKey(socketId)) {
-                return null;
+            lock(_sockets) {
+                if(!HasSocketState(socketId)) {
+                    return null;
+                }
+                return _sockets[socketId].Reader;
             }
-            return _sockets[socketId].Reader;
         }
 
         private void OnConnectAsyncFailedCallback(int socketId, SocketError error)
@@ -148,40 +157,40 @@ namespace EnergonSoftware.Core
             }
         }
 
-        public bool Poll(int socketId)
+        public void Poll(int socketId)
         {
+            if(socketId < 1) {
+                return;
+            }
+
             SocketState socketState = null;
             lock(_sockets) {
                 socketState = GetSocketState(socketId);
             }
 
             if(null == socketState) {
-                _logger.Error("No such socket for poll: " + socketId);
-                return false;
+                //_logger.Error("No such socket for poll: " + socketId);
+                return;
             }
 
             if(!socketState.Connected) {
-                return false;
+                return;
             }
 
             lock(socketState) {
-                // TODO: this needs to be a while loop
                 try {
                     if(socketState.Socket.Poll(100, SelectMode.SelectRead)) {
                         int len = socketState.Reader.Read();
                         if(0 == len) {
-                            SocketError(socketId, "End of stream!");
-                            return false;
+                            Disconnect(socketId);
+                            return;
                         }
                         _logger.Debug("Read " + len + " bytes");
                     }
-                } catch(SocketException e) {
+                } catch(Exception e) {
                     SocketError(socketId, e);
-                    return false;
                 }
             }
-
-            return true;
         }
 
         public void SendMessage(int socketId, IMessage message, IMessageFormatter formatter)
@@ -216,7 +225,9 @@ namespace EnergonSoftware.Core
             _logger.Error("Socket " + socketId + " encountered an error: " + error);
             Disconnect(socketId);
 
-            OnSocketError(socketId, error);
+            if(null != OnSocketError) {
+                OnSocketError(socketId, error);
+            }
         }
 
         public void SocketError(int socketId, Exception error)
@@ -227,7 +238,10 @@ namespace EnergonSoftware.Core
         public void Error(string error)
         {
             _logger.Error("Encountered an error: " + error);
-            OnError(error);
+
+            if(null != OnError) {
+                OnError(error);
+            }
         }
 
         public void Error(Exception error)
@@ -236,11 +250,11 @@ namespace EnergonSoftware.Core
         }
 
 #region Property Notifier
-        public event PropertyChangedEventHandler ApiPropertyChanged;
-        private void NotifyPropertyChanged(/*[CallerMemberName]*/ string property/*=null*/)
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void NotifyPropertyChanged(/*[CallerMemberName]*/ string property/*=null*/)
         {
-            if(null != ApiPropertyChanged) {
-                ApiPropertyChanged(this, new PropertyChangedEventArgs(property));
+            if(null != PropertyChanged) {
+                PropertyChanged(this, new PropertyChangedEventArgs(property));
             }
         }
 #endregion

@@ -5,7 +5,8 @@
         xmlns:launchercontrols="clr-namespace:EnergonSoftware.Launcher.Controls"
         Title="{x:Static launcherprops:Resources.MainWindowTitle}"
         Height="350" Width="525" ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Closed="OnClosed">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
@@ -18,7 +19,7 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <launchercontrols:LoginPage Grid.Row="0" Grid.Column="0" Margin="5" Visibility="{Binding NotAuthenticated, Converter={StaticResource BoolToVis}}" />
-        <launchercontrols:MainPage Grid.Row="1" Grid.Column="0" Margin="5" Visibility="{Binding Authenticated, Converter={StaticResource BoolToVis}}" />
+        <launchercontrols:LoginPage Grid.Row="0" Grid.Column="0" Margin="5" Visibility="{Binding NotLoggedIn, Converter={StaticResource BoolToVis}}" />
+        <launchercontrols:MainPage Grid.Row="1" Grid.Column="0" Margin="5" Visibility="{Binding LoggedIn, Converter={StaticResource BoolToVis}}" />
     </Grid>
 </Window>

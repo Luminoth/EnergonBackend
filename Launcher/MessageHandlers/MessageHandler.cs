@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System;
 
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
@@ -18,31 +17,35 @@ namespace EnergonSoftware.Launcher.MessageHandlers
         }
     }
 
-    internal interface IMessageHandler
+    internal abstract class MessageHandler
     {
-        void HandleMessage(object context);
-    }
-
-    internal static class MessageHandler
-    {
-        private static Dictionary<string, IMessageHandler> Handlers = new Dictionary<string,IMessageHandler>();
-
-        static MessageHandler()
+        public static MessageHandler Create(string type)
         {
-            Handlers[ChallengeMessage.MESSAGE_TYPE] = new ChallengeMessageHandler();
-            Handlers[FailureMessage.MESSAGE_TYPE] = new FailureMessageHandler();
-            Handlers[SuccessMessage.MESSAGE_TYPE] = new SuccessMessageHandler();
-        }
-
-        internal static void HandleMessage(IMessage message)
-        {
-            IMessageHandler handler = null;
-            try {
-                handler = Handlers[message.Type];
-            } catch(KeyNotFoundException) {
-                throw new MessageHandlerException("Unsupported message type: " + message.Type);
+            switch(type)
+            {
+            case ChallengeMessage.MESSAGE_TYPE:
+                return new ChallengeMessageHandler();
+            case FailureMessage.MESSAGE_TYPE:
+                return new FailureMessageHandler();
+            case SuccessMessage.MESSAGE_TYPE:
+                return new SuccessMessageHandler();
             }
-            ThreadPool.QueueUserWorkItem(handler.HandleMessage, new MessageHandlerContext(message));
+            throw new MessageHandlerException("Unsupported message type: " + type);
         }
+
+        public bool Finished { get; set; }
+
+        public void HandleMessage(object context)
+        {
+            Finished = false;
+            try {
+                OnHandleMessage(context);
+            } catch(Exception e) {
+                ClientState.Instance.Error(e);
+            }
+            Finished = true;
+        }
+
+        protected abstract void OnHandleMessage(object context);
     }
 }

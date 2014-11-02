@@ -1,12 +1,12 @@
 ﻿namespace EnergonSoftware.Overmind.MessageHandlers
 {
-    sealed class LoginMessageHandler : IMessageHandler
+    sealed class LoginMessageHandler : MessageHandler
     {
         internal LoginMessageHandler()
         {
         }
 
-        public void HandleMessage(object context)
+        protected override void OnHandleMessage(object context)
         {
             MessageHandlerContext ctx = (MessageHandlerContext)context;
         }

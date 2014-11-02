@@ -10,6 +10,8 @@ namespace EnergonSoftware.Core.Net
 {
     public class BufferedSocketReader
     {
+        private static int MAX_BUFFER = 1024;
+
         public Socket Socket { get; private set; }
         public MemoryBuffer Buffer { get; private set; }
         public long LastMessageTime { get; private set; }
@@ -23,7 +25,7 @@ namespace EnergonSoftware.Core.Net
 
         public int Read()
         {
-            byte[] data = new byte[1024];
+            byte[] data = new byte[MAX_BUFFER];
             int len = Socket.Receive(data);
             if(0 == len) {
                 return 0;
@@ -37,7 +39,7 @@ namespace EnergonSoftware.Core.Net
 
         /*public int ReadFrom(ref EndPoint endpoint)
         {
-            byte[] data = new byte[1024];
+            byte[] data = new byte[MAX_BUFFER];
             int len = Socket.ReceiveFrom(data, ref endpoint);
             if(0 == len) {
                 return 0;

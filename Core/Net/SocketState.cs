@@ -9,6 +9,7 @@ namespace EnergonSoftware.Core.Net
         private static int NextId { get { return ++_nextId; } }
 #endregion
 
+        // NOTE: id's always start at 1, not 0
         public int Id { get; private set; }
 
 #region Socket Properties

@@ -11,7 +11,7 @@ using EnergonSoftware.Authenticator.Net;
 
 namespace EnergonSoftware.Authenticator.MessageHandlers
 {
-    sealed class AuthMessageHandler : IMessageHandler
+    sealed class AuthMessageHandler : MessageHandler
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthMessageHandler));
 
@@ -46,7 +46,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             session.Challenge(challenge);
         }
 
-        public void HandleMessage(object context)
+        protected override void OnHandleMessage(object context)
         {
             MessageHandlerContext ctx = (MessageHandlerContext)context;
 

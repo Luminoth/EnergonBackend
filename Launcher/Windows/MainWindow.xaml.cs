@@ -15,13 +15,10 @@ namespace EnergonSoftware.Launcher
             DataContext = ClientState.Instance;
         }
 
-#region UI Helpers
-        private void OnError(string message, string title)
+#region Event Handlers
+        private void OnClosed(object sender, EventArgs evt)
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                MessageBox.Show(this, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
-            }));
+            App.Quit();
         }
 #endregion
     }
