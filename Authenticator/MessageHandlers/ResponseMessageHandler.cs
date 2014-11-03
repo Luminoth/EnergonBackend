@@ -80,7 +80,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
         protected override void OnHandleMessage(object context)
         {
             MessageHandlerContext ctx = (MessageHandlerContext)context;
-            ResponseMessage response = (ResponseMessage)ctx.Message;
+            ResponseMessage message = (ResponseMessage)ctx.Message;
 
             if(ctx.Session.Authenticated) {
                 CompleteAuthentication(ctx.Session);
@@ -97,7 +97,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 return;
             }
 
-            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(response.Response));
+            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(message.Response));
             _logger.Debug("Decoded response: " + decoded);
 
             Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(decoded);

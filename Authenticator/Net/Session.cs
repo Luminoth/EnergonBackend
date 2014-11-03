@@ -110,7 +110,7 @@ namespace EnergonSoftware.Authenticator.Net
                     // TODO: we need a way to say "hey, this handler is taking WAY too long,
                     // dump an error and kill the session"
                 } catch(Exception e) {
-                    Error(e);
+                    Error("Unhandled Exception!", e);
                 }
             }
         }
@@ -121,9 +121,16 @@ namespace EnergonSoftware.Authenticator.Net
             Disconnect();
         }
 
-        public void Error(Exception error)
+        public void Error(string error, Exception ex)
         {
-            Error(error.Message);
+            _logger.Error("Session " + Id + " encountered an error: " + error, ex);
+            Disconnect();
+        }
+
+        public void Error(Exception ex)
+        {
+            _logger.Error("Session " + Id + " encountered an error", ex);
+            Disconnect();
         }
 
 #region Network Methods
@@ -155,7 +162,7 @@ namespace EnergonSoftware.Authenticator.Net
                         }
                         _logger.Debug("Session " + Id + " read " + len + " bytes");
                     }
-                } catch(Exception e) {
+                } catch(SocketException e) {
                     Error(e);
                 }
             }
@@ -228,9 +235,9 @@ namespace EnergonSoftware.Authenticator.Net
             Disconnect();
         }
 
-        public void Failure(string reason=null)
+        public void Failure(string reason)
         {
-            EventLogger.Instance.SuccessEvent(Socket.RemoteEndPoint, null == AccountInfo ? null : AccountInfo.Username);
+            EventLogger.Instance.FailedEvent(Socket.RemoteEndPoint, null == AccountInfo ? null : AccountInfo.Username, reason);
 
             lock(_lock) {
                 Authenticating = false;

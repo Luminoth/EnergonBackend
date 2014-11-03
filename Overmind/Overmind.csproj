@@ -45,9 +45,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventLogger.cs" />
     <Compile Include="InstanceNotifier.cs" />
     <Compile Include="MessageHandlers\LoginMessageHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandler.cs" />
+    <Compile Include="MessageHandlers\PingMessageHandler.cs" />
     <Compile Include="Net\Session.cs" />
     <Compile Include="Net\SessionManager.cs" />
     <Compile Include="Program.cs" />
@@ -62,6 +64,10 @@
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{b8cf252f-2fbc-4d35-90a9-c0adf2b0b9e0}</Project>
       <Name>Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Database\Database.csproj">
+      <Project>{9821a7a5-8136-4863-ab09-bd5c7e1a6606}</Project>
+      <Name>Database</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

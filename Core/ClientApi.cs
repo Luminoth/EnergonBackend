@@ -55,6 +55,13 @@ namespace EnergonSoftware.Core
             }
         }
 
+        public bool HasSocketReader(int socketId)
+        {
+            lock(_sockets) {
+                return HasSocketState(socketId) && null != _sockets[socketId].Reader;
+            }
+        }
+
         public BufferedSocketReader GetSocketReader(int socketId)
         {
             lock(_sockets) {
@@ -63,6 +70,12 @@ namespace EnergonSoftware.Core
                 }
                 return _sockets[socketId].Reader;
             }
+        }
+
+        public long GetLastMessageTime(int socketId)
+        {
+            BufferedSocketReader reader = GetSocketReader(socketId);
+            return null != reader ? reader.LastMessageTime : 0;
         }
 
         private void OnConnectAsyncFailedCallback(int socketId, SocketError error)
@@ -187,7 +200,7 @@ namespace EnergonSoftware.Core
                         }
                         _logger.Debug("Read " + len + " bytes");
                     }
-                } catch(Exception e) {
+                } catch(SocketException e) {
                     SocketError(socketId, e);
                 }
             }

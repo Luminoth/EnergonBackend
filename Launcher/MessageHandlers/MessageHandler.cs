@@ -23,6 +23,8 @@ namespace EnergonSoftware.Launcher.MessageHandlers
         {
             switch(type)
             {
+            case PingMessage.MESSAGE_TYPE:
+                return new PingMessageHandler();
             case ChallengeMessage.MESSAGE_TYPE:
                 return new ChallengeMessageHandler();
             case FailureMessage.MESSAGE_TYPE:
@@ -38,11 +40,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers
         public void HandleMessage(object context)
         {
             Finished = false;
-            try {
-                OnHandleMessage(context);
-            } catch(Exception e) {
-                ClientState.Instance.Error(e);
-            }
+            OnHandleMessage(context);
             Finished = true;
         }
 

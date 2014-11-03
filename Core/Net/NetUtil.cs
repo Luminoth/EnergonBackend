@@ -73,7 +73,7 @@ namespace EnergonSoftware.Core.Net
                 Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 try {
                     socket.Connect(endPoint);
-                } catch(Exception) {
+                } catch(SocketException) {
                     continue;
                 }
                 return socket;

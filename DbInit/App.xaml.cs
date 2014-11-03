@@ -76,6 +76,7 @@ namespace EnergonSoftware.DbInit
         {
             _logger.Info("Creating event tables...");
             AuthEvent.CreateTable(connection);
+            LoginEvent.CreateTable(connection);
         }
 #endregion
 

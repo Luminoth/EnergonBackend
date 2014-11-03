@@ -84,6 +84,7 @@
     <Compile Include="MessageHandlers\Auth\FailureMessageHandler.cs" />
     <Compile Include="MessageHandlers\Auth\SuccessMessageHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandler.cs" />
+    <Compile Include="MessageHandlers\PingMessageHandler.cs" />
     <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

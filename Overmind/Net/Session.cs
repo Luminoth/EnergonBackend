@@ -10,6 +10,7 @@ using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
+using EnergonSoftware.Database.Objects;
 using EnergonSoftware.Overmind.MessageHandlers;
 
 namespace EnergonSoftware.Overmind.Net
@@ -45,6 +46,10 @@ namespace EnergonSoftware.Overmind.Net
                 return Time.CurrentTimeMs >= (Reader.LastMessageTime + timeout);
             }
         }
+#endregion
+
+#region Account Properties
+        public AccountInfo AccountInfo { get; private set; }
 #endregion
 
 #region Message properties
@@ -88,7 +93,7 @@ namespace EnergonSoftware.Overmind.Net
                     // TODO: we need a way to say "hey, this handler is taking WAY too long,
                     // dump an error and kill the session"
                 } catch(Exception e) {
-                    Error(e);
+                    Error("Unhandled Exception!", e);
                 }
             }
         }
@@ -99,9 +104,16 @@ namespace EnergonSoftware.Overmind.Net
             Disconnect();
         }
 
-        public void Error(Exception error)
+        public void Error(string error, Exception ex)
         {
-            Error(error.Message);
+            _logger.Error("Session " + Id + " encountered an error: " + error, ex);
+            Disconnect();
+        }
+
+        public void Error(Exception ex)
+        {
+            _logger.Error("Session " + Id + " encountered an error", ex);
+            Disconnect();
         }
 
 #region Network Methods
@@ -131,7 +143,7 @@ namespace EnergonSoftware.Overmind.Net
                         }
                         _logger.Debug("Session " + Id + " read " + len + " bytes");
                     }
-                } catch(Exception e) {
+                } catch(SocketException e) {
                     Error(e);
                 }
             }
@@ -153,5 +165,28 @@ namespace EnergonSoftware.Overmind.Net
             }
         }
 #endregion
+
+        public void Ping()
+        {
+            PingMessage ping = new PingMessage();
+            SendMessage(ping);
+        }
+
+        public void LoginFailure(string username, string reason)
+        {
+            EventLogger.Instance.LoginFailedEvent(Socket.RemoteEndPoint, username, reason);
+
+            Disconnect();
+        }
+
+        public void LoginSuccess(AccountInfo account)
+        {
+            InstanceNotifier.Instance.Login(account.Username, Socket.RemoteEndPoint);
+            EventLogger.Instance.LoginSuccessEvent(Socket.RemoteEndPoint, account.Username);
+
+            lock(_lock) {
+                AccountInfo = account;
+            }
+        }
     }
 }

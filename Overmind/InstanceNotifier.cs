@@ -75,6 +75,10 @@ namespace EnergonSoftware.Overmind
         }
 #endregion
 
+        public void Login(string username, EndPoint endpoint)
+        {
+        }
+
         private InstanceNotifier()
         {
         }

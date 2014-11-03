@@ -12,9 +12,9 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
         protected override void OnHandleMessage(object context)
         {
             MessageHandlerContext ctx = (MessageHandlerContext)context;
-            FailureMessage failure = (FailureMessage)ctx.Message;
+            FailureMessage message = (FailureMessage)ctx.Message;
             
-            ClientState.Instance.AuthFailed(failure.Reason);
+            ClientState.Instance.AuthFailed(message.Reason);
         }
     }
 }

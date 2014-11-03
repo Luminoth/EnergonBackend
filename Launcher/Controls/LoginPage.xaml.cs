@@ -18,9 +18,6 @@ namespace EnergonSoftware.Launcher.Controls
 
             ClientState.Instance.OnAuthFailed += OnAuthFailedCallback;
             ClientState.Instance.OnAuthSuccess += OnAuthSuccessCallback;
-
-            ClientState.Instance.OnLoginFailed += OnLoginFailedCallback;
-            ClientState.Instance.OnLoginSuccess += OnLoginSuccessCallback;
         }
 
 #region UI Helpers
@@ -55,18 +52,6 @@ namespace EnergonSoftware.Launcher.Controls
             ClearPassword();
             ClientState.Instance.OvermindConnect();
             ClientState.Instance.LoggingIn = false;
-        }
-
-        private void OnLoginFailedCallback(string reason)
-        {
-            ((App)Application.Current).OnError("Login failed: " + reason, "Login Failed");
-            ClientState.Instance.LoggingIn = false;
-        }
-
-        private void OnLoginSuccessCallback()
-        {
-            ClientState.Instance.LoggingIn = false;
-// TODO
         }
 #endregion
     }

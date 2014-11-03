@@ -65,6 +65,7 @@
     <Compile Include="Objects\DatabaseObject.cs" />
     <Compile Include="Objects\Events\Event.cs" />
     <Compile Include="Objects\Events\AuthEvent.cs" />
+    <Compile Include="Objects\Events\LoginEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TableDescription.cs" />
   </ItemGroup>

@@ -24,6 +24,8 @@ namespace EnergonSoftware.Overmind.MessageHandlers
         {
             switch(type)
             {
+            case PingMessage.MESSAGE_TYPE:
+                return new PingMessageHandler();
             case LoginMessage.MESSAGE_TYPE:
                 return new LoginMessageHandler();
             }
@@ -37,11 +39,7 @@ namespace EnergonSoftware.Overmind.MessageHandlers
             MessageHandlerContext ctx = (MessageHandlerContext)context;
 
             Finished = false;
-            try {
-                OnHandleMessage(context);
-            } catch(Exception e) {
-                ctx.Session.Error(e);
-            }
+            OnHandleMessage(context);
             Finished = true;
         }
 

@@ -56,20 +56,20 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 return;
             }
 
-            AuthMessage auth = (AuthMessage)ctx.Message;
-            if(Common.AUTH_VERSION != auth.Version) {
+            AuthMessage message = (AuthMessage)ctx.Message;
+            if(Common.AUTH_VERSION != message.Version) {
                 ctx.Session.Failure("Bad Version");
                 return;
             }
 
-            ctx.Session.AuthType = auth.MechanismType;
+            ctx.Session.AuthType = message.MechanismType;
             switch(ctx.Session.AuthType)
             {
             /*case AuthType.DigestMD5:
-                HandleDigestMD5Message(auth, session);
+                HandleDigestMD5Message(message, session);
                 break;*/
             case AuthType.DigestSHA512:
-                HandleDigestSHA512Message(auth, ctx.Session);
+                HandleDigestSHA512Message(message, ctx.Session);
                 break;
             default:
                 ctx.Session.Failure("Unsupported Mechanism");

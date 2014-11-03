@@ -3,34 +3,33 @@ using System.Data.Common;
 
 namespace EnergonSoftware.Database.Objects.Events
 {
-    public enum AuthEventType
+    public enum LoginEventType
     {
         Request,
-        Begin,
         Success,
         Failure,
     }
 
-    public sealed class AuthEvent : Event
+    public sealed class LoginEvent : Event
     {
-        private static TableDescription AUTH_EVENTS_TABLE = new TableDescription("events_authenticate",
+        private static TableDescription LOGIN_EVENTS_TABLE = new TableDescription("events_login",
             new List<ColumnDescription>
             {
                 { new ColumnDescription("id", DatabaseType.Integer).SetPrimaryKey() },
                 { new ColumnDescription("timestamp", DatabaseType.DateTime).SetNotNull() },
                 { new ColumnDescription("type", DatabaseType.Integer).SetNotNull() },
                 { new ColumnDescription("origin", DatabaseType.Text).SetNotNull() },
-                { new ColumnDescription("account", DatabaseType.Text) },
+                { new ColumnDescription("account", DatabaseType.Text).SetNotNull() },
                 { new ColumnDescription("reason", DatabaseType.Text) },
             }
         );
 
         public static void CreateTable(DatabaseConnection connection)
         {
-            AUTH_EVENTS_TABLE.Create(connection);
+            LOGIN_EVENTS_TABLE.Create(connection);
         }
 
-        public AuthEventType Type { get; private set; }
+        public LoginEventType Type { get; private set; }
 
         private string _account;
         public string Account { get { return _account; } set { _account = value; Dirty = true; } }
@@ -41,14 +40,14 @@ namespace EnergonSoftware.Database.Objects.Events
         private string _reason;
         public string Reason { get { return _reason; } set { _reason = value; Dirty = true; } }
 
-        public AuthEvent(AuthEventType type)
+        public LoginEvent(LoginEventType type)
         {
             Type = type;
         }
 
         public override void Insert(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AUTH_EVENTS_TABLE.Name
+            using(DbCommand command = connection.BuildCommand("INSERT INTO " + LOGIN_EVENTS_TABLE.Name
                 + "(timestamp, type, origin, account, reason)"
                 + " VALUES(@timestamp, @type, @origin, @account, @reason)"))
             {
@@ -64,7 +63,7 @@ namespace EnergonSoftware.Database.Objects.Events
 
         public override string ToString()
         {
-            return "AuthEvent(id: " + Id + ", timestamp: " + Timestamp + ", type: " + Type + ", origin: " + Origin + ", account: " + Account + ", reason: " + Reason + ")";
+            return "LoginEvent(id: " + Id + ", timestamp: " + Timestamp + ", type: " + Type + ", origin: " + Origin + ", account: " + Account + ", reason: " + Reason + ")";
         }
     }
 }

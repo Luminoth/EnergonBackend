@@ -2,6 +2,7 @@
 using System.Runtime.Serialization;
 
 using EnergonSoftware.Core.Messages.Auth;
+using EnergonSoftware.Core.Messages.Overmind;
 using EnergonSoftware.Core.Messages.Formatter;
 
 namespace EnergonSoftware.Core.Messages
@@ -19,6 +20,8 @@ namespace EnergonSoftware.Core.Messages
             {
             case "null":
                 return null;
+            case PingMessage.MESSAGE_TYPE:
+                return new PingMessage();
             case AuthMessage.MESSAGE_TYPE:
                 return new AuthMessage();
             case ChallengeMessage.MESSAGE_TYPE:
@@ -29,8 +32,10 @@ namespace EnergonSoftware.Core.Messages
                 return new ResponseMessage();
             case SuccessMessage.MESSAGE_TYPE:
                 return new SuccessMessage();
+            case LoginMessage.MESSAGE_TYPE:
+                return new LoginMessage();
             }
-            throw new MessageException("Unsupported message type: " + type);
+            throw new MessageException("Unsupported message type for construction: " + type);
         }
     }
 }

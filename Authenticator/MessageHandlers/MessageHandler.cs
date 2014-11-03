@@ -39,11 +39,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             MessageHandlerContext ctx = (MessageHandlerContext)context;
 
             Finished = false;
-            try {
-                OnHandleMessage(context);
-            } catch(Exception e) {
-                ctx.Session.Error(e);
-            }
+            OnHandleMessage(context);
             Finished = true;
         }
 

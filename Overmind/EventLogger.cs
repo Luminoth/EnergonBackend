@@ -6,7 +6,7 @@ using log4net;
 using EnergonSoftware.Database;
 using EnergonSoftware.Database.Objects.Events;
 
-namespace EnergonSoftware.Authenticator
+namespace EnergonSoftware.Overmind
 {
     sealed class EventLogger
     {
@@ -17,32 +17,25 @@ namespace EnergonSoftware.Authenticator
         public static EventLogger Instance { get { return _instance; } }
 #endregion
 
-        public void RequestEvent(EndPoint origin)
+        public void LoginRequestEvent(EndPoint origin, string username)
         {
-            AuthEvent evt = new AuthEvent(AuthEventType.Request);
+            LoginEvent evt = new LoginEvent(LoginEventType.Request);
             evt.Origin = origin.ToString();
+            evt.Account = origin.ToString();
             LogEvent(evt);
         }
 
-        public void BeginEvent(EndPoint origin, string username)
+        public void LoginSuccessEvent(EndPoint origin, string username)
         {
-            AuthEvent evt = new AuthEvent(AuthEventType.Begin);
-            evt.Origin = origin.ToString();
-            evt.Account = username;
-            LogEvent(evt);
-        }
-
-        public void SuccessEvent(EndPoint origin, string username)
-        {
-            AuthEvent evt = new AuthEvent(AuthEventType.Success);
+            LoginEvent evt = new LoginEvent(LoginEventType.Success);
             evt.Origin = origin.ToString();
             evt.Account = username;
             LogEvent(evt);
         }
 
-        public void FailedEvent(EndPoint origin, string username, string reason)
+        public void LoginFailedEvent(EndPoint origin, string username, string reason)
         {
-            AuthEvent evt = new AuthEvent(AuthEventType.Failure);
+            LoginEvent evt = new LoginEvent(LoginEventType.Failure);
             evt.Origin = origin.ToString();
             evt.Account = username;
             evt.Reason = reason;

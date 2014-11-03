@@ -13,6 +13,7 @@ using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Overmind;
 using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Util;
 
 using EnergonSoftware.Launcher.MessageHandlers;
 
@@ -51,18 +52,21 @@ namespace EnergonSoftware.Launcher
         public event OnAuthFailedHandler OnAuthFailed;
 #endregion
 
-#region Login Events
-        public delegate void OnLoginSuccessHandler();
-        public event OnLoginSuccessHandler OnLoginSuccess;
-
-        public delegate void OnLoginFailedHandler(string reason);
-        public event OnLoginFailedHandler OnLoginFailed;
-#endregion
-
 #region Message properties
         private Dictionary<int, Queue<IMessage>> _messages = new Dictionary<int,Queue<IMessage>>();
         private Dictionary<int, MessageHandler> _currentMessageHandlers = new Dictionary<int,MessageHandler>();
         private IMessageFormatter _formatter = new BinaryMessageFormatter();
+
+        private bool ShouldPing
+        {
+            get {
+                long lastMessageTime = GetLastMessageTime(OvermindSocketId);
+                if(0 == lastMessageTime) {
+                    return false;
+                }
+                return Time.CurrentTimeMs > (lastMessageTime + Convert.ToInt64(ConfigurationManager.AppSettings["overmindPingRate"]));
+            }
+        }
 #endregion
 
 #region Authentication Properties
@@ -137,6 +141,7 @@ namespace EnergonSoftware.Launcher
             } else if(socketId == OvermindSocketId) {
                 Error("Overmind disconnected!");
                 OvermindSocketId = -1;
+                LoggedIn = false;
             } else {
                 Error("Server disconnected!");
             }
@@ -148,7 +153,7 @@ namespace EnergonSoftware.Launcher
             if(AuthSocketId == socketId) {
                 AuthFailed("Failed to connect to the authentication server: " + error);
             } else if(OvermindSocketId == socketId) {
-                LoginFailed("Failed to connect to the overmind server: " + error);
+                Error("Failed to connect to the overmind server: " + error);
             }
         }
 
@@ -264,43 +269,21 @@ namespace EnergonSoftware.Launcher
                 message.Username = Username;
                 message.Ticket = Ticket;
                 SendMessage(OvermindSocketId, message, _formatter);
-            }
-        }
 
-        internal void LoginSuccess()
-        {
-            _logger.Info("Login successful!");
-
-            lock(_lock) {
+                LoggingIn = false;
                 LoggedIn = true;
-
-                if(null != OnLoginSuccess) {
-                    OnLoginSuccess();
-                }
-            }
-        }
-
-        internal void LoginFailed(string reason)
-        {
-            _logger.Warn("Login failed: " + reason);
-
-            lock(_lock) {
-                Reset();
-
-                if(null != OnLoginFailed) {
-                    OnLoginFailed(reason);
-                }
-
-                Disconnect(OvermindSocketId);
-                OvermindSocketId = -1;
             }
         }
 
         private void Ping()
         {
+            if(!ShouldPing) {
+                return;
+            }
+
             lock(_lock) {
-                /*PingMessage message = new PingMessage();
-                SendMessage(OvermindSocketId, message, _formatter);*/
+                PingMessage message = new PingMessage();
+                SendMessage(OvermindSocketId, message, _formatter);
             }
         }
 #endregion
@@ -321,36 +304,32 @@ namespace EnergonSoftware.Launcher
             }
 
             lock(_lock) {
-                try {
-                    // cleanup the current message handler
-                    if(_currentMessageHandlers.ContainsKey(socketId) && _currentMessageHandlers[socketId].Finished) {
-                        _currentMessageHandlers.Remove(socketId);
-                    }
-
-                    // read off the data buffer and queue any complete messages
-                    NetworkMessage message = NetworkMessage.Parse(reader.Buffer, _formatter);
-                    while(null != message) {
-                        _logger.Debug("Parsed message type: " + message.Payload.Type);
-                        _messages[socketId].Enqueue(message.Payload);
-                        message = NetworkMessage.Parse(reader.Buffer, _formatter);
-                    }
-
-                    // handle the next message if we can
-                    if(!_currentMessageHandlers.ContainsKey(socketId) && _messages[socketId].Count > 0) {
-                        IMessage nextMessage = _messages[socketId].Dequeue();
-
-                        MessageHandler handler = MessageHandler.Create(nextMessage.Type);
-                        if(null != handler) {
-                            _currentMessageHandlers[socketId] = handler;
-                            ThreadPool.QueueUserWorkItem(_currentMessageHandlers[socketId].HandleMessage, new MessageHandlerContext(nextMessage));
-                        }
-                    }
-
-                    // TODO: we need a way to say "hey, this handler is taking WAY too long,
-                    // dump an error and kill the session"
-                } catch(Exception e) {
-                    Error(e);
+                // cleanup the current message handler
+                if(_currentMessageHandlers.ContainsKey(socketId) && _currentMessageHandlers[socketId].Finished) {
+                    _currentMessageHandlers.Remove(socketId);
                 }
+
+                // read off the data buffer and queue any complete messages
+                NetworkMessage message = NetworkMessage.Parse(reader.Buffer, _formatter);
+                while(null != message) {
+                    _logger.Debug("Parsed message type: " + message.Payload.Type);
+                    _messages[socketId].Enqueue(message.Payload);
+                    message = NetworkMessage.Parse(reader.Buffer, _formatter);
+                }
+
+                // handle the next message if we can
+                if(!_currentMessageHandlers.ContainsKey(socketId) && _messages[socketId].Count > 0) {
+                    IMessage nextMessage = _messages[socketId].Dequeue();
+
+                    MessageHandler handler = MessageHandler.Create(nextMessage.Type);
+                    if(null != handler) {
+                        _currentMessageHandlers[socketId] = handler;
+                        ThreadPool.QueueUserWorkItem(_currentMessageHandlers[socketId].HandleMessage, new MessageHandlerContext(nextMessage));
+                    }
+                }
+
+                // TODO: we need a way to say "hey, this handler is taking WAY too long,
+                // dump an error and kill the session"
                 return;
             }
         }

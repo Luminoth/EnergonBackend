@@ -8,6 +8,7 @@ using log4net;
 
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Database;
 using EnergonSoftware.Overmind.Net;
 
 namespace EnergonSoftware.Overmind
@@ -76,6 +77,15 @@ namespace EnergonSoftware.Overmind
             lock(_listenSockets) {
                 _listenSockets.ForEach(s => PollListenSocket(s));
             }
+        }
+#endregion
+
+#region Database Methods
+        public DatabaseConnection AcquireDatabaseConnection()
+        {
+            DatabaseConnection connection = new DatabaseConnection(ConfigurationManager.ConnectionStrings["energonsoftware"]);
+            connection.Open();
+            return connection;
         }
 #endregion
 
