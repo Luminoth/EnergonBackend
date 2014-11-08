@@ -40,6 +40,10 @@ namespace EnergonSoftware.Overmind.Net
         {
         }
 
+        protected override void OnRun()
+        {
+        }
+
         public void Ping()
         {
             PingMessage ping = new PingMessage();

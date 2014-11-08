@@ -17,7 +17,7 @@ namespace EnergonSoftware.Launcher.Controls
 #region Event Handlers
         private void LogoutButton_Click(object sender, RoutedEventArgs evt)
         {
-            ClientState.Instance.Logout();
+            //ClientState.Instance.Logout();
         }
 #endregion
     }

@@ -94,9 +94,13 @@ namespace EnergonSoftware.Core.Net
                 _messageHandler = null;
             }
 
+            OnRun();
+
             // TODO: we need a way to say "hey, this handler is taking WAY too long,
             // dump an error and kill the session"
         }
+
+        protected abstract void OnRun();
 
         private void OnConnectAsyncFailedCallback(SocketError error)
         {

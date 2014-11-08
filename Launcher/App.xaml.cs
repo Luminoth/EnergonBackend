@@ -34,8 +34,6 @@ namespace EnergonSoftware.Launcher
                 try {
                     _sessions.PollAndRun();
                     _sessions.Cleanup();
-
-                    ClientState.Instance.Ping();
                 } catch(Exception e) {
                     _logger.Info("Unhandled Exception!", e);
                     ClientState.Instance.Error(e);

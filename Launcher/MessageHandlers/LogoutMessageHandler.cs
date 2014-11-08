@@ -6,13 +6,16 @@ namespace EnergonSoftware.Launcher.MessageHandlers
 {
     sealed class LogoutMessageHandler : MessageHandler
     {
-        internal LogoutMessageHandler()
+        private OvermindSession _session;
+
+        internal LogoutMessageHandler(OvermindSession session)
         {
+            _session = session;
         }
 
         protected override void OnHandleMessage(IMessage message)
         {
-            ClientState.Instance.Logout();
+            _session.Logout();
         }
     }
 }

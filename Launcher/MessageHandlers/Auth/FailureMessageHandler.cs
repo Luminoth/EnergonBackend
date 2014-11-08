@@ -7,7 +7,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 {
     sealed class FailureMessageHandler : MessageHandler
     {
-        AuthSession _session;
+        private AuthSession _session;
 
         internal FailureMessageHandler(AuthSession session)
         {
@@ -17,7 +17,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
         protected override void OnHandleMessage(IMessage message)
         {
             FailureMessage failure = (FailureMessage)message;
-            AuthManager.Instance.AuthFailed(failure.Reason);
+            _session.AuthFailed(failure.Reason);
         }
     }
 }

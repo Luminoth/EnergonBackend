@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Configuration;
 using System.Net.Sockets;
 using System.Windows;
 using System.Windows.Controls;
+
+using EnergonSoftware.Launcher.Net;
 
 namespace EnergonSoftware.Launcher.Controls
 {
@@ -12,9 +15,6 @@ namespace EnergonSoftware.Launcher.Controls
     {
         public LoginPage()
         {
-            AuthManager.Instance.OnAuthFailed += OnAuthFailedCallback;
-            AuthManager.Instance.OnAuthSuccess += OnAuthSuccessCallback;
-
             DataContext = ClientState.Instance;
             InitializeComponent();
         }
@@ -33,20 +33,27 @@ namespace EnergonSoftware.Launcher.Controls
         private void ButtonLogin_Click(object sender, RoutedEventArgs evt)
         {
             ClientState.Instance.LoggingIn = true;
-            ((App)Application.Current).Sessions.AddSession(AuthManager.Instance.AuthConnect(Password.Password));
+            ClientState.Instance.Password = Password.Password;
+            ClearPassword();
+  
+            AuthSession session = new AuthSession();
+            session.OnAuthFailed += OnAuthFailedCallback;
+            session.OnAuthSuccess += OnAuthSuccessCallback;
+            session.BeginConnect(ConfigurationManager.AppSettings["authHost"], Convert.ToInt32(ConfigurationManager.AppSettings["authPort"]));
+            ((App)Application.Current).Sessions.AddSession(session);
         }
 
         private void OnAuthFailedCallback(string reason)
         {
-            ClearPassword();
             ((App)Application.Current).OnError("Authentication failed: " + reason, "Authentication Failed");
             ClientState.Instance.LoggingIn = false;
         }
 
         private void OnAuthSuccessCallback()
         {
-            ClearPassword();
-            ((App)Application.Current).Sessions.AddSession(ClientState.Instance.OvermindConnect());
+            OvermindSession session = new OvermindSession();
+            session.BeginConnect(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"]));
+            ((App)Application.Current).Sessions.AddSession(session);
         }
 #endregion
     }

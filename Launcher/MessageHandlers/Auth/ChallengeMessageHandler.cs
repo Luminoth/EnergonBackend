@@ -18,7 +18,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ChallengeMessageHandler));
 
-        AuthSession _session;
+        private AuthSession _session;
 
         internal ChallengeMessageHandler(AuthSession session)
         {
@@ -45,11 +45,11 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 string nc = "00000001";
                 string digestURI = realm + "/" + ConfigurationManager.AppSettings["authHost"];
 
-                _logger.Debug("Authenticating " + AuthManager.Instance.Username + ":" + realm + ":***");
+                _logger.Debug("Authenticating " + ClientState.Instance.Username + ":" + realm + ":***");
                 string passwordHash = new SHA512().DigestPassword(
-                    AuthManager.Instance.Username,
+                    ClientState.Instance.Username,
                     realm,
-                    AuthManager.Instance.Password
+                    ClientState.Instance.Password
                 );
                 _logger.Debug("passwordHash=" + passwordHash);
             
@@ -57,7 +57,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 string qop = values["qop"].Trim(new char[]{'"'});
                 string rsp = EnergonSoftware.Core.Auth.DigestClientResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI);
             
-                string msg = "username=\"" + AuthManager.Instance.Username + "\","
+                string msg = "username=\"" + ClientState.Instance.Username + "\","
                     + "realm=" + realm + ","
                         + "nonce=" + nonce + ","
                         + "cnonce=\"" + cnonce.NonceHash + "\","
@@ -68,7 +68,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                         + "charset=" + charset;
                 _logger.Debug("Generated response: " + msg);
 
-                AuthManager.Instance.AuthResponse(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)),
+                _session.AuthResponse(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)),
                     EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI));
             } catch(KeyNotFoundException e) {
                 ClientState.Instance.Error("Invalid challenge: " + e.Message);
@@ -85,12 +85,12 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 
             try {
                 string rspauth = values["rspauth"].Trim(new char[]{'"'});
-                if(AuthManager.Instance.RspAuth != rspauth) {
-                    ClientState.Instance.Error("rspauth mismatch, expected: '" + AuthManager.Instance.RspAuth + "', got: '" + rspauth + "'");
+                if(_session.RspAuth != rspauth) {
+                    ClientState.Instance.Error("rspauth mismatch, expected: '" + _session.RspAuth + "', got: '" + rspauth + "'");
                     return;
                 }
 
-                AuthManager.Instance.AuthFinalize();
+                _session.AuthFinalize();
             } catch(KeyNotFoundException e) {
                 ClientState.Instance.Error("Invalid challenge: " + e.Message);
                 return;
@@ -104,16 +104,16 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(challenge.Challenge));
             _logger.Debug("Decoded challenge: " + decoded);
 
-            switch(AuthManager.Instance.AuthStage)
+            switch(_session.AuthStage)
             {
-            case AuthManager.AuthenticationStage.Begin:
+            case AuthenticationStage.Begin:
                 HandleChallengeState(decoded);
                 break;
-            case AuthManager.AuthenticationStage.Challenge:
+            case AuthenticationStage.Challenge:
                 HandleResponseState(decoded);
                 break;
             default:
-                ClientState.Instance.Error("Unexpected auth stage: " + AuthManager.Instance.AuthStage);
+                ClientState.Instance.Error("Unexpected auth stage: " + _session.AuthStage);
                 return;
             }
         }

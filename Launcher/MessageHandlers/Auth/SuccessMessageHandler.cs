@@ -7,7 +7,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 {
     sealed class SuccessMessageHandler : MessageHandler
     {
-        AuthSession _session;
+        private AuthSession _session;
 
         internal SuccessMessageHandler(AuthSession session)
         {
@@ -17,7 +17,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
         protected override void OnHandleMessage(IMessage message)
         {
             SuccessMessage success = (SuccessMessage)message;
-            AuthManager.Instance.AuthSuccess(success.SessionId);
+            _session.AuthSuccess(success.SessionId);
         }
     }
 }

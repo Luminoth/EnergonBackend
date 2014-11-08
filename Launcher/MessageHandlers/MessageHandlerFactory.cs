@@ -17,7 +17,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers
             case PingMessage.MESSAGE_TYPE:
                 return new PingMessageHandler();
             case LogoutMessage.MESSAGE_TYPE:
-                return new LogoutMessageHandler();
+                return new LogoutMessageHandler((OvermindSession)session);
             case ChallengeMessage.MESSAGE_TYPE:
                 return new ChallengeMessageHandler((AuthSession)session);
             case FailureMessage.MESSAGE_TYPE:
