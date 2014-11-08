@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -46,16 +47,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseManager.cs" />
     <Compile Include="EventLogger.cs" />
     <Compile Include="InstanceNotifier.cs" />
     <Compile Include="MessageHandlers\AuthMessageHandler.cs" />
-    <Compile Include="MessageHandlers\MessageHandler.cs" />
+    <Compile Include="MessageHandlers\MessageHandlerFactory.cs" />
     <Compile Include="MessageHandlers\ResponseMessageHandler.cs" />
-    <Compile Include="Net\Session.cs" />
-    <Compile Include="Net\SessionManager.cs" />
+    <Compile Include="Net\AuthSession.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

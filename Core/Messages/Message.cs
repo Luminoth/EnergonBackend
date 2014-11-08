@@ -34,6 +34,8 @@ namespace EnergonSoftware.Core.Messages
                 return new SuccessMessage();
             case LoginMessage.MESSAGE_TYPE:
                 return new LoginMessage();
+            case LogoutMessage.MESSAGE_TYPE:
+                return new LogoutMessage();
             }
             throw new MessageException("Unsupported message type for construction: " + type);
         }

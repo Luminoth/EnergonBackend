@@ -1,97 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
-using System.Threading;
+using System.Threading.Tasks;
 
 using log4net;
 
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Overmind;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
-
 using EnergonSoftware.Launcher.MessageHandlers;
+using EnergonSoftware.Launcher.Net;
 
 namespace EnergonSoftware.Launcher
 {
-    internal enum AuthenticationStage
+    sealed class ClientState
     {
-        NotAuthenticated,
-        Begin,
-        Challenge,
-        Finalize,
-        Authenticated,
-    }
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(ClientState));
 
-    sealed class ClientState : ClientApi
-    {
 #region Singleton
         private static ClientState _instance = new ClientState();
         public static ClientState Instance { get { return _instance; } }
 #endregion
 
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(ClientState));
-
-        private object _lock = new object();
-
-#region Network Properties
-        public int AuthSocketId { get; private set; }
-        public int OvermindSocketId { get; private set; }
-#endregion
-
-#region Authentication Events
-        public delegate void OnAuthSuccessHandler();
-        public event OnAuthSuccessHandler OnAuthSuccess;
-
-        public delegate void OnAuthFailedHandler(string reason);
-        public event OnAuthFailedHandler OnAuthFailed;
-#endregion
-
-#region Message properties
-        private Dictionary<int, Queue<IMessage>> _messages = new Dictionary<int,Queue<IMessage>>();
-        private Dictionary<int, MessageHandler> _currentMessageHandlers = new Dictionary<int,MessageHandler>();
-        private IMessageFormatter _formatter = new BinaryMessageFormatter();
+        public OvermindSession _overmindSession;
 
         private bool ShouldPing
         {
             get {
-                long lastMessageTime = GetLastMessageTime(OvermindSocketId);
-                if(0 == lastMessageTime) {
+                if(null == _overmindSession) {
                     return false;
                 }
-                return Time.CurrentTimeMs > (lastMessageTime + Convert.ToInt64(ConfigurationManager.AppSettings["overmindPingRate"]));
+
+                if(0 == _overmindSession.LastMessageTime) {
+                    return false;
+                }
+                return Time.CurrentTimeMs > (_overmindSession.LastMessageTime + Convert.ToInt64(ConfigurationManager.AppSettings["overmindPingRate"]));
             }
         }
-#endregion
-
-#region Authentication Properties
-        private AuthenticationStage _authStage = AuthenticationStage.NotAuthenticated;
-        internal AuthenticationStage AuthStage
-        {
-            get { return _authStage; }
-            set {
-                _authStage = value;
-                NotifyPropertyChanged("Authenticating");
-                NotifyPropertyChanged("Authenticated");
-            }
-        }
-
-        public bool Authenticating { get { return AuthStage > AuthenticationStage.NotAuthenticated && AuthStage < AuthenticationStage.Authenticated; } }
-        public bool Authenticated { get { return AuthenticationStage.Authenticated == AuthStage; } }
-
-        private string _username;
-        public string Username { get { return _username; } set { _username = value; NotifyPropertyChanged("Username"); } }
-
-        private string _password;
-        public string Password { get { return _password; } set { _password = value; NotifyPropertyChanged("Password"); } }
-
-        internal string RspAuth { get; set; }
-#endregion
 
 #region Login Properties
         private bool _loggedIn = false;
@@ -107,6 +58,8 @@ namespace EnergonSoftware.Launcher
 #endregion
 
 #region UI Helpers
+        public string Username { get { return AuthManager.Instance.Username; } set { AuthManager.Instance.Username = value; } }
+
         private bool _loggingIn = false;
         public bool LoggingIn
         {
@@ -122,180 +75,71 @@ namespace EnergonSoftware.Launcher
         public bool NotLoggedIn { get { return !LoggedIn; } }
 #endregion
 
-        private void OnSocketErrorCallback(int socketId, string error)
-        {
-            if(socketId == AuthSocketId) {
-                Disconnect(AuthSocketId);
-            } else if(socketId == OvermindSocketId) {
-                Disconnect(OvermindSocketId);
-            }
-        }
-
-        private void OnDisconnectCallback(int socketId)
-        {
-            if(socketId == AuthSocketId) {
-                if(!Authenticated) {
-                    Error("Auth server disconnected!");
-                }
-                AuthSocketId = -1;
-            } else if(socketId == OvermindSocketId) {
-                Error("Overmind disconnected!");
-                OvermindSocketId = -1;
-                LoggedIn = false;
-            } else {
-                Error("Server disconnected!");
-            }
-        }
-
-#region Network Methods
-        private void OnConnectFailedCallback(int socketId, SocketError error)
-        {
-            if(AuthSocketId == socketId) {
-                AuthFailed("Failed to connect to the authentication server: " + error);
-            } else if(OvermindSocketId == socketId) {
-                Error("Failed to connect to the overmind server: " + error);
-            }
-        }
-
-        private void OnConnectSuccessCallback(int socketId)
-        {
-            if(AuthSocketId == socketId) {
-                BeginAuth();
-            } else if(OvermindSocketId == socketId) {
-                Login();
-            }
-        }
-#endregion
-
-#region Authentication Methods
-        // TODO: this is silly, don't pass the password in here
-        // should use a more "proper" way of querying for it
-        internal void AuthConnect(string password)
-        {
-            lock(_lock) {
-                Password = password;
-
-                AuthSocketId = ConnectAsync(ConfigurationManager.AppSettings["authHost"], Int32.Parse(ConfigurationManager.AppSettings["authPort"]));
-            }
-        }
-
-        private void BeginAuth()
-        {
-            _logger.Info("Authenticating as user '" + Username + "'...");
-
-            lock(_lock) {
-                AuthMessage message = new AuthMessage();
-                message.MechanismType = AuthType.DigestSHA512;
-                SendMessage(AuthSocketId, message, _formatter);
-
-                AuthStage = AuthenticationStage.Begin;
-            }
-        }
-
-        internal void AuthResponse(string response)
-        {
-            lock(_lock) {
-                ResponseMessage message = new ResponseMessage();
-                message.Response = response;
-                SendMessage(AuthSocketId, message, _formatter);
-
-                AuthStage = AuthenticationStage.Challenge;
-            }
-        }
-
-        internal void AuthFinalize()
-        {
-            lock(_lock) {
-                ResponseMessage response = new ResponseMessage();
-                SendMessage(AuthSocketId, response, _formatter);
-
-                AuthStage = AuthenticationStage.Finalize;
-            }
-        }
-
-        internal void AuthSuccess(string ticket)
-        {
-            _logger.Info("Authentication successful!");
-            _logger.Debug("Ticket=" + ticket);
-
-            lock(_lock) {
-                Ticket = ticket;
-
-                Password = null;
-                RspAuth = null;
-
-                AuthStage = AuthenticationStage.Authenticated;
-
-                if(null != OnAuthSuccess) {
-                    OnAuthSuccess();
-                }
-
-                Disconnect(AuthSocketId);
-                AuthSocketId = -1;
-            }
-        }
-
-        internal void AuthFailed(string reason)
-        {
-            _logger.Warn("Authentication failed: " + reason);
-
-            lock(_lock) {
-                Reset();
-
-                if(null != OnAuthFailed) {
-                    OnAuthFailed(reason);
-                }
-
-                Disconnect(AuthSocketId);
-                AuthSocketId = -1;
-            }
-        }
-#endregion
-
 #region Overmind Methods
-        internal void OvermindConnect()
+        private void OnSocketErrorCallback(string error)
         {
-            lock(_lock) {
-                OvermindSocketId = ConnectAsync(ConfigurationManager.AppSettings["overmindHost"], Int32.Parse(ConfigurationManager.AppSettings["overmindPort"]));
-            }
+            _overmindSession.Disconnect();
+        }
+
+        private void OnDisconnectCallback()
+        {
+            Error("Overmind disconnected!");
+            _overmindSession = null;
+            LoggedIn = false;
+        }
+
+        private void OnConnectFailedCallback(SocketError error)
+        {
+            Error("Failed to connect to the overmind server: " + error);
+        }
+
+        private void OnConnectSuccessCallback()
+        {
+            Login();
+        }
+
+        internal OvermindSession OvermindConnect()
+        {
+            _overmindSession = new OvermindSession();
+            _overmindSession.ConnectAsync(ConfigurationManager.AppSettings["overmindHost"], Int32.Parse(ConfigurationManager.AppSettings["overmindPort"]));
+            return _overmindSession;
         }
 
         private void Login()
         {
             _logger.Info("Logging in...");
 
-            lock(_lock) {
-                LoginMessage message = new LoginMessage();
-                message.Username = Username;
-                message.Ticket = Ticket;
-                SendMessage(OvermindSocketId, message, _formatter);
+            LoginMessage message = new LoginMessage();
+            message.Username = AuthManager.Instance.Username;
+            message.Ticket = AuthManager.Instance.Ticket;
+            _overmindSession.SendMessage(message);
 
-                LoggingIn = false;
-                LoggedIn = true;
-            }
+            LoggingIn = false;
+            LoggedIn = true;
         }
 
-        private void Ping()
+        internal void Logout()
+        {
+            LogoutMessage message = new LogoutMessage();
+            _overmindSession.SendMessage(message);
+            _overmindSession.Disconnect();
+        }
+
+        public void Ping()
         {
             if(!ShouldPing) {
                 return;
             }
 
-            lock(_lock) {
-                PingMessage message = new PingMessage();
-                SendMessage(OvermindSocketId, message, _formatter);
-            }
+            PingMessage message = new PingMessage();
+            _overmindSession.SendMessage(message);
         }
 #endregion
 
-        private void HandleMessages(int socketId)
+        /*private void HandleMessages(int socketId)
         {
-            if(socketId < 1) {
-                return;
-            }
-
-            BufferedSocketReader reader = GetSocketReader(socketId);
-            if(null == reader) {
+            SocketState state = ConnectionManager.Instance.GetSocketState(socketId);
+            if(null == state || !state.HasSocket) {
                 return;
             }
 
@@ -303,35 +147,32 @@ namespace EnergonSoftware.Launcher
                 _messages[socketId]  = new Queue<IMessage>();
             }
 
-            lock(_lock) {
-                // cleanup the current message handler
-                if(_currentMessageHandlers.ContainsKey(socketId) && _currentMessageHandlers[socketId].Finished) {
-                    _currentMessageHandlers.Remove(socketId);
-                }
-
-                // read off the data buffer and queue any complete messages
-                NetworkMessage message = NetworkMessage.Parse(reader.Buffer, _formatter);
-                while(null != message) {
-                    _logger.Debug("Parsed message type: " + message.Payload.Type);
-                    _messages[socketId].Enqueue(message.Payload);
-                    message = NetworkMessage.Parse(reader.Buffer, _formatter);
-                }
-
-                // handle the next message if we can
-                if(!_currentMessageHandlers.ContainsKey(socketId) && _messages[socketId].Count > 0) {
-                    IMessage nextMessage = _messages[socketId].Dequeue();
-
-                    MessageHandler handler = MessageHandler.Create(nextMessage.Type);
-                    if(null != handler) {
-                        _currentMessageHandlers[socketId] = handler;
-                        ThreadPool.QueueUserWorkItem(_currentMessageHandlers[socketId].HandleMessage, new MessageHandlerContext(nextMessage));
-                    }
-                }
-
-                // TODO: we need a way to say "hey, this handler is taking WAY too long,
-                // dump an error and kill the session"
-                return;
+            // cleanup the current message handler
+            if(_currentMessageHandlers.ContainsKey(socketId) && _currentMessageHandlers[socketId].Finished) {
+                _currentMessageHandlers.Remove(socketId);
             }
+
+            // read off the data buffer and queue any complete messages
+            NetworkMessage message = NetworkMessage.Parse(state.Buffer, _formatter);
+            while(null != message) {
+                _logger.Debug("Parsed message type: " + message.Payload.Type);
+                _messages[socketId].Enqueue(message.Payload);
+                message = NetworkMessage.Parse(state.Buffer, _formatter);
+            }
+
+            // handle the next message if we can
+            if(!_currentMessageHandlers.ContainsKey(socketId) && _messages[socketId].Count > 0) {
+                IMessage nextMessage = _messages[socketId].Dequeue();
+
+                MessageHandler handler = MessageHandlerFactory.NewHandler(nextMessage.Type);
+                if(null != handler) {
+                    _currentMessageHandlers[socketId] = handler;
+                    _currentMessageHandlers[socketId].HandleMessage(nextMessage);
+                }
+            }
+
+            // TODO: we need a way to say "hey, this handler is taking WAY too long,
+            // dump an error and kill the session"
         }
 
         private void HandleMessages()
@@ -342,8 +183,8 @@ namespace EnergonSoftware.Launcher
 
         private void Poll()
         {
-            Poll(AuthSocketId);
-            Poll(OvermindSocketId);
+            ConnectionManager.Instance.Poll(AuthSocketId);
+            ConnectionManager.Instance.Poll(OvermindSocketId);
         }
 
         public void Run()
@@ -357,23 +198,45 @@ namespace EnergonSoftware.Launcher
 
         private void Reset()
         {
-            AuthStage = AuthenticationStage.NotAuthenticated;
-            Ticket = null;
-            Password = null;
-            RspAuth = null;
-
             LoggingIn = false;
             LoggedIn = false;
+        }*/
+
+        public delegate void OnErrorHandler(string error);
+        public event OnErrorHandler OnError;
+
+        public void Error(string error)
+        {
+            _logger.Error("Encountered an error: " + error);
+
+            if(null != OnError) {
+                OnError(error);
+            }
         }
+
+        public void Error(Exception error)
+        {
+            Error(error.Message);
+        }
+
+#region Property Notifier
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged(/*[CallerMemberName]*/ string property/*=null*/)
+        {
+            if(null != PropertyChanged) {
+                PropertyChanged(this, new PropertyChangedEventArgs(property));
+            }
+        }
+#endregion
 
         private ClientState()
         {
-            OnSocketError += OnSocketErrorCallback;
+            /*ConnectionManager.Instance.OnSocketError += OnSocketErrorCallback;
 
-            OnConnectFailed += OnConnectFailedCallback;
-            OnConnectSuccess += OnConnectSuccessCallback;
+            ConnectionManager.Instance.OnConnectFailed += OnConnectFailedCallback;
+            ConnectionManager.Instance.OnConnectSuccess += OnConnectSuccessCallback;
 
-            OnDisconnect += OnDisconnectCallback;
+            ConnectionManager.Instance.OnDisconnect += OnDisconnectCallback;*/
         }
     }
 }

@@ -45,9 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Auth.cs" />
-    <Compile Include="ClientApi.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="Configuration\ListenAddressConfiguration.cs" />
+    <Compile Include="MessageHandlers\MessageProcessor.cs" />
     <Compile Include="Messages\Auth\AuthMessage.cs" />
     <Compile Include="Messages\Auth\ChallengeMessage.cs" />
     <Compile Include="Messages\Auth\FailureMessage.cs" />
@@ -58,13 +58,19 @@
     <Compile Include="Messages\Formatter\MessageSerializable.cs" />
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessageException.cs" />
-    <Compile Include="Messages\MessageHandlerException.cs" />
+    <Compile Include="MessageHandlers\MessageHandler.cs" />
+    <Compile Include="MessageHandlers\MessageHandlerException.cs" />
     <Compile Include="Messages\Overmind\LoginMessage.cs" />
+    <Compile Include="Messages\Overmind\LogoutMessage.cs" />
     <Compile Include="Messages\PingMessage.cs" />
     <Compile Include="Net\BufferedSocketReader.cs" />
+    <Compile Include="Net\HttpServer.cs" />
     <Compile Include="Net\NetUtil.cs" />
-    <Compile Include="Net\NetworkMessage.cs" />
+    <Compile Include="Messages\NetworkMessage.cs" />
     <Compile Include="Account\Friend.cs" />
+    <Compile Include="Net\Session.cs" />
+    <Compile Include="Net\SessionManager.cs" />
+    <Compile Include="Net\SocketListener.cs" />
     <Compile Include="Net\SocketState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\Crypt\AES.cs" />

@@ -2,11 +2,10 @@
 using System.IO;
 using System.Linq;
 
-using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Util;
 
-namespace EnergonSoftware.Core.Net
+namespace EnergonSoftware.Core.Messages
 {
     /*
      * Packet Format:
@@ -122,6 +121,11 @@ namespace EnergonSoftware.Core.Net
                 return 0;
             }
             return (int)(Id - rhs.Id);
+        }
+
+        public override string ToString()
+        {
+            return "NetworkMessage(Id: " + Id + ", Payload: " + Payload + ")";
         }
     }
 }

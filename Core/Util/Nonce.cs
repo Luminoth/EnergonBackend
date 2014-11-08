@@ -12,6 +12,7 @@ namespace EnergonSoftware.Core.Util
         public string NonceValue { get; private set; }
         public string NonceHash { get; private set; }
         public long CreationTime { get; private set; }
+
         public bool Expired
         {
             get

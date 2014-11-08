@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace EnergonSoftware.Core.Messages
+namespace EnergonSoftware.Core.MessageHandlers
 {
     [Serializable]
     public class MessageHandlerException : Exception

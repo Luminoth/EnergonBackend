@@ -8,6 +8,9 @@ using log4net;
 using log4net.Config;
 
 using EnergonSoftware.Core;
+using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Net;
+using EnergonSoftware.Launcher.MessageHandlers;
 
 namespace EnergonSoftware.Launcher
 {
@@ -18,25 +21,26 @@ namespace EnergonSoftware.Launcher
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(App));
 
-        private static volatile bool _quit = false;
+        private static volatile bool _quit;
         private static Thread _idleThread;
 
-        public static void Quit()
-        {
-            _logger.Info("Quitting...");
-            _quit = true;
-            if(null != _idleThread) {
-                _logger.Info("Waiting for idle thread to stop...");
-                _idleThread.Join();
-            }
-            _logger.Info("Goodbye!");
-        }
+        private static SessionManager _sessions = new SessionManager();
+        public SessionManager Sessions { get { return _sessions; } }
 
         private static void OnIdle()
         {
             _logger.Info("**Idle mark**");
             while(!_quit) {
-                ClientState.Instance.Run();
+                try {
+                    _sessions.PollAndRun();
+                    _sessions.Cleanup();
+
+                    ClientState.Instance.Ping();
+                } catch(Exception e) {
+                    _logger.Info("Unhandled Exception!", e);
+                    ClientState.Instance.Error(e);
+                }
+
                 Thread.Sleep(0);
             }
         }
@@ -59,7 +63,7 @@ namespace EnergonSoftware.Launcher
 #endregion
 
 #region Event Handlers
-        private void OnApplicationStartup(object sender, StartupEventArgs e)
+        private void Application_Startup(object sender, StartupEventArgs e)
         {
             ConfigureLogging();
             Common.InitFilesystem();
@@ -73,11 +77,28 @@ namespace EnergonSoftware.Launcher
 
             ClientState.Instance.OnError += OnErrorCallback;
 
+            _sessions.Start(new MessageHandlerFactory());
+
             // have to run this in a separate thread
             // so that we don't lock up the UI
             _logger.Info("Starting idle thread...");
             _idleThread = new Thread(new ThreadStart(OnIdle));
             _idleThread.Start();
+        }
+
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
+            _logger.Info("Exiting...");
+
+            _sessions.Stop();
+
+            _quit = true;
+            if(null != _idleThread) {
+                _logger.Info("Waiting for idle thread to stop...");
+                _idleThread.Join();
+            }
+
+            _logger.Info("Goodbye!");
         }
 #endregion
 

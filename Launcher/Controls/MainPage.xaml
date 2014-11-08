@@ -14,6 +14,6 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="main page" />
+        <Button Grid.Row="0" Grid.Column="0" Margin="5" Width="50" Click="LogoutButton_Click" IsEnabled="{Binding LoggedIn}" IsDefault="True"><TextBlock Text="{x:Static launcherprops:Resources.LogoutButtonLabel}" /></Button>
     </Grid>
 </UserControl>

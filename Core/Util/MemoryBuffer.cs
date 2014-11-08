@@ -5,6 +5,7 @@ using System.Text;
 
 namespace EnergonSoftware.Core.Util
 {
+    // TODO: add a lock to this
     public sealed class MemoryBuffer
     {
         public Stream Buffer { get; private set; }

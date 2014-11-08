@@ -1,6 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Configuration;
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 
 using log4net;
@@ -16,40 +19,53 @@ namespace EnergonSoftware.DbInit
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App : Application, INotifyPropertyChanged
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(App));
+
+        private bool _running = false;
+        public bool Running { get { return _running; } private set { _running = value; NotifyPropertyChanged(); NotifyPropertyChanged("NotRunning"); } }
+        public bool NotRunning { get { return !Running; } }
 
 #region Initialization
         private void ConfigureLogging()
         {
             XmlConfigurator.Configure();
         }
-
-        public static bool InitializeDatabase()
-        {
-            ConnectionStringSettings connectionSettings = ConfigurationManager.ConnectionStrings["energonsoftware"];
-
-            _logger.Info("Creating database...");
-            if(!CreateDatabase(connectionSettings)) {
-                _logger.Error("Failed to create database!");
-                return false;
-            }
-
-            _logger.Info("Populating database...");
-            using(DatabaseConnection connection = AcquireDatabaseConnection(connectionSettings)) {
-                CreateEventsTables(connection);
-
-                CreateAccountsTables(connection);
-                InsertAccountsData(connection);
-                VerifyAccountsData(connection);
-            }
-
-            return true;
-        }
 #endregion
 
 #region Database
+        public Task<bool> InitializeDatabase()
+        {
+            return Task<bool>.Factory.StartNew(() =>
+                {
+                    Running = true;
+                    try {
+                        ConnectionStringSettings connectionSettings = ConfigurationManager.ConnectionStrings["energonsoftware"];
+
+                        _logger.Info("Creating database...");
+                        if(!CreateDatabase(connectionSettings)) {
+                            _logger.Error("Failed to create database!");
+                            return false;
+                        }
+
+                        _logger.Info("Populating database...");
+                        using(DatabaseConnection connection = AcquireDatabaseConnection(connectionSettings)) {
+                            CreateEventsTables(connection);
+
+                            CreateAccountsTables(connection);
+                            InsertAccountsData(connection);
+                            VerifyAccountsData(connection);
+                        }
+
+                        return true;
+                    } finally {
+                        Running = false;
+                    }
+                }
+            );
+        }
+
         // TODO: this kind of assumes we're using SQLite and we shouldn't do that
         private static bool CreateDatabase(ConnectionStringSettings connectionSettings)
         {
@@ -131,6 +147,16 @@ namespace EnergonSoftware.DbInit
         {
             ConfigureLogging();
             Common.InitFilesystem();
+        }
+#endregion
+
+#region Property Notifier
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void NotifyPropertyChanged([CallerMemberName] string property=null)
+        {
+            if(null != PropertyChanged) {
+                PropertyChanged(this, new PropertyChangedEventArgs(property));
+            }
         }
 #endregion
     }

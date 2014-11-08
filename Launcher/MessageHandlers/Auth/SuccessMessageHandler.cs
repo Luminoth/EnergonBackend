@@ -1,20 +1,23 @@
-﻿using EnergonSoftware.Core.Messages;
+﻿using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
+using EnergonSoftware.Launcher.Net;
 
 namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 {
-    internal sealed class SuccessMessageHandler : MessageHandler
+    sealed class SuccessMessageHandler : MessageHandler
     {
-        internal SuccessMessageHandler()
+        AuthSession _session;
+
+        internal SuccessMessageHandler(AuthSession session)
         {
+            _session = session;
         }
         
-        protected override void OnHandleMessage(object context)
+        protected override void OnHandleMessage(IMessage message)
         {
-            MessageHandlerContext ctx = (MessageHandlerContext)context;
-            SuccessMessage message = (SuccessMessage)ctx.Message;
-
-            ClientState.Instance.AuthSuccess(message.SessionId);
+            SuccessMessage success = (SuccessMessage)message;
+            AuthManager.Instance.AuthSuccess(success.SessionId);
         }
     }
 }

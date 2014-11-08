@@ -70,6 +70,15 @@ namespace EnergonSoftware.Launcher.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Logout.
+        /// </summary>
+        public static string LogoutButtonLabel {
+            get {
+                return ResourceManager.GetString("LogoutButtonLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Launcher.
         /// </summary>
         public static string MainWindowTitle {

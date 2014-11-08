@@ -6,12 +6,14 @@ using EnergonSoftware.Core.Util.Crypt;
 
 namespace EnergonSoftware.Core.Util
 {
+    [Serializable]
     public sealed class SessionId
     {
         public string Secret { get; private set; }
         public int ExpiryMS { get; private set; }
         public string SessionID { get; private set; }
         public long CreationTime { get; private set; }
+
         public bool Expired
         {
             get

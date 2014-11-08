@@ -1,22 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Text;
 
 using log4net;
 
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Core.Util.Crypt;
+using EnergonSoftware.Launcher.Net;
 
 namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 {
-    internal sealed class ChallengeMessageHandler : MessageHandler
+    sealed class ChallengeMessageHandler : MessageHandler
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ChallengeMessageHandler));
 
-        internal ChallengeMessageHandler()
+        AuthSession _session;
+
+        internal ChallengeMessageHandler(AuthSession session)
         {
+            _session = session;
         }
 
         private void HandleChallengeState(string message)
@@ -37,22 +43,21 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 string realm = values["realm"].Trim(new char[]{'"'});
                 Nonce cnonce = new Nonce(realm, -1);
                 string nc = "00000001";
-                string digestURI = realm + "/" + ClientState.Instance.GetSocketState(ClientState.Instance.AuthSocketId).Host;
+                string digestURI = realm + "/" + ConfigurationManager.AppSettings["authHost"];
 
-                _logger.Debug("Authenticating " + ClientState.Instance.Username + ":" + realm + ":***");
+                _logger.Debug("Authenticating " + AuthManager.Instance.Username + ":" + realm + ":***");
                 string passwordHash = new SHA512().DigestPassword(
-                    ClientState.Instance.Username,
+                    AuthManager.Instance.Username,
                     realm,
-                    ClientState.Instance.Password
+                    AuthManager.Instance.Password
                 );
                 _logger.Debug("passwordHash=" + passwordHash);
             
                 string nonce = values["nonce"].Trim(new char[]{'"'});
                 string qop = values["qop"].Trim(new char[]{'"'});
                 string rsp = EnergonSoftware.Core.Auth.DigestClientResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI);
-                ClientState.Instance.RspAuth = EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI);
             
-                string msg = "username=\"" + ClientState.Instance.Username + "\","
+                string msg = "username=\"" + AuthManager.Instance.Username + "\","
                     + "realm=" + realm + ","
                         + "nonce=" + nonce + ","
                         + "cnonce=\"" + cnonce.NonceHash + "\","
@@ -63,7 +68,8 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                         + "charset=" + charset;
                 _logger.Debug("Generated response: " + msg);
 
-                ClientState.Instance.AuthResponse(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)));
+                AuthManager.Instance.AuthResponse(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)),
+                    EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI));
             } catch(KeyNotFoundException e) {
                 ClientState.Instance.Error("Invalid challenge: " + e.Message);
             }
@@ -79,36 +85,35 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 
             try {
                 string rspauth = values["rspauth"].Trim(new char[]{'"'});
-                if(ClientState.Instance.RspAuth != rspauth) {
-                    ClientState.Instance.Error("rspauth mismatch, expected: '" + ClientState.Instance.RspAuth + "', got: '" + rspauth + "'");
+                if(AuthManager.Instance.RspAuth != rspauth) {
+                    ClientState.Instance.Error("rspauth mismatch, expected: '" + AuthManager.Instance.RspAuth + "', got: '" + rspauth + "'");
                     return;
                 }
 
-                ClientState.Instance.AuthFinalize();
+                AuthManager.Instance.AuthFinalize();
             } catch(KeyNotFoundException e) {
                 ClientState.Instance.Error("Invalid challenge: " + e.Message);
                 return;
             }
         }
 
-        protected override void OnHandleMessage(object context)
+        protected override void OnHandleMessage(IMessage message)
         {
-            MessageHandlerContext ctx = (MessageHandlerContext)context;
-            ChallengeMessage message = (ChallengeMessage)ctx.Message;
+            ChallengeMessage challenge = (ChallengeMessage)message;
 
-            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(message.Challenge));
+            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(challenge.Challenge));
             _logger.Debug("Decoded challenge: " + decoded);
 
-            switch(ClientState.Instance.AuthStage)
+            switch(AuthManager.Instance.AuthStage)
             {
-            case AuthenticationStage.Begin:
+            case AuthManager.AuthenticationStage.Begin:
                 HandleChallengeState(decoded);
                 break;
-            case AuthenticationStage.Challenge:
+            case AuthManager.AuthenticationStage.Challenge:
                 HandleResponseState(decoded);
                 break;
             default:
-                ClientState.Instance.Error("Unexpected auth stage: " + ClientState.Instance.AuthStage);
+                ClientState.Instance.Error("Unexpected auth stage: " + AuthManager.Instance.AuthStage);
                 return;
             }
         }

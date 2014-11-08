@@ -10,30 +10,27 @@ namespace EnergonSoftware.DbInit
     {
         public static void AppendOutputText(string text)
         {
-            if(null == Application.Current.MainWindow) {
-                return;
-            }
-
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                ((MainWindow)Application.Current.MainWindow).OutputText.AppendText(text);
+                if(null != Application.Current.MainWindow) {
+                    ((MainWindow)Application.Current.MainWindow).OutputText.AppendText(text);
+                }
             }));
         }
 
         public static void SetStatusBarText(string text)
         {
-            if(null == Application.Current.MainWindow) {
-                return;
-            }
-
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                ((MainWindow)Application.Current.MainWindow).StatusBarText.Text = text;
+                if(null != Application.Current.MainWindow) {
+                    ((MainWindow)Application.Current.MainWindow).StatusBarText.Text = text;
+                }
             }));
         }
 
         public MainWindow()
         {
+            DataContext = Application.Current;
             InitializeComponent();
 
             SetStatusBarText("Waiting...");
@@ -52,9 +49,10 @@ namespace EnergonSoftware.DbInit
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        public void ButtonInitialize_Click(object sender, RoutedEventArgs e)
+        public async void ButtonInitialize_Click(object sender, RoutedEventArgs e)
         {
-            App.InitializeDatabase();
+            OutputText.Clear();
+            await ((App)Application.Current).InitializeDatabase();
         }
 #endregion
     }

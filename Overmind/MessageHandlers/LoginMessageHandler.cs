@@ -1,9 +1,12 @@
 ﻿using log4net;
 
+using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Overmind;
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Database;
 using EnergonSoftware.Database.Objects;
+using EnergonSoftware.Overmind.Net;
 
 namespace EnergonSoftware.Overmind.MessageHandlers
 {
@@ -11,44 +14,45 @@ namespace EnergonSoftware.Overmind.MessageHandlers
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(LoginMessageHandler));
 
-        internal LoginMessageHandler()
+        private LoginSession _session;
+
+        internal LoginMessageHandler(LoginSession session)
         {
+            _session = session;
         }
 
-        protected override void OnHandleMessage(object context)
+        protected override void OnHandleMessage(IMessage message)
         {
-            MessageHandlerContext ctx = (MessageHandlerContext)context;
-            LoginMessage message = (LoginMessage)ctx.Message;
+            LoginMessage login = (LoginMessage)message;
+            EventLogger.Instance.LoginRequestEvent(_session.RemoteEndPoint, login.Username);
 
-            EventLogger.Instance.LoginRequestEvent(ctx.Session.Socket.RemoteEndPoint, message.Username);
+            _logger.Info("New login attempt from user=" + login.Username + " and endpoint=" + _session.RemoteEndPoint);
 
-            _logger.Info("New login attempt from user=" + message.Username + " and endpoint=" + ctx.Session.Socket.RemoteEndPoint);
-
-            AccountInfo account = new AccountInfo(message.Username);
-            using(DatabaseConnection connection = ServerState.Instance.AcquireDatabaseConnection()) {
+            AccountInfo account = new AccountInfo(login.Username);
+            using(DatabaseConnection connection = DatabaseManager.AcquireDatabaseConnection()) {
                 if(!account.Read(connection)) {
-                    ctx.Session.LoginFailure(message.Username, "Bad Username");
+                    _session.LoginFailure(login.Username, "Bad Username");
                     return;
                 }
             }
 
             if(!account.Active) {
-                ctx.Session.LoginFailure(account.Username, "Account Inactive");
+                _session.LoginFailure(account.Username, "Account Inactive");
                 return;
             }
 
-            if(!account.SessionId.Equals(message.Ticket, System.StringComparison.InvariantCultureIgnoreCase)) {
-                ctx.Session.LoginFailure(account.Username, "Invalid SessionId");
+            if(!account.SessionId.Equals(login.Ticket, System.StringComparison.InvariantCultureIgnoreCase)) {
+                _session.LoginFailure(account.Username, "Invalid SessionId");
                 return;
             }
 
-            if(!NetUtil.CompareEndPoints(account.SessionEndPoint, ctx.Session.Socket.RemoteEndPoint)) {
-                _logger.Error("*** Possible spoof attempt from " + ctx.Session.Socket.RemoteEndPoint + " for account=" + account + "! ***");
-                ctx.Session.LoginFailure(account.Username, "Endpoint Mistmatch");
+            if(!NetUtil.CompareEndPoints(account.SessionEndPoint, _session.RemoteEndPoint)) {
+                _logger.Error("*** Possible spoof attempt from " + _session.RemoteEndPoint + " for account=" + account + "! ***");
+                _session.LoginFailure(account.Username, "Endpoint Mistmatch");
                 return;
             }
 
-            ctx.Session.LoginSuccess(account);
+            _session.LoginSuccess(account);
         }
     }
 }

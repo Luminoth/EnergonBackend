@@ -10,16 +10,8 @@ namespace EnergonSoftware.Launcher
     {
         public MainWindow()
         {
-            InitializeComponent();
-
             DataContext = ClientState.Instance;
+            InitializeComponent();
         }
-
-#region Event Handlers
-        private void OnClosed(object sender, EventArgs evt)
-        {
-            App.Quit();
-        }
-#endregion
     }
 }

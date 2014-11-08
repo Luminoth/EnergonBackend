@@ -1,17 +1,18 @@
 ﻿using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Net;
+using EnergonSoftware.Launcher.Net;
 
 namespace EnergonSoftware.Launcher.MessageHandlers
 {
-    sealed class PingMessageHandler : MessageHandler
+    sealed class LogoutMessageHandler : MessageHandler
     {
-        internal PingMessageHandler()
+        internal LogoutMessageHandler()
         {
         }
 
         protected override void OnHandleMessage(IMessage message)
         {
+            ClientState.Instance.Logout();
         }
     }
 }

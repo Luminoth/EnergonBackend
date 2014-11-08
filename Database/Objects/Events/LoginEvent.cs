@@ -8,6 +8,7 @@ namespace EnergonSoftware.Database.Objects.Events
         Request,
         Success,
         Failure,
+        Logout,
     }
 
     public sealed class LoginEvent : Event

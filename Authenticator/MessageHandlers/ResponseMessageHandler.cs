@@ -7,6 +7,7 @@ using log4net;
 
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Core.Util.Crypt;
 using EnergonSoftware.Database;
@@ -19,36 +20,39 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ResponseMessageHandler));
 
-        internal ResponseMessageHandler()
+        private AuthSession _session;
+
+        internal ResponseMessageHandler(AuthSession session)
         {
+            _session = session;
         }
 
 // TODO: handle the case of a user authenticating a second time
 
-        private void CompleteAuthentication(Session session)
+        private void CompleteAuthentication()
         {
             SessionId sessionid = new SessionId(ConfigurationManager.AppSettings["sessionSecret"]);
-            _logger.Info("Session " + session.Id + " generated sessionid '" + sessionid.SessionID + "' for account '" + session.AccountInfo.Username + "'");
-            session.Success(sessionid.SessionID);
+            _logger.Info("Session " + _session.Id + " generated sessionid '" + sessionid.SessionID + "' for account '" + _session.AccountInfo.Username + "'");
+            _session.Success(sessionid.SessionID);
         }
 
-        private void Authenticate(string username, string nonce, string cnonce, string nc, string qop, string digestURI, string response, Session session)
+        private void Authenticate(string username, string nonce, string cnonce, string nc, string qop, string digestURI, string response)
         {
             AccountInfo account = new AccountInfo(username);
-            using(DatabaseConnection connection = ServerState.Instance.AcquireDatabaseConnection()) {
+            using(DatabaseConnection connection = DatabaseManager.AcquireDatabaseConnection()) {
                 if(!account.Read(connection)) {
-                    session.Failure("Bad Username or Password");
+                    _session.Failure("Bad Username or Password");
                     return;
                 }
             }
 
             if(!account.Active) {
-                session.Failure("Account Inactive");
+                _session.Failure("Account Inactive");
                 return;
             }
 
             string expected = "", rspauth = "";
-            switch(session.AuthType)
+            switch(_session.AuthType)
             {
             /*case Heroes.Core.AuthType.DigestMD5:
                 _logger.Debug("Handling MD5 response...");
@@ -63,74 +67,73 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 rspauth = EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI);
                 break;
             default:
-                session.Failure("Unsupported Auth Type");
+                _session.Failure("Unsupported Auth Type");
                 return;
             }
 
             if(!expected.Equals(response)) {
-                session.Failure("Bad Username or Password");
+                _session.Failure("Bad Username or Password");
                 return;
             }
 
             string challenge = "rspauth=" + rspauth;
-            _logger.Info("Session " + session.Id + " authenticated account '" + username + "', sending response: " + rspauth);
-            session.Challenge(challenge, account);
+            _logger.Info("Session " + _session.Id + " authenticated account '" + username + "', sending response: " + rspauth);
+            _session.Challenge(challenge, account);
         }
 
-        protected override void OnHandleMessage(object context)
+        protected override void OnHandleMessage(IMessage message)
         {
-            MessageHandlerContext ctx = (MessageHandlerContext)context;
-            ResponseMessage message = (ResponseMessage)ctx.Message;
-
-            if(ctx.Session.Authenticated) {
-                CompleteAuthentication(ctx.Session);
+            if(_session.Authenticated) {
+                CompleteAuthentication();
                 return;
             }
 
-            if(!ctx.Session.Authenticating) {
-                ctx.Session.Failure("Not Authenticating");
+            if(!_session.Authenticating) {
+                _session.Failure("Not Authenticating");
                 return;
             }
 
-            if(ctx.Session.AuthNonce.Expired) {
-                ctx.Session.Failure("Session Expired");
+            if(_session.AuthNonce.Expired) {
+                _session.Failure("Session Expired");
                 return;
             }
 
-            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(message.Response));
+            ResponseMessage response = (ResponseMessage)message;
+
+            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(response.Response));
             _logger.Debug("Decoded response: " + decoded);
 
             Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(decoded);
             if(null == values || 0 == values.Count) {
-                ctx.Session.Failure("Invalid Response");
+                _session.Failure("Invalid Response");
                 return;
             }
 
             try {
                 string username = values["username"].Trim(new char[]{'"'});
-                EventLogger.Instance.BeginEvent(ctx.Session.Socket.RemoteEndPoint, username);
+                EventLogger.Instance.BeginEvent(_session.RemoteEndPoint, username);
 
                 string charset = values["charset"].Trim(new char[]{'"'});
                 if(!"utf-8".Equals(charset, StringComparison.InvariantCultureIgnoreCase)) {
-                    ctx.Session.Failure("Invalid Response");
+                    _session.Failure("Invalid Response");
                     return;
                 }
 
                 string qop = values["qop"].Trim(new char[]{'"'});
                 if(!"auth".Equals(qop, StringComparison.InvariantCultureIgnoreCase)) {
-                    ctx.Session.Failure("Invalid Response");
+                    _session.Failure("Invalid Response");
                     return;
                 }
 
                 string realm = values["realm"].Trim(new char[]{'"'});
                 if(!ConfigurationManager.AppSettings["authRealm"].Equals(realm, StringComparison.InvariantCultureIgnoreCase)) {
-                    ctx.Session.Failure("Invalid Response");
+                    _session.Failure("Invalid Response");
                     return;
                 }
 
                 string nonce = values["nonce"].Trim(new char[]{'"'});
-                if(!ctx.Session.AuthNonce.NonceHash.Equals(nonce)) {
-                    ctx.Session.Failure("Invalid Response");
+                if(!_session.AuthNonce.NonceHash.Equals(nonce)) {
+                    _session.Failure("Invalid Response");
                     return;
                 }
 
@@ -141,9 +144,9 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 string nc = values["nc"].Trim(new char[]{'"'});
                 string rsp = values["response"].Trim(new char[]{'"'});
 
-                Authenticate(username, nonce, cnonce, nc, qop, digestURI, rsp, ctx.Session);
+                Authenticate(username, nonce, cnonce, nc, qop, digestURI, rsp);
             } catch(KeyNotFoundException) {
-                ctx.Session.Failure("Invalid response!");
+                _session.Failure("Invalid response!");
             }
         }
     }

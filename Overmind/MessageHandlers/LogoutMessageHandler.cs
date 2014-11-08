@@ -4,18 +4,18 @@ using EnergonSoftware.Overmind.Net;
 
 namespace EnergonSoftware.Overmind.MessageHandlers
 {
-    sealed class PingMessageHandler : MessageHandler
+    sealed class LogoutMessageHandler : MessageHandler
     {
         private LoginSession _session;
 
-        internal PingMessageHandler(LoginSession session)
+        internal LogoutMessageHandler(LoginSession session)
         {
             _session = session;
         }
 
         protected override void OnHandleMessage(IMessage message)
         {
-            _session.Ping();
+            _session.Logout();
         }
     }
 }

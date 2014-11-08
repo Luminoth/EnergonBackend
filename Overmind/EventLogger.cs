@@ -17,6 +17,8 @@ namespace EnergonSoftware.Overmind
         public static EventLogger Instance { get { return _instance; } }
 #endregion
 
+        private object _lock = new object();
+
         public void LoginRequestEvent(EndPoint origin, string username)
         {
             LoginEvent evt = new LoginEvent(LoginEventType.Request);
@@ -42,12 +44,22 @@ namespace EnergonSoftware.Overmind
             LogEvent(evt);
         }
 
+        public void LogoutEvent(EndPoint origin, string username)
+        {
+            LoginEvent evt = new LoginEvent(LoginEventType.Logout);
+            evt.Origin = origin.ToString();
+            evt.Account = username;
+            LogEvent(evt);
+        }
+
         // TODO: move this to a base class
         private void LogEvent(Event evt)
         {
-            _logger.Debug("Logging event: " + evt);
-            using(DatabaseConnection connection = ServerState.Instance.AcquireDatabaseConnection()) {
-                evt.Insert(connection);
+            lock(_lock) {
+                _logger.Debug("Logging event: " + evt);
+                using(DatabaseConnection connection = DatabaseManager.AcquireDatabaseConnection()) {
+                    evt.Insert(connection);
+                }
             }
         }
 

@@ -12,12 +12,11 @@ namespace EnergonSoftware.Launcher.Controls
     {
         public LoginPage()
         {
-            InitializeComponent();
+            AuthManager.Instance.OnAuthFailed += OnAuthFailedCallback;
+            AuthManager.Instance.OnAuthSuccess += OnAuthSuccessCallback;
 
             DataContext = ClientState.Instance;
-
-            ClientState.Instance.OnAuthFailed += OnAuthFailedCallback;
-            ClientState.Instance.OnAuthSuccess += OnAuthSuccessCallback;
+            InitializeComponent();
         }
 
 #region UI Helpers
@@ -31,13 +30,10 @@ namespace EnergonSoftware.Launcher.Controls
 #endregion
 
 #region Event Handlers
-        private void OnLogin(object sender, RoutedEventArgs evt)
+        private void ButtonLogin_Click(object sender, RoutedEventArgs evt)
         {
             ClientState.Instance.LoggingIn = true;
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                ClientState.Instance.AuthConnect(Password.Password);
-            }));
+            ((App)Application.Current).Sessions.AddSession(AuthManager.Instance.AuthConnect(Password.Password));
         }
 
         private void OnAuthFailedCallback(string reason)
@@ -50,8 +46,7 @@ namespace EnergonSoftware.Launcher.Controls
         private void OnAuthSuccessCallback()
         {
             ClearPassword();
-            ClientState.Instance.OvermindConnect();
-            ClientState.Instance.LoggingIn = false;
+            ((App)Application.Current).Sessions.AddSession(ClientState.Instance.OvermindConnect());
         }
 #endregion
     }

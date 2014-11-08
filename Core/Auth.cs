@@ -11,9 +11,9 @@ namespace EnergonSoftware.Core
         [Description("NONE")]
         None,
 
-        /*[Obsolete]
+        [Obsolete]
         [Description("DIGEST-MD5")]
-        DigestMD5,*/
+        DigestMD5,
 
         [Description("DIGEST-SHA512")]
         DigestSHA512,

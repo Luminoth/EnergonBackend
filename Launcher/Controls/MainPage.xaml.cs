@@ -10,9 +10,15 @@ namespace EnergonSoftware.Launcher.Controls
     {
         public MainPage()
         {
-            InitializeComponent();
-
             DataContext = ClientState.Instance;
+            InitializeComponent();
         }
+
+#region Event Handlers
+        private void LogoutButton_Click(object sender, RoutedEventArgs evt)
+        {
+            ClientState.Instance.Logout();
+        }
+#endregion
     }
 }

@@ -1,39 +1,43 @@
-﻿using System.Net.Sockets;
+﻿using System.Net;
+using System.Net.Sockets;
+
+using log4net;
+
+using EnergonSoftware.Core.Util;
 
 namespace EnergonSoftware.Core.Net
 {
     public sealed class SocketState
     {
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(SocketState));
+
 #region Id Generator
         private static int _nextId = 0;
         private static int NextId { get { return ++_nextId; } }
 #endregion
 
-        // NOTE: id's always start at 1, not 0
         public int Id { get; private set; }
 
-#region Socket Properties
-        // NOTE: these are not maintained by the socket state
-        // they're just caller storage when needed
-        public string Host { get; set; }
-        public int Port { get; set; }
         public bool Connecting { get; set; }
 
         private Socket _socket;
         public Socket Socket
         {
-            get { return _socket; }
+            private get { return _socket; }
             set {
                 _socket = value;
-                Reader = null == _socket ? null : new BufferedSocketReader(_socket);
+                _reader = new BufferedSocketReader(_socket);
             }
         }
+
         public bool HasSocket { get { return null != _socket; } }
+        public bool Connected { get { return HasSocket && _socket.Connected; } }
+        public EndPoint RemoteEndPoint { get { return HasSocket ? _socket.RemoteEndPoint : null; } }
 
-        public bool Connected { get { return HasSocket && Socket.Connected; } }
-#endregion
+        private BufferedSocketReader _reader;
+        public MemoryBuffer Buffer { get { return HasSocket ? _reader.Buffer : null; } }
 
-        public BufferedSocketReader Reader { get; private set; }
+        public long LastMessageTime { get; private set; }
 
         public SocketState()
         {
@@ -44,6 +48,22 @@ namespace EnergonSoftware.Core.Net
         {
             Id = NextId;
             Socket = socket;
+        }
+
+        public int Poll()
+        {
+            int len = _reader.Poll();
+            if(len > 0) {
+                _logger.Debug("Socket state " + Id + " read " + len + " bytes");
+                LastMessageTime = Time.CurrentTimeMs;
+            }
+            return len;
+        }
+
+        public int Send(byte[] buffer)
+        {
+            _logger.Debug("Socket state " + Id + " sending " + buffer.Length + " bytes");
+            return Socket.Send(buffer);
         }
 
         public void ShutdownAndClose(bool reuseSocket)
@@ -59,10 +79,6 @@ namespace EnergonSoftware.Core.Net
 
         public void Reset()
         {
-            Host = null;
-            Port = 0;
-            Connecting = false;
-
             Socket = null;
         }
     }

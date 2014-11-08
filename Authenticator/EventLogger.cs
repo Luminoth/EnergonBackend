@@ -17,6 +17,8 @@ namespace EnergonSoftware.Authenticator
         public static EventLogger Instance { get { return _instance; } }
 #endregion
 
+        private object _lock = new object();
+
         public void RequestEvent(EndPoint origin)
         {
             AuthEvent evt = new AuthEvent(AuthEventType.Request);
@@ -52,9 +54,11 @@ namespace EnergonSoftware.Authenticator
         // TODO: move this to a base class
         private void LogEvent(Event evt)
         {
-            _logger.Debug("Logging event: " + evt);
-            using(DatabaseConnection connection = ServerState.Instance.AcquireDatabaseConnection()) {
-                evt.Insert(connection);
+            lock(_lock) {
+                _logger.Debug("Logging event: " + evt);
+                using(DatabaseConnection connection = DatabaseManager.AcquireDatabaseConnection()) {
+                    evt.Insert(connection);
+                }
             }
         }
 

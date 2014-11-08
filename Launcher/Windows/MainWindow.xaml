@@ -5,8 +5,7 @@
         xmlns:launchercontrols="clr-namespace:EnergonSoftware.Launcher.Controls"
         Title="{x:Static launcherprops:Resources.MainWindowTitle}"
         Height="350" Width="525" ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen"
-        Closed="OnClosed">
+        WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>

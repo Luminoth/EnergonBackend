@@ -12,49 +12,38 @@ namespace EnergonSoftware.Core.Net
     {
         private static int MAX_BUFFER = 1024;
 
-        public Socket Socket { get; private set; }
+        private Socket _socket;
         public MemoryBuffer Buffer { get; private set; }
-        public long LastMessageTime { get; private set; }
 
         public BufferedSocketReader(Socket socket)
         {
-            Socket = socket;
+            _socket = socket;
             Buffer = new MemoryBuffer();
-            LastMessageTime = Time.CurrentTimeMs;
+        }
+
+        public int Poll()
+        {
+            int count = 0;
+            while(_socket.Poll(100, SelectMode.SelectRead)) {
+                int len = Read();
+                if(0 == len) {
+                    return -1;
+                }
+                count += len;
+            }
+            return count;
         }
 
         public int Read()
         {
             byte[] data = new byte[MAX_BUFFER];
-            int len = Socket.Receive(data);
+            int len = _socket.Receive(data);
             if(0 == len) {
                 return 0;
             }
 
             Buffer.Write(data, 0, len);
-            LastMessageTime = Time.CurrentTimeMs;
-
             return len;
-        }
-
-        /*public int ReadFrom(ref EndPoint endpoint)
-        {
-            byte[] data = new byte[MAX_BUFFER];
-            int len = Socket.ReceiveFrom(data, ref endpoint);
-            if(0 == len) {
-                return 0;
-            }
-
-            Buffer.Write(data, 0, len);
-            LastMessageTime = Time.CurrentTimeMs;
-
-            return len;
-        }*/
-
-        public void Read(byte[] data, int offset, int len)
-        {
-            Buffer.Write(data, offset, len);
-            LastMessageTime = Time.CurrentTimeMs;
         }
     }
 }

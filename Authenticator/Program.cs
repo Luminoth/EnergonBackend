@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Net.Sockets;
 using System.Threading;
 
 using log4net;
 using log4net.Config;
 
+using EnergonSoftware.Core.Configuration;
+using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Net;
+using EnergonSoftware.Authenticator.MessageHandlers;
 using EnergonSoftware.Authenticator.Net;
 
 namespace EnergonSoftware.Authenticator
@@ -13,25 +19,28 @@ namespace EnergonSoftware.Authenticator
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(Program));
 
+        private static volatile bool _quit = false;
+
+        private static SocketListener _authListener = new SocketListener(new AuthSessionFactory());
+        private static SessionManager _authSessions = new SessionManager();
+
+        private static HttpServer _diagnosticServer = new HttpServer();
+
         private static void ConfigureLogging()
         {
             XmlConfigurator.Configure();
         }
 
+        private static void OnQuit(object sender, ConsoleCancelEventArgs e)
+        {
+            _quit = true;
+
+            e.Cancel = true;
+        }
+
         private static bool Init()
         {
-            Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e) {
-                e.Cancel = true;
-                ServerState.Instance.Quit = true;
-            };
-
-            if(!InstanceNotifier.Instance.CreateSockets()) {
-                return false;
-            }
-
-            if(!ServerState.Instance.CreateSockets()) {
-                return false;
-            }
+            Console.CancelKeyPress += OnQuit;
 
             int workerThreads,ioThreads;
             ThreadPool.GetMinThreads(out workerThreads, out ioThreads);
@@ -40,6 +49,23 @@ namespace EnergonSoftware.Authenticator
             ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
             ThreadPool.SetMaxThreads(Convert.ToInt32(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
 
+            _authSessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
+
+            ListenAddressesConfigurationSection listenAddresses = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("listenAddresses");
+            if(null == listenAddresses || listenAddresses.ListenAddresses.Count < 1) {
+                _logger.Error("No configured listen addresses!");
+                return false;
+            }
+
+            _authListener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
+            if(!_authListener.CreateSockets(listenAddresses.ListenAddresses, SocketType.Stream, ProtocolType.Tcp)) {
+                return false;
+            }
+
+            _authSessions.Start(new MessageHandlerFactory());
+
+            _diagnosticServer.Start(new List<string>() { "http://localhost:9001/" });
+
             return true;
         }
 
@@ -47,25 +73,25 @@ namespace EnergonSoftware.Authenticator
         {
             _logger.Info("Cleaning up...");
 
-            ServerState.Instance.CloseSockets();
-            SessionManager.Instance.CloseAll();
-            InstanceNotifier.Instance.CloseSockets();
+            _authListener.CloseSockets();
+            _authSessions.Stop();
+
+            _diagnosticServer.Stop();
         }
 
         private static void Run()
         {
             _logger.Info("Running...");
 
-            while(!ServerState.Instance.Quit) {
+            while(!_quit) {
                 try {
-                    InstanceNotifier.Instance.Poll();
-                    ServerState.Instance.Poll();
+                    _authListener.Poll(_authSessions);
 
-                    SessionManager.Instance.PollAndRun();
-                    SessionManager.Instance.Cleanup();
+                    _authSessions.PollAndRun();
+                    _authSessions.Cleanup();
                 } catch(Exception e) {
                     _logger.Info("Unhandled Exception!", e);
-                    ServerState.Instance.Quit = true;
+                    _quit = true;
                 }
 
                 Thread.Sleep(0);
