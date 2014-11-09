@@ -28,7 +28,7 @@ namespace EnergonSoftware.Launcher
         Authenticated,
     }
 
-    sealed class ClientState
+    sealed class ClientState : INotifyPropertyChanged
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ClientState));
 
@@ -47,7 +47,6 @@ namespace EnergonSoftware.Launcher
 
         public string Ticket { get; set; }
 
-#region Login Properties
         private bool _loggedIn = false;
         public bool LoggedIn
         {
@@ -58,9 +57,8 @@ namespace EnergonSoftware.Launcher
                 NotifyPropertyChanged("NotLoggedIn");
             }
         }
-#endregion
+        public bool NotLoggedIn { get { return !LoggedIn; } }
 
-#region UI Helpers
         private bool _loggingIn = false;
         public bool LoggingIn
         {
@@ -68,13 +66,10 @@ namespace EnergonSoftware.Launcher
             set {
                 _loggingIn = value;
                 NotifyPropertyChanged("LoggingIn");
-                NotifyPropertyChanged("CanLogin");
+                NotifyPropertyChanged("NotLoggingIn");
             }
         }
-
-        public bool CanLogin { get { return !LoggingIn && !LoggedIn; } }
-        public bool NotLoggedIn { get { return !LoggedIn; } }
-#endregion
+        public bool NotLoggingIn { get { return !LoggingIn; } }
 
         public delegate void OnErrorHandler(string error);
         public event OnErrorHandler OnError;

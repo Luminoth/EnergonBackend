@@ -18,11 +18,11 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static launcherprops:Resources.UsernameLabel}" />
-        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Width="100" Name="Username" IsEnabled="{Binding CanLogin}" Text="{Binding Username}" />
+        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Width="100" Name="Username" IsEnabled="{Binding NotLoggingIn}" Text="{Binding Username}" />
 
         <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"  Text="{x:Static launcherprops:Resources.PasswordLabel}" />
-        <PasswordBox Grid.Row="1" Grid.Column="1" Margin="5" Width="100" Name="Password" IsEnabled="{Binding CanLogin}" />
+        <PasswordBox Grid.Row="1" Grid.Column="1" Margin="5" Width="100" Name="Password" IsEnabled="{Binding NotLoggingIn}" />
 
-        <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Width="50" Click="ButtonLogin_Click" IsEnabled="{Binding CanLogin}" IsDefault="True"><TextBlock Text="{x:Static launcherprops:Resources.LoginButtonLabel}" /></Button>
+        <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Width="50" Click="ButtonLogin_Click" IsEnabled="{Binding NotLoggingIn}" IsDefault="True"><TextBlock Text="{x:Static launcherprops:Resources.LoginButtonLabel}" /></Button>
     </Grid>
 </UserControl>
