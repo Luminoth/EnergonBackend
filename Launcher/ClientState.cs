@@ -1,21 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Configuration;
-using System.Net.Sockets;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
 using log4net;
-
-using EnergonSoftware.Core;
-using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Formatter;
-using EnergonSoftware.Core.Messages.Overmind;
-using EnergonSoftware.Core.Net;
-using EnergonSoftware.Core.Util;
-using EnergonSoftware.Launcher.MessageHandlers;
-using EnergonSoftware.Launcher.Net;
 
 namespace EnergonSoftware.Launcher
 {
@@ -36,8 +22,6 @@ namespace EnergonSoftware.Launcher
         private static ClientState _instance = new ClientState();
         public static ClientState Instance { get { return _instance; } }
 #endregion
-
-        public OvermindSession _overmindSession;
 
         private string _username;
         public string Username { get { return _username; } set { _username = value; ClientState.Instance.NotifyPropertyChanged("Username"); } }
@@ -71,23 +55,6 @@ namespace EnergonSoftware.Launcher
         }
         public bool NotLoggingIn { get { return !LoggingIn; } }
 
-        public delegate void OnErrorHandler(string error);
-        public event OnErrorHandler OnError;
-
-        public void Error(string error)
-        {
-            _logger.Error("Encountered an error: " + error);
-
-            if(null != OnError) {
-                OnError(error);
-            }
-        }
-
-        public void Error(Exception error)
-        {
-            Error(error.Message);
-        }
-
 #region Property Notifier
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(/*[CallerMemberName]*/ string property/*=null*/)
@@ -100,13 +67,6 @@ namespace EnergonSoftware.Launcher
 
         private ClientState()
         {
-// TODO: These go to the sessions
-            /*ConnectionManager.Instance.OnSocketError += OnSocketErrorCallback;
-
-            ConnectionManager.Instance.OnConnectFailed += OnConnectFailedCallback;
-            ConnectionManager.Instance.OnConnectSuccess += OnConnectSuccessCallback;
-
-            ConnectionManager.Instance.OnDisconnect += OnDisconnectCallback;*/
         }
     }
 }

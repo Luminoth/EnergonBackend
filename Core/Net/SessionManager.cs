@@ -66,7 +66,7 @@ namespace EnergonSoftware.Core.Net
 
             if(session.TimedOut) {
                 _logger.Info("Session " + session.Id + " timed out!");
-                session.Disconnect();
+                session.Disconnect("Timed Out!");
                 return;
             }
 

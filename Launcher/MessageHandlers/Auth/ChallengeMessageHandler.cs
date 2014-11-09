@@ -29,14 +29,14 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
         {
             Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(message);
             if(null == values || 0 == values.Count) {
-                ClientState.Instance.Error("Invalid challenge!");
+                _session.Error("Invalid challenge!");
                 return;
             }
 
             try {
                 string charset = values["charset"].Trim(new char[]{'"'});
                 if(!"utf-8".Equals(charset, StringComparison.InvariantCultureIgnoreCase)) {
-                    ClientState.Instance.Error("Invalid charset!");
+                    _session.Error("Invalid charset!");
                     return;
                 }
 
@@ -71,7 +71,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 _session.AuthResponse(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)),
                     EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI));
             } catch(KeyNotFoundException e) {
-                ClientState.Instance.Error("Invalid challenge: " + e.Message);
+                _session.Error("Invalid challenge: " + e.Message);
             }
         }
 
@@ -79,20 +79,20 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
         {
             Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(message);
             if(null == values || 0 == values.Count) {
-                ClientState.Instance.Error("Invalid challenge!");
+                _session.Error("Invalid challenge!");
                 return;
             }
 
             try {
                 string rspauth = values["rspauth"].Trim(new char[]{'"'});
                 if(_session.RspAuth != rspauth) {
-                    ClientState.Instance.Error("rspauth mismatch, expected: '" + _session.RspAuth + "', got: '" + rspauth + "'");
+                    _session.Error("rspauth mismatch, expected: '" + _session.RspAuth + "', got: '" + rspauth + "'");
                     return;
                 }
 
                 _session.AuthFinalize();
             } catch(KeyNotFoundException e) {
-                ClientState.Instance.Error("Invalid challenge: " + e.Message);
+                _session.Error("Invalid challenge: " + e.Message);
                 return;
             }
         }
@@ -113,7 +113,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 HandleResponseState(decoded);
                 break;
             default:
-                ClientState.Instance.Error("Unexpected auth stage: " + _session.AuthStage);
+                _session.Error("Unexpected auth stage: " + _session.AuthStage);
                 return;
             }
         }

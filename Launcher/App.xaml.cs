@@ -36,7 +36,7 @@ namespace EnergonSoftware.Launcher
                     _sessions.Cleanup();
                 } catch(Exception e) {
                     _logger.Info("Unhandled Exception!", e);
-                    ClientState.Instance.Error(e);
+                    ((App)Application.Current).OnError(e.Message, "Unhandled Exception!");
                 }
 
                 Thread.Sleep(0);
@@ -73,8 +73,6 @@ namespace EnergonSoftware.Launcher
             ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
             ThreadPool.SetMaxThreads(Int32.Parse(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
 
-            ClientState.Instance.OnError += OnErrorCallback;
-
             _sessions.Start(new MessageHandlerFactory());
 
             // have to run this in a separate thread
@@ -99,10 +97,5 @@ namespace EnergonSoftware.Launcher
             _logger.Info("Goodbye!");
         }
 #endregion
-
-        private void OnErrorCallback(string error)
-        {
-            OnError(error, "Error!");
-        }
     }
 }

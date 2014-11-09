@@ -34,11 +34,11 @@ namespace EnergonSoftware.Core.Net
         public delegate void OnConnectFailedHandler(SocketError error);
         public event OnConnectFailedHandler OnConnectFailed;
 
-        public delegate void OnDisconnectHandler();
+        public delegate void OnDisconnectHandler(string reason);
         public event OnDisconnectHandler OnDisconnect;
 
-        public delegate void OnSocketErrorHandler(string error);
-        public event OnSocketErrorHandler OnSocketError;
+        public delegate void OnErrorHandler(string error);
+        public event OnErrorHandler OnError;
 #endregion
 
         public int Id { get; private set; }
@@ -106,7 +106,7 @@ namespace EnergonSoftware.Core.Net
         {
             _logger.Error("Session " + Id + " connect failed: " + error);
 
-            Disconnect();
+            Disconnect(error.ToString());
 
             if(null != OnConnectFailed) {
                 OnConnectFailed(error);
@@ -137,14 +137,14 @@ namespace EnergonSoftware.Core.Net
         }
 
 
-        public void Disconnect()
+        public void Disconnect(string reason=null)
         {
             if(Connected) {
                 _logger.Info("Session " + Id + " disconnecting...");
                 _socketState.ShutdownAndClose(false);
 
                 if(null != OnDisconnect) {
-                    OnDisconnect();
+                    OnDisconnect(reason);
                 }
             }
         }
@@ -205,34 +205,31 @@ namespace EnergonSoftware.Core.Net
         public void Error(string error)
         {
             _logger.Error("Session " + Id + " encountered an error: " + error);
-            Disconnect();
+            Disconnect(error);
+
+            if(null != OnError) {
+                OnError(error);
+            }
         }
 
         public void Error(string error, Exception ex)
         {
             _logger.Error("Session " + Id + " encountered an error: " + error, ex);
-            Disconnect();
+            Disconnect(error);
+
+            if(null != OnError) {
+                OnError(error);
+            }
         }
 
         public void Error(Exception ex)
         {
             _logger.Error("Session " + Id + " encountered an error", ex);
-            Disconnect();
-        }
+            Disconnect(ex.Message);
 
-        public void SocketError(string error)
-        {
-            _logger.Error("Socket " + Id + " encountered an error: " + error);
-            Disconnect();
-
-            if(null != OnSocketError) {
-                OnSocketError(error);
+            if(null != OnError) {
+                OnError(ex.Message);
             }
-        }
-
-        public void SocketError(Exception error)
-        {
-            SocketError(error.Message);
         }
     }
 }

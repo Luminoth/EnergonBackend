@@ -39,6 +39,7 @@ namespace EnergonSoftware.Launcher.Controls
             AuthSession session = new AuthSession();
             session.OnAuthFailed += OnAuthFailedCallback;
             session.OnAuthSuccess += OnAuthSuccessCallback;
+// TODO: add disconnect/error callbacks
             session.BeginConnect(ConfigurationManager.AppSettings["authHost"], Convert.ToInt32(ConfigurationManager.AppSettings["authPort"]));
             ((App)Application.Current).Sessions.AddSession(session);
         }
@@ -52,6 +53,7 @@ namespace EnergonSoftware.Launcher.Controls
         private void OnAuthSuccessCallback()
         {
             OvermindSession session = new OvermindSession();
+// TODO: add disconnect/error callbacks
             session.BeginConnect(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"]));
             ((App)Application.Current).Sessions.AddSession(session);
         }
