@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.ServiceProcess;
 using System.Threading;
 
@@ -12,8 +13,16 @@ namespace EnergonSoftware.Overmind
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(Program));
 
+        public const string EVENT_LOG_SOURCE = "Energon Software Overmind";
+        public static EventLog ServiceEventLogger = new EventLog();
+
         private static void ConfigureLogging()
         {
+            if(!EventLog.SourceExists(EVENT_LOG_SOURCE))  {         
+                EventLog.CreateEventSource(EVENT_LOG_SOURCE, "Energon Software");
+            }
+            ServiceEventLogger.Source = EVENT_LOG_SOURCE;
+
             XmlConfigurator.Configure();
         }
 

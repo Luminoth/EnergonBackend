@@ -21,10 +21,10 @@ namespace EnergonSoftware.Authenticator
 
         public bool Running { get; private set; }
 
-        private SocketListener _authListener;
-        private SessionManager _authSessions;
+        private HttpServer _diagnosticServer = new HttpServer();
 
-        private HttpServer _diagnosticServer;
+        private SocketListener _authListener = new SocketListener(new AuthSessionFactory());
+        private SessionManager _authSessions = new SessionManager();
 
         public Authenticator()
         {
@@ -43,24 +43,21 @@ namespace EnergonSoftware.Authenticator
             ListenAddressesConfigurationSection listenAddresses = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("listenAddresses");
             if(null == listenAddresses || listenAddresses.ListenAddresses.Count < 1) {
                 _logger.Error("No configured listen addresses!");
-// TODO: status == not running
+                Stop();
                 return;
             }
 
             _logger.Debug("Starting diagnostic interface...");
-            _diagnosticServer = new HttpServer();
             _diagnosticServer.Start(new List<string>() { "http://localhost:9001/" });
 
             _logger.Debug("Opening listener sockets...");
-            _authListener = new SocketListener(new AuthSessionFactory());
             _authListener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
             if(!_authListener.CreateSockets(listenAddresses.ListenAddresses, SocketType.Stream, ProtocolType.Tcp)) {
-// TODO: status == not running
+                Stop();
                 return;
             }
 
             _logger.Debug("Starting session manager...");
-            _authSessions = new SessionManager();
             _authSessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
             _authSessions.Start(new MessageHandlerFactory());
 
@@ -76,15 +73,12 @@ namespace EnergonSoftware.Authenticator
 
             _logger.Debug("Closing listener sockets...");
             _authListener.CloseSockets();
-            _authListener = null;
 
             _logger.Debug("Stopping session manager...");
             _authSessions.Stop();
-            _authSessions = null;
 
             _logger.Debug("Stopping diagnostic interface...");
             _diagnosticServer.Stop();
-            _diagnosticServer = null;
         }
 
         private Task Run()
@@ -99,7 +93,7 @@ namespace EnergonSoftware.Authenticator
                             _authSessions.Cleanup();
                         } catch(Exception e) {
                             _logger.Fatal("Unhandled Exception!", e);
-                            Running = false;
+                            Stop();
                         }
                         Thread.Sleep(0);
                     }
