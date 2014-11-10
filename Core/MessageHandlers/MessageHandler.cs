@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+
+using log4net;
 
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net;
@@ -13,6 +16,8 @@ namespace EnergonSoftware.Core.MessageHandlers
 
     public abstract class MessageHandler
     {
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(MessageHandler));
+
 private Task _task;
 public bool Finished { get { return null != _task && _task.IsCompleted; } }
         //public bool Finished { get; private set; }
@@ -24,14 +29,18 @@ public bool Finished { get { return null != _task && _task.IsCompleted; } }
         {
 _task = Task.Factory.StartNew(() =>
     {
-        _startTime = Time.CurrentTimeMs;
-        OnHandleMessage(message);
-        _finishTime = Time.CurrentTimeMs;
+        try {
+            _startTime = Time.CurrentTimeMs;
+            OnHandleMessage(message);
+            _finishTime = Time.CurrentTimeMs;
+        } catch(Exception e) {
+            _logger.Error("Unhandled Exception!", e);
+        }
     }
 );
             /*Finished = false;
             _startTime = Time.CurrentTimeMs;
-            await OnHandleMessage(session, message);
+            await OnHandleMessage(message);
             _finishTime = Time.CurrentTimeMs;
             Finished = true;*/
         }

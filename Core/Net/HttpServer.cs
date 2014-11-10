@@ -27,7 +27,7 @@ namespace EnergonSoftware.Core.Net
 
         public void Start(List<string> prefixes)
         {
-            _logger.Info("Starting HttpServer...");
+            _logger.Debug("Starting HttpServer...");
 
             prefixes.ForEach(prefix => _listener.Prefixes.Add(prefix));
 
@@ -37,7 +37,7 @@ namespace EnergonSoftware.Core.Net
 
         public void Stop()
         {
-            _logger.Info("Stopping HttpServer...");
+            _logger.Debug("Stopping HttpServer...");
 
             _listener.Stop();
             _thread.Join();

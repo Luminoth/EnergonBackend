@@ -34,7 +34,7 @@ namespace EnergonSoftware.Core.MessageHandlers
         {
             _factory = factory;
 
-            _logger.Info("Starting message processor...");
+            _logger.Debug("Starting message processor...");
 _task = Task.Factory.StartNew(() =>
     {
         Run();
@@ -45,7 +45,7 @@ _task = Task.Factory.StartNew(() =>
 
         public void Stop()
         {
-            _logger.Info("Stopping message processor...");
+            _logger.Debug("Stopping message processor...");
             _quit = true;
             _task.Wait();
 

@@ -29,8 +29,10 @@ namespace EnergonSoftware.Core.Net
         public void Stop()
         {
             _logger.Info("Closing all sessions...");
-            _sessions.ForEach(s => s.Disconnect());
-            _sessions.Clear();
+            lock(_sessions) {
+                _sessions.ForEach(s => s.Disconnect());
+                _sessions.Clear();
+            }
 
             _processor.Stop();
         }
@@ -39,21 +41,26 @@ namespace EnergonSoftware.Core.Net
         {
             session.Timeout = SessionTimeout;
 
-            _sessions.Add(session);
+            lock(_sessions) {
+                _sessions.Add(session);
+            }
             _logger.Info("Added new session " + session.Id);
         }
 
         public void Cleanup()
         {
-            int count = _sessions.RemoveAll(s =>
-                {
-                    if(!s.Connecting && !s.Connected) {
-                        _processor.RemoveSession(s.Id);
-                        return true;
+            int count = 0;
+            lock(_sessions) {
+                count = _sessions.RemoveAll(s =>
+                    {
+                        if(!s.Connecting && !s.Connected) {
+                            _processor.RemoveSession(s.Id);
+                            return true;
+                        }
+                        return false;
                     }
-                    return false;
-                }
-            );
+                );
+            }
 
             if(count > 0) {
                 _logger.Info("Removed " + count + " disconnected sessions");
@@ -77,7 +84,9 @@ namespace EnergonSoftware.Core.Net
 
         public void PollAndRun()
         {
-            _sessions.ForEach(s => PollAndRun(s));
+            lock(_sessions) {
+                _sessions.ForEach(s => PollAndRun(s));
+            }
         }
     }
 }

@@ -10,7 +10,7 @@ using log4net;
 
 namespace EnergonSoftware.Database
 {
-    public class DatabaseConnection : IDisposable
+    public sealed class DatabaseConnection : IDisposable
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(DatabaseConnection));
 
