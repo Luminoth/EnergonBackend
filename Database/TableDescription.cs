@@ -50,17 +50,16 @@ namespace EnergonSoftware.Database
             return "";
         }
 
-        private Tuple<string, string> _references;
-
         public int Id { get; set; }
         public TableDescription Table { get; set; }
-        public string Name { get; private set; }
-        public DatabaseType Type { get; private set; }
+        public readonly string Name;
+        public readonly DatabaseType Type;
         public bool PrimaryKey { get; private set; }
         public bool Nullable { get; private set; }
 
-        public bool HasForeignKey { get { return null != _references; } }
+        private Tuple<string, string> _references;
         public Tuple<string, string> References { get { return _references; } }
+        public bool HasForeignKey { get { return null != _references; } }
 
         public ColumnDescription(string name, DatabaseType type)
         {
@@ -118,7 +117,7 @@ namespace EnergonSoftware.Database
         private Dictionary<string, ColumnDescription> _columns = new Dictionary<string, ColumnDescription>();
         private List<string> _primaryKeys = new List<string>();
 
-        public string Name { get; private set; }
+        public readonly string Name;
         public ColumnDescription this[string key] { get { return _columns[key]; } }
 
         public TableDescription(string name, List<ColumnDescription> columns)

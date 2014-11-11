@@ -9,21 +9,11 @@ namespace EnergonSoftware.Core.Util
     [Serializable]
     public sealed class SessionId
     {
-        public string Secret { get; private set; }
-        public int ExpiryMS { get; private set; }
-        public string SessionID { get; private set; }
-        public long CreationTime { get; private set; }
-
-        public bool Expired
-        {
-            get
-            {
-                if(ExpiryMS < 0) {
-                    return false;
-                }
-                return Time.CurrentTimeMs >= (CreationTime + ExpiryMS);
-            }
-        }
+        public readonly string Secret;
+        public readonly int ExpiryMS;
+        public readonly string SessionID;
+        public readonly long CreationTime;
+        public bool Expired { get { return ExpiryMS < 0 ? false : Time.CurrentTimeMs >= (CreationTime + ExpiryMS); } }
 
         public SessionId(string secret, int expiry=-1)
         {

@@ -20,7 +20,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ResponseMessageHandler));
 
-        private AuthSession _session;
+        private readonly AuthSession _session;
 
         internal ResponseMessageHandler(AuthSession session)
         {

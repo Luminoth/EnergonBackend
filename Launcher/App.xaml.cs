@@ -48,6 +48,16 @@ namespace EnergonSoftware.Launcher
         {
             XmlConfigurator.Configure();
         }
+
+        private static void ConfigureThreading()
+        {
+            int workerThreads,ioThreads;
+            ThreadPool.GetMinThreads(out workerThreads, out ioThreads);
+            ThreadPool.SetMinThreads(Int32.Parse(ConfigurationManager.AppSettings["minWorkerThreads"]), ioThreads);
+
+            ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
+            ThreadPool.SetMaxThreads(Int32.Parse(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
+        }
 #endregion
 
 #region UI Helpers
@@ -64,14 +74,8 @@ namespace EnergonSoftware.Launcher
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             ConfigureLogging();
+            ConfigureThreading();
             Common.InitFilesystem();
-
-            int workerThreads,ioThreads;
-            ThreadPool.GetMinThreads(out workerThreads, out ioThreads);
-            ThreadPool.SetMinThreads(Int32.Parse(ConfigurationManager.AppSettings["minWorkerThreads"]), ioThreads);
-
-            ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
-            ThreadPool.SetMaxThreads(Int32.Parse(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
 
             _sessions.Start(new MessageHandlerFactory());
 

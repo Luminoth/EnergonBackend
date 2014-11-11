@@ -7,7 +7,7 @@ namespace EnergonSoftware.Database.Objects
 {
     public sealed class AccountFriend : IDatabaseObject
     {
-        private static TableDescription ACCOUNT_FRIENDS_TABLE = new TableDescription("accounts_friends",
+        private static readonly TableDescription ACCOUNT_FRIENDS_TABLE = new TableDescription("accounts_friends",
             new List<ColumnDescription>
             {
                 { new ColumnDescription("account", DatabaseType.Integer).SetPrimaryKey().SetReferences("accounts", "id") },
@@ -40,14 +40,16 @@ namespace EnergonSoftware.Database.Objects
         }
 #endregion
 
-        private long _account = -1;
+        private long _account;
         public long Account { get { return _account; } set { _account = value; Dirty = true; } }
 
-        private long _friend = -1;
+        private long _friend;
         public long Friend { get { return _friend; } set { _friend = value; Dirty = true; } }
 
         public AccountFriend()
         {
+            _account = -1;
+            _friend = -1;
         }
 
         public AccountFriend(long account, long friend)

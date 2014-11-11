@@ -16,9 +16,7 @@ namespace EnergonSoftware.Core.Net
         private static int NextId { get { return ++_nextId; } }
 #endregion
 
-        public int Id { get; private set; }
-
-        public bool Connecting { get; set; }
+        public readonly int Id;
 
         private Socket _socket;
         public Socket Socket
@@ -31,6 +29,7 @@ namespace EnergonSoftware.Core.Net
         }
 
         public bool HasSocket { get { return null != _socket; } }
+        public bool Connecting { get; set; }
         public bool Connected { get { return HasSocket && _socket.Connected; } }
         public EndPoint RemoteEndPoint { get { return HasSocket ? _socket.RemoteEndPoint : null; } }
 
@@ -75,11 +74,6 @@ namespace EnergonSoftware.Core.Net
             Socket.Shutdown(SocketShutdown.Both);
             Socket.Disconnect(reuseSocket);
             Socket.Close();
-        }
-
-        public void Reset()
-        {
-            Socket = null;
         }
     }
 }

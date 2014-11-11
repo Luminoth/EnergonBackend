@@ -9,7 +9,7 @@ namespace EnergonSoftware.Core.Messages.Auth
         public const string MESSAGE_TYPE = "response";
         public string Type { get { return MESSAGE_TYPE; } }
 
-        public string Response = "";
+        public string Response { get; set; }
 
         public ResponseMessage()
         {

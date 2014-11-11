@@ -9,7 +9,7 @@ namespace EnergonSoftware.Core.Messages.Auth
         public const string MESSAGE_TYPE = "success";
         public string Type { get { return MESSAGE_TYPE; } }
 
-        public string SessionId = "";
+        public string SessionId { get; set; }
 
         public SuccessMessage()
         {

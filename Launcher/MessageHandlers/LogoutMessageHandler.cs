@@ -6,7 +6,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers
 {
     sealed class LogoutMessageHandler : MessageHandler
     {
-        private OvermindSession _session;
+        private readonly OvermindSession _session;
 
         internal LogoutMessageHandler(OvermindSession session)
         {
@@ -15,6 +15,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers
 
         protected override void OnHandleMessage(IMessage message)
         {
+            // TODO: should this log *everything* out?
             _session.Logout();
         }
     }

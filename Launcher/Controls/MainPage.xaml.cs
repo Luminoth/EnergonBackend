@@ -10,8 +10,8 @@ namespace EnergonSoftware.Launcher.Controls
     {
         public MainPage()
         {
-            DataContext = ClientState.Instance;
             InitializeComponent();
+            DataContext = ClientState.Instance;
         }
 
 #region Event Handlers

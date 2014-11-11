@@ -11,7 +11,7 @@ namespace EnergonSoftware.Database.Objects
 {
     public sealed class AccountInfo : IDatabaseObject
     {
-        private static TableDescription ACCOUNTS_TABLE = new TableDescription("accounts",
+        private static readonly TableDescription ACCOUNTS_TABLE = new TableDescription("accounts",
             new List<ColumnDescription>
             {
                 { new ColumnDescription("id", DatabaseType.Integer).SetPrimaryKey() },
@@ -42,11 +42,13 @@ namespace EnergonSoftware.Database.Objects
                 connection.AddParameter(command, "account", accountId);
                 using(DbDataReader reader = command.ExecuteReader()) {
                     while(reader.Read()) {
-                        Friend friend = new Friend();
-                        friend.Id = reader.GetInt32(0);
-                        friend.Name = reader.GetString(1);
-                        friend.Status = (Status)reader.GetInt32(2);
-                        friends.Add(friend);
+                        friends.Add(new Friend()
+                            {
+                                Id = reader.GetInt32(0),
+                                Name = reader.GetString(1),
+                                Status = (Status)reader.GetInt32(2),
+                            }
+                        );
                     }
                 }
             }
@@ -66,7 +68,7 @@ namespace EnergonSoftware.Database.Objects
         public long Id { get; private set; }
         public bool Valid { get { return Id > 0; } }
 
-        private bool _active = false;
+        private bool _active;
         public bool Active { get { return _active; } set { _active = value; Dirty = true; } }
 
         // NOTE: changing the username invalidates the password digest!

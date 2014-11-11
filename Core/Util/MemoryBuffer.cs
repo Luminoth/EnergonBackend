@@ -8,7 +8,7 @@ namespace EnergonSoftware.Core.Util
     // TODO: add a lock to this
     public sealed class MemoryBuffer
     {
-        public Stream Buffer { get; private set; }
+        public readonly Stream Buffer;
         public int Capacity { get { return ((MemoryStream)Buffer).Capacity; } }
         public long Length { get { return Buffer.Length; } }
         public long Position { get { return Buffer.Position; } }
@@ -37,18 +37,24 @@ namespace EnergonSoftware.Core.Util
 
         public void Write(byte[] value, int offset, int count)
         {
-            Buffer.Write(value, offset, count);
+            lock(Buffer) {
+                Buffer.Write(value, offset, count);
+            }
         }
 
         public void Read(byte[] value, int offset, int count)
         {
-            Buffer.Read(value, offset, count);
+            lock(Buffer) {
+                Buffer.Read(value, offset, count);
+            }
         }
 
         public void Clear()
         {
-            Buffer.Position = 0;
-            Buffer.SetLength(0);
+            lock(Buffer) {
+                Buffer.Position = 0;
+                Buffer.SetLength(0);
+            }
         }
 
         public void Compact()
@@ -62,18 +68,24 @@ namespace EnergonSoftware.Core.Util
 
         public void Flip()
         {
-            Buffer.SetLength(Position);
-            Buffer.Position = 0;
+            lock(Buffer) {
+                Buffer.SetLength(Position);
+                Buffer.Position = 0;
+            }
         }
 
         public void Reset()
         {
-            Buffer.Position = Length;
+            lock(Buffer) {
+                Buffer.Position = Length;
+            }
         }
 
         public byte[] ToArray()
         {
-            return ((MemoryStream)Buffer).ToArray();
+            lock(Buffer) {
+                return ((MemoryStream)Buffer).ToArray();
+            }
         }
     }
 }

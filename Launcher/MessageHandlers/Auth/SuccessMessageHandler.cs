@@ -7,7 +7,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 {
     sealed class SuccessMessageHandler : MessageHandler
     {
-        private AuthSession _session;
+        private readonly AuthSession _session;
 
         internal SuccessMessageHandler(AuthSession session)
         {

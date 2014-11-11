@@ -19,7 +19,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
         [Obsolete]
         private static string BuildDigestMD5Challenge(Nonce nonce)
         {
-            _logger.Info("Building MD5 challenge...");
+            _logger.Debug("Building MD5 challenge...");
 
             return "realm=\"" + ConfigurationManager.AppSettings["authRealm"] + "\""
                 + ",nonce=\"" + nonce.NonceHash + "\""
@@ -28,14 +28,14 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 
         private static string BuildDigestSHA512Challenge(Nonce nonce)
         {
-            _logger.Info("Building SHA512 challenge...");
+            _logger.Debug("Building SHA512 challenge...");
 
             return "realm=\"" + ConfigurationManager.AppSettings["authRealm"] + "\""
                 + ",nonce=\"" + nonce.NonceHash + "\""
                 + ",qop=\"auth\",charset=utf-8,algorithm=sha512-sess";
         }
 
-        private AuthSession _session;
+        private readonly AuthSession _session;
 
         internal AuthMessageHandler(AuthSession session)
         {

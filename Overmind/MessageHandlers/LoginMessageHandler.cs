@@ -14,7 +14,7 @@ namespace EnergonSoftware.Overmind.MessageHandlers
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(LoginMessageHandler));
 
-        private LoginSession _session;
+        private readonly LoginSession _session;
 
         internal LoginMessageHandler(LoginSession session)
         {

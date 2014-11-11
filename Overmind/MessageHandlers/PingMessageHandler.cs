@@ -6,7 +6,7 @@ namespace EnergonSoftware.Overmind.MessageHandlers
 {
     sealed class PingMessageHandler : MessageHandler
     {
-        private LoginSession _session;
+        private readonly LoginSession _session;
 
         internal PingMessageHandler(LoginSession session)
         {

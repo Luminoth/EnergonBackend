@@ -18,7 +18,7 @@ namespace EnergonSoftware.Core.Messages
         private static int NextId { get { return ++_nextId; } }
 #endregion
 
-        private static byte[] TERMINATOR = new byte[]{ (byte)'\r', (byte)'\n', 0 };
+        private static readonly byte[] TERMINATOR = new byte[]{ (byte)'\r', (byte)'\n', 0 };
         private static int MAX_PAYLOAD_SIZE { get { return ushort.MaxValue; } }
 
         // returns null if not enough data was available

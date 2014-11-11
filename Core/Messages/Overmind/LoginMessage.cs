@@ -9,8 +9,8 @@ namespace EnergonSoftware.Core.Messages.Overmind
         public const string MESSAGE_TYPE = "login";
         public string Type { get { return MESSAGE_TYPE; } }
 
-        public string Username = "";
-        public string Ticket = "";
+        public string Username { get; set; }
+        public string Ticket { get; set; }
 
         public LoginMessage()
         {

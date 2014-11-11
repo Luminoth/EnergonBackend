@@ -12,8 +12,8 @@ namespace EnergonSoftware.Core.Net
     {
         private static int MAX_BUFFER = 1024;
 
-        private Socket _socket;
-        public MemoryBuffer Buffer { get; private set; }
+        private readonly Socket _socket;
+        public readonly MemoryBuffer Buffer;
 
         public BufferedSocketReader(Socket socket)
         {

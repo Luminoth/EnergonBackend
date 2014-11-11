@@ -9,7 +9,7 @@ namespace EnergonSoftware.Core.Messages.Auth
         public const string MESSAGE_TYPE = "failure";
         public string Type { get { return MESSAGE_TYPE; } }
 
-        public string Reason = "";
+        public string Reason { get; set; }
 
         public FailureMessage()
         {

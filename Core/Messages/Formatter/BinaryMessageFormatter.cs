@@ -5,6 +5,7 @@ using System.Text;
 
 namespace EnergonSoftware.Core.Messages.Formatter
 {
+    // TODO: should this lock the stream maybe?
     public sealed class BinaryMessageFormatter : IMessageFormatter
     {
         public BinaryMessageFormatter()

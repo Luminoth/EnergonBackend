@@ -30,6 +30,38 @@ namespace EnergonSoftware.Core.MessageHandlers
         {
         }
 
+        public int GetQueueSize(int sessionId)
+        {
+            ConcurrentQueue<MessageQueueContext> queue;
+            if(_messageQueue.TryGetValue(sessionId, out queue)) {
+                return queue.Count;
+            }
+            return 0;
+        }
+
+        public bool QueueMessage(Session session, IMessage message)
+        {
+            _messageQueue.TryAdd(session.Id, new ConcurrentQueue<MessageQueueContext>());
+
+            ConcurrentQueue<MessageQueueContext> queue;
+            if(_messageQueue.TryGetValue(session.Id, out queue)) {
+                queue.Enqueue(new MessageQueueContext()
+                    {
+                        Session = session,
+                        Message = message,
+                    }
+                );
+                return true;
+            }
+            return false;
+        }
+
+        public bool RemoveSession(int sessionId)
+        {
+            ConcurrentQueue<MessageQueueContext> queue;
+            return _messageQueue.TryRemove(sessionId, out queue);
+        }
+
         public /*async*/ void Start(IMessageHandlerFactory factory)
         {
             _factory = factory;
@@ -75,25 +107,6 @@ _task = Task.Factory.StartNew(() =>
             }
 
             // TODO: cleanup any currently running handlers
-        }
-
-        public void QueueMessage(Session session, IMessage message)
-        {
-            _messageQueue.TryAdd(session.Id, new ConcurrentQueue<MessageQueueContext>());
-
-            ConcurrentQueue<MessageQueueContext> queue = _messageQueue[session.Id];
-            queue.Enqueue(new MessageQueueContext()
-                {
-                    Session = session,
-                    Message = message,
-                }
-            );
-        }
-
-        public bool RemoveSession(int sessionId)
-        {
-            ConcurrentQueue<MessageQueueContext> queue;
-            return _messageQueue.TryRemove(sessionId, out queue);
         }
     }
 }

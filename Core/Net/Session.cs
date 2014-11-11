@@ -41,10 +41,10 @@ namespace EnergonSoftware.Core.Net
         public event OnErrorHandler OnError;
 #endregion
 
-        public int Id { get; private set; }
+        public readonly int Id;
 
 #region Network Properties
-        private SocketState _socketState;
+        private readonly SocketState _socketState;
         public EndPoint RemoteEndPoint { get { return _socketState.RemoteEndPoint ; } }
 
         public bool Connecting { get { return _socketState.Connecting; } }
@@ -159,7 +159,6 @@ namespace EnergonSoftware.Core.Net
                 int len = _socketState.Poll();
                 if(len < 0) {
                     Error("End of stream!");
-                    return;
                 } else if(len > 0) {
                     _logger.Debug("Session " + Id + " read " + len + " bytes");
                 }

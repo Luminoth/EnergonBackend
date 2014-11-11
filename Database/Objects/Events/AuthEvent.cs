@@ -13,7 +13,7 @@ namespace EnergonSoftware.Database.Objects.Events
 
     public sealed class AuthEvent : Event
     {
-        private static TableDescription AUTH_EVENTS_TABLE = new TableDescription("events_authenticate",
+        private static readonly TableDescription AUTH_EVENTS_TABLE = new TableDescription("events_authenticate",
             new List<ColumnDescription>
             {
                 { new ColumnDescription("id", DatabaseType.Integer).SetPrimaryKey() },
@@ -30,7 +30,7 @@ namespace EnergonSoftware.Database.Objects.Events
             AUTH_EVENTS_TABLE.Create(connection);
         }
 
-        public AuthEventType Type { get; private set; }
+        public readonly AuthEventType Type;
 
         private string _account;
         public string Account { get { return _account; } set { _account = value; Dirty = true; } }

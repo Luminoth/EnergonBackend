@@ -10,13 +10,15 @@ namespace EnergonSoftware.Core.Messages.Auth
         public const string MESSAGE_TYPE = "auth";
         public string Type { get { return MESSAGE_TYPE; } }
 
-        public int Version = Common.AUTH_VERSION;
-        public AuthType MechanismType = AuthType.DigestSHA512;
+        public int Version { get; set; }
+        public AuthType MechanismType { get; set; }
 
         public string Mechanism { get { return EnumDescription.GetDescriptionFromEnumValue(MechanismType); } }
 
         public AuthMessage()
         {
+            Version = Common.AUTH_VERSION;
+            MechanismType = AuthType.DigestSHA512;
         }
 
         public void Serialize(Stream stream, IMessageFormatter formatter)

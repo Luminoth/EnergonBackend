@@ -19,15 +19,17 @@ namespace EnergonSoftware.Core.Account
 
     public sealed class Friend : IMessageSerializable
     {
-        public long Id = -1;
-        public string Name = "";
-        public Status Status = Status.Offline;
+        public long Id { get; set; }
+        public string Name { get; set; }
+        public Status Status { get; set; }
 
         public bool Offline { get { return Status.Offline == Status; } }
         public bool Online { get { return !Offline; } }
 
         public Friend()
         {
+            Id = -1;
+            Status = Status.Offline;
         }
 
         public void Serialize(Stream stream, IMessageFormatter formatter)

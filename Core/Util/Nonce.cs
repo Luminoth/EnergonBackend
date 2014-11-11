@@ -7,22 +7,12 @@ namespace EnergonSoftware.Core.Util
     [Serializable]
     public sealed class Nonce
     {
-        public string Realm { get; private set; }
-        public int ExpiryMS { get; private set; }
-        public string NonceValue { get; private set; }
-        public string NonceHash { get; private set; }
-        public long CreationTime { get; private set; }
-
-        public bool Expired
-        {
-            get
-            {
-                if(ExpiryMS < 0) {
-                    return false;
-                }
-                return Time.CurrentTimeMs >= (CreationTime + ExpiryMS);
-            }
-        }
+        public readonly string Realm;
+        public readonly int ExpiryMS;
+        public readonly string NonceValue;
+        public readonly string NonceHash;
+        public readonly long CreationTime;
+        public bool Expired { get { return ExpiryMS < 0 ? false : Time.CurrentTimeMs >= (CreationTime + ExpiryMS); } }
 
         public Nonce(string realm, int expiry)
         {

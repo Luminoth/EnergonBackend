@@ -6,7 +6,7 @@ namespace EnergonSoftware.Overmind.MessageHandlers
 {
     sealed class LogoutMessageHandler : MessageHandler
     {
-        private LoginSession _session;
+        private readonly LoginSession _session;
 
         internal LogoutMessageHandler(LoginSession session)
         {

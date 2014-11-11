@@ -15,8 +15,8 @@ namespace EnergonSoftware.Launcher.Controls
     {
         public LoginPage()
         {
-            DataContext = ClientState.Instance;
             InitializeComponent();
+            DataContext = ClientState.Instance;
         }
 
 #region UI Helpers

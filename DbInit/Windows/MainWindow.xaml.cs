@@ -30,8 +30,8 @@ namespace EnergonSoftware.DbInit
 
         public MainWindow()
         {
-            DataContext = Application.Current;
             InitializeComponent();
+            DataContext = Application.Current;
 
             SetStatusBarText("Waiting...");
         }

@@ -10,8 +10,8 @@ namespace EnergonSoftware.Launcher
     {
         public MainWindow()
         {
-            DataContext = ClientState.Instance;
             InitializeComponent();
+            DataContext = ClientState.Instance;
         }
     }
 }

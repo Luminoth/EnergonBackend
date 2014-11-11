@@ -18,7 +18,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ChallengeMessageHandler));
 
-        private AuthSession _session;
+        private readonly AuthSession _session;
 
         internal ChallengeMessageHandler(AuthSession session)
         {
