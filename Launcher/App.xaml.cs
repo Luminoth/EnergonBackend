@@ -11,6 +11,7 @@ using EnergonSoftware.Core;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Launcher.MessageHandlers;
+using EnergonSoftware.Launcher.Net;
 
 namespace EnergonSoftware.Launcher
 {
@@ -25,7 +26,6 @@ namespace EnergonSoftware.Launcher
         private static Thread _idleThread;
 
         private static SessionManager _sessions = new SessionManager();
-        public SessionManager Sessions { get { return _sessions; } }
 
         private static void OnIdle()
         {
@@ -100,6 +100,54 @@ namespace EnergonSoftware.Launcher
 
             _logger.Info("Goodbye!");
         }
+
+        private void OnAuthFailedCallback(string reason)
+        {
+            OnError("Authentication failed: " + reason, "Authentication Failed");
+            ClientState.Instance.LoggingIn = false;
+        }
+
+        private void OnAuthSuccessCallback()
+        {
+            OvermindSession session = new OvermindSession();
+            session.OnDisconnect += OnDisconnectCallback;
+            session.OnError += OnErrorCallback;
+            session.BeginConnect(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"]));
+            _sessions.AddSession(session);
+        }
+
+        private void OnDisconnectCallback(string reason)
+        {
+            //OnError(reason, "Disconnected!");
+        }
+
+        private void OnErrorCallback(string error)
+        {
+            OnError(error, "Error!");
+        }
 #endregion
+
+        public void Login(string password)
+        {
+            ClientState.Instance.Password = password;
+            ClientState.Instance.LoggingIn = true;
+
+            AuthSession session = new AuthSession();
+            session.OnAuthFailed += OnAuthFailedCallback;
+            session.OnAuthSuccess += OnAuthSuccessCallback;
+            session.OnDisconnect += OnDisconnectCallback;
+            session.OnError += OnErrorCallback;
+            session.BeginConnect(ConfigurationManager.AppSettings["authHost"], Convert.ToInt32(ConfigurationManager.AppSettings["authPort"]));
+            _sessions.AddSession(session);
+        }
+
+        public void Logout()
+        {
+            foreach(Session session in _sessions.Sessions) {
+                if(session is OvermindSession) {
+                    ((OvermindSession)session).Logout();
+                }
+            }
+        }
     }
 }

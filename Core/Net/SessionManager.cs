@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net.Sockets;
 
 using log4net;
@@ -12,6 +13,8 @@ namespace EnergonSoftware.Core.Net
         private static readonly ILog _logger = LogManager.GetLogger(typeof(SessionManager));
 
         private List<Session> _sessions = new List<Session>();
+        public ReadOnlyCollection<Session> Sessions { get { return _sessions.AsReadOnly(); } }
+
         private MessageProcessor _processor = new MessageProcessor();
 
         public long SessionTimeout { get; set; }

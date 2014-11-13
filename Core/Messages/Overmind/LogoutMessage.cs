@@ -20,5 +20,10 @@ namespace EnergonSoftware.Core.Messages.Overmind
         public void DeSerialize(Stream stream, IMessageFormatter formatter)
         {
         }
+
+        public override string ToString()
+        {
+            return "LogoutMessage()";
+        }
     }
 }

@@ -32,5 +32,10 @@ namespace EnergonSoftware.Core.Messages.Auth
             Version = formatter.ReadInt(stream);
             MechanismType = (AuthType)formatter.ReadInt(stream);
         }
+
+        public override string ToString()
+        {
+            return "AuthMessage(Version=" + Version + ", Mechanism=" + Mechanism + ")";
+        }
     }
 }

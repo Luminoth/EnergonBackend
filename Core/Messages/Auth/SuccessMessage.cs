@@ -13,6 +13,7 @@ namespace EnergonSoftware.Core.Messages.Auth
 
         public SuccessMessage()
         {
+            SessionId = "";
         }
 
         public void Serialize(Stream stream, IMessageFormatter formatter)
@@ -23,6 +24,11 @@ namespace EnergonSoftware.Core.Messages.Auth
         public void DeSerialize(Stream stream, IMessageFormatter formatter)
         {
             SessionId = formatter.ReadString(stream);
+        }
+
+        public override string ToString()
+        {
+            return "SuccessMessage(" + SessionId + ")";
         }
     }
 }

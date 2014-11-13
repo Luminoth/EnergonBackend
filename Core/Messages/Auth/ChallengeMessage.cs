@@ -13,6 +13,7 @@ namespace EnergonSoftware.Core.Messages.Auth
 
         public ChallengeMessage()
         {
+            Challenge = "";
         }
 
         public void Serialize(Stream stream, IMessageFormatter formatter)
@@ -23,6 +24,11 @@ namespace EnergonSoftware.Core.Messages.Auth
         public void DeSerialize(Stream stream, IMessageFormatter formatter)
         {
             Challenge = formatter.ReadString(stream);
+        }
+
+        public override string ToString()
+        {
+            return "ChallengeMessage(Challenge=" + Challenge + ")";
         }
     }
 }

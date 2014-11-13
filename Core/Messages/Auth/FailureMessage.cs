@@ -13,6 +13,7 @@ namespace EnergonSoftware.Core.Messages.Auth
 
         public FailureMessage()
         {
+            Reason = "";
         }
 
         public void Serialize(Stream stream, IMessageFormatter formatter)
@@ -23,6 +24,11 @@ namespace EnergonSoftware.Core.Messages.Auth
         public void DeSerialize(Stream stream, IMessageFormatter formatter)
         {
             Reason = formatter.ReadString(stream);
+        }
+
+        public override string ToString()
+        {
+            return "FailureMessage(Reason=" + Reason + ")";
         }
     }
 }

@@ -14,6 +14,8 @@ namespace EnergonSoftware.Core.Messages.Overmind
 
         public LoginMessage()
         {
+            Username = "";
+            Ticket = "";
         }
 
         public void Serialize(Stream stream, IMessageFormatter formatter)
@@ -26,6 +28,11 @@ namespace EnergonSoftware.Core.Messages.Overmind
         {
             Username = formatter.ReadString(stream);
             Ticket = formatter.ReadString(stream);
+        }
+
+        public override string ToString()
+        {
+            return "LoginMessage(Username=" + Username + ", Ticket=" + Ticket + ")";
         }
     }
 }
