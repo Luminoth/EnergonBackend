@@ -13,14 +13,14 @@ namespace EnergonSoftware.Overmind.Net
 {
     sealed class LoginSessionFactory : ISessionFactory
     {
-        public Session CreateSession()
+        public Session CreateSession(SessionManager manager)
         {
-            return new LoginSession();
+            return new LoginSession(manager);
         }
 
-        public Session CreateSession(Socket socket)
+        public Session CreateSession(Socket socket, SessionManager manager)
         {
-            return new LoginSession(socket);
+            return new LoginSession(socket, manager);
         }
     }
 
@@ -32,11 +32,16 @@ namespace EnergonSoftware.Overmind.Net
 
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
 
-        public LoginSession() : base()
+        /*public LoginSession() : base()
+        {
+        }*/
+
+        public LoginSession(SessionManager manager) : base(manager)
         {
         }
 
-        public LoginSession(Socket socket) : base(socket)
+
+        public LoginSession(Socket socket, SessionManager manager) : base(socket, manager)
         {
         }
 

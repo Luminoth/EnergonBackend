@@ -16,14 +16,14 @@ namespace EnergonSoftware.Authenticator.Net
 {
     sealed class AuthSessionFactory : ISessionFactory
     {
-        public Session CreateSession()
+        public Session CreateSession(SessionManager manager)
         {
-            return new AuthSession();
+            return new AuthSession(manager);
         }
 
-        public Session CreateSession(Socket socket)
+        public Session CreateSession(Socket socket, SessionManager manager)
         {
-            return new AuthSession(socket);
+            return new AuthSession(socket, manager);
         }
     }
 
@@ -41,12 +41,17 @@ namespace EnergonSoftware.Authenticator.Net
 
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
 
-        public AuthSession() : base()
+        /*private AuthSession() : base()
+        {
+            AuthType = AuthType.None;
+        }*/
+
+        public AuthSession(SessionManager manager) : base(manager)
         {
             AuthType = AuthType.None;
         }
 
-        public AuthSession(Socket socket) : base(socket)
+        public AuthSession(Socket socket, SessionManager manager) : base(socket, manager)
         {
             AuthType = AuthType.None;
         }

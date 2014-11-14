@@ -152,7 +152,7 @@ namespace EnergonSoftware.DbInit
 
 #region Property Notifier
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged([CallerMemberName] string property=null)
+        private void NotifyPropertyChanged([CallerMemberName] string property=null)
         {
             if(null != PropertyChanged) {
                 PropertyChanged(this, new PropertyChangedEventArgs(property));

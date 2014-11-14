@@ -23,11 +23,14 @@ namespace EnergonSoftware.Launcher
         public static ClientState Instance { get { return _instance; } }
 #endregion
 
+        private string _news = "news";
+        public string News { get { return _news; } set { _news = value; NotifyPropertyChanged(); } }
+
         private string _username;
-        public string Username { get { return _username; } set { _username = value; ClientState.Instance.NotifyPropertyChanged("Username"); } }
+        public string Username { get { return _username; } set { _username = value; NotifyPropertyChanged(); } }
 
         private string _password;
-        public string Password { get { return _password; } set { _password = value; ClientState.Instance.NotifyPropertyChanged("Password"); } }
+        public string Password { get { return _password; } set { _password = value; NotifyPropertyChanged(); } }
 
         public string Ticket { get; set; }
 
@@ -37,7 +40,7 @@ namespace EnergonSoftware.Launcher
             get { return _loggedIn; }
             set {
                 _loggedIn = value;
-                NotifyPropertyChanged("LoggedIn");
+                NotifyPropertyChanged();
                 NotifyPropertyChanged("NotLoggedIn");
             }
         }
@@ -49,7 +52,7 @@ namespace EnergonSoftware.Launcher
             get { return _loggingIn; }
             set {
                 _loggingIn = value;
-                NotifyPropertyChanged("LoggingIn");
+                NotifyPropertyChanged();
                 NotifyPropertyChanged("NotLoggingIn");
             }
         }
@@ -57,7 +60,7 @@ namespace EnergonSoftware.Launcher
 
 #region Property Notifier
         public event PropertyChangedEventHandler PropertyChanged;
-        public void NotifyPropertyChanged(/*[CallerMemberName]*/ string property/*=null*/)
+        private void NotifyPropertyChanged([CallerMemberName] string property=null)
         {
             if(null != PropertyChanged) {
                 PropertyChanged(this, new PropertyChangedEventArgs(property));

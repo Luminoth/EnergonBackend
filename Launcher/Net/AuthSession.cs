@@ -21,17 +21,7 @@ namespace EnergonSoftware.Launcher.Net
         public event OnAuthFailedHandler OnAuthFailed;
 #endregion
 
-        private AuthenticationStage _authStage = AuthenticationStage.NotAuthenticated;
-        public AuthenticationStage AuthStage
-        {
-            get { return _authStage; }
-            private set {
-                _authStage = value;
-                ClientState.Instance.NotifyPropertyChanged("Authenticating");
-                ClientState.Instance.NotifyPropertyChanged("Authenticated");
-            }
-        }
-
+        public AuthenticationStage AuthStage { get; private set; }
         public bool Authenticating { get { return AuthStage > AuthenticationStage.NotAuthenticated && AuthStage < AuthenticationStage.Authenticated; } }
         public bool Authenticated { get { return AuthenticationStage.Authenticated == AuthStage; } }
 
@@ -39,12 +29,19 @@ namespace EnergonSoftware.Launcher.Net
 
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
 
-        public AuthSession() : base()
+        /*public AuthSession() : base()
         {
+            AuthStage = AuthenticationStage.NotAuthenticated;
+        }*/
+
+        public AuthSession(SessionManager manager) : base(manager)
+        {
+            AuthStage = AuthenticationStage.NotAuthenticated;
         }
 
-        public AuthSession(Socket socket) : base(socket)
+        public AuthSession(Socket socket, SessionManager manager) : base(socket, manager)
         {
+            AuthStage = AuthenticationStage.NotAuthenticated;
         }
 
         protected override void OnRun()

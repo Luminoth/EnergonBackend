@@ -18,9 +18,9 @@ namespace EnergonSoftware.Authenticator
 
         private static void ConfigureLogging()
         {
-            if(!EventLog.SourceExists(EVENT_LOG_SOURCE))  {         
+            /*if(!EventLog.SourceExists(EVENT_LOG_SOURCE))  {
                 EventLog.CreateEventSource(EVENT_LOG_SOURCE, "Energon Software");
-            }
+            }*/
             ServiceEventLogger.Source = EVENT_LOG_SOURCE;
 
             XmlConfigurator.Configure();

@@ -38,7 +38,7 @@ namespace EnergonSoftware.Database
             return false;
         }
 
-        private object _lock = new object();
+        private readonly object _lock = new object();
 
         public ConnectionStringSettings ConnectionSettings { get; private set; }
         public DbConnection Connection { get; private set; }

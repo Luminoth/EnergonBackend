@@ -56,7 +56,7 @@ namespace EnergonSoftware.Core.Net
             if(socket.Poll(100, SelectMode.SelectRead)) {
                 Socket remote = socket.Accept();
                 _logger.Info("New connection from " + remote.RemoteEndPoint);
-                manager.AddSession(_factory.CreateSession(remote));
+                manager.AddSession(_factory.CreateSession(remote, manager));
             }
         }
 

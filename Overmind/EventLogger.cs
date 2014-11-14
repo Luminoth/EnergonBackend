@@ -17,7 +17,7 @@ namespace EnergonSoftware.Overmind
         public static EventLogger Instance { get { return _instance; } }
 #endregion
 
-        private object _lock = new object();
+        private readonly object _lock = new object();
 
         public void LoginRequestEvent(EndPoint origin, string username)
         {

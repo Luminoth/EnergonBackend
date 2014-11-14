@@ -12,6 +12,8 @@ namespace EnergonSoftware.Core.Net
     {
         private static int MAX_BUFFER = 1024;
 
+        private readonly object _lock = new object();
+
         private readonly Socket _socket;
         public readonly MemoryBuffer Buffer;
 
@@ -19,27 +21,29 @@ namespace EnergonSoftware.Core.Net
         {
             _socket = socket;
             Buffer = new MemoryBuffer();
-        }
+        } 
 
-        public int Poll()
+        public bool PollAndRead(out int count)
         {
-            int count = 0;
-            while(_socket.Poll(100, SelectMode.SelectRead)) {
-                int len = Read();
-                if(0 == len) {
-                    return -1;
+            lock(_lock) {
+                count = 0;
+                while(_socket.Connected && _socket.Poll(100, SelectMode.SelectRead)) {
+                    int len = Read();
+                    if(len <= 0) {
+                        return false;
+                    }
+                    count += len;
                 }
-                count += len;
+                return true;
             }
-            return count;
         }
 
-        public int Read()
+        private int Read()
         {
-            byte[] data = new byte[MAX_BUFFER];
+            byte[] data = new byte[_socket.Available];
             int len = _socket.Receive(data);
-            if(0 == len) {
-                return 0;
+            if(len <= 0) {
+                return len;
             }
 
             Buffer.Write(data, 0, len);

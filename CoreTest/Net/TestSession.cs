@@ -7,14 +7,14 @@ namespace EnergonSoftware.Core.Test.Net
 {
     sealed class TestSessionFactory : ISessionFactory
     {
-        public Session CreateSession()
+        public Session CreateSession(SessionManager manager)
         {
-            return new TestSession();
+            return new TestSession(manager);
         }
 
-        public Session CreateSession(Socket socket)
+        public Session CreateSession(Socket socket, SessionManager manager)
         {
-            return new TestSession(socket);
+            return new TestSession(socket, manager);
         }
     }
 
@@ -22,11 +22,15 @@ namespace EnergonSoftware.Core.Test.Net
     {
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
 
-        public TestSession() : base()
+        /*public TestSession() : base()
+        {
+        }*/
+
+        public TestSession(SessionManager manager) : base(manager)
         {
         }
 
-        public TestSession(Socket socket) : base(socket)
+        public TestSession(Socket socket, SessionManager manager) : base(socket, manager)
         {
         }
 

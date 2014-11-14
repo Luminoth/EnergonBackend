@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 
@@ -58,6 +59,16 @@ namespace EnergonSoftware.Launcher
             ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
             ThreadPool.SetMaxThreads(Int32.Parse(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
         }
+
+        private static async void GetNews()
+        {
+            _logger.Info("Retreiving news...");
+
+// TODO: This all goes in ClientState and probably should be constantly polled
+// for updates rather than just being a task that's kicked off one time
+await Task.Delay(1000);
+ClientState.Instance.News = "News Updated!";
+        }
 #endregion
 
 #region UI Helpers
@@ -77,6 +88,9 @@ namespace EnergonSoftware.Launcher
             ConfigureThreading();
             Common.InitFilesystem();
 
+            GetNews();
+
+            _sessions.Blocking = false;
             _sessions.Start(new MessageHandlerFactory());
 
             // have to run this in a separate thread
@@ -109,7 +123,7 @@ namespace EnergonSoftware.Launcher
 
         private void OnAuthSuccessCallback()
         {
-            OvermindSession session = new OvermindSession();
+            OvermindSession session = new OvermindSession(_sessions);
             session.OnDisconnect += OnDisconnectCallback;
             session.OnError += OnErrorCallback;
             session.BeginConnect(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"]));
@@ -124,15 +138,18 @@ namespace EnergonSoftware.Launcher
         private void OnErrorCallback(string error)
         {
             OnError(error, "Error!");
+            Logout();
         }
 #endregion
 
         public void Login(string password)
         {
+            _logger.Info("Logging in...");
+
             ClientState.Instance.Password = password;
             ClientState.Instance.LoggingIn = true;
 
-            AuthSession session = new AuthSession();
+            AuthSession session = new AuthSession(_sessions);
             session.OnAuthFailed += OnAuthFailedCallback;
             session.OnAuthSuccess += OnAuthSuccessCallback;
             session.OnDisconnect += OnDisconnectCallback;
@@ -143,11 +160,14 @@ namespace EnergonSoftware.Launcher
 
         public void Logout()
         {
+            _logger.Info("Logging out...");
             foreach(Session session in _sessions.Sessions) {
-                if(session is OvermindSession) {
-                    ((OvermindSession)session).Logout();
+                OvermindSession overmindSession = session as OvermindSession;
+                if(null != overmindSession) {
+                    overmindSession.Logout();
                 }
             }
+            _sessions.DisconnectAll();
         }
     }
 }

@@ -20,11 +20,15 @@ namespace EnergonSoftware.Launcher.Net
 
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
 
-        public OvermindSession() : base()
+        /*private OvermindSession() : base()
+        {
+        }*/
+
+        public OvermindSession(SessionManager manager) : base(manager)
         {
         }
 
-        public OvermindSession(Socket socket) : base(socket)
+        public OvermindSession(Socket socket, SessionManager manager) : base(socket, manager)
         {
         }
 
@@ -68,6 +72,9 @@ namespace EnergonSoftware.Launcher.Net
             LogoutMessage message = new LogoutMessage();
             SendMessage(message);
             Disconnect();
+
+            ClientState.Instance.LoggingIn = false;
+            ClientState.Instance.LoggedIn = false;
         }
 
         public void Ping()

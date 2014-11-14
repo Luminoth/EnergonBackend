@@ -58,6 +58,7 @@ namespace EnergonSoftware.Overmind
             }
 
             _logger.Debug("Starting session manager...");
+            _loginSessions.Blocking = false;
             _loginSessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
             _loginSessions.Start(new MessageHandlerFactory());
 

@@ -16,6 +16,8 @@ namespace EnergonSoftware.Core.Net
         private static int NextId { get { return ++_nextId; } }
 #endregion
 
+        private readonly object _lock = new object();
+
         public readonly int Id;
 
         private Socket _socket;
@@ -32,6 +34,7 @@ namespace EnergonSoftware.Core.Net
         public bool Connecting { get; set; }
         public bool Connected { get { return HasSocket && _socket.Connected; } }
         public EndPoint RemoteEndPoint { get { return HasSocket ? _socket.RemoteEndPoint : null; } }
+        public bool Blocking { get { return HasSocket && _socket.Blocking; } set { if(HasSocket) { _socket.Blocking = value; } } }
 
         private BufferedSocketReader _reader;
         public MemoryBuffer Buffer { get { return HasSocket ? _reader.Buffer : null; } }
@@ -49,31 +52,36 @@ namespace EnergonSoftware.Core.Net
             Socket = socket;
         }
 
-        public int Poll()
+        public bool PollAndRead(out int count)
         {
-            int len = _reader.Poll();
-            if(len > 0) {
-                _logger.Debug("Socket state " + Id + " read " + len + " bytes");
-                LastMessageTime = Time.CurrentTimeMs;
+            lock(_lock) {
+                bool connected = _reader.PollAndRead(out count);
+                if(count > 0) {
+                    LastMessageTime = Time.CurrentTimeMs;
+                }
+                return connected;
             }
-            return len;
         }
 
         public int Send(byte[] buffer)
         {
-            _logger.Debug("Socket state " + Id + " sending " + buffer.Length + " bytes");
-            return Socket.Send(buffer);
+            lock(_lock) {
+                _logger.Debug("Socket state " + Id + " sending " + buffer.Length + " bytes");
+                return Socket.Send(buffer);
+            }
         }
 
         public void ShutdownAndClose(bool reuseSocket)
         {
-            if(!HasSocket) {
-                return;
-            }
+            lock(_lock) {
+                if(!HasSocket) {
+                    return;
+                }
 
-            Socket.Shutdown(SocketShutdown.Both);
-            Socket.Disconnect(reuseSocket);
-            Socket.Close();
+                Socket.Shutdown(SocketShutdown.Both);
+                Socket.Disconnect(reuseSocket);
+                Socket.Close();
+            }
         }
     }
 }
