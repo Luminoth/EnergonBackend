@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CancelLabel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CloseLabel" xml:space="preserve">
+    <value>Close</value>
+  </data>
   <data name="LoginButtonLabel" xml:space="preserve">
     <value>Login</value>
   </data>
@@ -126,8 +132,14 @@
   <data name="MainWindowTitle" xml:space="preserve">
     <value>Launcher</value>
   </data>
+  <data name="OkLabel" xml:space="preserve">
+    <value>OK</value>
+  </data>
   <data name="PasswordLabel" xml:space="preserve">
     <value>Password:</value>
+  </data>
+  <data name="UpdatesLabel" xml:space="preserve">
+    <value>Checking for updates...</value>
   </data>
   <data name="UsernameLabel" xml:space="preserve">
     <value>Username:</value>

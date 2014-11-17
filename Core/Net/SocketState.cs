@@ -52,14 +52,14 @@ namespace EnergonSoftware.Core.Net
             Socket = socket;
         }
 
-        public bool PollAndRead(out int count)
+        public int PollAndRead()
         {
             lock(_lock) {
-                bool connected = _reader.PollAndRead(out count);
+                int count = _reader.PollAndRead();
                 if(count > 0) {
                     LastMessageTime = Time.CurrentTimeMs;
                 }
-                return connected;
+                return count;
             }
         }
 

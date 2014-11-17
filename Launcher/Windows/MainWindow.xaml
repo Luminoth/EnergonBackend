@@ -13,12 +13,14 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <launchercontrols:LoginPage Grid.Row="0" Grid.Column="0" Margin="5" Visibility="{Binding NotLoggedIn, Converter={StaticResource BoolToVis}}" />
-        <launchercontrols:MainPage Grid.Row="1" Grid.Column="0" Margin="5" Visibility="{Binding LoggedIn, Converter={StaticResource BoolToVis}}" />
+        <launchercontrols:UpdatePage Grid.Row="0" Grid.Column="0" Margin="5" Visibility="{Binding ShowingUpdatePage, Converter={StaticResource BoolToVis}}" />
+        <launchercontrols:LoginPage Grid.Row="1" Grid.Column="0" Margin="5" Visibility="{Binding ShowingLoginPage, Converter={StaticResource BoolToVis}}" />
+        <launchercontrols:MainPage Grid.Row="2" Grid.Column="0" Margin="5" Visibility="{Binding ShowingMainPage, Converter={StaticResource BoolToVis}}" />
     </Grid>
 </Window>

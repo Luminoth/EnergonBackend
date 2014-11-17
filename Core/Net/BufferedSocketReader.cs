@@ -10,8 +10,6 @@ namespace EnergonSoftware.Core.Net
 {
     public class BufferedSocketReader
     {
-        private static int MAX_BUFFER = 1024;
-
         private readonly object _lock = new object();
 
         private readonly Socket _socket;
@@ -23,18 +21,18 @@ namespace EnergonSoftware.Core.Net
             Buffer = new MemoryBuffer();
         } 
 
-        public bool PollAndRead(out int count)
+        public int PollAndRead()
         {
             lock(_lock) {
-                count = 0;
-                while(_socket.Connected && _socket.Poll(100, SelectMode.SelectRead)) {
+                int count = 0;
+                while(_socket.Poll(100, SelectMode.SelectRead)) {
                     int len = Read();
                     if(len <= 0) {
-                        return false;
+                        return count > 0 ? count : -1;
                     }
                     count += len;
                 }
-                return true;
+                return count;
             }
         }
 

@@ -27,6 +27,7 @@ namespace EnergonSoftware.Launcher
         private static Thread _idleThread;
 
         private static SessionManager _sessions = new SessionManager();
+        private static OvermindSession _overmindSession;
 
         private static void OnIdle()
         {
@@ -59,16 +60,6 @@ namespace EnergonSoftware.Launcher
             ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
             ThreadPool.SetMaxThreads(Int32.Parse(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
         }
-
-        private static async void GetNews()
-        {
-            _logger.Info("Retreiving news...");
-
-// TODO: This all goes in ClientState and probably should be constantly polled
-// for updates rather than just being a task that's kicked off one time
-await Task.Delay(1000);
-ClientState.Instance.News = "News Updated!";
-        }
 #endregion
 
 #region UI Helpers
@@ -88,9 +79,9 @@ ClientState.Instance.News = "News Updated!";
             ConfigureThreading();
             Common.InitFilesystem();
 
-            GetNews();
+            UpdateChecker.Instance.CheckForUpdates();
+            NewsChecker.Instance.UpdateNews();
 
-            _sessions.Blocking = false;
             _sessions.Start(new MessageHandlerFactory());
 
             // have to run this in a separate thread
@@ -123,15 +114,16 @@ ClientState.Instance.News = "News Updated!";
 
         private void OnAuthSuccessCallback()
         {
-            OvermindSession session = new OvermindSession(_sessions);
-            session.OnDisconnect += OnDisconnectCallback;
-            session.OnError += OnErrorCallback;
-            session.BeginConnect(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"]));
-            _sessions.AddSession(session);
+            _overmindSession = new OvermindSession(_sessions);
+            _overmindSession.OnDisconnect += OnDisconnectCallback;
+            _overmindSession.OnError += OnErrorCallback;
+            _overmindSession.BeginConnect(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"]));
+            _sessions.AddSession(_overmindSession);
         }
 
         private void OnDisconnectCallback(string reason)
         {
+            _logger.Debug("Disconnected: " + reason);
             //OnError(reason, "Disconnected!");
         }
 
@@ -160,14 +152,11 @@ ClientState.Instance.News = "News Updated!";
 
         public void Logout()
         {
-            _logger.Info("Logging out...");
-            foreach(Session session in _sessions.Sessions) {
-                OvermindSession overmindSession = session as OvermindSession;
-                if(null != overmindSession) {
-                    overmindSession.Logout();
-                }
+            if(null != _overmindSession) {
+                _logger.Info("Logging out...");
+                _overmindSession.Logout();
+                _overmindSession = null;
             }
-            _sessions.DisconnectAll();
         }
     }
 }

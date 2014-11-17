@@ -164,7 +164,7 @@ namespace EnergonSoftware.Core.Net
         {
             lock(_lock) {
                 if(Connected) {
-                    _logger.Info("Session " + Id + " disconnecting...");
+                    _logger.Info("Session " + Id + " disconnecting: " + reason);
                     _socketState.ShutdownAndClose(false);
 
                     if(null != OnDisconnect) {
@@ -174,24 +174,22 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public bool PollAndRead(out int count)
+        public int PollAndRead()
         {
             lock(_lock) {
-                count = 0;
-
                 if(!Connected) {
-                    return false;
+                    return -1;
                 }
 
                 try {
-                    bool connected = _socketState.PollAndRead(out count);
+                    int count = _socketState.PollAndRead();
                     if(count > 0) {
                         _logger.Debug("Session " + Id + " read " + count + " bytes");
                     }
-                    return connected;
+                    return count;
                 } catch(SocketException e) {
                     Error(e);
-                    return false;
+                    return -1;
                 }
             }
         }

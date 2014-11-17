@@ -9,6 +9,15 @@ using EnergonSoftware.Core.Net;
 
 namespace EnergonSoftware.Launcher.Net
 {
+    enum AuthenticationStage
+    {
+        NotAuthenticated,
+        Begin,
+        Challenge,
+        Finalize,
+        Authenticated,
+    }
+
     sealed class AuthSession : Session
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthSession));

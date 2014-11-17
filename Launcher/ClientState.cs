@@ -5,17 +5,15 @@ using log4net;
 
 namespace EnergonSoftware.Launcher
 {
-    public enum AuthenticationStage
-    {
-        NotAuthenticated,
-        Begin,
-        Challenge,
-        Finalize,
-        Authenticated,
-    }
-
     sealed class ClientState : INotifyPropertyChanged
     {
+        public enum Page
+        {
+            Update,
+            Login,
+            Main,
+        }
+
         private static readonly ILog _logger = LogManager.GetLogger(typeof(ClientState));
 
 #region Singleton
@@ -23,6 +21,23 @@ namespace EnergonSoftware.Launcher
         public static ClientState Instance { get { return _instance; } }
 #endregion
 
+        private Page _currentPage = Page.Update;
+        public Page CurrentPage
+        {
+            get { return _currentPage; }
+            set {
+                _currentPage = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged("ShowingUpdatePage");
+                NotifyPropertyChanged("ShowingLoginPage");
+                NotifyPropertyChanged("ShowingMainPage");
+            }
+        }
+        public bool ShowingUpdatePage { get { return Page.Update == _currentPage; } }
+        public bool ShowingLoginPage { get { return Page.Login == _currentPage; } }
+        public bool ShowingMainPage { get { return Page.Main == _currentPage; } }
+
+        // *** move these
         private string _news = "news";
         public string News { get { return _news; } set { _news = value; NotifyPropertyChanged(); } }
 

@@ -15,7 +15,6 @@ namespace EnergonSoftware.Core.Net
         private readonly object _lock = new object();
 
         private List<Session> _sessions = new List<Session>();
-        public ReadOnlyCollection<Session> Sessions { get { lock(_lock) { return _sessions.AsReadOnly(); } } }
 
         private MessageProcessor _processor = new MessageProcessor();
 
@@ -86,8 +85,8 @@ namespace EnergonSoftware.Core.Net
 
         private void PollAndRun(Session session)
         {
-            int count = 0;
-            if(!session.PollAndRead(out count)) {
+            int count = session.PollAndRead();
+            if(count < 0) {
                 session.Disconnect("Socket closed!");
                 return;
             }
@@ -105,11 +104,8 @@ namespace EnergonSoftware.Core.Net
 
         public void PollAndRun()
         {
-            // NOTE: we don't use _sessions here so that
-            // we work on a read-only copy and don't need
-            // to lock the entire collection while we process
-            foreach(Session session in Sessions) {
-                PollAndRun(session);
+            lock(_lock) {
+                _sessions.ForEach(session => PollAndRun(session));
             }
         }
     }

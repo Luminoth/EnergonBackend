@@ -24,7 +24,7 @@ namespace EnergonSoftware.Core.MessageHandlers
         private IMessageHandlerFactory _factory;
 
         private Task _task;
-        private volatile bool _quit;
+        private volatile bool _running;
 
         public MessageProcessor()
         {
@@ -64,9 +64,10 @@ namespace EnergonSoftware.Core.MessageHandlers
 
         public /*async*/ void Start(IMessageHandlerFactory factory)
         {
+            _logger.Debug("Starting message processor...");
             _factory = factory;
 
-            _logger.Debug("Starting message processor...");
+            _running = true;
 _task = Task.Factory.StartNew(() =>
     {
         Run();
@@ -77,8 +78,13 @@ _task = Task.Factory.StartNew(() =>
 
         public void Stop()
         {
+            if(!_running) {
+                return;
+            }
+
             _logger.Debug("Stopping message processor...");
-            _quit = true;
+            _running = false;
+
             _task.Wait();
 
             _logger.Debug("Clearing message queue...");
@@ -89,7 +95,7 @@ _task = Task.Factory.StartNew(() =>
 
         private void Run()
         {
-            while(!_quit) {
+            while(_running) {
                 foreach(var sessionQueue in _messageQueue) {
                     MessageQueueContext context;
                     if(sessionQueue.Value.TryPeek(out context)) {

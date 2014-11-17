@@ -58,7 +58,6 @@ namespace EnergonSoftware.Authenticator
             }
 
             _logger.Debug("Starting session manager...");
-            _authSessions.Blocking = false;
             _authSessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
             _authSessions.Start(new MessageHandlerFactory());
 

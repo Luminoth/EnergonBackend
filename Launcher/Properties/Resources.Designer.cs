@@ -61,6 +61,24 @@ namespace EnergonSoftware.Launcher.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string CancelLabel {
+            get {
+                return ResourceManager.GetString("CancelLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close.
+        /// </summary>
+        public static string CloseLabel {
+            get {
+                return ResourceManager.GetString("CloseLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Login.
         /// </summary>
         public static string LoginButtonLabel {
@@ -88,11 +106,29 @@ namespace EnergonSoftware.Launcher.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        public static string OkLabel {
+            get {
+                return ResourceManager.GetString("OkLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password:.
         /// </summary>
         public static string PasswordLabel {
             get {
                 return ResourceManager.GetString("PasswordLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checking for updates....
+        /// </summary>
+        public static string UpdatesLabel {
+            get {
+                return ResourceManager.GetString("UpdatesLabel", resourceCulture);
             }
         }
         
