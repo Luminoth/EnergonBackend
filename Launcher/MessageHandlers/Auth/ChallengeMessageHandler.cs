@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Text;
+using System.Threading.Tasks;
 
 using log4net;
 
@@ -97,25 +98,29 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             }
         }
 
-        protected override void OnHandleMessage(IMessage message)
+        protected override Task OnHandleMessage(IMessage message)
         {
-            ChallengeMessage challenge = (ChallengeMessage)message;
+            return new Task(() =>
+                {
+                    ChallengeMessage challenge = (ChallengeMessage)message;
 
-            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(challenge.Challenge));
-            _logger.Debug("Decoded challenge: " + decoded);
+                    string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(challenge.Challenge));
+                    _logger.Debug("Decoded challenge: " + decoded);
 
-            switch(_session.AuthStage)
-            {
-            case AuthenticationStage.Begin:
-                HandleChallengeState(decoded);
-                break;
-            case AuthenticationStage.Challenge:
-                HandleResponseState(decoded);
-                break;
-            default:
-                _session.Error("Unexpected auth stage: " + _session.AuthStage);
-                return;
-            }
+                    switch(_session.AuthStage)
+                    {
+                    case AuthenticationStage.Begin:
+                        HandleChallengeState(decoded);
+                        break;
+                    case AuthenticationStage.Challenge:
+                        HandleResponseState(decoded);
+                        break;
+                    default:
+                        _session.Error("Unexpected auth stage: " + _session.AuthStage);
+                        return;
+                    }
+                }
+            );
         }
     }
 }

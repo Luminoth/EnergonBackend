@@ -28,14 +28,14 @@ namespace EnergonSoftware.Launcher
             set {
                 _currentPage = value;
                 NotifyPropertyChanged();
-                NotifyPropertyChanged("ShowingUpdatePage");
-                NotifyPropertyChanged("ShowingLoginPage");
-                NotifyPropertyChanged("ShowingMainPage");
+                NotifyPropertyChanged("ShowUpdatePage");
+                NotifyPropertyChanged("ShowLoginPage");
+                NotifyPropertyChanged("ShowMainPage");
             }
         }
-        public bool ShowingUpdatePage { get { return Page.Update == _currentPage; } }
-        public bool ShowingLoginPage { get { return Page.Login == _currentPage; } }
-        public bool ShowingMainPage { get { return Page.Main == _currentPage; } }
+        public bool ShowUpdatePage { get { return Page.Update == CurrentPage; } }
+        public bool ShowLoginPage { get { return Page.Login == CurrentPage; } }
+        public bool ShowMainPage { get { return Page.Main == CurrentPage; } }
 
         // *** move these
         private string _news = "news";

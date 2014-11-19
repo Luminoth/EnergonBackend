@@ -1,4 +1,6 @@
-﻿using EnergonSoftware.Core.Messages;
+﻿using System.Threading.Tasks;
+
+using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Overmind.Net;
 
@@ -13,9 +15,13 @@ namespace EnergonSoftware.Overmind.MessageHandlers
             _session = session;
         }
 
-        protected override void OnHandleMessage(IMessage message)
+        protected override Task OnHandleMessage(IMessage message)
         {
-            _session.Ping();
+            return new Task(() =>
+                {
+                    _session.Ping();
+                }
+            );
         }
     }
 }

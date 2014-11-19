@@ -13,6 +13,8 @@ namespace EnergonSoftware.Launcher.Controls
         {
             InitializeComponent();
             DataContext = ClientState.Instance;
+
+            IsVisibleChanged += OnVisibleChanged;
         }
 
 #region UI Helpers
@@ -30,6 +32,13 @@ namespace EnergonSoftware.Launcher.Controls
         {
             ((App)Application.Current).Login(Password.Password);
             ClearPassword();
+        }
+
+        private void OnVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if(IsVisible) {
+                NewsChecker.Instance.UpdateNews();
+            }
         }
 #endregion
     }

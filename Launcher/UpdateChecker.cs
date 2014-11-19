@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,13 +17,24 @@ namespace EnergonSoftware.Launcher
 {
     class UpdateChecker : INotifyPropertyChanged
     {
+        [DataContract]
         private class Update
         {
-            public string Version { get; set; }
-            public string URL { get; set; }
+            [DataMember(Name="category")]
+            public string Category { get; set; }
 
-            public Update()
+            [DataMember(Name="version")]
+            public string Version { get; set; }
+
+            [DataMember(Name="release_date")]
+            public /*DateTime*/string ReleaseDate { get; set; }
+
+            [DataMember(Name="url")]
+            public string Url { get; set; }
+
+            public override string ToString()
             {
+                return "Update(category=" + Category + ", version=" + Version + ", release date=" + ReleaseDate + ", url=" + Url + ")";
             }
         }
 
@@ -45,21 +60,29 @@ namespace EnergonSoftware.Launcher
             _logger.Info("Checking for updates...");
 
             using(HttpClient client = new HttpClient()) {
-                // TODO: don't hardcode these addresses!
                 client.BaseAddress = new Uri(ConfigurationManager.AppSettings["updateHost"]);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 HttpResponseMessage response = await client.GetAsync("updates/launcher");
                 if(response.IsSuccessStatusCode) {
-                    //Update update = await response.Content.ReadAsAsync<Update>();
-UpdateStatus = "Up to date!";
+                    List<Update> updates = new List<Update>();
+                    using(Stream stream = await response.Content.ReadAsStreamAsync()) {
+                        DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Update>));
+                        updates = (List<Update>)serializer.ReadObject(stream);
+                    }
+                    _logger.Debug("Read updates: " + string.Join(",", (object[])updates.ToArray()));
+
+                    // TODO: check the updates and then update!
+
+                    UpdateStatus = "Up to date!";
                     UpdateFailed = false;
                     Updated = true;
 
+                    await Task.Delay(3000);
                     ClientState.Instance.CurrentPage = ClientState.Page.Login;
                 } else {
-UpdateStatus = "Error contacting update server: " + response.ReasonPhrase;
+                    UpdateStatus = "Error contacting update server: " + response.ReasonPhrase;
                     UpdateFailed = true;
                     Updated = false;
                 }

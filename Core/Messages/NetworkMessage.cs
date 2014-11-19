@@ -19,7 +19,7 @@ namespace EnergonSoftware.Core.Messages
 #endregion
 
         private static readonly byte[] TERMINATOR = new byte[]{ (byte)'\r', (byte)'\n', 0 };
-        private static int MAX_PAYLOAD_SIZE { get { return ushort.MaxValue; } }
+        private const int MAX_PAYLOAD_SIZE = ushort.MaxValue;
 
         // returns null if not enough data was available
         // throws MessageException if deserialization failed

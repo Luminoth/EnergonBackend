@@ -1,4 +1,6 @@
-﻿using EnergonSoftware.Core.MessageHandlers;
+﻿using System.Threading.Tasks;
+
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Launcher.Net;
@@ -14,10 +16,14 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             _session = session;
         }
 
-        protected override void OnHandleMessage(IMessage message)
+        protected override Task OnHandleMessage(IMessage message)
         {
-            FailureMessage failure = (FailureMessage)message;
-            _session.AuthFailed(failure.Reason);
+            return new Task(() =>
+                {
+                    FailureMessage failure = (FailureMessage)message;
+                    _session.AuthFailed(failure.Reason);
+                }
+            );
         }
     }
 }

@@ -62,18 +62,17 @@ namespace EnergonSoftware.Core.MessageHandlers
             return _messageQueue.TryRemove(sessionId, out queue);
         }
 
-        public /*async*/ void Start(IMessageHandlerFactory factory)
+        public void Start(IMessageHandlerFactory factory)
         {
             _logger.Debug("Starting message processor...");
             _factory = factory;
 
             _running = true;
-_task = Task.Factory.StartNew(() =>
-    {
-        Run();
-    }
-);
-            //await Run();
+            _task = Task.Factory.StartNew(() =>
+                {
+                    Run();
+                }
+            );
         }
 
         public void Stop()

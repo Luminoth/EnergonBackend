@@ -1,4 +1,6 @@
-﻿using EnergonSoftware.Core.MessageHandlers;
+﻿using System.Threading.Tasks;
+
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 
 namespace EnergonSoftware.Core.Test.MessageHandlers
@@ -9,7 +11,7 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
         {
         }
 
-        protected override void OnHandleMessage(IMessage message)
+        protected override Task OnHandleMessage(IMessage message)
         {
             throw new MessageHandlerException("Test Exception");
         }

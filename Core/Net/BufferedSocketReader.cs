@@ -21,6 +21,10 @@ namespace EnergonSoftware.Core.Net
             Buffer = new MemoryBuffer();
         } 
 
+        // reads from the socket as long
+        // as there is data to be read
+        // returns the total number of bytes read
+        // or -1 on socket closed
         public int PollAndRead()
         {
             lock(_lock) {

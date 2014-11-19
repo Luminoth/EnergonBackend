@@ -80,7 +80,6 @@ namespace EnergonSoftware.Launcher
             Common.InitFilesystem();
 
             UpdateChecker.Instance.CheckForUpdates();
-            NewsChecker.Instance.UpdateNews();
 
             _sessions.Start(new MessageHandlerFactory());
 

@@ -22,22 +22,14 @@ private Task _task;
 public bool Finished { get { return null != _task && _task.IsCompleted; } }
         //public bool Finished { get; private set; }
 
-        private long _startTime, _finishTime;
-        public long RuntimeMs { get { return Finished ? _finishTime - _startTime : Time.CurrentTimeMs - _startTime; } }
+        /*private long _startTime, _finishTime;
+        public long RuntimeMs { get { return Finished ? _finishTime - _startTime : Time.CurrentTimeMs - _startTime; } }*/
 
         public /*async*/ void HandleMessage(IMessage message)
         {
-_task = Task.Factory.StartNew(() =>
-    {
-        try {
-            _startTime = Time.CurrentTimeMs;
-            OnHandleMessage(message);
-            _finishTime = Time.CurrentTimeMs;
-        } catch(Exception e) {
-            _logger.Error("Unhandled Exception!", e);
-        }
-    }
-);
+_task = OnHandleMessage(message);
+_task.Start();
+
             /*Finished = false;
             _startTime = Time.CurrentTimeMs;
             await OnHandleMessage(message);
@@ -45,6 +37,6 @@ _task = Task.Factory.StartNew(() =>
             Finished = true;*/
         }
 
-        protected abstract void OnHandleMessage(IMessage message);
+        protected abstract Task OnHandleMessage(IMessage message);
     }
 }

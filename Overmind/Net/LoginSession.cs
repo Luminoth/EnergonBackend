@@ -32,10 +32,6 @@ namespace EnergonSoftware.Overmind.Net
 
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
 
-        /*public LoginSession() : base()
-        {
-        }*/
-
         public LoginSession(SessionManager manager) : base(manager)
         {
         }

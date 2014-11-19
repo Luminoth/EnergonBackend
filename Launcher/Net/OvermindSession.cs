@@ -20,10 +20,6 @@ namespace EnergonSoftware.Launcher.Net
 
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
 
-        /*private OvermindSession() : base()
-        {
-        }*/
-
         public OvermindSession(SessionManager manager) : base(manager)
         {
         }
@@ -65,6 +61,8 @@ namespace EnergonSoftware.Launcher.Net
 
             ClientState.Instance.LoggingIn = false;
             ClientState.Instance.LoggedIn = true;
+
+            ClientState.Instance.CurrentPage = ClientState.Page.Main;
         }
 
         public void Logout()
@@ -75,6 +73,8 @@ namespace EnergonSoftware.Launcher.Net
 
             ClientState.Instance.LoggingIn = false;
             ClientState.Instance.LoggedIn = false;
+
+            ClientState.Instance.CurrentPage = ClientState.Page.Login;
         }
 
         public void Ping()

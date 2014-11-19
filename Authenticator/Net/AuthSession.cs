@@ -41,11 +41,6 @@ namespace EnergonSoftware.Authenticator.Net
 
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
 
-        /*private AuthSession() : base()
-        {
-            AuthType = AuthType.None;
-        }*/
-
         public AuthSession(SessionManager manager) : base(manager)
         {
             AuthType = AuthType.None;

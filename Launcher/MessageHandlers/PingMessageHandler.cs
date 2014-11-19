@@ -1,4 +1,6 @@
-﻿using EnergonSoftware.Core.MessageHandlers;
+﻿using System.Threading.Tasks;
+
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net;
 
@@ -10,8 +12,12 @@ namespace EnergonSoftware.Launcher.MessageHandlers
         {
         }
 
-        protected override void OnHandleMessage(IMessage message)
+        protected override Task OnHandleMessage(IMessage message)
         {
+            return new Task(() =>
+                {
+                }
+            );
         }
     }
 }

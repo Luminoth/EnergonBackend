@@ -1,4 +1,6 @@
-﻿using EnergonSoftware.Core.MessageHandlers;
+﻿using System.Threading.Tasks;
+
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Launcher.Net;
 
@@ -13,10 +15,14 @@ namespace EnergonSoftware.Launcher.MessageHandlers
             _session = session;
         }
 
-        protected override void OnHandleMessage(IMessage message)
+        protected override Task OnHandleMessage(IMessage message)
         {
-            // TODO: should this log *everything* out?
-            _session.Logout();
+            return new Task(() =>
+                {
+                    // TODO: should this log *everything* out?
+                    _session.Logout();
+                }
+            );
         }
     }
 }

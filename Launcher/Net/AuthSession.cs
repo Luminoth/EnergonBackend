@@ -38,11 +38,6 @@ namespace EnergonSoftware.Launcher.Net
 
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
 
-        /*public AuthSession() : base()
-        {
-            AuthStage = AuthenticationStage.NotAuthenticated;
-        }*/
-
         public AuthSession(SessionManager manager) : base(manager)
         {
             AuthStage = AuthenticationStage.NotAuthenticated;
