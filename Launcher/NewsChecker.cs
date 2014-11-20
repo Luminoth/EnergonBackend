@@ -61,7 +61,7 @@ namespace EnergonSoftware.Launcher
                     }
                     _logger.Debug("Read news: " + string.Join(",", (object[])news.ToArray()));
 
-                    await Task.Delay(3000);
+                    await Task.Delay(2000);
                     if(news.Count < 1) {
                         ClientState.Instance.News = "No news updates!";
                     } else {

@@ -50,6 +50,10 @@ namespace EnergonSoftware.Core.Net
                     HttpListenerContext context = _listener.GetContext();
                     HandleRequest(context.Request, context.Response);
                 }
+            } catch(HttpListenerException e) {
+                if(995 != e.ErrorCode) {
+                    _logger.Error("Unhandled Exception!", e);
+                }
             } catch(Exception e) {
                 _logger.Fatal("Unhandled Exception!", e);
             }

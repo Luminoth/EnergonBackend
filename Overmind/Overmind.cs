@@ -47,15 +47,22 @@ namespace EnergonSoftware.Overmind
                 return;
             }
 
-            _logger.Debug("Starting diagnostic interface...");
-            _diagnosticServer.Start(new List<string>() { "http://localhost:9002/" });
-
-            _logger.Debug("Opening listener sockets...");
-            _loginListener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
-            if(!_loginListener.CreateSockets(listenAddresses.ListenAddresses, SocketType.Stream, ProtocolType.Tcp)) {
+            ListenAddressesConfigurationSection instanceNotifierListenAddresses = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("instanceNotifierAddresses");
+            if(null == instanceNotifierListenAddresses || instanceNotifierListenAddresses.ListenAddresses.Count < 1) {
+                _logger.Error("No configured instance notifier addresses!");
                 Stop();
                 return;
             }
+
+            _logger.Debug("Starting diagnostic interface...");
+            _diagnosticServer.Start(new List<string>() { "http://localhost:9002/" });
+
+            _logger.Info("Creating instance notifier multicast socket...");
+            InstanceNotifier.Instance.CreateSockets(instanceNotifierListenAddresses.ListenAddresses);
+
+            _logger.Debug("Opening listener sockets...");
+            _loginListener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
+            _loginListener.CreateSockets(listenAddresses.ListenAddresses, SocketType.Stream, ProtocolType.Tcp);
 
             _logger.Debug("Starting session manager...");
             _loginSessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
@@ -87,6 +94,8 @@ namespace EnergonSoftware.Overmind
                 {
                     while(Running) {
                         try {
+                            InstanceNotifier.Instance.Run();
+
                             _loginListener.Poll(_loginSessions);
 
                             _loginSessions.PollAndRun();

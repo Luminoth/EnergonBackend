@@ -38,7 +38,7 @@ namespace EnergonSoftware.Launcher
         public bool ShowMainPage { get { return Page.Main == CurrentPage; } }
 
         // *** move these
-        private string _news = "news";
+        private string _news = "Checking for news updates...";
         public string News { get { return _news; } set { _news = value; NotifyPropertyChanged(); } }
 
         private string _username;

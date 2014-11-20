@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Net;
 using System.Net.Sockets;
 using System.ServiceProcess;
 using System.Threading;
@@ -47,15 +48,22 @@ namespace EnergonSoftware.Authenticator
                 return;
             }
 
-            _logger.Debug("Starting diagnostic interface...");
-            _diagnosticServer.Start(new List<string>() { "http://localhost:9001/" });
-
-            _logger.Debug("Opening listener sockets...");
-            _authListener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
-            if(!_authListener.CreateSockets(listenAddresses.ListenAddresses, SocketType.Stream, ProtocolType.Tcp)) {
+            ListenAddressesConfigurationSection instanceNotifierListenAddresses = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("instanceNotifierAddresses");
+            if(null == instanceNotifierListenAddresses || instanceNotifierListenAddresses.ListenAddresses.Count < 1) {
+                _logger.Error("No configured instance notifier addresses!");
                 Stop();
                 return;
             }
+
+            _logger.Debug("Starting diagnostic interface...");
+            _diagnosticServer.Start(new List<string>() { "http://localhost:9001/" });
+
+            _logger.Info("Creating instance notifier multicast socket...");
+            InstanceNotifier.Instance.CreateSockets(instanceNotifierListenAddresses.ListenAddresses);
+
+            _logger.Debug("Opening listener sockets...");
+            _authListener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
+            _authListener.CreateSockets(listenAddresses.ListenAddresses, SocketType.Stream, ProtocolType.Tcp);
 
             _logger.Debug("Starting session manager...");
             _authSessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
@@ -87,6 +95,8 @@ namespace EnergonSoftware.Authenticator
                 {
                     while(Running) {
                         try {
+                            InstanceNotifier.Instance.Run();
+
                             _authListener.Poll(_authSessions);
 
                             _authSessions.PollAndRun();

@@ -29,9 +29,9 @@ namespace EnergonSoftware.Core.Net
             _factory = factory;
         }
 
-        public bool CreateSockets(ListenAddressConfigurationElementCollection ListenAddresses, SocketType socketType, ProtocolType protocol)
+        public void CreateSockets(ListenAddressConfigurationElementCollection listenAddresses, SocketType socketType, ProtocolType protocol)
         {
-            foreach(ListenAddressConfigurationElement listenAddress in ListenAddresses) {
+            foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
                 IPEndPoint endpoint = new IPEndPoint(listenAddress.IPAddress, listenAddress.Port);
                 _logger.Info("Listening on endpoint " + endpoint + "...");
 
@@ -40,8 +40,6 @@ namespace EnergonSoftware.Core.Net
                 socket.Listen(SocketBacklog);
                 _listenSockets.Add(socket);
             }
-
-            return true;
         }
 
         public void CloseSockets()
