@@ -25,10 +25,9 @@ namespace EnergonSoftware.Core.Util
             }
 
             FieldInfo[] fields = type.GetFields();
-            var field = fields.SelectMany(f => f.GetCustomAttributes(
-                typeof(DescriptionAttribute), false), (f, a) => new { Field = f, Att = a })
-                    .Where(a => ((DescriptionAttribute)a.Att)
-                    .Description == description).SingleOrDefault();
+            var field = fields.SelectMany(f => f.GetCustomAttributes(typeof(DescriptionAttribute), false), (f, a) => new { Field = f, Att = a })
+                .Where(a => ((DescriptionAttribute)a.Att)
+                .Description == description).SingleOrDefault();
             return field == null ? default(T) : (T)field.Field.GetRawConstantValue();
         }
     }

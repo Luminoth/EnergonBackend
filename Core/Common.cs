@@ -6,10 +6,10 @@ namespace EnergonSoftware.Core
 {
     public static class Common
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(Common));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Common));
 
 #region Auth Properties
-        public const int AUTH_VERSION = 2;
+        public const int AuthVersion = 2;
 #endregion
 
         // TODO: read this from the registry/CLI/whatever
@@ -21,7 +21,7 @@ namespace EnergonSoftware.Core
 
         public static void InitFilesystem()
         {
-            _logger.Info("Initializing filesystem...");
+            Logger.Info("Initializing filesystem...");
             Directory.CreateDirectory(BinDir);
             Directory.CreateDirectory(ConfDir);
             Directory.CreateDirectory(DataDir);

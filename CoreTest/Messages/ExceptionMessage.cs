@@ -7,8 +7,8 @@ namespace EnergonSoftware.Core.Test.Messages
 {
     public sealed class ExceptionMessage : IMessage
     {
-        public const string MESSAGE_TYPE = "exception";
-        public string Type { get { return MESSAGE_TYPE; } }
+        public const string MessageType = "exception";
+        public string Type { get { return MessageType; } }
 
         public ExceptionMessage()
         {

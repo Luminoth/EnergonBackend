@@ -13,7 +13,8 @@ namespace EnergonSoftware.Database.Objects.Events
 
     public sealed class LoginEvent : Event
     {
-        private static readonly TableDescription LOGIN_EVENTS_TABLE = new TableDescription("events_login",
+        private static readonly TableDescription LoginEventsTable = new TableDescription(
+            "events_login",
             new List<ColumnDescription>
             {
                 { new ColumnDescription("id", DatabaseType.Integer).SetPrimaryKey() },
@@ -27,7 +28,7 @@ namespace EnergonSoftware.Database.Objects.Events
 
         public static void CreateTable(DatabaseConnection connection)
         {
-            LOGIN_EVENTS_TABLE.Create(connection);
+            LoginEventsTable.Create(connection);
         }
 
         public readonly LoginEventType Type;
@@ -48,7 +49,7 @@ namespace EnergonSoftware.Database.Objects.Events
 
         public override void Insert(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("INSERT INTO " + LOGIN_EVENTS_TABLE.Name
+            using(DbCommand command = connection.BuildCommand("INSERT INTO " + LoginEventsTable.Name
                 + "(timestamp, type, origin, account, reason)"
                 + " VALUES(@timestamp, @type, @origin, @account, @reason)"))
             {

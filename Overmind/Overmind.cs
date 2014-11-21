@@ -6,18 +6,18 @@ using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 
-using log4net;
-
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Overmind.MessageHandlers;
 using EnergonSoftware.Overmind.Net;
 
+using log4net;
+
 namespace EnergonSoftware.Overmind
 {
-    sealed partial class Overmind : ServiceBase
+    internal sealed partial class Overmind : ServiceBase
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(Overmind));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Overmind));
 
         public bool Running { get; private set; }
 
@@ -38,56 +38,56 @@ namespace EnergonSoftware.Overmind
 
         protected async override void OnStart(string[] args)
         {
-            _logger.Info("Starting overmind...");
+            Logger.Info("Starting overmind...");
 
             ListenAddressesConfigurationSection listenAddresses = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("listenAddresses");
             if(null == listenAddresses || listenAddresses.ListenAddresses.Count < 1) {
-                _logger.Error("No configured listen addresses!");
+                Logger.Error("No configured listen addresses!");
                 Stop();
                 return;
             }
 
             ListenAddressesConfigurationSection instanceNotifierListenAddresses = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("instanceNotifierAddresses");
             if(null == instanceNotifierListenAddresses || instanceNotifierListenAddresses.ListenAddresses.Count < 1) {
-                _logger.Error("No configured instance notifier addresses!");
+                Logger.Error("No configured instance notifier addresses!");
                 Stop();
                 return;
             }
 
-            _logger.Debug("Starting diagnostic interface...");
+            Logger.Debug("Starting diagnostic interface...");
             _diagnosticServer.Start(new List<string>() { "http://localhost:9002/" });
 
-            _logger.Info("Starting instance notifier...");
+            Logger.Info("Starting instance notifier...");
             InstanceNotifier.Instance.Start(instanceNotifierListenAddresses.ListenAddresses);
 
-            _logger.Debug("Opening listener sockets...");
+            Logger.Debug("Opening listener sockets...");
             _loginListener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
             _loginListener.CreateSockets(listenAddresses.ListenAddresses);
 
-            _logger.Debug("Starting session manager...");
+            Logger.Debug("Starting session manager...");
             _loginSessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
             _loginSessions.Start(new MessageHandlerFactory());
 
-            _logger.Info("Running...");
+            Logger.Info("Running...");
             Running = true;
             await Run();
         }
 
         protected override void OnStop()
         {
-            _logger.Info("Stopping overmind...");
+            Logger.Info("Stopping overmind...");
             Running = false;
 
-            _logger.Debug("Closing listener sockets...");
+            Logger.Debug("Closing listener sockets...");
             _loginListener.CloseSockets();
 
-            _logger.Debug("Stopping session manager...");
+            Logger.Debug("Stopping session manager...");
             _loginSessions.Stop();
 
-            _logger.Debug("Stopping instance notifier...");
+            Logger.Debug("Stopping instance notifier...");
             InstanceNotifier.Instance.Stop();
 
-            _logger.Debug("Stopping diagnostic interface...");
+            Logger.Debug("Stopping diagnostic interface...");
             _diagnosticServer.Stop();
         }
 
@@ -104,7 +104,7 @@ namespace EnergonSoftware.Overmind
                             _loginSessions.PollAndRun();
                             _loginSessions.Cleanup();
                         } catch(Exception e) {
-                            _logger.Fatal("Unhandled Exception!", e);
+                            Logger.Fatal("Unhandled Exception!", e);
                             Stop();
                         }
                         Thread.Sleep(0);

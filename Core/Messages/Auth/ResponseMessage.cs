@@ -6,14 +6,14 @@ namespace EnergonSoftware.Core.Messages.Auth
 {
     public sealed class ResponseMessage : IMessage
     {
-        public const string MESSAGE_TYPE = "response";
-        public string Type { get { return MESSAGE_TYPE; } }
+        public const string MessageType = "response";
+        public string Type { get { return MessageType; } }
 
         public string Response { get; set; }
 
         public ResponseMessage()
         {
-            Response = "";
+            Response = string.Empty;
         }
 
         public void Serialize(Stream stream, IMessageFormatter formatter)

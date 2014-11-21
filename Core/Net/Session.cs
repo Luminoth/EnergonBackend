@@ -3,12 +3,12 @@ using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
 
-using log4net;
-
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Util;
+
+using log4net;
 
 namespace EnergonSoftware.Core.Net
 {
@@ -20,7 +20,7 @@ namespace EnergonSoftware.Core.Net
 
     public abstract class Session
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(Session));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Session));
 
 #region Id Generator
         private static int _nextId = 0;
@@ -48,7 +48,7 @@ namespace EnergonSoftware.Core.Net
 
 #region Network Properties
         private readonly SocketState _socketState;
-        public EndPoint RemoteEndPoint { get { return _socketState.RemoteEndPoint ; } }
+        public EndPoint RemoteEndPoint { get { return _socketState.RemoteEndPoint; } }
 
         public bool Connecting { get { return _socketState.Connecting; } }
         public bool Connected { get { return _socketState.Connected; } }
@@ -100,7 +100,7 @@ namespace EnergonSoftware.Core.Net
             lock(_lock) {
                 NetworkMessage message = NetworkMessage.Parse(_socketState.Buffer, Formatter);
                 while(null != message) {
-                    _logger.Debug("Session " + Id + " parsed message type: " + message.Payload.Type);
+                    Logger.Debug("Session " + Id + " parsed message type: " + message.Payload.Type);
                     processor.QueueMessage(this, message.Payload);
                     message = NetworkMessage.Parse(_socketState.Buffer, Formatter);
                 }
@@ -120,7 +120,7 @@ namespace EnergonSoftware.Core.Net
 
         private void OnConnectAsyncFailedCallback(SocketError error)
         {
-            _logger.Error("Session " + Id + " connect failed: " + error);
+            Logger.Error("Session " + Id + " connect failed: " + error);
 
             Disconnect(error.ToString());
 
@@ -131,7 +131,7 @@ namespace EnergonSoftware.Core.Net
 
         private void OnConnectAsyncSuccessCallback(Socket socket)
         {
-            _logger.Info("Connected session " + Id + " to " + socket.RemoteEndPoint);
+            Logger.Info("Connected session " + Id + " to " + socket.RemoteEndPoint);
 
             lock(_lock) {
                 _socketState.Socket = socket;
@@ -145,7 +145,7 @@ namespace EnergonSoftware.Core.Net
 
         public void ConnectAsync(string host, int port)
         {
-            _logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
+            Logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
 
             lock(_lock) {
                 _socketState.Connecting = true;
@@ -161,7 +161,7 @@ namespace EnergonSoftware.Core.Net
         {
             lock(_lock) {
                 if(Connected) {
-                    _logger.Info("Session " + Id + " disconnecting: " + reason);
+                    Logger.Info("Session " + Id + " disconnecting: " + reason);
                     _socketState.ShutdownAndClose(false);
 
                     if(null != OnDisconnect) {
@@ -195,7 +195,7 @@ namespace EnergonSoftware.Core.Net
                 try {
                     int count = _socketState.PollAndRead();
                     if(count > 0) {
-                        _logger.Debug("Session " + Id + " read " + count + " bytes");
+                        Logger.Debug("Session " + Id + " read " + count + " bytes");
                     }
                     return count;
                 } catch(SocketException e) {
@@ -215,10 +215,10 @@ namespace EnergonSoftware.Core.Net
                 NetworkMessage packet = new NetworkMessage();
                 packet.Payload = message;
 
-                _logger.Debug("Sending network message: " + packet);
+                Logger.Debug("Sending network message: " + packet);
 
                 byte[] bytes = packet.Serialize(Formatter);
-                _logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
+                Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
                 _socketState.Send(bytes);
             }
         }
@@ -227,11 +227,11 @@ namespace EnergonSoftware.Core.Net
         {
             lock(_lock) {
                 if(HasMessageHandler && !_messageHandler.Finished) {
-                    _logger.Warn("Attempted to handle new message before handler completed!");
+                    Logger.Warn("Attempted to handle new message before handler completed!");
                     return false;
                 }
 
-                _logger.Debug("Processing message with type=" + message.Type + " for session id=" + Id + "...");
+                Logger.Debug("Processing message with type=" + message.Type + " for session id=" + Id + "...");
 
                 _messageHandler = factory.NewHandler(message.Type, this);
                 if(null == _messageHandler) {
@@ -245,7 +245,7 @@ namespace EnergonSoftware.Core.Net
 
         public void Error(string error)
         {
-            _logger.Error("Session " + Id + " encountered an error: " + error);
+            Logger.Error("Session " + Id + " encountered an error: " + error);
             Disconnect(error);
 
             if(null != OnError) {
@@ -255,7 +255,7 @@ namespace EnergonSoftware.Core.Net
 
         public void Error(string error, Exception ex)
         {
-            _logger.Error("Session " + Id + " encountered an error: " + error, ex);
+            Logger.Error("Session " + Id + " encountered an error: " + error, ex);
             Disconnect(error);
 
             if(null != OnError) {
@@ -265,7 +265,7 @@ namespace EnergonSoftware.Core.Net
 
         public void Error(Exception ex)
         {
-            _logger.Error("Session " + Id + " encountered an error", ex);
+            Logger.Error("Session " + Id + " encountered an error", ex);
             Disconnect(ex.Message);
 
             if(null != OnError) {

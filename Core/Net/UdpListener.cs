@@ -2,15 +2,15 @@
 using System.Net;
 using System.Net.Sockets;
 
-using log4net;
-
 using EnergonSoftware.Core.Configuration;
+
+using log4net;
 
 namespace EnergonSoftware.Core.Net
 {
     public sealed class UdpListener
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(UdpListener));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(UdpListener));
 
         private List<Socket> _listenSockets = new List<Socket>();
         private ISessionFactory _factory;
@@ -27,7 +27,7 @@ namespace EnergonSoftware.Core.Net
         public void CreateSockets(ListenAddressConfigurationElementCollection listenAddresses)
         {
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
-                _logger.Info("Listening on address " + listenAddress + "...");
+                Logger.Info("Listening on address " + listenAddress + "...");
 
                 IPEndPoint endpoint = new IPEndPoint(listenAddress.IPAddress, listenAddress.Port);
                 Socket socket = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
@@ -40,7 +40,7 @@ namespace EnergonSoftware.Core.Net
         public void CreateMulticastSockets(ListenAddressConfigurationElementCollection listenAddresses)
         {
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
-                _logger.Info("Multicasting on address " + listenAddress + "...");
+                Logger.Info("Multicasting on address " + listenAddress + "...");
 
                 IPEndPoint endpoint = new IPEndPoint(listenAddress.IPAddress, listenAddress.Port);
                 Socket socket = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
@@ -56,7 +56,7 @@ namespace EnergonSoftware.Core.Net
 
         public void CloseSockets()
         {
-            _logger.Info("Closing listen sockets...");
+            Logger.Info("Closing listen sockets...");
             _listenSockets.ForEach(s => s.Close());
             _listenSockets.Clear();
         }
@@ -74,7 +74,7 @@ namespace EnergonSoftware.Core.Net
 
             Socket remote = new Socket(socket.AddressFamily, socket.SocketType, socket.ProtocolType);
             remote.Connect(remoteEndpoint);
-            _logger.Info("New connection from " + remote.RemoteEndPoint);
+            Logger.Info("New connection from " + remote.RemoteEndPoint);
             return remote;
         }
 
@@ -90,7 +90,7 @@ namespace EnergonSoftware.Core.Net
                             return;
                         }
 
-                        _logger.Info("New connection from " + remote.RemoteEndPoint);
+                        Logger.Info("New connection from " + remote.RemoteEndPoint);
 
                         Session session = _factory.CreateSession(remote, manager);
                         session.BufferData(data);

@@ -7,7 +7,7 @@ using EnergonSoftware.Launcher.Net;
 
 namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 {
-    sealed class FailureMessageHandler : MessageHandler
+    internal sealed class FailureMessageHandler : MessageHandler
     {
         private readonly AuthSession _session;
 

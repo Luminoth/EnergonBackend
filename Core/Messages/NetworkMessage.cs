@@ -13,13 +13,13 @@ namespace EnergonSoftware.Core.Messages
      */
     public class NetworkMessage : IComparable
     {
+        private const int MaxPayloadSize = ushort.MaxValue;
+        private static readonly byte[] Terminator = new byte[] { (byte)'\r', (byte)'\n', 0 };
+
 #region Id Generator
         private static int _nextId = 0;
         private static int NextId { get { return ++_nextId; } }
 #endregion
-
-        private static readonly byte[] TERMINATOR = new byte[]{ (byte)'\r', (byte)'\n', 0 };
-        private const int MAX_PAYLOAD_SIZE = ushort.MaxValue;
 
         // returns null if not enough data was available
         // throws MessageException if deserialization failed
@@ -64,7 +64,7 @@ namespace EnergonSoftware.Core.Messages
                         Payload.Serialize(mstream, formatter);
 
                         byte[] bytes = mstream.ToArray();
-                        if(bytes.Length > MAX_PAYLOAD_SIZE) {
+                        if(bytes.Length > MaxPayloadSize) {
                             throw new MessageException("Packet payload is too large!");
                         }
 
@@ -73,7 +73,7 @@ namespace EnergonSoftware.Core.Messages
                     }
                 }
 
-                formatter.Write(TERMINATOR, 0, TERMINATOR.Length, stream);
+                formatter.Write(Terminator, 0, Terminator.Length, stream);
                 return stream.ToArray();
             }
         }
@@ -88,11 +88,11 @@ namespace EnergonSoftware.Core.Messages
             Payload = MessageFactory.CreateMessage(type);
 
             int payloadLength = formatter.ReadInt(buffer.Buffer);
-            if(payloadLength > MAX_PAYLOAD_SIZE) {
+            if(payloadLength > MaxPayloadSize) {
                 throw new MessageException("Invalid packet payload length: " + payloadLength);
             }
 
-            int expectedLength = payloadLength + TERMINATOR.Length;
+            int expectedLength = payloadLength + Terminator.Length;
             if(expectedLength > buffer.Remaining) {
                 return false;
             }
@@ -105,9 +105,9 @@ namespace EnergonSoftware.Core.Messages
                 }
             }
 
-            byte[] terminator = new byte[TERMINATOR.Length];
+            byte[] terminator = new byte[Terminator.Length];
             buffer.Read(terminator, 0, terminator.Length);
-            if(!terminator.SequenceEqual(TERMINATOR)) {
+            if(!terminator.SequenceEqual(Terminator)) {
                 throw new MessageException("Invalid message terminator!");
             }
 

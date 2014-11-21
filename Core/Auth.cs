@@ -23,7 +23,7 @@ namespace EnergonSoftware.Core
     {
         public static Dictionary<string, string> ParseDigestValues(string message)
         {
-            string[] pairs = message.Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            string[] pairs = message.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             Dictionary<string, string> values = new Dictionary<string, string>();
             foreach(string pair in pairs) {
                 int idx = pair.IndexOf("=");

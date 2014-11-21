@@ -6,13 +6,13 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 
-using log4net;
-using log4net.Config;
-
 using EnergonSoftware.Core;
 using EnergonSoftware.Database;
 using EnergonSoftware.Database.Objects;
 using EnergonSoftware.Database.Objects.Events;
+
+using log4net;
+using log4net.Config;
 
 namespace EnergonSoftware.DbInit
 {
@@ -21,7 +21,7 @@ namespace EnergonSoftware.DbInit
     /// </summary>
     public partial class App : Application, INotifyPropertyChanged
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(App));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(App));
 
         private bool _running = false;
         public bool Running { get { return _running; } private set { _running = value; NotifyPropertyChanged(); NotifyPropertyChanged("NotRunning"); } }
@@ -43,13 +43,13 @@ namespace EnergonSoftware.DbInit
                     try {
                         ConnectionStringSettings connectionSettings = ConfigurationManager.ConnectionStrings["energonsoftware"];
 
-                        _logger.Info("Creating database...");
+                        Logger.Info("Creating database...");
                         if(!CreateDatabase(connectionSettings)) {
-                            _logger.Error("Failed to create database!");
+                            Logger.Error("Failed to create database!");
                             return false;
                         }
 
-                        _logger.Info("Populating database...");
+                        Logger.Info("Populating database...");
                         using(DatabaseConnection connection = AcquireDatabaseConnection(connectionSettings)) {
                             CreateEventsTables(connection);
 
@@ -67,19 +67,19 @@ namespace EnergonSoftware.DbInit
         }
 
         // TODO: this kind of assumes we're using SQLite and we shouldn't do that
-        private static bool CreateDatabase(ConnectionStringSettings connectionSettings)
+        private bool CreateDatabase(ConnectionStringSettings connectionSettings)
         {
             string dataSource = DatabaseConnection.ParseDataSource(connectionSettings);
             if(File.Exists(dataSource)) {
                 string backupfilename = dataSource + ".bak";
-                _logger.Info("Backing up old database to " + backupfilename + "...");
+                Logger.Info("Backing up old database to " + backupfilename + "...");
                 File.Delete(backupfilename);
                 File.Move(dataSource, backupfilename);
             }
             return DatabaseConnection.CreateDatabase(connectionSettings);
         }
 
-        private static DatabaseConnection AcquireDatabaseConnection(ConnectionStringSettings connectionSettings)
+        private DatabaseConnection AcquireDatabaseConnection(ConnectionStringSettings connectionSettings)
         {
             DatabaseConnection connection = new DatabaseConnection(connectionSettings);
             connection.Open();
@@ -88,57 +88,57 @@ namespace EnergonSoftware.DbInit
 #endregion
 
 #region Events Table
-        private static void CreateEventsTables(DatabaseConnection connection)
+        private void CreateEventsTables(DatabaseConnection connection)
         {
-            _logger.Info("Creating event tables...");
+            Logger.Info("Creating event tables...");
             AuthEvent.CreateTable(connection);
             LoginEvent.CreateTable(connection);
         }
 #endregion
 
 #region Accounts Table
-        private static void CreateAccountsTables(DatabaseConnection connection)
+        private void CreateAccountsTables(DatabaseConnection connection)
         {
-            _logger.Info("Creating account tables...");
+            Logger.Info("Creating account tables...");
             AccountInfo.CreateTable(connection);
             AccountFriend.CreateTable(connection);
         }
 
-        private static void InsertAccountsData(DatabaseConnection connection)
+        private void InsertAccountsData(DatabaseConnection connection)
         {
-            _logger.Info("Inserting account data...");
+            Logger.Info("Inserting account data...");
 
             string authRealm = ConfigurationManager.AppSettings["authRealm"];
-            _logger.Debug("Using authRealm='" + authRealm + "'");
+            Logger.Debug("Using authRealm='" + authRealm + "'");
 
             AccountInfo shaneAccount = new AccountInfo();
             shaneAccount.Active = true;
             shaneAccount.Username = "shane";
             shaneAccount.SetPassword(authRealm, "password");
             shaneAccount.Insert(connection);
-            _logger.Info("Inserted new account: " + shaneAccount);
+            Logger.Info("Inserted new account: " + shaneAccount);
 
             AccountInfo testAccount1 = new AccountInfo();
             testAccount1.Active = true;
             testAccount1.Username = "test1";
             testAccount1.SetPassword(authRealm, "password");
             testAccount1.Insert(connection);
-            _logger.Info("Inserted new account: " + testAccount1);
+            Logger.Info("Inserted new account: " + testAccount1);
 
             AccountFriend friend = new AccountFriend();
             friend.Account = shaneAccount.Id;
             friend.Friend = testAccount1.Id;
             friend.Insert(connection);
-            _logger.Info("Inserted new account friend: " + friend);
+            Logger.Info("Inserted new account friend: " + friend);
         }
 
-        private static void VerifyAccountsData(DatabaseConnection connection)
+        private void VerifyAccountsData(DatabaseConnection connection)
         {
-            _logger.Info("Verifying account data...");
+            Logger.Info("Verifying account data...");
 
             AccountInfo account = new AccountInfo("shane");
             account.Read(connection);
-            _logger.Info("Read account: " + account);
+            Logger.Info("Read account: " + account);
         }
 #endregion
 

@@ -6,14 +6,14 @@ namespace EnergonSoftware.Core.Messages.Auth
 {
     public sealed class SuccessMessage : IMessage
     {
-        public const string MESSAGE_TYPE = "success";
-        public string Type { get { return MESSAGE_TYPE; } }
+        public const string MessageType = "success";
+        public string Type { get { return MessageType; } }
 
         public string SessionId { get; set; }
 
         public SuccessMessage()
         {
-            SessionId = "";
+            SessionId = string.Empty;
         }
 
         public void Serialize(Stream stream, IMessageFormatter formatter)

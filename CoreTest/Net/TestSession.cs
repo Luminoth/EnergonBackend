@@ -5,7 +5,7 @@ using EnergonSoftware.Core.Net;
 
 namespace EnergonSoftware.Core.Test.Net
 {
-    sealed class TestSessionFactory : ISessionFactory
+    internal sealed class TestSessionFactory : ISessionFactory
     {
         public Session CreateSession(SessionManager manager)
         {
@@ -18,13 +18,9 @@ namespace EnergonSoftware.Core.Test.Net
         }
     }
 
-    sealed class TestSession : Session
+    internal sealed class TestSession : Session
     {
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
-
-        /*public TestSession() : base()
-        {
-        }*/
 
         public TestSession(SessionManager manager) : base(manager)
         {

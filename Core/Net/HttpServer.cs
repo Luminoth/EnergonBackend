@@ -11,7 +11,7 @@ namespace EnergonSoftware.Core.Net
 {
     public sealed class HttpServer
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(HttpServer));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpServer));
 
         private Thread _thread;
         private HttpListener _listener = new HttpListener();
@@ -27,7 +27,7 @@ namespace EnergonSoftware.Core.Net
 
         public void Start(List<string> prefixes)
         {
-            _logger.Debug("Starting HttpServer...");
+            Logger.Debug("Starting HttpServer...");
 
             prefixes.ForEach(prefix => _listener.Prefixes.Add(prefix));
 
@@ -37,7 +37,7 @@ namespace EnergonSoftware.Core.Net
 
         public void Stop()
         {
-            _logger.Debug("Stopping HttpServer...");
+            Logger.Debug("Stopping HttpServer...");
 
             _listener.Stop();
             _thread.Join();
@@ -52,16 +52,16 @@ namespace EnergonSoftware.Core.Net
                 }
             } catch(HttpListenerException e) {
                 if(995 != e.ErrorCode) {
-                    _logger.Error("Unhandled Exception!", e);
+                    Logger.Error("Unhandled Exception!", e);
                 }
             } catch(Exception e) {
-                _logger.Fatal("Unhandled Exception!", e);
+                Logger.Fatal("Unhandled Exception!", e);
             }
         }
 
         private void HandleRequest(HttpListenerRequest request, HttpListenerResponse response)
         {
-            _logger.Debug("New HttpListenerRequest: " + request.Url);
+            Logger.Debug("New HttpListenerRequest: " + request.Url);
 
             Encoding encoding = response.ContentEncoding;
             if(null == encoding) {
@@ -71,7 +71,7 @@ namespace EnergonSoftware.Core.Net
 
             byte[] data = ReadContent(request.RawUrl, encoding);
             if(null == data) {
-                _logger.Debug("Content not found!");
+                Logger.Debug("Content not found!");
                 response.StatusCode = (int)HttpStatusCode.NotFound;
             } else {
                 response.StatusCode = (int)HttpStatusCode.OK;
@@ -87,7 +87,7 @@ namespace EnergonSoftware.Core.Net
                 url = DefaultIndex;
             }
 
-            _logger.Debug("Reading content for url=" + url);
+            Logger.Debug("Reading content for url=" + url);
             if(DefaultIndex == url) {
                 string data = "<html><head><title>HttpServer Test</title></head><body>Hello World!</body></html>";
                 return encoding.GetBytes(data);

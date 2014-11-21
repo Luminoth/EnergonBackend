@@ -4,8 +4,6 @@ using System.Configuration;
 using System.Text;
 using System.Threading.Tasks;
 
-using log4net;
-
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
@@ -13,11 +11,13 @@ using EnergonSoftware.Core.Util;
 using EnergonSoftware.Core.Util.Crypt;
 using EnergonSoftware.Launcher.Net;
 
+using log4net;
+
 namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 {
-    sealed class ChallengeMessageHandler : MessageHandler
+    internal sealed class ChallengeMessageHandler : MessageHandler
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(ChallengeMessageHandler));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ChallengeMessageHandler));
 
         private readonly AuthSession _session;
 
@@ -35,27 +35,27 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             }
 
             try {
-                string charset = values["charset"].Trim(new char[]{'"'});
+                string charset = values["charset"].Trim(new char[] { '"' });
                 if(!"utf-8".Equals(charset, StringComparison.InvariantCultureIgnoreCase)) {
                     _session.Error("Invalid charset!");
                     return;
                 }
 
-                string realm = values["realm"].Trim(new char[]{'"'});
+                string realm = values["realm"].Trim(new char[] { '"' });
                 Nonce cnonce = new Nonce(realm, -1);
                 string nc = "00000001";
                 string digestURI = realm + "/" + ConfigurationManager.AppSettings["authHost"];
 
-                _logger.Debug("Authenticating " + ClientState.Instance.Username + ":" + realm + ":***");
+                Logger.Debug("Authenticating " + ClientState.Instance.Username + ":" + realm + ":***");
                 string passwordHash = new SHA512().DigestPassword(
                     ClientState.Instance.Username,
                     realm,
                     ClientState.Instance.Password
                 );
-                _logger.Debug("passwordHash=" + passwordHash);
+                Logger.Debug("passwordHash=" + passwordHash);
             
-                string nonce = values["nonce"].Trim(new char[]{'"'});
-                string qop = values["qop"].Trim(new char[]{'"'});
+                string nonce = values["nonce"].Trim(new char[] { '"' });
+                string qop = values["qop"].Trim(new char[] { '"' });
                 string rsp = EnergonSoftware.Core.Auth.DigestClientResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI);
             
                 string msg = "username=\"" + ClientState.Instance.Username + "\","
@@ -67,7 +67,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                         + "digest-uri=\"" + digestURI + "\","
                         + "response=" + rsp + ","
                         + "charset=" + charset;
-                _logger.Debug("Generated response: " + msg);
+                Logger.Debug("Generated response: " + msg);
 
                 _session.AuthResponse(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)),
                     EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI));
@@ -85,7 +85,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             }
 
             try {
-                string rspauth = values["rspauth"].Trim(new char[]{'"'});
+                string rspauth = values["rspauth"].Trim(new char[] { '"' });
                 if(_session.RspAuth != rspauth) {
                     _session.Error("rspauth mismatch, expected: '" + _session.RspAuth + "', got: '" + rspauth + "'");
                     return;
@@ -105,7 +105,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                     ChallengeMessage challenge = (ChallengeMessage)message;
 
                     string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(challenge.Challenge));
-                    _logger.Debug("Decoded challenge: " + decoded);
+                    Logger.Debug("Decoded challenge: " + decoded);
 
                     switch(_session.AuthStage)
                     {

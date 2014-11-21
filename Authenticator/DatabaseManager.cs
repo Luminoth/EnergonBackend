@@ -4,7 +4,7 @@ using EnergonSoftware.Database;
 
 namespace EnergonSoftware.Authenticator
 {
-    static class DatabaseManager
+    internal static class DatabaseManager
     {
         public static DatabaseConnection AcquireDatabaseConnection()
         {

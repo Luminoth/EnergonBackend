@@ -38,11 +38,11 @@ namespace EnergonSoftware.Core.Net
     {
         private sealed class AsyncConnectContext
         {
-            public AsyncConnectEventArgs EventHandler;
-            public IPAddress[] AddressList;
-            public int CurrentAddressIdx;
-            public int Port;
-            public Socket Socket;
+            public AsyncConnectEventArgs EventHandler { get; set; }
+            public IPAddress[] AddressList { get; set; }
+            public int CurrentAddressIdx { get; set; }
+            public int Port { get; set; }
+            public Socket Socket { get; set; }
 
             public IPAddress CurrentAddress
             {
@@ -58,7 +58,7 @@ namespace EnergonSoftware.Core.Net
 
         public static Socket Connect(string host, int port)
         {
-            bool useIPv6 = Boolean.Parse(ConfigurationManager.AppSettings["useIPv6"]);
+            bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);
 
             IPHostEntry hostEntry = Dns.GetHostEntry(host);
             foreach(IPAddress address in hostEntry.AddressList) {
@@ -115,7 +115,7 @@ namespace EnergonSoftware.Core.Net
 
         public static bool ConnectAsync(string host, int port, AsyncConnectEventArgs args)
         {
-            bool useIPv6 = Boolean.Parse(ConfigurationManager.AppSettings["useIPv6"]);
+            bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);
             IPHostEntry hostEntry = Dns.GetHostEntry(host);
 
             int idx = -1;
@@ -150,17 +150,17 @@ namespace EnergonSoftware.Core.Net
 
         public static bool CompareEndPoints(string a, EndPoint b)
         {
-            string[] aParts = a.Split(new char[] {':'}, StringSplitOptions.RemoveEmptyEntries);
-            if(aParts.Length < 1) {
+            string[] aparts = a.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+            if(aparts.Length < 1) {
                 return false;
             }
 
-            string[] bParts = b.ToString().Split(new char[] {':'}, StringSplitOptions.RemoveEmptyEntries);
-            if(bParts.Length < 1) {
+            string[] bparts = b.ToString().Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+            if(bparts.Length < 1) {
                 return false;
             }
 
-            return aParts[0].Equals(bParts[0], StringComparison.InvariantCultureIgnoreCase);
+            return aparts[0].Equals(bparts[0], StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Net.Sockets;
 
-using log4net;
-
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Database.Objects;
 
+using log4net;
+
 namespace EnergonSoftware.Overmind.Net
 {
-    sealed class LoginSessionFactory : ISessionFactory
+    internal sealed class LoginSessionFactory : ISessionFactory
     {
         public Session CreateSession(SessionManager manager)
         {
@@ -24,10 +24,8 @@ namespace EnergonSoftware.Overmind.Net
         }
     }
 
-    sealed class LoginSession : Session
+    internal sealed class LoginSession : Session
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(LoginSession));
-
         public AccountInfo AccountInfo { get; private set; }
 
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
@@ -35,7 +33,6 @@ namespace EnergonSoftware.Overmind.Net
         public LoginSession(SessionManager manager) : base(manager)
         {
         }
-
 
         public LoginSession(Socket socket, SessionManager manager) : base(socket, manager)
         {

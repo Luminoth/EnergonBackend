@@ -4,13 +4,13 @@ using EnergonSoftware.Core.Test.Messages;
 
 namespace EnergonSoftware.Core.Test.MessageHandlers
 {
-    sealed class MessageHandlerFactory : IMessageHandlerFactory
+    internal sealed class MessageHandlerFactory : IMessageHandlerFactory
     {
         public MessageHandler NewHandler(string type, Session session)
         {
             switch(type)
             {
-            case ExceptionMessage.MESSAGE_TYPE:
+            case ExceptionMessage.MessageType:
                 return new ExceptionMessageHandler();
             }
             throw new MessageHandlerException("Unsupported message type: " + type);

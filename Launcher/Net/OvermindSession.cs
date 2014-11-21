@@ -2,21 +2,21 @@
 using System.Configuration;
 using System.Net.Sockets;
 
-using log4net;
-
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Overmind;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Overmind;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 
+using log4net;
+
 namespace EnergonSoftware.Launcher.Net
 {
-    sealed class OvermindSession : Session
+    internal sealed class OvermindSession : Session
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(OvermindSession));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(OvermindSession));
 
-        private bool ShouldPing { get {  return 0 == LastMessageTime ? false : Time.CurrentTimeMs > (LastMessageTime + Convert.ToInt64(ConfigurationManager.AppSettings["overmindPingRate"])); } }
+        private bool ShouldPing { get { return 0 == LastMessageTime ? false : Time.CurrentTimeMs > (LastMessageTime + Convert.ToInt64(ConfigurationManager.AppSettings["overmindPingRate"])); } }
 
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
 
@@ -52,7 +52,7 @@ namespace EnergonSoftware.Launcher.Net
 
         private void Login()
         {
-            _logger.Info("Logging in...");
+            Logger.Info("Logging in...");
 
             LoginMessage message = new LoginMessage();
             message.Username = ClientState.Instance.Username;

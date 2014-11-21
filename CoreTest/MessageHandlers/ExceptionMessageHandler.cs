@@ -5,7 +5,7 @@ using EnergonSoftware.Core.Messages;
 
 namespace EnergonSoftware.Core.Test.MessageHandlers
 {
-    sealed class ExceptionMessageHandler : MessageHandler
+    internal sealed class ExceptionMessageHandler : MessageHandler
     {
         internal ExceptionMessageHandler()
         {

@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 
-using log4net;
-using log4net.Config;
-
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Launcher.MessageHandlers;
 using EnergonSoftware.Launcher.Net;
+
+using log4net;
+using log4net.Config;
 
 namespace EnergonSoftware.Launcher
 {
@@ -21,7 +21,7 @@ namespace EnergonSoftware.Launcher
     /// </summary>
     public partial class App : Application
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(App));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(App));
 
         private static volatile bool _quit;
         private static Thread _idleThread;
@@ -31,13 +31,13 @@ namespace EnergonSoftware.Launcher
 
         private static void OnIdle()
         {
-            _logger.Info("**Idle mark**");
+            Logger.Info("**Idle mark**");
             while(!_quit) {
                 try {
                     _sessions.PollAndRun();
                     _sessions.Cleanup();
                 } catch(Exception e) {
-                    _logger.Info("Unhandled Exception!", e);
+                    Logger.Info("Unhandled Exception!", e);
                     ((App)Application.Current).OnError(e.Message, "Unhandled Exception!");
                 }
 
@@ -51,14 +51,14 @@ namespace EnergonSoftware.Launcher
             XmlConfigurator.Configure();
         }
 
-        private static void ConfigureThreading()
+        private void ConfigureThreading()
         {
-            int workerThreads,ioThreads;
+            int workerThreads, ioThreads;
             ThreadPool.GetMinThreads(out workerThreads, out ioThreads);
-            ThreadPool.SetMinThreads(Int32.Parse(ConfigurationManager.AppSettings["minWorkerThreads"]), ioThreads);
+            ThreadPool.SetMinThreads(Convert.ToInt32(ConfigurationManager.AppSettings["minWorkerThreads"]), ioThreads);
 
             ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
-            ThreadPool.SetMaxThreads(Int32.Parse(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
+            ThreadPool.SetMaxThreads(Convert.ToInt32(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
         }
 #endregion
 
@@ -85,24 +85,24 @@ namespace EnergonSoftware.Launcher
 
             // have to run this in a separate thread
             // so that we don't lock up the UI
-            _logger.Info("Starting idle thread...");
+            Logger.Info("Starting idle thread...");
             _idleThread = new Thread(new ThreadStart(OnIdle));
             _idleThread.Start();
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-            _logger.Info("Exiting...");
+            Logger.Info("Exiting...");
 
             _sessions.Stop();
 
             _quit = true;
             if(null != _idleThread) {
-                _logger.Info("Waiting for idle thread to stop...");
+                Logger.Info("Waiting for idle thread to stop...");
                 _idleThread.Join();
             }
 
-            _logger.Info("Goodbye!");
+            Logger.Info("Goodbye!");
         }
 
         private void OnAuthFailedCallback(string reason)
@@ -122,7 +122,7 @@ namespace EnergonSoftware.Launcher
 
         private void OnDisconnectCallback(string reason)
         {
-            _logger.Debug("Disconnected: " + reason);
+            Logger.Debug("Disconnected: " + reason);
             //OnError(reason, "Disconnected!");
         }
 
@@ -135,7 +135,7 @@ namespace EnergonSoftware.Launcher
 
         public void Login(string password)
         {
-            _logger.Info("Logging in...");
+            Logger.Info("Logging in...");
 
             ClientState.Instance.Password = password;
             ClientState.Instance.LoggingIn = true;
@@ -152,7 +152,7 @@ namespace EnergonSoftware.Launcher
         public void Logout()
         {
             if(null != _overmindSession) {
-                _logger.Info("Logging out...");
+                Logger.Info("Logging out...");
                 _overmindSession.Logout();
                 _overmindSession = null;
             }

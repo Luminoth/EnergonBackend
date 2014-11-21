@@ -5,7 +5,7 @@ using EnergonSoftware.Core.Net;
 
 namespace EnergonSoftware.Overmind.Net
 {
-    sealed class InstanceNotifierSessionFactory : ISessionFactory
+    internal sealed class InstanceNotifierSessionFactory : ISessionFactory
     {
         public Session CreateSession(SessionManager manager)
         {
@@ -18,7 +18,7 @@ namespace EnergonSoftware.Overmind.Net
         }
     }
 
-    sealed class InstanceNotifierSession : Session
+    internal sealed class InstanceNotifierSession : Session
     {
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
 

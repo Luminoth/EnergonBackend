@@ -6,7 +6,7 @@ using EnergonSoftware.Launcher.Net;
 
 namespace EnergonSoftware.Launcher.MessageHandlers
 {
-    sealed class LogoutMessageHandler : MessageHandler
+    internal sealed class LogoutMessageHandler : MessageHandler
     {
         private readonly OvermindSession _session;
 

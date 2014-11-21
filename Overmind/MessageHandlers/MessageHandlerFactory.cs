@@ -1,23 +1,23 @@
-﻿using EnergonSoftware.Core.Messages;
+﻿using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Overmind;
-using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Overmind.Net;
 
 namespace EnergonSoftware.Overmind.MessageHandlers
 {
-    sealed class MessageHandlerFactory : IMessageHandlerFactory
+    internal sealed class MessageHandlerFactory : IMessageHandlerFactory
     {
         public MessageHandler NewHandler(string type, Session session)
         {
             LoginSession loginSession = (LoginSession)session;
             switch(type)
             {
-            case PingMessage.MESSAGE_TYPE:
+            case PingMessage.MessageType:
                 return new PingMessageHandler(loginSession);
-            case LoginMessage.MESSAGE_TYPE:
+            case LoginMessage.MessageType:
                 return new LoginMessageHandler(loginSession);
-            case LogoutMessage.MESSAGE_TYPE:
+            case LogoutMessage.MessageType:
                 return new LogoutMessageHandler(loginSession);
             }
             throw new MessageHandlerException("Unsupported message type: " + type);

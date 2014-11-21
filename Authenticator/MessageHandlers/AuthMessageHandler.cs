@@ -2,25 +2,26 @@
 using System.Configuration;
 using System.Threading.Tasks;
 
-using log4net;
+using EnergonSoftware.Authenticator.Net;
 
 using EnergonSoftware.Core;
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
-using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Util;
-using EnergonSoftware.Authenticator.Net;
+
+using log4net;
 
 namespace EnergonSoftware.Authenticator.MessageHandlers
 {
-    sealed class AuthMessageHandler : MessageHandler
+    internal sealed class AuthMessageHandler : MessageHandler
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthMessageHandler));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthMessageHandler));
 
         [Obsolete]
         private static string BuildDigestMD5Challenge(Nonce nonce)
         {
-            _logger.Debug("Building MD5 challenge...");
+            Logger.Debug("Building MD5 challenge...");
 
             return "realm=\"" + ConfigurationManager.AppSettings["authRealm"] + "\""
                 + ",nonce=\"" + nonce.NonceHash + "\""
@@ -29,7 +30,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 
         private static string BuildDigestSHA512Challenge(Nonce nonce)
         {
-            _logger.Debug("Building SHA512 challenge...");
+            Logger.Debug("Building SHA512 challenge...");
 
             return "realm=\"" + ConfigurationManager.AppSettings["authRealm"] + "\""
                 + ",nonce=\"" + nonce.NonceHash + "\""
@@ -54,7 +55,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                     }
 
                     AuthMessage auth = (AuthMessage)message;
-                    if(Common.AUTH_VERSION != auth.Version) {
+                    if(Common.AuthVersion != auth.Version) {
                         _session.Failure("Bad Version");
                         return;
                     }
@@ -75,7 +76,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                         return;
                     }
 
-                    _logger.Debug("Session " + _session.Id + " generated challenge: " + challenge);
+                    Logger.Debug("Session " + _session.Id + " generated challenge: " + challenge);
                     _session.Challenge(auth.MechanismType, nonce, challenge);
                 }
             );

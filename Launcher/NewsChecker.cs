@@ -13,7 +13,7 @@ using log4net;
 
 namespace EnergonSoftware.Launcher
 {
-    class NewsChecker
+    internal class NewsChecker
     {
         [DataContract]
         private class News
@@ -35,17 +35,17 @@ namespace EnergonSoftware.Launcher
             }
         }
 
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(NewsChecker));
+
 #region Singleton
         private static NewsChecker _instance = new NewsChecker();
         public static NewsChecker Instance { get { return _instance; } }
 #endregion
 
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(NewsChecker));
-
         public async void UpdateNews()
         {
             // TODO: use string resources here
-            _logger.Info("Updating news...");
+            Logger.Info("Updating news...");
 
             using(HttpClient client = new HttpClient()) {
                 client.BaseAddress = new Uri(ConfigurationManager.AppSettings["newsHost"]);
@@ -59,7 +59,7 @@ namespace EnergonSoftware.Launcher
                         DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<News>));
                         news = (List<News>)serializer.ReadObject(stream);
                     }
-                    _logger.Debug("Read news: " + string.Join(",", (object[])news.ToArray()));
+                    Logger.Debug("Read news: " + string.Join(",", (object[])news.ToArray()));
 
                     await Task.Delay(2000);
                     if(news.Count < 1) {

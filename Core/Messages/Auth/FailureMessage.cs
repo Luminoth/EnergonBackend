@@ -6,14 +6,14 @@ namespace EnergonSoftware.Core.Messages.Auth
 {
     public sealed class FailureMessage : IMessage
     {
-        public const string MESSAGE_TYPE = "failure";
-        public string Type { get { return MESSAGE_TYPE; } }
+        public const string MessageType = "failure";
+        public string Type { get { return MessageType; } }
 
         public string Reason { get; set; }
 
         public FailureMessage()
         {
-            Reason = "";
+            Reason = string.Empty;
         }
 
         public void Serialize(Stream stream, IMessageFormatter formatter)

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data.SQLite;
@@ -12,7 +12,7 @@ namespace EnergonSoftware.Database
 {
     public sealed class DatabaseConnection : IDisposable
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(DatabaseConnection));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(DatabaseConnection));
 
         public static string ParseDataSource(ConnectionStringSettings connectionSettings)
         {
@@ -27,7 +27,7 @@ namespace EnergonSoftware.Database
         {
             string dataSource = ParseDataSource(connectionSettings);
 
-            _logger.Info("Creating " + connectionSettings.ProviderName + " database at " + dataSource + "...");
+            Logger.Info("Creating " + connectionSettings.ProviderName + " database at " + dataSource + "...");
             switch(connectionSettings.ProviderName)
             {
             case "System.Data.SQLite":
@@ -76,7 +76,7 @@ namespace EnergonSoftware.Database
         public void Open()
         {
             lock(_lock) {
-                _logger.Debug("Opening " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
+                Logger.Debug("Opening " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
                 Connection.Open();
             }
         }
@@ -84,7 +84,7 @@ namespace EnergonSoftware.Database
         public void Close()
         {
             lock(_lock) {
-                _logger.Debug("Closing " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
+                Logger.Debug("Closing " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
                 Connection.Close();
             }
         }
@@ -94,7 +94,7 @@ namespace EnergonSoftware.Database
             DbCommand command = Connection.CreateCommand();
             command.CommandText = commandText;
 
-            _logger.Debug("Built command: " + command.CommandText);
+            Logger.Debug("Built command: " + command.CommandText);
             return command;
         }
 
@@ -109,7 +109,7 @@ namespace EnergonSoftware.Database
 
         public void AddParameter(DbCommand command, string name, object value)
         {
-            _logger.Debug("Adding parameter " + name + "=" + value);
+            Logger.Debug("Adding parameter " + name + "=" + value);
 
             DbParameter param = command.CreateParameter();
             param.ParameterName = name;

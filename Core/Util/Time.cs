@@ -6,7 +6,7 @@ namespace EnergonSoftware.Core.Util
     {
         public static long CurrentTimeMs
         {
-            get { return (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond); }
+            get { return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond; }
         }
     }
 }

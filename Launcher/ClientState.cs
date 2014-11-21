@@ -5,7 +5,7 @@ using log4net;
 
 namespace EnergonSoftware.Launcher
 {
-    sealed class ClientState : INotifyPropertyChanged
+    internal sealed class ClientState : INotifyPropertyChanged
     {
         public enum Page
         {
@@ -13,8 +13,6 @@ namespace EnergonSoftware.Launcher
             Login,
             Main,
         }
-
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(ClientState));
 
 #region Singleton
         private static ClientState _instance = new ClientState();

@@ -15,7 +15,7 @@ using log4net;
 
 namespace EnergonSoftware.Launcher
 {
-    class UpdateChecker : INotifyPropertyChanged
+    internal class UpdateChecker : INotifyPropertyChanged
     {
         [DataContract]
         private class Update
@@ -38,12 +38,12 @@ namespace EnergonSoftware.Launcher
             }
         }
 
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(UpdateChecker));
+
 #region Singleton
         private static UpdateChecker _instance = new UpdateChecker();
         public static UpdateChecker Instance { get { return _instance; } }
 #endregion
-
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(UpdateChecker));
 
         private string _updateStatus = Properties.Resources.UpdatesLabel;
         public string UpdateStatus { get { return _updateStatus; } private set { _updateStatus = value; NotifyPropertyChanged(); } }
@@ -57,7 +57,7 @@ namespace EnergonSoftware.Launcher
         public async void CheckForUpdates()
         {
             // TODO: use string resources here
-            _logger.Info("Checking for updates...");
+            Logger.Info("Checking for updates...");
 
             using(HttpClient client = new HttpClient()) {
                 client.BaseAddress = new Uri(ConfigurationManager.AppSettings["updateHost"]);
@@ -71,7 +71,7 @@ namespace EnergonSoftware.Launcher
                         DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Update>));
                         updates = (List<Update>)serializer.ReadObject(stream);
                     }
-                    _logger.Debug("Read updates: " + string.Join(",", (object[])updates.ToArray()));
+                    Logger.Debug("Read updates: " + string.Join(",", (object[])updates.ToArray()));
 
                     // TODO: check the updates and then update!
 

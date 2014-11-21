@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Net;
 
-using log4net;
-
 using EnergonSoftware.Database;
 using EnergonSoftware.Database.Objects.Events;
 
+using log4net;
+
 namespace EnergonSoftware.Overmind
 {
-    sealed class EventLogger
+    internal sealed class EventLogger
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(EventLogger));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(EventLogger));
 
 #region Singleton
         private static EventLogger _instance = new EventLogger();
@@ -56,7 +56,7 @@ namespace EnergonSoftware.Overmind
         private void LogEvent(Event evt)
         {
             lock(_lock) {
-                _logger.Debug("Logging event: " + evt);
+                Logger.Debug("Logging event: " + evt);
                 using(DatabaseConnection connection = DatabaseManager.AcquireDatabaseConnection()) {
                     evt.Insert(connection);
                 }

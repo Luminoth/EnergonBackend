@@ -37,7 +37,7 @@ namespace EnergonSoftware.Database
             case DatabaseType.DateTime:
                 return "DATETIME";
             }
-            return "";
+            return string.Empty;
         }
 
         private static string DatabaseTypeString(string providerName, DatabaseType type)
@@ -47,7 +47,7 @@ namespace EnergonSoftware.Database
             case "System.Data.SQLite":
                 return SQLiteDatabaseTypeString(type);
             }
-            return "";
+            return string.Empty;
         }
 
         public int Id { get; set; }
@@ -112,7 +112,7 @@ namespace EnergonSoftware.Database
 
     public sealed class TableDescription
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(TableDescription));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(TableDescription));
 
         private Dictionary<string, ColumnDescription> _columns = new Dictionary<string, ColumnDescription>();
         private List<string> _primaryKeys = new List<string>();
@@ -134,7 +134,7 @@ namespace EnergonSoftware.Database
 
         public void Create(DatabaseConnection connection)
         {
-            _logger.Info("Creating table " + Name + "...");
+            Logger.Info("Creating table " + Name + "...");
 
             StringBuilder create = new StringBuilder("CREATE TABLE " + Name);
             create.Append("(");

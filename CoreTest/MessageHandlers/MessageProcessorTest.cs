@@ -1,10 +1,11 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Net;
-using EnergonSoftware.Core.Test.Net;
 using EnergonSoftware.Core.Test.Messages;
+using EnergonSoftware.Core.Test.Net;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EnergonSoftware.Core.Test.MessageHandlers
 {

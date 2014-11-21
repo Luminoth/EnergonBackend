@@ -13,7 +13,8 @@ namespace EnergonSoftware.Database.Objects.Events
 
     public sealed class AuthEvent : Event
     {
-        private static readonly TableDescription AUTH_EVENTS_TABLE = new TableDescription("events_authenticate",
+        private static readonly TableDescription AuthEventsTable = new TableDescription(
+            "events_authenticate",
             new List<ColumnDescription>
             {
                 { new ColumnDescription("id", DatabaseType.Integer).SetPrimaryKey() },
@@ -27,7 +28,7 @@ namespace EnergonSoftware.Database.Objects.Events
 
         public static void CreateTable(DatabaseConnection connection)
         {
-            AUTH_EVENTS_TABLE.Create(connection);
+            AuthEventsTable.Create(connection);
         }
 
         public readonly AuthEventType Type;
@@ -48,7 +49,7 @@ namespace EnergonSoftware.Database.Objects.Events
 
         public override void Insert(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AUTH_EVENTS_TABLE.Name
+            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AuthEventsTable.Name
                 + "(timestamp, type, origin, account, reason)"
                 + " VALUES(@timestamp, @type, @origin, @account, @reason)"))
             {

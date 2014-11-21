@@ -22,7 +22,7 @@ namespace EnergonSoftware.Launcher.Controls
         {
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
-                Password.Password = "";
+                Password.Password = string.Empty;
             }));
         }
 #endregion

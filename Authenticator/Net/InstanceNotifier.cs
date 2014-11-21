@@ -2,19 +2,19 @@
 using System.Configuration;
 using System.Net;
 
-using log4net;
-
+using EnergonSoftware.Authenticator.MessageHandlers;
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
-using EnergonSoftware.Authenticator.MessageHandlers;
+
+using log4net;
 
 namespace EnergonSoftware.Authenticator.Net
 {
-    sealed class InstanceNotifier
+    internal sealed class InstanceNotifier
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(InstanceNotifier));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(InstanceNotifier));
 
 #region Singleton
         private static InstanceNotifier _instance = new InstanceNotifier();
@@ -26,20 +26,20 @@ namespace EnergonSoftware.Authenticator.Net
 
         public void Start(ListenAddressConfigurationElementCollection listenAddresses)
         {
-            _logger.Debug("Opening multicast listener sockets...");
+            Logger.Debug("Opening multicast listener sockets...");
             _listener.CreateMulticastSockets(listenAddresses);
 
-            _logger.Debug("Starting session manager...");
+            Logger.Debug("Starting session manager...");
             _sessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
             _sessions.Start(new MessageHandlerFactory());
         }
 
         public void Stop()
         {
-            _logger.Debug("Closing multicast sockets...");
+            Logger.Debug("Closing multicast sockets...");
             _listener.CloseSockets();
 
-            _logger.Debug("Stopping session manager...");
+            Logger.Debug("Stopping session manager...");
             _sessions.Stop();
         }
 

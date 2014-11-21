@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Overmind.Net;
 
 namespace EnergonSoftware.Overmind.MessageHandlers
 {
-    sealed class PingMessageHandler : MessageHandler
+    internal sealed class PingMessageHandler : MessageHandler
     {
         private readonly LoginSession _session;
 

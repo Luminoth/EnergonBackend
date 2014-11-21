@@ -7,7 +7,8 @@ namespace EnergonSoftware.Database.Objects
 {
     public sealed class AccountFriend : IDatabaseObject
     {
-        private static readonly TableDescription ACCOUNT_FRIENDS_TABLE = new TableDescription("accounts_friends",
+        private static readonly TableDescription AccountFriendsTable = new TableDescription(
+            "accounts_friends",
             new List<ColumnDescription>
             {
                 { new ColumnDescription("account", DatabaseType.Integer).SetPrimaryKey().SetReferences("accounts", "id") },
@@ -15,16 +16,16 @@ namespace EnergonSoftware.Database.Objects
             }
         );
 
-        public static string TableName { get { return ACCOUNT_FRIENDS_TABLE.Name; } }
+        public static string TableName { get { return AccountFriendsTable.Name; } }
 
         public static void CreateTable(DatabaseConnection connection)
         {
-            ACCOUNT_FRIENDS_TABLE.Create(connection);
+            AccountFriendsTable.Create(connection);
         }
 
         public static void DeleteAll(DatabaseConnection connection, long accountId)
         {
-            using(DbCommand command = connection.BuildCommand("DELETE FROM " + ACCOUNT_FRIENDS_TABLE.Name + " WHERE account=@account OR friend=@friend")) {
+            using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountFriendsTable.Name + " WHERE account=@account OR friend=@friend")) {
                 connection.AddParameter(command, "account", accountId);
                 connection.AddParameter(command, "friend", accountId);
                 command.ExecuteNonQuery();
@@ -65,21 +66,21 @@ namespace EnergonSoftware.Database.Objects
 
         public void Load(DbDataReader reader)
         {
-            _account = reader.GetInt32(ACCOUNT_FRIENDS_TABLE["account"].Id);
-            _friend = reader.GetInt32(ACCOUNT_FRIENDS_TABLE["friend"].Id);
+            _account = reader.GetInt32(AccountFriendsTable["account"].Id);
+            _friend = reader.GetInt32(AccountFriendsTable["friend"].Id);
         }
 
         public void Insert(DatabaseConnection connection)
         {
             // account -> friend
-            using(DbCommand command = connection.BuildCommand("INSERT INTO " + ACCOUNT_FRIENDS_TABLE.Name + "(account, friend) VALUES(@account, @friend)")) {
+            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountFriendsTable.Name + "(account, friend) VALUES(@account, @friend)")) {
                 connection.AddParameter(command, "account", Account);
                 connection.AddParameter(command, "friend", Friend);
                 command.ExecuteNonQuery();
             }
 
             // friend -> account
-            using(DbCommand command = connection.BuildCommand("INSERT INTO " + ACCOUNT_FRIENDS_TABLE.Name + "(account, friend) VALUES(@account, @friend)")) {
+            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountFriendsTable.Name + "(account, friend) VALUES(@account, @friend)")) {
                 connection.AddParameter(command, "account", Friend);
                 connection.AddParameter(command, "friend", Account);
                 command.ExecuteNonQuery();
@@ -89,14 +90,14 @@ namespace EnergonSoftware.Database.Objects
         public void Delete(DatabaseConnection connection)
         {
             // account -> friend
-            using(DbCommand command = connection.BuildCommand("DELETE FROM " + ACCOUNT_FRIENDS_TABLE.Name + " WHERE account=@account AND friend=@friend")) {
+            using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountFriendsTable.Name + " WHERE account=@account AND friend=@friend")) {
                 connection.AddParameter(command, "account", Account);
                 connection.AddParameter(command, "friend", Friend);
                 command.ExecuteNonQuery();
             }
 
             // friend -> account
-            using(DbCommand command = connection.BuildCommand("DELETE FROM " + ACCOUNT_FRIENDS_TABLE.Name + " WHERE account=@account AND friend=@friend")) {
+            using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountFriendsTable.Name + " WHERE account=@account AND friend=@friend")) {
                 connection.AddParameter(command, "account", Friend);
                 connection.AddParameter(command, "friend", Account);
                 command.ExecuteNonQuery();

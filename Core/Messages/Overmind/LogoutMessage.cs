@@ -6,8 +6,8 @@ namespace EnergonSoftware.Core.Messages.Overmind
 {
     public sealed class LogoutMessage : IMessage
     {
-        public const string MESSAGE_TYPE = "logout";
-        public string Type { get { return MESSAGE_TYPE; } }
+        public const string MessageType = "logout";
+        public string Type { get { return MessageType; } }
 
         public LogoutMessage()
         {

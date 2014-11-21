@@ -2,8 +2,6 @@
 using System.Net.Sockets;
 using System.Text;
 
-using log4net;
-
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
@@ -12,9 +10,11 @@ using EnergonSoftware.Core.Util;
 using EnergonSoftware.Database;
 using EnergonSoftware.Database.Objects;
 
+using log4net;
+
 namespace EnergonSoftware.Authenticator.Net
 {
-    sealed class AuthSessionFactory : ISessionFactory
+    internal sealed class AuthSessionFactory : ISessionFactory
     {
         public Session CreateSession(SessionManager manager)
         {
@@ -27,10 +27,8 @@ namespace EnergonSoftware.Authenticator.Net
         }
     }
 
-    sealed class AuthSession : Session
+    internal sealed class AuthSession : Session
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthSession));
-
         public AuthType AuthType { get; private set; }
         public Nonce AuthNonce { get; private set; }
 

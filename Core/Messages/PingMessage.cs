@@ -6,8 +6,8 @@ namespace EnergonSoftware.Core.Messages
 {
     public sealed class PingMessage : IMessage
     {
-        public const string MESSAGE_TYPE = "ping";
-        public string Type { get { return MESSAGE_TYPE; } }
+        public const string MessageType = "ping";
+        public string Type { get { return MessageType; } }
 
         public PingMessage()
         {

@@ -3,16 +3,16 @@ using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Sockets;
 
-using log4net;
-
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
+
+using log4net;
 
 namespace EnergonSoftware.Core.Net
 {
     public sealed class SessionManager
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(SessionManager));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(SessionManager));
 
         private readonly object _lock = new object();
  
@@ -36,7 +36,7 @@ namespace EnergonSoftware.Core.Net
         public void Stop()
         {
             lock(_lock) {
-                _logger.Info("Closing all sessions...");
+                Logger.Info("Closing all sessions...");
                 DisconnectAll();
                 _sessions.Clear();
 
@@ -50,7 +50,7 @@ namespace EnergonSoftware.Core.Net
                 session.Timeout = SessionTimeout;
                 _sessions.Add(session);
 
-                _logger.Info("Added new session: " + session.Id);
+                Logger.Info("Added new session: " + session.Id);
             }
         }
 
@@ -91,7 +91,7 @@ namespace EnergonSoftware.Core.Net
             }
 
             if(count > 0) {
-                _logger.Info("Removed " + count + " disconnected sessions");
+                Logger.Info("Removed " + count + " disconnected sessions");
             }
         }
 
@@ -107,7 +107,7 @@ namespace EnergonSoftware.Core.Net
                         }
 
                         if(session.TimedOut) {
-                            _logger.Info("Session " + session.Id + " timed out!");
+                            Logger.Info("Session " + session.Id + " timed out!");
                             session.Disconnect("Timed Out!");
                             return;
                         }

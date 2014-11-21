@@ -6,7 +6,7 @@ using EnergonSoftware.Core.Net;
 
 namespace EnergonSoftware.Launcher.MessageHandlers
 {
-    sealed class PingMessageHandler : MessageHandler
+    internal sealed class PingMessageHandler : MessageHandler
     {
         internal PingMessageHandler()
         {

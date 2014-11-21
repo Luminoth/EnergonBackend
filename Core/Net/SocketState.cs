@@ -1,15 +1,15 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 
-using log4net;
-
 using EnergonSoftware.Core.Util;
+
+using log4net;
 
 namespace EnergonSoftware.Core.Net
 {
     public sealed class SocketState
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(SocketState));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(SocketState));
 
 #region Id Generator
         private static int _nextId = 0;
@@ -79,7 +79,7 @@ namespace EnergonSoftware.Core.Net
         public int Send(byte[] buffer)
         {
             lock(_lock) {
-                _logger.Debug("Socket state " + Id + " sending " + buffer.Length + " bytes");
+                Logger.Debug("Socket state " + Id + " sending " + buffer.Length + " bytes");
                 return Socket.Send(buffer);
             }
         }

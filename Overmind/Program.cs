@@ -9,26 +9,24 @@ using log4net.Config;
 
 namespace EnergonSoftware.Overmind
 {
-    class Program
+    internal class Program
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(Program));
-
-        public const string EVENT_LOG_SOURCE = "Energon Software Overmind";
-        public static EventLog ServiceEventLogger = new EventLog();
+        public const string EventLogSource = "Energon Software Overmind";
+        public static readonly EventLog ServiceEventLogger = new EventLog();
 
         private static void ConfigureLogging()
         {
-            /*if(!EventLog.SourceExists(EVENT_LOG_SOURCE))  {         
-                EventLog.CreateEventSource(EVENT_LOG_SOURCE, "Energon Software");
+            /*if(!EventLog.SourceExists(EventLogSource))  {         
+                EventLog.CreateEventSource(EventLogSource, "Energon Software");
             }*/
-            ServiceEventLogger.Source = EVENT_LOG_SOURCE;
+            ServiceEventLogger.Source = EventLogSource;
 
             XmlConfigurator.Configure();
         }
 
         private static void ConfigureThreading()
         {
-            int workerThreads,ioThreads;
+            int workerThreads, ioThreads;
             ThreadPool.GetMinThreads(out workerThreads, out ioThreads);
             ThreadPool.SetMinThreads(Convert.ToInt32(ConfigurationManager.AppSettings["minWorkerThreads"]), ioThreads);
 
@@ -36,7 +34,7 @@ namespace EnergonSoftware.Overmind
             ThreadPool.SetMaxThreads(Convert.ToInt32(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
         }
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             ConfigureLogging();
             ConfigureThreading();

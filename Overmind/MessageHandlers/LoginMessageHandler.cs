@@ -1,20 +1,20 @@
 ﻿using System.Threading.Tasks;
 
-using log4net;
-
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Overmind;
-using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Database;
 using EnergonSoftware.Database.Objects;
 using EnergonSoftware.Overmind.Net;
 
+using log4net;
+
 namespace EnergonSoftware.Overmind.MessageHandlers
 {
-    sealed class LoginMessageHandler : MessageHandler
+    internal sealed class LoginMessageHandler : MessageHandler
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(LoginMessageHandler));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(LoginMessageHandler));
 
         private readonly LoginSession _session;
 
@@ -30,7 +30,7 @@ namespace EnergonSoftware.Overmind.MessageHandlers
                     LoginMessage login = (LoginMessage)message;
                     EventLogger.Instance.LoginRequestEvent(_session.RemoteEndPoint, login.Username);
 
-                    _logger.Info("New login attempt from user=" + login.Username + " and endpoint=" + _session.RemoteEndPoint);
+                    Logger.Info("New login attempt from user=" + login.Username + " and endpoint=" + _session.RemoteEndPoint);
 
                     AccountInfo account = new AccountInfo(login.Username);
                     using(DatabaseConnection connection = DatabaseManager.AcquireDatabaseConnection()) {
@@ -51,7 +51,7 @@ namespace EnergonSoftware.Overmind.MessageHandlers
                     }
 
                     if(!NetUtil.CompareEndPoints(account.SessionEndPoint, _session.RemoteEndPoint)) {
-                        _logger.Error("*** Possible spoof attempt from " + _session.RemoteEndPoint + " for account=" + account + "! ***");
+                        Logger.Error("*** Possible spoof attempt from " + _session.RemoteEndPoint + " for account=" + account + "! ***");
                         _session.LoginFailure(account.Username, "Endpoint Mistmatch");
                         return;
                     }

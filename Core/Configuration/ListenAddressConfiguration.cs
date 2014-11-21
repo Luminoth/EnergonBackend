@@ -55,7 +55,7 @@ namespace EnergonSoftware.Core.Configuration
         [ConfigurationProperty("", IsDefaultCollection=true)]
         public ListenAddressConfigurationElementCollection ListenAddresses
         {
-            get { return (ListenAddressConfigurationElementCollection)base[""]; }
+            get { return (ListenAddressConfigurationElementCollection)base[string.Empty]; }
         }
     }
 }

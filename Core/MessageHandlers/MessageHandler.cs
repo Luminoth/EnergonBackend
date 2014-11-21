@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using log4net;
-
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
+
+using log4net;
 
 namespace EnergonSoftware.Core.MessageHandlers
 {
@@ -16,8 +16,6 @@ namespace EnergonSoftware.Core.MessageHandlers
 
     public abstract class MessageHandler
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(MessageHandler));
-
 private Task _task;
 public bool Finished { get { return null != _task && _task.IsCompleted; } }
         //public bool Finished { get; private set; }

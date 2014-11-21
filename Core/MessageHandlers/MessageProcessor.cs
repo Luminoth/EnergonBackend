@@ -2,17 +2,17 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-using log4net;
-
-using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net;
+
+using log4net;
 
 namespace EnergonSoftware.Core.MessageHandlers
 {
     public sealed class MessageProcessor
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(MessageProcessor));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageProcessor));
 
         private class MessageQueueContext
         {
@@ -20,7 +20,7 @@ namespace EnergonSoftware.Core.MessageHandlers
             public IMessage Message { get; set; }
         }
 
-        private ConcurrentDictionary<int, ConcurrentQueue<MessageQueueContext>> _messageQueue = new ConcurrentDictionary<int,ConcurrentQueue<MessageQueueContext>>();
+        private ConcurrentDictionary<int, ConcurrentQueue<MessageQueueContext>> _messageQueue = new ConcurrentDictionary<int, ConcurrentQueue<MessageQueueContext>>();
         private IMessageHandlerFactory _factory;
 
         private Task _task;
@@ -64,7 +64,7 @@ namespace EnergonSoftware.Core.MessageHandlers
 
         public void Start(IMessageHandlerFactory factory)
         {
-            _logger.Debug("Starting message processor...");
+            Logger.Debug("Starting message processor...");
             _factory = factory;
 
             _running = true;
@@ -81,12 +81,12 @@ namespace EnergonSoftware.Core.MessageHandlers
                 return;
             }
 
-            _logger.Debug("Stopping message processor...");
+            Logger.Debug("Stopping message processor...");
             _running = false;
 
             _task.Wait();
 
-            _logger.Debug("Clearing message queue...");
+            Logger.Debug("Clearing message queue...");
             _messageQueue.Clear();
             _factory = null;
             _task = null;

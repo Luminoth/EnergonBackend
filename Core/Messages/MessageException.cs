@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace EnergonSoftware.Core.Messages
 {
     [Serializable]
-    class MessageException : Exception
+    public class MessageException : Exception
     {
         public MessageException() : base()
         {

@@ -6,16 +6,16 @@ namespace EnergonSoftware.Core.Messages.Overmind
 {
     public sealed class LoginMessage : IMessage
     {
-        public const string MESSAGE_TYPE = "login";
-        public string Type { get { return MESSAGE_TYPE; } }
+        public const string MessageType = "login";
+        public string Type { get { return MessageType; } }
 
         public string Username { get; set; }
         public string Ticket { get; set; }
 
         public LoginMessage()
         {
-            Username = "";
-            Ticket = "";
+            Username = string.Empty;
+            Ticket = string.Empty;
         }
 
         public void Serialize(Stream stream, IMessageFormatter formatter)

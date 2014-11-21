@@ -1,15 +1,15 @@
 ﻿using System.Net.Sockets;
 
-using log4net;
-
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
 
+using log4net;
+
 namespace EnergonSoftware.Launcher.Net
 {
-    enum AuthenticationStage
+    internal enum AuthenticationStage
     {
         NotAuthenticated,
         Begin,
@@ -18,9 +18,9 @@ namespace EnergonSoftware.Launcher.Net
         Authenticated,
     }
 
-    sealed class AuthSession : Session
+    internal sealed class AuthSession : Session
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthSession));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthSession));
 
 #region Events
         public delegate void OnAuthSuccessHandler();
@@ -71,7 +71,7 @@ namespace EnergonSoftware.Launcher.Net
 
         private void BeginAuth()
         {
-            _logger.Info("Authenticating as user '" + ClientState.Instance.Username + "'...");
+            Logger.Info("Authenticating as user '" + ClientState.Instance.Username + "'...");
 
             AuthMessage message = new AuthMessage();
             message.MechanismType = AuthType.DigestSHA512;
@@ -101,8 +101,8 @@ namespace EnergonSoftware.Launcher.Net
 
         public void AuthSuccess(string ticket)
         {
-            _logger.Info("Authentication successful!");
-            _logger.Debug("Ticket=" + ticket);
+            Logger.Info("Authentication successful!");
+            Logger.Debug("Ticket=" + ticket);
 
             AuthStage = AuthenticationStage.Authenticated;
             ClientState.Instance.Ticket = ticket;
@@ -117,7 +117,7 @@ namespace EnergonSoftware.Launcher.Net
 
         public void AuthFailed(string reason)
         {
-            _logger.Warn("Authentication failed: " + reason);
+            Logger.Warn("Authentication failed: " + reason);
 
             AuthStage = AuthenticationStage.NotAuthenticated;
             ClientState.Instance.Password = null;

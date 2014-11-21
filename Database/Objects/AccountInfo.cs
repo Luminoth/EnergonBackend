@@ -11,7 +11,8 @@ namespace EnergonSoftware.Database.Objects
 {
     public sealed class AccountInfo : IDatabaseObject
     {
-        private static readonly TableDescription ACCOUNTS_TABLE = new TableDescription("accounts",
+        private static readonly TableDescription AccountsTable = new TableDescription(
+            "accounts",
             new List<ColumnDescription>
             {
                 { new ColumnDescription("id", DatabaseType.Integer).SetPrimaryKey() },
@@ -25,18 +26,18 @@ namespace EnergonSoftware.Database.Objects
             }
         );
 
-        public static string TableName { get { return ACCOUNTS_TABLE.Name; } }
+        public static string TableName { get { return AccountsTable.Name; } }
 
         public static void CreateTable(DatabaseConnection connection)
         {
-            ACCOUNTS_TABLE.Create(connection);
+            AccountsTable.Create(connection);
         }
 
         public static List<Friend> ReadFriends(DatabaseConnection connection, long accountId)
         {
             List<Friend> friends = new List<Friend>();
 
-            using(DbCommand command = connection.BuildCommand("SELECT id, username, status FROM " + ACCOUNTS_TABLE.Name + " WHERE id IN"
+            using(DbCommand command = connection.BuildCommand("SELECT id, username, status FROM " + AccountsTable.Name + " WHERE id IN"
                 + " (SELECT friend FROM " + AccountFriend.TableName + " where account=@account) AND active=1"))
             {
                 connection.AddParameter(command, "account", accountId);
@@ -115,10 +116,10 @@ namespace EnergonSoftware.Database.Objects
         {
             DbCommand command = null;
             if(Id > 0) {
-                command = connection.BuildCommand("SELECT * FROM " + ACCOUNTS_TABLE.Name + " WHERE id=@id");
+                command = connection.BuildCommand("SELECT * FROM " + AccountsTable.Name + " WHERE id=@id");
                 connection.AddParameter(command, "id", Id);
             } else {
-                command = connection.BuildCommand("SELECT * FROM " + ACCOUNTS_TABLE.Name + " WHERE username=@username");
+                command = connection.BuildCommand("SELECT * FROM " + AccountsTable.Name + " WHERE username=@username");
                 connection.AddParameter(command, "username", Username);
             }
 
@@ -137,26 +138,26 @@ namespace EnergonSoftware.Database.Objects
 
         public void Load(DbDataReader reader)
         {
-            Id = reader.GetInt32(ACCOUNTS_TABLE["id"].Id);
-            _active = reader.GetBoolean(ACCOUNTS_TABLE["active"].Id);
-            _username = reader.GetString(ACCOUNTS_TABLE["username"].Id);
-            PasswordMD5 = reader.GetString(ACCOUNTS_TABLE["passwordMD5"].Id);
-            PasswordSHA512 = reader.GetString(ACCOUNTS_TABLE["passwordSHA512"].Id);
+            Id = reader.GetInt32(AccountsTable["id"].Id);
+            _active = reader.GetBoolean(AccountsTable["active"].Id);
+            _username = reader.GetString(AccountsTable["username"].Id);
+            PasswordMD5 = reader.GetString(AccountsTable["passwordMD5"].Id);
+            PasswordSHA512 = reader.GetString(AccountsTable["passwordSHA512"].Id);
 
-            if(!reader.IsDBNull(ACCOUNTS_TABLE["sessionEndPoint"].Id)) {
-                _sessionEndPoint = reader.GetString(ACCOUNTS_TABLE["sessionEndPoint"].Id);
+            if(!reader.IsDBNull(AccountsTable["sessionEndPoint"].Id)) {
+                _sessionEndPoint = reader.GetString(AccountsTable["sessionEndPoint"].Id);
             }
 
-            if(!reader.IsDBNull(ACCOUNTS_TABLE["sessionid"].Id)) {
-                _sessionid = reader.GetString(ACCOUNTS_TABLE["sessionid"].Id);
+            if(!reader.IsDBNull(AccountsTable["sessionid"].Id)) {
+                _sessionid = reader.GetString(AccountsTable["sessionid"].Id);
             }
 
-            _status = (Status)reader.GetInt32(ACCOUNTS_TABLE["status"].Id);
+            _status = (Status)reader.GetInt32(AccountsTable["status"].Id);
         }
 
         public void Insert(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("INSERT INTO " + ACCOUNTS_TABLE.Name
+            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountsTable.Name
                 + "(active, username" + ", passwordMD5" + ", passwordSHA512" + ", status)"
                 + " VALUES(@active, @username" + ", @passwordMD5" + ", @passwordSHA512" + ", @status)"))
             {
@@ -172,7 +173,7 @@ namespace EnergonSoftware.Database.Objects
 
         public void Update(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("UPDATE " + ACCOUNTS_TABLE.Name
+            using(DbCommand command = connection.BuildCommand("UPDATE " + AccountsTable.Name
                 + " SET active=@active, sessionEndPoint=@sessionEndPoint, sessionid=@sessionid, status=@status WHERE id=@id"))
             {
                 connection.AddParameter(command, "active", Active);
@@ -187,7 +188,7 @@ namespace EnergonSoftware.Database.Objects
 
         public void Delete(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("DELETE FROM " + ACCOUNTS_TABLE.Name + " WHERE id=@id")) {
+            using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountsTable.Name + " WHERE id=@id")) {
                 connection.AddParameter(command, "id", Id);
                 command.ExecuteNonQuery();
             }
