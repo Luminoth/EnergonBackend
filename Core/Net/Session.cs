@@ -49,7 +49,6 @@ namespace EnergonSoftware.Core.Net
 #region Network Properties
         private readonly SocketState _socketState;
         public EndPoint RemoteEndPoint { get { return _socketState.RemoteEndPoint ; } }
-        public bool Blocking { get { return _socketState.Blocking; } set { _socketState.Blocking = value; } }
 
         public bool Connecting { get { return _socketState.Connecting; } }
         public bool Connected { get { return _socketState.Connected; } }
@@ -136,7 +135,6 @@ namespace EnergonSoftware.Core.Net
 
             lock(_lock) {
                 _socketState.Socket = socket;
-                _socketState.Blocking = _manager.Blocking;
                 _socketState.Connecting = false;
             }
 
@@ -159,7 +157,6 @@ namespace EnergonSoftware.Core.Net
             NetUtil.ConnectAsync(host, port, args);
         }
 
-
         public void Disconnect(string reason=null)
         {
             lock(_lock) {
@@ -171,6 +168,20 @@ namespace EnergonSoftware.Core.Net
                         OnDisconnect(reason);
                     }
                 }
+            }
+        }
+
+        public void BufferData(byte[] data)
+        {
+            lock(_lock) {
+                _socketState.BufferData(data);
+            }
+        }
+
+        public void BufferData(byte[] data, int offset, int count)
+        {
+            lock(_lock) {
+                _socketState.BufferData(data, offset, count);
             }
         }
 

@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Net;
 using System.Net.Sockets;
 
 using log4net;
 
 using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Messages;
 
 namespace EnergonSoftware.Core.Net
 {
@@ -13,17 +15,14 @@ namespace EnergonSoftware.Core.Net
         private static readonly ILog _logger = LogManager.GetLogger(typeof(SessionManager));
 
         private readonly object _lock = new object();
-
+ 
         private List<Session> _sessions = new List<Session>();
-
         private MessageProcessor _processor = new MessageProcessor();
 
-        public bool Blocking { get; set; }
         public long SessionTimeout { get; set; }
 
         public SessionManager()
         {
-            Blocking = true;
             SessionTimeout = -1;
         }
 
@@ -45,21 +44,34 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public void AddSession(Session session)
+        public void Add(Session session)
         {
             lock(_lock) {
-                session.Blocking = Blocking;
                 session.Timeout = SessionTimeout;
                 _sessions.Add(session);
 
-                _logger.Info("Added new session " + session.Id);
+                _logger.Info("Added new session: " + session.Id);
+            }
+        }
+
+        public bool Contains(EndPoint remoteEndpoint)
+        {
+            lock(_lock) {
+                return _sessions.Exists(session => session.Connected && remoteEndpoint.Equals(session.RemoteEndPoint));
+            }
+        }
+
+        public Session Get(EndPoint remoteEndpoint)
+        {
+            lock(_lock) {
+                return _sessions.Find(session => session.Connected && remoteEndpoint.Equals(session.RemoteEndPoint));
             }
         }
 
         public void DisconnectAll()
         {
             lock(_lock) {
-                _sessions.ForEach(s => s.Disconnect());
+                _sessions.ForEach(session => session.Disconnect());
             }
         }
 
@@ -67,10 +79,10 @@ namespace EnergonSoftware.Core.Net
         {
             int count = 0;
             lock(_lock) {
-                count = _sessions.RemoveAll(s =>
+                count = _sessions.RemoveAll(session =>
                     {
-                        if(!s.Connecting && !s.Connected) {
-                            _processor.RemoveSession(s.Id);
+                        if(!session.Connecting && !session.Connected) {
+                            _processor.RemoveSession(session.Id);
                             return true;
                         }
                         return false;
@@ -83,29 +95,35 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        private void PollAndRun(Session session)
-        {
-            int count = session.PollAndRead();
-            if(count < 0) {
-                session.Disconnect("Socket closed!");
-                return;
-            }
-
-            if(session.TimedOut) {
-                _logger.Info("Session " + session.Id + " timed out!");
-                session.Disconnect("Timed Out!");
-                return;
-            }
-
-            if(session.Connected) {
-                session.Run(_processor);
-            }
-        }
-
         public void PollAndRun()
         {
             lock(_lock) {
-                _sessions.ForEach(session => PollAndRun(session));
+                _sessions.ForEach(session =>
+                    {
+                        int count = session.PollAndRead();
+                        if(count < 0) {
+                            session.Disconnect("Socket closed!");
+                            return;
+                        }
+
+                        if(session.TimedOut) {
+                            _logger.Info("Session " + session.Id + " timed out!");
+                            session.Disconnect("Timed Out!");
+                            return;
+                        }
+
+                        if(session.Connected) {
+                            session.Run(_processor);
+                        }
+                    }
+                );
+            }
+        }
+
+        public void SendMessage(IMessage message)
+        {
+            lock(_lock) {
+                _sessions.ForEach(session => session.SendMessage(message));
             }
         }
     }

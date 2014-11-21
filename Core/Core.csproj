@@ -65,6 +65,7 @@
     <Compile Include="Messages\PingMessage.cs" />
     <Compile Include="Net\BufferedSocketReader.cs" />
     <Compile Include="Net\HttpServer.cs" />
+    <Compile Include="Net\UdpListener.cs" />
     <Compile Include="Net\NetUtil.cs" />
     <Compile Include="Messages\NetworkMessage.cs" />
     <Compile Include="Account\Friend.cs" />

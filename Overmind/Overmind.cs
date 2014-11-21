@@ -57,12 +57,12 @@ namespace EnergonSoftware.Overmind
             _logger.Debug("Starting diagnostic interface...");
             _diagnosticServer.Start(new List<string>() { "http://localhost:9002/" });
 
-            _logger.Info("Creating instance notifier multicast socket...");
-            InstanceNotifier.Instance.CreateSockets(instanceNotifierListenAddresses.ListenAddresses);
+            _logger.Info("Starting instance notifier...");
+            InstanceNotifier.Instance.Start(instanceNotifierListenAddresses.ListenAddresses);
 
             _logger.Debug("Opening listener sockets...");
             _loginListener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
-            _loginListener.CreateSockets(listenAddresses.ListenAddresses, SocketType.Stream, ProtocolType.Tcp);
+            _loginListener.CreateSockets(listenAddresses.ListenAddresses);
 
             _logger.Debug("Starting session manager...");
             _loginSessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
@@ -83,6 +83,9 @@ namespace EnergonSoftware.Overmind
 
             _logger.Debug("Stopping session manager...");
             _loginSessions.Stop();
+
+            _logger.Debug("Stopping instance notifier...");
+            InstanceNotifier.Instance.Stop();
 
             _logger.Debug("Stopping diagnostic interface...");
             _diagnosticServer.Stop();

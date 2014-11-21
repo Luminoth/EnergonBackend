@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Net;
 using System.Net.Sockets;
 using System.ServiceProcess;
 using System.Threading;
@@ -24,8 +23,8 @@ namespace EnergonSoftware.Authenticator
 
         private HttpServer _diagnosticServer = new HttpServer();
 
-        private SocketListener _authListener = new SocketListener(new AuthSessionFactory());
-        private SessionManager _authSessions = new SessionManager();
+        private SocketListener _listener = new SocketListener(new AuthSessionFactory());
+        private SessionManager _sessions = new SessionManager();
 
         public Authenticator()
         {
@@ -58,16 +57,16 @@ namespace EnergonSoftware.Authenticator
             _logger.Debug("Starting diagnostic interface...");
             _diagnosticServer.Start(new List<string>() { "http://localhost:9001/" });
 
-            _logger.Info("Creating instance notifier multicast socket...");
-            InstanceNotifier.Instance.CreateSockets(instanceNotifierListenAddresses.ListenAddresses);
+            _logger.Info("Starting instance notifier...");
+            InstanceNotifier.Instance.Start(instanceNotifierListenAddresses.ListenAddresses);
 
             _logger.Debug("Opening listener sockets...");
-            _authListener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
-            _authListener.CreateSockets(listenAddresses.ListenAddresses, SocketType.Stream, ProtocolType.Tcp);
+            _listener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
+            _listener.CreateSockets(listenAddresses.ListenAddresses);
 
             _logger.Debug("Starting session manager...");
-            _authSessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
-            _authSessions.Start(new MessageHandlerFactory());
+            _sessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
+            _sessions.Start(new MessageHandlerFactory());
 
             _logger.Info("Running...");
             Running = true;
@@ -80,10 +79,13 @@ namespace EnergonSoftware.Authenticator
             Running = false;
 
             _logger.Debug("Closing listener sockets...");
-            _authListener.CloseSockets();
+            _listener.CloseSockets();
 
             _logger.Debug("Stopping session manager...");
-            _authSessions.Stop();
+            _sessions.Stop();
+
+            _logger.Debug("Stopping instance notifier...");
+            InstanceNotifier.Instance.Stop();
 
             _logger.Debug("Stopping diagnostic interface...");
             _diagnosticServer.Stop();
@@ -97,10 +99,10 @@ namespace EnergonSoftware.Authenticator
                         try {
                             InstanceNotifier.Instance.Run();
 
-                            _authListener.Poll(_authSessions);
+                            _listener.Poll(_sessions);
 
-                            _authSessions.PollAndRun();
-                            _authSessions.Cleanup();
+                            _sessions.PollAndRun();
+                            _sessions.Cleanup();
                         } catch(Exception e) {
                             _logger.Fatal("Unhandled Exception!", e);
                             Stop();

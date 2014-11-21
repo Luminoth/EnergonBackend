@@ -21,7 +21,7 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
             _manager.Start(new MessageHandlerFactory());
 
             _session = new TestSession(_manager);
-            _manager.AddSession(_session);
+            _manager.Add(_session);
         }
 
         [TestCleanup]

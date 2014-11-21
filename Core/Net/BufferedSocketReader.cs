@@ -8,7 +8,7 @@ using EnergonSoftware.Core.Util;
 
 namespace EnergonSoftware.Core.Net
 {
-    public class BufferedSocketReader
+    public sealed class BufferedSocketReader
     {
         private readonly object _lock = new object();
 
@@ -19,7 +19,7 @@ namespace EnergonSoftware.Core.Net
         {
             _socket = socket;
             Buffer = new MemoryBuffer();
-        } 
+        }
 
         // reads from the socket as long
         // as there is data to be read
@@ -40,6 +40,16 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
+        public void BufferData(byte[] data)
+        {
+            Buffer.Write(data, 0, data.Length);
+        }
+
+        public void BufferData(byte[] data, int offset, int count)
+        {
+            Buffer.Write(data, offset, count);
+        }
+
         private int Read()
         {
             byte[] data = new byte[_socket.Available];
@@ -48,7 +58,7 @@ namespace EnergonSoftware.Core.Net
                 return len;
             }
 
-            Buffer.Write(data, 0, len);
+            BufferData(data, 0, len);
             return len;
         }
     }

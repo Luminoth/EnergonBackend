@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.IO;
 
 using EnergonSoftware.Core.Messages.Formatter;
@@ -17,6 +18,7 @@ namespace EnergonSoftware.Core.Account
         Away,
     }
 
+    [Serializable]
     public sealed class Friend : IMessageSerializable
     {
         public long Id { get; set; }

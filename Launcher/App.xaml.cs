@@ -117,7 +117,7 @@ namespace EnergonSoftware.Launcher
             _overmindSession.OnDisconnect += OnDisconnectCallback;
             _overmindSession.OnError += OnErrorCallback;
             _overmindSession.BeginConnect(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"]));
-            _sessions.AddSession(_overmindSession);
+            _sessions.Add(_overmindSession);
         }
 
         private void OnDisconnectCallback(string reason)
@@ -146,7 +146,7 @@ namespace EnergonSoftware.Launcher
             session.OnDisconnect += OnDisconnectCallback;
             session.OnError += OnErrorCallback;
             session.BeginConnect(ConfigurationManager.AppSettings["authHost"], Convert.ToInt32(ConfigurationManager.AppSettings["authPort"]));
-            _sessions.AddSession(session);
+            _sessions.Add(session);
         }
 
         public void Logout()

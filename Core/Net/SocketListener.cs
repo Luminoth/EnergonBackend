@@ -29,13 +29,14 @@ namespace EnergonSoftware.Core.Net
             _factory = factory;
         }
 
-        public void CreateSockets(ListenAddressConfigurationElementCollection listenAddresses, SocketType socketType, ProtocolType protocol)
+        public void CreateSockets(ListenAddressConfigurationElementCollection listenAddresses)
         {
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
-                IPEndPoint endpoint = new IPEndPoint(listenAddress.IPAddress, listenAddress.Port);
-                _logger.Info("Listening on endpoint " + endpoint + "...");
+                _logger.Info("Listening on address " + listenAddress + "...");
 
-                Socket socket = new Socket(endpoint.AddressFamily, socketType, protocol);
+                IPEndPoint endpoint = new IPEndPoint(listenAddress.IPAddress, listenAddress.Port);
+                Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 socket.Bind(endpoint);
                 socket.Listen(SocketBacklog);
                 _listenSockets.Add(socket);
@@ -49,18 +50,19 @@ namespace EnergonSoftware.Core.Net
             _listenSockets.Clear();
         }
 
-        private void PollListenSocket(Socket socket, SessionManager manager)
-        {
-            if(socket.Poll(100, SelectMode.SelectRead)) {
-                Socket remote = socket.Accept();
-                _logger.Info("New connection from " + remote.RemoteEndPoint);
-                manager.AddSession(_factory.CreateSession(remote, manager));
-            }
-        }
-
         public void Poll(SessionManager manager)
         {
-            _listenSockets.ForEach(s => PollListenSocket(s, manager));
+            _listenSockets.ForEach(socket =>
+                {
+                    if(socket.Poll(100, SelectMode.SelectRead)) {
+                        Socket remote = socket.Accept();
+                        _logger.Info("New connection from " + remote.RemoteEndPoint);
+
+                        Session session = _factory.CreateSession(remote, manager);
+                        manager.Add(session);
+                    }
+                }
+            );
         }
     }
 }
