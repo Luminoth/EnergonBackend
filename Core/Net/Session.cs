@@ -18,7 +18,7 @@ namespace EnergonSoftware.Core.Net
         Session CreateSession(Socket socket, SessionManager manager);
     }
 
-    public abstract class Session
+    public abstract class Session : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Session));
 
@@ -93,6 +93,11 @@ namespace EnergonSoftware.Core.Net
             _socketState = new SocketState(socket);
 
             Timeout = -1;
+        }
+
+        public void Dispose()
+        {
+            _socketState.Dispose();
         }
 
         public void Run(MessageProcessor processor)

@@ -8,7 +8,7 @@ using EnergonSoftware.Core.Util;
 
 namespace EnergonSoftware.Core.Net
 {
-    public sealed class BufferedSocketReader
+    public sealed class BufferedSocketReader : IDisposable
     {
         private readonly object _lock = new object();
 
@@ -19,6 +19,11 @@ namespace EnergonSoftware.Core.Net
         {
             _socket = socket;
             Buffer = new MemoryBuffer();
+        }
+
+        public void Dispose()
+        {
+            Buffer.Dispose();
         }
 
         // reads from the socket as long

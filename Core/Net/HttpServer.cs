@@ -9,7 +9,7 @@ using log4net;
 
 namespace EnergonSoftware.Core.Net
 {
-    public sealed class HttpServer
+    public sealed class HttpServer : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpServer));
 
@@ -23,6 +23,11 @@ namespace EnergonSoftware.Core.Net
             _thread = new Thread(new ThreadStart(Run));
 
             DefaultIndex = "/index.html";
+        }
+
+        public void Dispose()
+        {
+            _listener.Close();
         }
 
         public void Start(List<string> prefixes)

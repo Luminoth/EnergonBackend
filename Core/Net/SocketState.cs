@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Sockets;
 
 using EnergonSoftware.Core.Util;
@@ -7,7 +8,7 @@ using log4net;
 
 namespace EnergonSoftware.Core.Net
 {
-    public sealed class SocketState
+    public sealed class SocketState : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SocketState));
 
@@ -26,17 +27,16 @@ namespace EnergonSoftware.Core.Net
             private get { return _socket; }
             set {
                 _socket = value;
-                _reader = new BufferedSocketReader(_socket);
+                _reader = null == _socket ? null : new BufferedSocketReader(_socket);
             }
         }
 
-        public bool HasSocket { get { return null != _socket; } }
         public bool Connecting { get; set; }
-        public bool Connected { get { return HasSocket && _socket.Connected; } }
-        public EndPoint RemoteEndPoint { get { return HasSocket ? _socket.RemoteEndPoint : null; } }
+        public bool Connected { get { return null != _socket && _socket.Connected; } }
+        public EndPoint RemoteEndPoint { get { return null != _socket ? _socket.RemoteEndPoint : null; } }
 
         private BufferedSocketReader _reader;
-        public MemoryBuffer Buffer { get { return HasSocket ? _reader.Buffer : null; } }
+        public MemoryBuffer Buffer { get { return null != _reader ? _reader.Buffer : null; } }
 
         public long LastMessageTime { get; private set; }
 
@@ -49,6 +49,13 @@ namespace EnergonSoftware.Core.Net
         {
             Id = NextId;
             Socket = socket;
+        }
+
+        public void Dispose()
+        {
+            if(null != _socket) {
+                _socket.Dispose();
+            }
         }
 
         public int PollAndRead()
@@ -87,7 +94,7 @@ namespace EnergonSoftware.Core.Net
         public void ShutdownAndClose(bool reuseSocket)
         {
             lock(_lock) {
-                if(!HasSocket) {
+                if(null == _socket) {
                     return;
                 }
 

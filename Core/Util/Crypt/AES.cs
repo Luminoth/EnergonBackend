@@ -10,16 +10,13 @@ namespace EnergonSoftware.Core.Util.Crypt
             using(Aes aes = Aes.Create()) {
                 aes.Key = key;
                 aes.IV = iv;
-
                 ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-                using(MemoryStream ms = new MemoryStream()) {
-                    using(CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write)) {
-                        using(StreamWriter writer = new StreamWriter(cs)) {
-                            writer.Write(data);
-                        }
-                        return ms.ToArray();
-                    }
+
+                MemoryStream ms = new MemoryStream();
+                using(StreamWriter writer = new StreamWriter(new CryptoStream(ms, encryptor, CryptoStreamMode.Write))) {
+                    writer.Write(data);
                 }
+                return ms.ToArray();
             }
         }
 
@@ -28,14 +25,11 @@ namespace EnergonSoftware.Core.Util.Crypt
             using(Aes aes = Aes.Create()) {
                 aes.Key = key;
                 aes.IV = iv;
-
                 ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-                using(MemoryStream ms = new MemoryStream()) {
-                    using(CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read)) {
-                        using(StreamReader reader = new StreamReader(cs)) {
-                            return reader.ReadToEnd();
-                        }
-                    }
+
+                MemoryStream ms = new MemoryStream();
+                using(StreamReader reader = new StreamReader(new CryptoStream(ms, decryptor, CryptoStreamMode.Read))) {
+                    return reader.ReadToEnd();
                 }
             }
         }

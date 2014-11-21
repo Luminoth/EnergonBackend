@@ -10,10 +10,17 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EnergonSoftware.Core.Test.MessageHandlers
 {
     [TestClass]
-    public class MessageProcessorTest
+    public class MessageProcessorTest : IDisposable
     {
         private SessionManager _manager;
         private TestSession _session;
+
+        public void Dispose()
+        {
+            if(null != _session) {
+                _session.Dispose();
+            }
+        }
 
         [TestInitialize]
         public void Initialize()
