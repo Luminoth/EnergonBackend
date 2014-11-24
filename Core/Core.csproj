@@ -60,6 +60,8 @@
     <Compile Include="Messages\MessageException.cs" />
     <Compile Include="MessageHandlers\MessageHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandlerException.cs" />
+    <Compile Include="Messages\Notifications\NotificationMessage.cs" />
+    <Compile Include="Messages\Notifications\StartupMessage.cs" />
     <Compile Include="Messages\Overmind\LoginMessage.cs" />
     <Compile Include="Messages\Overmind\LogoutMessage.cs" />
     <Compile Include="Messages\PingMessage.cs" />

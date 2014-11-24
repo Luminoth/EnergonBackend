@@ -43,7 +43,7 @@ namespace EnergonSoftware.Launcher.Net
             AuthStage = AuthenticationStage.NotAuthenticated;
         }
 
-        public AuthSession(Socket socket, SessionManager manager) : base(socket, manager)
+        private AuthSession(Socket socket, SessionManager manager) : base(socket, manager)
         {
             AuthStage = AuthenticationStage.NotAuthenticated;
         }

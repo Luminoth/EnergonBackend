@@ -24,7 +24,7 @@ namespace EnergonSoftware.Launcher.Net
         {
         }
 
-        public OvermindSession(Socket socket, SessionManager manager) : base(socket, manager)
+        private OvermindSession(Socket socket, SessionManager manager) : base(socket, manager)
         {
         }
 

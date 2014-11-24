@@ -56,29 +56,6 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public static Socket Connect(string host, int port)
-        {
-            bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);
-
-            IPHostEntry hostEntry = Dns.GetHostEntry(host);
-            foreach(IPAddress address in hostEntry.AddressList) {
-                if(AddressFamily.InterNetwork != address.AddressFamily && (AddressFamily.InterNetworkV6 != address.AddressFamily || !useIPv6)) {
-                    continue;
-                }
-
-                EndPoint endPoint = new IPEndPoint(address, port);
-                Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                try {
-                    socket.Connect(endPoint);
-                } catch(SocketException) {
-                    continue;
-                }
-                return socket;
-            }
-
-            return null;
-        }
-
         private static void ConnectAsyncCallback(object sender, SocketAsyncEventArgs ea)
         {
             AsyncConnectContext context = (AsyncConnectContext)ea.UserToken;
@@ -146,6 +123,57 @@ namespace EnergonSoftware.Core.Net
                 return false;
             }
             return true;
+        }
+
+        public static Socket Connect(string host, int port, SocketType socketType, ProtocolType protocolType)
+        {
+            bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);
+
+            IPHostEntry hostEntry = Dns.GetHostEntry(host);
+            foreach(IPAddress address in hostEntry.AddressList) {
+                if(AddressFamily.InterNetwork != address.AddressFamily && (AddressFamily.InterNetworkV6 != address.AddressFamily || !useIPv6)) {
+                    continue;
+                }
+
+                EndPoint endPoint = new IPEndPoint(address, port);
+                Socket socket = new Socket(endPoint.AddressFamily, socketType, protocolType);
+                try {
+                    socket.Connect(endPoint);
+                } catch(SocketException) {
+                    continue;
+                }
+                return socket;
+            }
+
+            return null;
+        }
+
+        public static Socket CreateMulticastListener(IPAddress iface, int port, IPAddress group, int ttl)
+        {
+            EndPoint endpoint = new IPEndPoint(iface, port);
+
+            Socket listener = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+            listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            listener.Bind(endpoint);
+
+// TODO: support ipv6 here
+            listener.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(group, iface));
+            listener.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, ttl);
+
+            return listener;
+        }
+
+        public static Socket ConnectMulticast(IPAddress group, int port, int ttl)
+        {
+            EndPoint endPoint = new IPEndPoint(group, port);
+            Socket socket = new Socket(endPoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+
+// TODO: support ipv6 here
+            socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(group));
+            socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, ttl);
+            socket.Connect(endPoint);
+
+            return socket;
         }
 
         public static bool CompareEndPoints(string a, EndPoint b)

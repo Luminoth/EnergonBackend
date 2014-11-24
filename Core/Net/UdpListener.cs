@@ -29,28 +29,11 @@ namespace EnergonSoftware.Core.Net
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
                 Logger.Info("Listening on address " + listenAddress + "...");
 
-                IPEndPoint endpoint = new IPEndPoint(listenAddress.IPAddress, listenAddress.Port);
+                IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
                 Socket socket = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
                 socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 socket.Bind(endpoint);
                 _listenSockets.Add(socket);
-            }
-        }
-
-        public void CreateMulticastSockets(ListenAddressConfigurationElementCollection listenAddresses)
-        {
-            foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
-                Logger.Info("Multicasting on address " + listenAddress + "...");
-
-                IPEndPoint endpoint = new IPEndPoint(listenAddress.IPAddress, listenAddress.Port);
-                Socket socket = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                socket.Bind(endpoint);
-                _listenSockets.Add(socket);
-
-// TODO: support ipv6 here ?
-                socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(listenAddress.MulticastGroupIPAddress, listenAddress.IPAddress));
-                socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, listenAddress.MulticastTTL);
             }
         }
 

@@ -10,9 +10,9 @@ namespace EnergonSoftware.Core.Configuration
         [ConfigurationProperty("name", IsRequired=true, IsKey=true)]
         public string Name { get { return (string)this["name"]; } }
 
-        [ConfigurationProperty("address", IsRequired=true)]
-        public string Address { get { return (string)this["address"]; } }
-        public IPAddress IPAddress { get { return IPAddress.Parse(Address); } }
+        [ConfigurationProperty("interface", IsRequired=true)]
+        public string Interface { get { return (string)this["interface"]; } }
+        public IPAddress InterfaceAddress { get { return IPAddress.Parse(Interface); } }
 
         [ConfigurationProperty("port", IsRequired=true)]
         public int Port { get { return(int)this["port"]; } }
@@ -26,7 +26,7 @@ namespace EnergonSoftware.Core.Configuration
 
         public override string ToString()
         {
-            StringBuilder builder = new StringBuilder("ListenAddress(Name=" + Name + ", Address=" + Address + ":" + Port);
+            StringBuilder builder = new StringBuilder("ListenAddress(Name=" + Name + ", Interface=" + Interface + ":" + Port);
             if(!string.IsNullOrEmpty(MulticastGroup)) {
                 builder.Append(", MulticastGroup=" + MulticastGroup + ", MulticastTTL=" + MulticastTTL);
             }

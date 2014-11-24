@@ -19,6 +19,9 @@ namespace EnergonSoftware.Authenticator
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Authenticator));
 
+        public const string ServiceId = "authenticator";
+        public static readonly Guid UniqueId = Guid.NewGuid();
+
         public bool Running { get; private set; }
 
         private HttpServer _diagnosticServer = new HttpServer();
@@ -38,7 +41,7 @@ namespace EnergonSoftware.Authenticator
 
         protected async override void OnStart(string[] args)
         {
-            Logger.Info("Starting authenticator...");
+            Logger.Info("Starting " + ServiceName + " with guid=" + UniqueId + "...");
 
             ListenAddressesConfigurationSection listenAddresses = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("listenAddresses");
             if(null == listenAddresses || listenAddresses.ListenAddresses.Count < 1) {
@@ -60,16 +63,18 @@ namespace EnergonSoftware.Authenticator
             Logger.Info("Starting instance notifier...");
             InstanceNotifier.Instance.Start(instanceNotifierListenAddresses.ListenAddresses);
 
-            Logger.Debug("Opening listener sockets...");
-            _listener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
-            _listener.CreateSockets(listenAddresses.ListenAddresses);
-
             Logger.Debug("Starting session manager...");
             _sessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
             _sessions.Start(new MessageHandlerFactory());
 
+            Logger.Debug("Opening listener sockets...");
+            _listener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
+            _listener.CreateSockets(listenAddresses.ListenAddresses);
+
             Logger.Info("Running...");
             Running = true;
+            InstanceNotifier.Instance.Startup();
+
             await Run();
         }
 

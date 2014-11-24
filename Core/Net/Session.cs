@@ -100,29 +100,6 @@ namespace EnergonSoftware.Core.Net
             _socketState.Dispose();
         }
 
-        public void Run(MessageProcessor processor)
-        {
-            lock(_lock) {
-                NetworkMessage message = NetworkMessage.Parse(_socketState.Buffer, Formatter);
-                while(null != message) {
-                    Logger.Debug("Session " + Id + " parsed message type: " + message.Payload.Type);
-                    processor.QueueMessage(this, message.Payload);
-                    message = NetworkMessage.Parse(_socketState.Buffer, Formatter);
-                }
-
-                if(HasMessageHandler && _messageHandler.Finished) {
-                    _messageHandler = null;
-                }
-
-                OnRun();
-
-                // TODO: we need a way to say "hey, this handler is taking WAY too long,
-                // dump an error and kill the session"
-            }
-        }
-
-        protected abstract void OnRun();
-
         private void OnConnectAsyncFailedCallback(SocketError error)
         {
             Logger.Error("Session " + Id + " connect failed: " + error);
@@ -162,6 +139,24 @@ namespace EnergonSoftware.Core.Net
             NetUtil.ConnectAsync(host, port, args);
         }
 
+        public void Connect(string host, int port, SocketType socketType, ProtocolType protocolType)
+        {
+            Logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
+
+            lock(_lock) {
+                _socketState.Socket = NetUtil.Connect(host, port, socketType, protocolType);
+            }
+        }
+
+        public void ConnectMulticast(IPAddress group, int port, int ttl)
+        {
+            Logger.Info("Session " + Id + " connecting to multicast group " + group + ":" + port + "...");
+
+            lock(_lock) {
+                _socketState.Socket = NetUtil.ConnectMulticast(group, port, ttl);
+            }
+        }
+
         public void Disconnect(string reason=null)
         {
             lock(_lock) {
@@ -173,20 +168,6 @@ namespace EnergonSoftware.Core.Net
                         OnDisconnect(reason);
                     }
                 }
-            }
-        }
-
-        public void BufferData(byte[] data)
-        {
-            lock(_lock) {
-                _socketState.BufferData(data);
-            }
-        }
-
-        public void BufferData(byte[] data, int offset, int count)
-        {
-            lock(_lock) {
-                _socketState.BufferData(data, offset, count);
             }
         }
 
@@ -209,6 +190,43 @@ namespace EnergonSoftware.Core.Net
                 }
             }
         }
+
+        public void BufferData(byte[] data)
+        {
+            lock(_lock) {
+                _socketState.BufferData(data);
+            }
+        }
+
+        public void BufferData(byte[] data, int offset, int count)
+        {
+            lock(_lock) {
+                _socketState.BufferData(data, offset, count);
+            }
+        }
+
+        public void Run(MessageProcessor processor)
+        {
+            lock(_lock) {
+                NetworkMessage message = NetworkMessage.Parse(_socketState.Buffer, Formatter);
+                while(null != message) {
+                    Logger.Debug("Session " + Id + " parsed message type: " + message.Payload.Type);
+                    processor.QueueMessage(this, message.Payload);
+                    message = NetworkMessage.Parse(_socketState.Buffer, Formatter);
+                }
+
+                if(HasMessageHandler && _messageHandler.Finished) {
+                    _messageHandler = null;
+                }
+
+                OnRun();
+
+                // TODO: we need a way to say "hey, this handler is taking WAY too long,
+                // dump an error and kill the session"
+            }
+        }
+
+        protected abstract void OnRun();
 
         public void SendMessage(IMessage message)
         {

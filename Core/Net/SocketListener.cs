@@ -34,7 +34,7 @@ namespace EnergonSoftware.Core.Net
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
                 Logger.Info("Listening on address " + listenAddress + "...");
 
-                IPEndPoint endpoint = new IPEndPoint(listenAddress.IPAddress, listenAddress.Port);
+                IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
                 Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 socket.Bind(endpoint);

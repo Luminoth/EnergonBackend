@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Net;
+using System.Net.Sockets;
 
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Messages;
@@ -21,34 +22,43 @@ namespace EnergonSoftware.Overmind.Net
         public static InstanceNotifier Instance { get { return _instance; } }
 #endregion
 
-        private UdpListener _listener = new UdpListener(new InstanceNotifierSessionFactory());
         private SessionManager _sessions = new SessionManager();
 
         public void Start(ListenAddressConfigurationElementCollection listenAddresses)
         {
-            Logger.Debug("Opening multicast listener sockets...");
-            _listener.CreateMulticastSockets(listenAddresses);
-
-            Logger.Debug("Starting session manager...");
+            Logger.Debug("Starting instance notifier session manager...");
             _sessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
             _sessions.Start(new MessageHandlerFactory());
+
+            Logger.Debug("Opening multicast sockets...");
+            foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
+                Socket listener = NetUtil.CreateMulticastListener(listenAddress.InterfaceAddress, listenAddress.Port,
+                    listenAddress.MulticastGroupIPAddress, listenAddress.MulticastTTL);
+
+                Session sender = new InstanceNotifierSession(_sessions, new SocketState(listener));
+                sender.ConnectMulticast(listenAddress.MulticastGroupIPAddress, listenAddress.Port, listenAddress.MulticastTTL);
+                _sessions.Add(sender);
+            }
         }
 
         public void Stop()
         {
-            Logger.Debug("Closing multicast sockets...");
-            _listener.CloseSockets();
-
-            Logger.Debug("Stopping session manager...");
+            Logger.Debug("Stopping instance notifier session manager...");
             _sessions.Stop();
         }
 
         public void Run()
         {
-            _listener.Poll(_sessions);
-
             _sessions.PollAndRun();
             _sessions.Cleanup();
+        }
+
+        public void Startup()
+        {
+            StartupMessage message = new StartupMessage();
+            message.ServiceName = Overmind.ServiceId;
+            message.ServiceId = Overmind.UniqueId.ToString();
+            _sessions.SendMessage(message);
         }
 
         public void Login(string username, EndPoint endpoint)

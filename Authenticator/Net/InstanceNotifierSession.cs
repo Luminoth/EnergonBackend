@@ -3,35 +3,38 @@
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
 
+using log4net;
+
 namespace EnergonSoftware.Authenticator.Net
 {
-    internal sealed class InstanceNotifierSessionFactory : ISessionFactory
-    {
-        public Session CreateSession(SessionManager manager)
-        {
-            return new InstanceNotifierSession(manager);
-        }
-
-        public Session CreateSession(Socket socket, SessionManager manager)
-        {
-            return new InstanceNotifierSession(socket, manager);
-        }
-    }
-
     internal sealed class InstanceNotifierSession : Session
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(InstanceNotifierSession));
+
+        private readonly SocketState _listener;
+
         protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
 
-        public InstanceNotifierSession(SessionManager manager) : base(manager)
+        private InstanceNotifierSession(SessionManager manager) : base(manager)
         {
         }
 
-        public InstanceNotifierSession(Socket socket, SessionManager manager) : base(socket, manager)
+        private InstanceNotifierSession(Socket socket, SessionManager manager) : base(socket, manager)
         {
+        }
+
+        public InstanceNotifierSession(SessionManager manager, SocketState listener) : base(manager)
+        {
+            _listener = listener;
         }
 
         protected override void OnRun()
         {
+            int count = _listener.PollAndRead();
+            if(count > 0) {
+                Logger.Debug("Instance notifier session " + Id + " read " + count + " bytes");
+            }
+
         }
     }
 }

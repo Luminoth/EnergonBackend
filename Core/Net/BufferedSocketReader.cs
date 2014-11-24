@@ -13,12 +13,15 @@ namespace EnergonSoftware.Core.Net
         private readonly object _lock = new object();
 
         private readonly Socket _socket;
-        public readonly MemoryBuffer Buffer;
+        public readonly MemoryBuffer Buffer = new MemoryBuffer();
+
+        private BufferedSocketReader()
+        {
+        }
 
         public BufferedSocketReader(Socket socket)
         {
             _socket = socket;
-            Buffer = new MemoryBuffer();
         }
 
         public void Dispose()
