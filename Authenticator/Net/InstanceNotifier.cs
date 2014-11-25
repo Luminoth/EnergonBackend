@@ -28,7 +28,7 @@ namespace EnergonSoftware.Authenticator.Net
         {
             Logger.Debug("Starting instance notifier session manager...");
             _sessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
-            _sessions.Start(new MessageHandlerFactory());
+            _sessions.Start(new InstanceNotifierMessageHandlerFactory());
 
             Logger.Debug("Opening multicast sockets...");
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
@@ -56,6 +56,14 @@ namespace EnergonSoftware.Authenticator.Net
         public void Startup()
         {
             StartupMessage message = new StartupMessage();
+            message.ServiceName = Authenticator.ServiceId;
+            message.ServiceId = Authenticator.UniqueId.ToString();
+            _sessions.SendMessage(message);
+        }
+
+        public void Shutdown()
+        {
+            ShutdownMessage message = new ShutdownMessage();
             message.ServiceName = Authenticator.ServiceId;
             message.ServiceId = Authenticator.UniqueId.ToString();
             _sessions.SendMessage(message);

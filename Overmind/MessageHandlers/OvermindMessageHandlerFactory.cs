@@ -6,7 +6,7 @@ using EnergonSoftware.Overmind.Net;
 
 namespace EnergonSoftware.Overmind.MessageHandlers
 {
-    internal sealed class MessageHandlerFactory : IMessageHandlerFactory
+    internal sealed class OvermindMessageHandlerFactory : IMessageHandlerFactory
     {
         public MessageHandler NewHandler(string type, Session session)
         {

@@ -73,9 +73,10 @@
   <ItemGroup>
     <Compile Include="DatabaseManager.cs" />
     <Compile Include="EventLogger.cs" />
+    <Compile Include="MessageHandlers\InstanceNotifierMessageHandlerFactory.cs" />
     <Compile Include="Net\InstanceNotifier.cs" />
     <Compile Include="MessageHandlers\AuthMessageHandler.cs" />
-    <Compile Include="MessageHandlers\MessageHandlerFactory.cs" />
+    <Compile Include="MessageHandlers\AuthMessageHandlerFactory.cs" />
     <Compile Include="MessageHandlers\ResponseMessageHandler.cs" />
     <Compile Include="Net\AuthSession.cs" />
     <Compile Include="Net\InstanceNotifierSession.cs" />

@@ -20,8 +20,18 @@ namespace EnergonSoftware.Core.Messages
             {
             case "null":
                 return null;
+
+            /* notifications */
+            case StartupMessage.MessageType:
+                return new StartupMessage();
+            case ShutdownMessage.MessageType:
+                return new ShutdownMessage();
+
+            /* misc */
             case PingMessage.MessageType:
                 return new PingMessage();
+
+            /* auth */
             case AuthMessage.MessageType:
                 return new AuthMessage();
             case ChallengeMessage.MessageType:
@@ -32,6 +42,8 @@ namespace EnergonSoftware.Core.Messages
                 return new ResponseMessage();
             case SuccessMessage.MessageType:
                 return new SuccessMessage();
+
+            /* overmind */
             case LoginMessage.MessageType:
                 return new LoginMessage();
             case LogoutMessage.MessageType:

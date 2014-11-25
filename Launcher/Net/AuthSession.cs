@@ -1,6 +1,7 @@
 ﻿using System.Net.Sockets;
 
 using EnergonSoftware.Core;
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
@@ -48,7 +49,7 @@ namespace EnergonSoftware.Launcher.Net
             AuthStage = AuthenticationStage.NotAuthenticated;
         }
 
-        protected override void OnRun()
+        protected override void OnRun(MessageProcessor processor)
         {
         }
 

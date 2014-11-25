@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
@@ -38,7 +39,7 @@ namespace EnergonSoftware.Overmind.Net
         {
         }
 
-        protected override void OnRun()
+        protected override void OnRun(MessageProcessor processor)
         {
         }
 

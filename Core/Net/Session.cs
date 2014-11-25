@@ -27,6 +27,20 @@ namespace EnergonSoftware.Core.Net
         private static int NextId { get { return ++_nextId; } }
 #endregion
 
+        protected static void ProcessMessages(Session session, SocketState socketState, MessageProcessor processor)
+        {
+            NetworkMessage message = NetworkMessage.Parse(socketState.Buffer, session.Formatter);
+            while(null != message) {
+                Logger.Debug("Session " + session.Id + " parsed message type: " + message.Payload.Type);
+                processor.QueueMessage(session, message.Payload);
+                message = NetworkMessage.Parse(socketState.Buffer, session.Formatter);
+            }
+
+            if(session.HasMessageHandler && session.MessageHandler.Finished) {
+                session.MessageHandler = null;
+            }
+        }
+
 #region Events
         public delegate void OnConnectSuccessHandler();
         public event OnConnectSuccessHandler OnConnectSuccess;
@@ -62,6 +76,7 @@ namespace EnergonSoftware.Core.Net
 #region Message Properties
         private MessageHandler _messageHandler;
         public bool HasMessageHandler { get { return null != _messageHandler; } }
+        private MessageHandler MessageHandler { get { return _messageHandler; } set { _messageHandler = value; } }
 
         protected abstract IMessageFormatter Formatter { get; }
 #endregion
@@ -208,25 +223,16 @@ namespace EnergonSoftware.Core.Net
         public void Run(MessageProcessor processor)
         {
             lock(_lock) {
-                NetworkMessage message = NetworkMessage.Parse(_socketState.Buffer, Formatter);
-                while(null != message) {
-                    Logger.Debug("Session " + Id + " parsed message type: " + message.Payload.Type);
-                    processor.QueueMessage(this, message.Payload);
-                    message = NetworkMessage.Parse(_socketState.Buffer, Formatter);
-                }
-
-                if(HasMessageHandler && _messageHandler.Finished) {
-                    _messageHandler = null;
-                }
-
-                OnRun();
+                ProcessMessages(this, _socketState, processor);
 
                 // TODO: we need a way to say "hey, this handler is taking WAY too long,
                 // dump an error and kill the session"
+
+                OnRun(processor);
             }
         }
 
-        protected abstract void OnRun();
+        protected abstract void OnRun(MessageProcessor processor);
 
         public void SendMessage(IMessage message)
         {
@@ -256,12 +262,19 @@ namespace EnergonSoftware.Core.Net
 
                 Logger.Debug("Processing message with type=" + message.Type + " for session id=" + Id + "...");
 
-                _messageHandler = factory.NewHandler(message.Type, this);
-                if(null == _messageHandler) {
+                try {
+                    _messageHandler = factory.NewHandler(message.Type, this);
+                    if(null == _messageHandler) {
+                        return false;
+                    }
+                    _messageHandler.HandleMessage(message);
+                } catch(MessageHandlerException e) {
+                    Logger.Error("Error handling message", e);
+                    return false;
+                } catch(Exception e) {
+                    Logger.Error("Unhandled message processing exception!", e);
                     return false;
                 }
-
-                _messageHandler.HandleMessage(message);
                 return true;
             }
         }

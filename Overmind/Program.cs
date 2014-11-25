@@ -11,6 +11,8 @@ namespace EnergonSoftware.Overmind
 {
     internal class Program
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
+
         public const string EventLogSource = "Energon Software Overmind";
         public static readonly EventLog ServiceEventLogger = new EventLog();
 
@@ -50,6 +52,7 @@ namespace EnergonSoftware.Overmind
 
                 Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e)
                 {
+                    Logger.Info("Caught CancelKeyPress, stopping...");
                     overmind.Stop();
                     e.Cancel = true;
                 };

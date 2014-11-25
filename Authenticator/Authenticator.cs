@@ -65,7 +65,7 @@ namespace EnergonSoftware.Authenticator
 
             Logger.Debug("Starting session manager...");
             _sessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
-            _sessions.Start(new MessageHandlerFactory());
+            _sessions.Start(new AuthMessageHandlerFactory());
 
             Logger.Debug("Opening listener sockets...");
             _listener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
@@ -73,6 +73,7 @@ namespace EnergonSoftware.Authenticator
 
             Logger.Info("Running...");
             Running = true;
+
             InstanceNotifier.Instance.Startup();
 
             await Run();
@@ -80,8 +81,10 @@ namespace EnergonSoftware.Authenticator
 
         protected override void OnStop()
         {
-            Logger.Info("Stopping authenticator...");
+            Logger.Info("Stopping " + ServiceName + " with guid=" + UniqueId + "...");
             Running = false;
+
+            InstanceNotifier.Instance.Shutdown();
 
             Logger.Debug("Closing listener sockets...");
             _listener.CloseSockets();

@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 
 using EnergonSoftware.Core;
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
@@ -49,7 +50,7 @@ namespace EnergonSoftware.Authenticator.Net
             AuthType = AuthType.None;
         }
 
-        protected override void OnRun()
+        protected override void OnRun(MessageProcessor processor)
         {
         }
 

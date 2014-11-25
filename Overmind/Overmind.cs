@@ -65,7 +65,7 @@ namespace EnergonSoftware.Overmind
 
             Logger.Debug("Starting session manager...");
             _loginSessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
-            _loginSessions.Start(new MessageHandlerFactory());
+            _loginSessions.Start(new OvermindMessageHandlerFactory());
 
             Logger.Debug("Opening listener sockets...");
             _loginListener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
@@ -73,6 +73,7 @@ namespace EnergonSoftware.Overmind
 
             Logger.Info("Running...");
             Running = true;
+
             InstanceNotifier.Instance.Startup();
 
             await Run();
@@ -80,8 +81,10 @@ namespace EnergonSoftware.Overmind
 
         protected override void OnStop()
         {
-            Logger.Info("Stopping overmind...");
+            Logger.Info("Stopping " + ServiceName + " with guid=" + UniqueId + "...");
             Running = false;
+
+            InstanceNotifier.Instance.Shutdown();
 
             Logger.Debug("Closing listener sockets...");
             _loginListener.CloseSockets();

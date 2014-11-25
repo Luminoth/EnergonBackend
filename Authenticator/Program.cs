@@ -11,6 +11,8 @@ namespace EnergonSoftware.Authenticator
 {
     internal class Program
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
+
         public const string EventLogSource = "Energon Software Authenticator";
         public static readonly EventLog ServiceEventLogger = new EventLog();
 
@@ -50,6 +52,7 @@ namespace EnergonSoftware.Authenticator
 
                 Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e)
                 {
+                    Logger.Info("Caught CancelKeyPress, stopping...");
                     authenticator.Stop();
                     e.Cancel = true;
                 };

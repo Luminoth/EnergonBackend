@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
 
@@ -30,7 +31,7 @@ namespace EnergonSoftware.Core.Test.Net
         {
         }
 
-        protected override void OnRun()
+        protected override void OnRun(MessageProcessor processor)
         {
         }
     }
