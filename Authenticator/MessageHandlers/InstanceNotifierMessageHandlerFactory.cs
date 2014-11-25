@@ -1,5 +1,6 @@
 ﻿using EnergonSoftware.Authenticator.Net;
 using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Messages.Notifications;
 using EnergonSoftware.Core.Net;
 
 namespace EnergonSoftware.Authenticator.MessageHandlers
@@ -8,9 +9,13 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
     {
         public MessageHandler NewHandler(string type, Session session)
         {
-            InstanceNotifierSession authSession = (InstanceNotifierSession)session;
+            InstanceNotifierSession notifierSession = (InstanceNotifierSession)session;
             switch(type)
             {
+            case StartupMessage.MessageType:
+                return new MessageHandler();
+            case ShutdownMessage.MessageType:
+                return new MessageHandler();
             }
             throw new MessageHandlerException("Unsupported message type: " + type);
         }

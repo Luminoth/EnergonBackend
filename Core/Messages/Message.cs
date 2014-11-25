@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Notifications;
 using EnergonSoftware.Core.Messages.Overmind;
 
 namespace EnergonSoftware.Core.Messages

@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Notifications;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Overmind.MessageHandlers;
 

@@ -14,7 +14,7 @@ namespace EnergonSoftware.Core.MessageHandlers
         MessageHandler NewHandler(string type, Session session);
     }
 
-    public abstract class MessageHandler
+    public class MessageHandler
     {
 private Task _task;
 public bool Finished { get { return null != _task && _task.IsCompleted; } }
@@ -35,6 +35,9 @@ _task.Start();
             Finished = true;*/
         }
 
-        protected abstract Task OnHandleMessage(IMessage message);
+        protected virtual Task OnHandleMessage(IMessage message)
+        {
+            return new Task(() => { });
+        }
     }
 }

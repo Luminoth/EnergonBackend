@@ -50,10 +50,6 @@ namespace EnergonSoftware.Authenticator.Net
             AuthType = AuthType.None;
         }
 
-        protected override void OnRun(MessageProcessor processor)
-        {
-        }
-
         public void Challenge(AuthType type, Nonce nonce, string challenge)
         {
             AuthType = type;

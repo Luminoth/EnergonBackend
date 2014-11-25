@@ -2,9 +2,9 @@
 
 using EnergonSoftware.Core.Messages.Formatter;
 
-namespace EnergonSoftware.Core.Messages
+namespace EnergonSoftware.Core.Messages.Notifications
 {
-    public sealed class StartupMessage : NotificationMessage
+    public sealed class StartupMessage : INotificationMessage
     {
         public const string MessageType = "startup";
         public string Type { get { return MessageType; } }

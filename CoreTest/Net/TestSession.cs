@@ -30,9 +30,5 @@ namespace EnergonSoftware.Core.Test.Net
         public TestSession(Socket socket, SessionManager manager) : base(socket, manager)
         {
         }
-
-        protected override void OnRun(MessageProcessor processor)
-        {
-        }
     }
 }

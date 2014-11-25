@@ -232,7 +232,9 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        protected abstract void OnRun(MessageProcessor processor);
+        protected virtual void OnRun(MessageProcessor processor)
+        {
+        }
 
         public void SendMessage(IMessage message)
         {

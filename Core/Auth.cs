@@ -37,28 +37,28 @@ namespace EnergonSoftware.Core
 
         public static string DigestClientResponse(Digest digest, string passwordHash, string nonce, string nc, string qop, string cnonce, string digestURI)
         {
-            string A1 = passwordHash + ":" + nonce + ":" + cnonce;
-            string HA1 = digest.HashHex(A1);
+            string a1 = passwordHash + ":" + nonce + ":" + cnonce;
+            string ha1 = digest.HashHex(a1);
 
-            string A2 = "AUTHENTICATE:" + digestURI;
-            string HA2 = digest.HashHex(A2);
+            string a2 = "AUTHENTICATE:" + digestURI;
+            string ha2 = digest.HashHex(a2);
 
-            string S = nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + HA2;
-            string k = HA1 + ":" + S;
+            string s = nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2;
+            string k = ha1 + ":" + s;
 
             return digest.HashHex(k);
         }
 
         public static string DigestServerResponse(Digest digest, string passwordHash, string nonce, string nc, string qop, string cnonce, string digestURI)
         {
-            string A1 = passwordHash + ":" + nonce + ":" + cnonce;
-            string HA1 = digest.HashHex(A1);
+            string a1 = passwordHash + ":" + nonce + ":" + cnonce;
+            string ha1 = digest.HashHex(a1);
 
-            string A2 = ":" + digestURI;
-            string HA2 = digest.HashHex(A2);
+            string a2 = ":" + digestURI;
+            string ha2 = digest.HashHex(a2);
 
-            string S = nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + HA2;
-            string k = HA1 + ":" + S;
+            string s = nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2;
+            string k = ha1 + ":" + s;
 
             return digest.HashHex(k);
         }

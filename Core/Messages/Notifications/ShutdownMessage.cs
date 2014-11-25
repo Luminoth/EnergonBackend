@@ -2,9 +2,9 @@
 
 using EnergonSoftware.Core.Messages.Formatter;
 
-namespace EnergonSoftware.Core.Messages
+namespace EnergonSoftware.Core.Messages.Notifications
 {
-    public sealed class ShutdownMessage : NotificationMessage
+    public sealed class ShutdownMessage : INotificationMessage
     {
         public const string MessageType = "shutdown";
         public string Type { get { return MessageType; } }

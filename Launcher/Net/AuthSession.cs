@@ -49,10 +49,6 @@ namespace EnergonSoftware.Launcher.Net
             AuthStage = AuthenticationStage.NotAuthenticated;
         }
 
-        protected override void OnRun(MessageProcessor processor)
-        {
-        }
-
         private void OnConnectFailedCallback(SocketError error)
         {
             AuthFailed("Failed to connect to the authentication server: " + error);
