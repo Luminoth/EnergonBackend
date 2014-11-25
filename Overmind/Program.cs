@@ -9,7 +9,7 @@ using log4net.Config;
 
 namespace EnergonSoftware.Overmind
 {
-    internal class Program
+    internal static class Program
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
 
@@ -36,7 +36,7 @@ namespace EnergonSoftware.Overmind
             ThreadPool.SetMaxThreads(Convert.ToInt32(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
         }
 
-        public static void Main(string[] args)
+        internal static void Main(string[] args)
         {
             ConfigureLogging();
             ConfigureThreading();

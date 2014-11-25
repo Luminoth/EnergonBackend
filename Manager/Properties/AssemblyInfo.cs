@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Overmind")]
+[assembly: AssemblyTitle("Manager")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Energon Software")]
-[assembly: AssemblyProduct("Overmind")]
+[assembly: AssemblyProduct("Manager")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("12913805-a1e6-481a-8364-c5a09ecac74b")]
+[assembly: Guid("0786cee7-6d32-40ae-8be3-d35e54178893")]
 
 // Version information for an assembly consists of the following four values:
 //
