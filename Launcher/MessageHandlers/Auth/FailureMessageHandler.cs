@@ -16,14 +16,10 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             _session = session;
         }
 
-        protected override Task OnHandleMessage(IMessage message)
+        protected override void OnHandleMessage(IMessage message)
         {
-            return new Task(() =>
-                {
-                    FailureMessage failure = (FailureMessage)message;
-                    _session.AuthFailed(failure.Reason);
-                }
-            );
+            FailureMessage failure = (FailureMessage)message;
+            _session.AuthFailed(failure.Reason);
         }
     }
 }

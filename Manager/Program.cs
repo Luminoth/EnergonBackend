@@ -30,9 +30,6 @@ namespace EnergonSoftware.Manager
                 };
 
                 manager.Start(args);
-                while(manager.Running) {
-                    Thread.Sleep(0);
-                }
             }
         }
     }

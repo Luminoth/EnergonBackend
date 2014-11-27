@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
@@ -16,8 +17,8 @@ namespace EnergonSoftware.Core.Net
 
         private readonly object _lock = new object();
  
-        private List<Session> _sessions = new List<Session>();
-        private MessageProcessor _processor = new MessageProcessor();
+        private readonly List<Session> _sessions = new List<Session>();
+        private readonly MessageProcessor _processor = new MessageProcessor();
 
         public long SessionTimeout { get; set; }
 
@@ -29,7 +30,7 @@ namespace EnergonSoftware.Core.Net
         public void Start(IMessageHandlerFactory factory)
         {
             lock(_lock) {
-                _processor.Start(factory);
+                Task.Factory.StartNew(() => _processor.Start(factory)).Wait();
             }
         }
 
@@ -113,7 +114,7 @@ namespace EnergonSoftware.Core.Net
                         }
 
                         if(session.Connected) {
-                            session.Run(_processor);
+                            Task.Factory.StartNew(() => session.Run(_processor)).Wait();
                         }
                     }
                 );

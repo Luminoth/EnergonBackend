@@ -54,7 +54,7 @@ namespace EnergonSoftware.Launcher
         private bool _updated;
         public bool Updated { get { return _updated; } private set { _updated = value; NotifyPropertyChanged(); } }
 
-        public async void CheckForUpdates()
+        public async Task CheckForUpdates()
         {
             // TODO: use string resources here
             Logger.Info("Checking for updates...");

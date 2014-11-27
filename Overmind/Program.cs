@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.ServiceProcess;
 using System.Threading;
+using System.Threading.Tasks;
 
 using log4net;
 using log4net.Config;
@@ -41,6 +42,11 @@ namespace EnergonSoftware.Overmind
             ConfigureLogging();
             ConfigureThreading();
 
+            if(!DatabaseManager.TestDatabaseConnection()) {
+                Logger.Fatal("Could not connect to database!");
+                return;
+            }
+
             if(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"])) {
                 ServiceBase[] services = new ServiceBase[] 
                 { 
@@ -58,9 +64,6 @@ namespace EnergonSoftware.Overmind
                 };
 
                 overmind.Start(args);
-                while(overmind.Running) {
-                    Thread.Sleep(0);
-                }
             }
         }
     }

@@ -12,8 +12,8 @@ namespace EnergonSoftware.Core.Net
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SocketListener));
 
-        private List<Socket> _listenSockets = new List<Socket>();
-        private ISessionFactory _factory;
+        private readonly List<Socket> _listenSockets = new List<Socket>();
+        private readonly ISessionFactory _factory;
 
         public int SocketBacklog { get; set; }
 

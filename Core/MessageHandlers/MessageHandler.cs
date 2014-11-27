@@ -23,21 +23,18 @@ public bool Finished { get { return null != _task && _task.IsCompleted; } }
         /*private long _startTime, _finishTime;
         public long RuntimeMs { get { return Finished ? _finishTime - _startTime : Time.CurrentTimeMs - _startTime; } }*/
 
-        public /*async*/ void HandleMessage(IMessage message)
+        public /*async Task*/ void HandleMessage(IMessage message)
         {
-_task = OnHandleMessage(message);
-_task.Start();
-
+_task = Task.Factory.StartNew(() => OnHandleMessage(message));
             /*Finished = false;
             _startTime = Time.CurrentTimeMs;
-            await OnHandleMessage(message);
+            await Task.Run(() => OnHandleMessage(message));
             _finishTime = Time.CurrentTimeMs;
             Finished = true;*/
         }
 
-        protected virtual Task OnHandleMessage(IMessage message)
+        protected virtual void OnHandleMessage(IMessage message)
         {
-            return new Task(() => { });
         }
     }
 }

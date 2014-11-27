@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.MessageHandlers;
@@ -75,16 +76,16 @@ namespace EnergonSoftware.Authenticator.Net
             SendMessage(message);
         }
 
-        public void Success(string sessionid)
+        public async Task Success(string sessionid)
         {
             InstanceNotifier.Instance.Authenticated(AccountInfo.Username, sessionid, RemoteEndPoint);
-            EventLogger.Instance.SuccessEvent(RemoteEndPoint, AccountInfo.Username);
+            await EventLogger.Instance.SuccessEvent(RemoteEndPoint, AccountInfo.Username);
 
             AccountInfo.SessionId = sessionid;
             AccountInfo.SessionEndPoint = RemoteEndPoint.ToString();
 
-            using(DatabaseConnection connection = DatabaseManager.AcquireDatabaseConnection()) {
-                AccountInfo.Update(connection);
+            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnection()) {
+                await AccountInfo.Update(connection);
             }
 
             SuccessMessage message = new SuccessMessage();
@@ -94,9 +95,9 @@ namespace EnergonSoftware.Authenticator.Net
             Disconnect();
         }
 
-        public void Failure(string reason)
+        public async Task Failure(string reason)
         {
-            EventLogger.Instance.FailedEvent(RemoteEndPoint, null == AccountInfo ? null : AccountInfo.Username, reason);
+            await EventLogger.Instance.FailedEvent(RemoteEndPoint, null == AccountInfo ? null : AccountInfo.Username, reason);
 
             // NOTE: we don't update the database here because this
             // might be a malicious login attempt against an account

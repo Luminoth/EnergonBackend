@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using System.Threading.Tasks;
 
 namespace EnergonSoftware.Database.Objects
 {
@@ -7,10 +8,11 @@ namespace EnergonSoftware.Database.Objects
         bool Dirty { get; set; }
         void Clean();
 
-        bool Read(DatabaseConnection connection);
+        Task<bool> Read(DatabaseConnection connection);
         void Load(DbDataReader reader);
-        void Insert(DatabaseConnection connection);
-        void Update(DatabaseConnection connection);
-        void Delete(DatabaseConnection connection);
+
+        Task Insert(DatabaseConnection connection);
+        Task Update(DatabaseConnection connection);
+        Task Delete(DatabaseConnection connection);
     }
 }

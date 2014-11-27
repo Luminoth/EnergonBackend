@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ServiceProcess;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EnergonSoftware.Manager
 {
@@ -17,15 +19,26 @@ namespace EnergonSoftware.Manager
 
         public void Start(string[] args)
         {
-            OnStart(args);
+            Task.Run(() => OnStart(args)).Wait();
         }
 
         protected override void OnStart(string[] args)
         {
+            Running = true;
+
+            Task.Run(() => Run()).Wait();
         }
 
         protected override void OnStop()
         {
+            Running = false;
+        }
+
+        private void Run()
+        {
+            while(Running) {
+                Thread.Sleep(0);
+            }
         }
     }
 }

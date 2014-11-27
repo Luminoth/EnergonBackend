@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data.SQLite;
+using System.Threading.Tasks;
 
 using log4net;
 
@@ -23,7 +24,7 @@ namespace EnergonSoftware.Database
             return (string)builder["Data Source"];
         }
 
-        public static bool CreateDatabase(ConnectionStringSettings connectionSettings)
+        public static async Task<bool> CreateDatabase(ConnectionStringSettings connectionSettings)
         {
             string dataSource = ParseDataSource(connectionSettings);
 
@@ -31,11 +32,24 @@ namespace EnergonSoftware.Database
             switch(connectionSettings.ProviderName)
             {
             case "System.Data.SQLite":
-                SQLiteConnection.CreateFile(dataSource);
+                await Task.Run(() => SQLiteConnection.CreateFile(dataSource));
                 return true;
             }
 
             return false;
+        }
+
+        public static bool TestDatabaseConnection(ConnectionStringSettings connectionSettings)
+        {
+            try {
+                using(DatabaseConnection connection = new DatabaseConnection(connectionSettings)) {
+                    Task.Run(() => connection.Open()).Wait();
+                    return true;
+                }
+            } catch(Exception e) {
+                Logger.Error("Database connection test failed!", e);
+                return false;
+            }
         }
 
         private readonly object _lock = new object();
@@ -73,12 +87,16 @@ namespace EnergonSoftware.Database
             Connection.Dispose();
         }
 
-        public void Open()
+        public async Task Open()
         {
-            lock(_lock) {
-                Logger.Debug("Opening " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
-                Connection.Open();
-            }
+            await Task.Run(() =>
+                {
+                    lock(_lock) {
+                        Logger.Debug("Opening " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
+                        Connection.Open();
+                    }
+                }
+            );
         }
 
         public void Close()

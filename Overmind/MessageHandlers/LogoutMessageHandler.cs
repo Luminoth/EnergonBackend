@@ -15,13 +15,9 @@ namespace EnergonSoftware.Overmind.MessageHandlers
             _session = session;
         }
 
-        protected override Task OnHandleMessage(IMessage message)
+        protected async override void OnHandleMessage(IMessage message)
         {
-            return new Task(() =>
-                {
-                    _session.Logout();
-                }
-            );
+            await _session.Logout();
         }
     }
 }

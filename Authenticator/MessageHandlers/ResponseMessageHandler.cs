@@ -30,25 +30,25 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 
 // TODO: handle the case of a user authenticating a second time
 
-        private void CompleteAuthentication()
+        private async Task CompleteAuthentication()
         {
             SessionId sessionid = new SessionId(ConfigurationManager.AppSettings["sessionSecret"]);
             Logger.Info("Session " + _session.Id + " generated sessionid '" + sessionid.SessionID + "' for account '" + _session.AccountInfo.Username + "'");
-            _session.Success(sessionid.SessionID);
+            await _session.Success(sessionid.SessionID);
         }
 
-        private void Authenticate(string username, string nonce, string cnonce, string nc, string qop, string digestURI, string response)
+        private async Task Authenticate(string username, string nonce, string cnonce, string nc, string qop, string digestURI, string response)
         {
             AccountInfo account = new AccountInfo(username);
-            using(DatabaseConnection connection = DatabaseManager.AcquireDatabaseConnection()) {
-                if(!account.Read(connection)) {
-                    _session.Failure("Bad Username or Password");
+            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnection()) {
+                if(!await account.Read(connection)) {
+                    await _session.Failure("Bad Username or Password");
                     return;
                 }
             }
 
             if(!account.Active) {
-                _session.Failure("Account Inactive");
+                await _session.Failure("Account Inactive");
                 return;
             }
 
@@ -68,12 +68,12 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 rspauth = EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI);
                 break;
             default:
-                _session.Failure("Unsupported Auth Type");
+                await _session.Failure("Unsupported Auth Type");
                 return;
             }
 
             if(!expected.Equals(response)) {
-                _session.Failure("Bad Username or Password");
+                await _session.Failure("Bad Username or Password");
                 return;
             }
 
@@ -82,77 +82,73 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             _session.Challenge(challenge, account);
         }
 
-        protected override Task OnHandleMessage(IMessage message)
+        protected async override void OnHandleMessage(IMessage message)
         {
-            return new Task(() =>
-                {
-                    if(_session.Authenticated) {
-                        CompleteAuthentication();
-                        return;
-                    }
+            if(_session.Authenticated) {
+                await CompleteAuthentication();
+                return;
+            }
 
-                    if(!_session.Authenticating) {
-                        _session.Failure("Not Authenticating");
-                        return;
-                    }
+            if(!_session.Authenticating) {
+                await _session.Failure("Not Authenticating");
+                return;
+            }
 
-                    if(_session.AuthNonce.Expired) {
-                        _session.Failure("Session Expired");
-                        return;
-                    }
+            if(_session.AuthNonce.Expired) {
+                await _session.Failure("Session Expired");
+                return;
+            }
 
-                    ResponseMessage response = (ResponseMessage)message;
+            ResponseMessage response = (ResponseMessage)message;
 
-                    string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(response.Response));
-                    Logger.Debug("Decoded response: " + decoded);
+            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(response.Response));
+            Logger.Debug("Decoded response: " + decoded);
 
-                    Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(decoded);
-                    if(null == values || 0 == values.Count) {
-                        _session.Failure("Invalid Response");
-                        return;
-                    }
+            Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(decoded);
+            if(null == values || 0 == values.Count) {
+                await _session.Failure("Invalid Response");
+                return;
+            }
 
-                    try {
-                        string username = values["username"].Trim(new char[] { '"' });
-                        EventLogger.Instance.BeginEvent(_session.RemoteEndPoint, username);
+            try {
+                string username = values["username"].Trim(new char[] { '"' });
+                await EventLogger.Instance.BeginEvent(_session.RemoteEndPoint, username);
 
-                        string charset = values["charset"].Trim(new char[] { '"' });
-                        if(!"utf-8".Equals(charset, StringComparison.InvariantCultureIgnoreCase)) {
-                            _session.Failure("Invalid Response");
-                            return;
-                        }
-
-                        string qop = values["qop"].Trim(new char[] { '"' });
-                        if(!"auth".Equals(qop, StringComparison.InvariantCultureIgnoreCase)) {
-                            _session.Failure("Invalid Response");
-                            return;
-                        }
-
-                        string realm = values["realm"].Trim(new char[] { '"' });
-                        if(!ConfigurationManager.AppSettings["authRealm"].Equals(realm, StringComparison.InvariantCultureIgnoreCase)) {
-                            _session.Failure("Invalid Response");
-                            return;
-                        }
-
-                        string nonce = values["nonce"].Trim(new char[] { '"' });
-                        if(!_session.AuthNonce.NonceHash.Equals(nonce)) {
-                            _session.Failure("Invalid Response");
-                            return;
-                        }
-
-                        string digestURI = values["digest-uri"].Trim(new char[] { '"' });
-                        // TODO: validate the digest-uri
-
-                        string cnonce = values["cnonce"].Trim(new char[] { '"' });
-                        string nc = values["nc"].Trim(new char[] { '"' });
-                        string rsp = values["response"].Trim(new char[] { '"' });
-
-                        Authenticate(username, nonce, cnonce, nc, qop, digestURI, rsp);
-                    } catch(KeyNotFoundException) {
-                        _session.Failure("Invalid response!");
-                    }
+                string charset = values["charset"].Trim(new char[] { '"' });
+                if(!"utf-8".Equals(charset, StringComparison.InvariantCultureIgnoreCase)) {
+                    await _session.Failure("Invalid Response");
+                    return;
                 }
-            );
+
+                string qop = values["qop"].Trim(new char[] { '"' });
+                if(!"auth".Equals(qop, StringComparison.InvariantCultureIgnoreCase)) {
+                    await _session.Failure("Invalid Response");
+                    return;
+                }
+
+                string realm = values["realm"].Trim(new char[] { '"' });
+                if(!ConfigurationManager.AppSettings["authRealm"].Equals(realm, StringComparison.InvariantCultureIgnoreCase)) {
+                    await _session.Failure("Invalid Response");
+                    return;
+                }
+
+                string nonce = values["nonce"].Trim(new char[] { '"' });
+                if(!_session.AuthNonce.NonceHash.Equals(nonce)) {
+                    await _session.Failure("Invalid Response");
+                    return;
+                }
+
+                string digestURI = values["digest-uri"].Trim(new char[] { '"' });
+                // TODO: validate the digest-uri
+
+                string cnonce = values["cnonce"].Trim(new char[] { '"' });
+                string nc = values["nc"].Trim(new char[] { '"' });
+                string rsp = values["response"].Trim(new char[] { '"' });
+
+                await Authenticate(username, nonce, cnonce, nc, qop, digestURI, rsp);
+            } catch(KeyNotFoundException) {
+                Task.Run(() => _session.Failure("Invalid response!")).Wait();
+            }
         }
     }
 }

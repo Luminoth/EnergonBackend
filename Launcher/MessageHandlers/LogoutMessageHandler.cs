@@ -15,14 +15,10 @@ namespace EnergonSoftware.Launcher.MessageHandlers
             _session = session;
         }
 
-        protected override Task OnHandleMessage(IMessage message)
+        protected override void OnHandleMessage(IMessage message)
         {
-            return new Task(() =>
-                {
-                    // TODO: should this log *everything* out?
-                    _session.Logout();
-                }
-            );
+            // TODO: should this log *everything* out?
+            _session.Logout();
         }
     }
 }

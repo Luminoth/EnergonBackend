@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 using log4net;
 
@@ -87,10 +88,10 @@ namespace EnergonSoftware.Database
             return this;
         }
 
-        public DbDataReader SelectAll(DatabaseConnection connection)
+        public async Task<DbDataReader> SelectAll(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("SELECT " + Name + " FROM " + Table.Name)) {
-                return command.ExecuteReader();
+                return await Task.Run(() => command.ExecuteReader());
             }
         }
 
@@ -132,7 +133,7 @@ namespace EnergonSoftware.Database
             _primaryKeys.AddRange(from column in _columns.Values where column.PrimaryKey select column.Name);
         }
 
-        public void Create(DatabaseConnection connection)
+        public async Task Create(DatabaseConnection connection)
         {
             Logger.Info("Creating table " + Name + "...");
 
@@ -145,14 +146,14 @@ namespace EnergonSoftware.Database
             create.Append(")");
 
             using(DbCommand command = connection.BuildCommand(create.ToString())) {
-                command.ExecuteNonQuery();
+                await Task.Run(() => command.ExecuteNonQuery());
             }
         }
 
-        public DbDataReader SelectAll(DatabaseConnection connection)
+        public async Task<DbDataReader> SelectAll(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("SELECT * FROM " + Name)) {
-                return command.ExecuteReader();
+                return await Task.Run(() => command.ExecuteReader());
             }
         }
     }

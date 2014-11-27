@@ -98,29 +98,25 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             }
         }
 
-        protected override Task OnHandleMessage(IMessage message)
+        protected override void OnHandleMessage(IMessage message)
         {
-            return new Task(() =>
-                {
-                    ChallengeMessage challenge = (ChallengeMessage)message;
+            ChallengeMessage challenge = (ChallengeMessage)message;
 
-                    string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(challenge.Challenge));
-                    Logger.Debug("Decoded challenge: " + decoded);
+            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(challenge.Challenge));
+            Logger.Debug("Decoded challenge: " + decoded);
 
-                    switch(_session.AuthStage)
-                    {
-                    case AuthenticationStage.Begin:
-                        HandleChallengeState(decoded);
-                        break;
-                    case AuthenticationStage.Challenge:
-                        HandleResponseState(decoded);
-                        break;
-                    default:
-                        _session.Error("Unexpected auth stage: " + _session.AuthStage);
-                        return;
-                    }
-                }
-            );
+            switch(_session.AuthStage)
+            {
+            case AuthenticationStage.Begin:
+                HandleChallengeState(decoded);
+                break;
+            case AuthenticationStage.Challenge:
+                HandleResponseState(decoded);
+                break;
+            default:
+                _session.Error("Unexpected auth stage: " + _session.AuthStage);
+                return;
+            }
         }
     }
 }

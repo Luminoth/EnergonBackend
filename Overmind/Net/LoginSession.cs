@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
@@ -45,25 +46,25 @@ namespace EnergonSoftware.Overmind.Net
             SendMessage(ping);
         }
 
-        public void LoginFailure(string username, string reason)
+        public async Task LoginFailure(string username, string reason)
         {
-            EventLogger.Instance.LoginFailedEvent(RemoteEndPoint, username, reason);
+            await EventLogger.Instance.LoginFailedEvent(RemoteEndPoint, username, reason);
 
             Disconnect();
         }
 
-        public void LoginSuccess(AccountInfo account)
+        public async Task LoginSuccess(AccountInfo account)
         {
             InstanceNotifier.Instance.Login(account.Username, RemoteEndPoint);
-            EventLogger.Instance.LoginSuccessEvent(RemoteEndPoint, account.Username);
+            await EventLogger.Instance.LoginSuccessEvent(RemoteEndPoint, account.Username);
 
             AccountInfo = account;
         }
 
-        public void Logout()
+        public async Task Logout()
         {
             InstanceNotifier.Instance.Logout(AccountInfo.Username);
-            EventLogger.Instance.LogoutEvent(RemoteEndPoint, AccountInfo.Username);
+            await EventLogger.Instance.LogoutEvent(RemoteEndPoint, AccountInfo.Username);
 
             Disconnect();
         }

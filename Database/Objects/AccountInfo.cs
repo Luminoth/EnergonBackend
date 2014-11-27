@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Text;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.Account;
@@ -28,12 +29,12 @@ namespace EnergonSoftware.Database.Objects
 
         public static string TableName { get { return AccountsTable.Name; } }
 
-        public static void CreateTable(DatabaseConnection connection)
+        public static async Task CreateTable(DatabaseConnection connection)
         {
-            AccountsTable.Create(connection);
+            await AccountsTable.Create(connection);
         }
 
-        public static List<Friend> ReadFriends(DatabaseConnection connection, long accountId)
+        public static async Task<List<Friend>> ReadFriends(DatabaseConnection connection, long accountId)
         {
             List<Friend> friends = new List<Friend>();
 
@@ -41,7 +42,7 @@ namespace EnergonSoftware.Database.Objects
                 + " (SELECT friend FROM " + AccountFriend.TableName + " where account=@account) AND active=1"))
             {
                 connection.AddParameter(command, "account", accountId);
-                using(DbDataReader reader = command.ExecuteReader()) {
+                using(DbDataReader reader = await Task.Run(() => command.ExecuteReader())) {
                     while(reader.Read()) {
                         friends.Add(new Friend()
                             {
@@ -112,7 +113,7 @@ namespace EnergonSoftware.Database.Objects
             Dirty = true;
         }
 
-        public bool Read(DatabaseConnection connection)
+        public async Task<bool> Read(DatabaseConnection connection)
         {
             DbCommand command = null;
             if(Id > 0) {
@@ -124,7 +125,7 @@ namespace EnergonSoftware.Database.Objects
             }
 
             using(command) {
-                using(DbDataReader reader = command.ExecuteReader()) {
+                using(DbDataReader reader = await Task.Run(() =>command.ExecuteReader())) {
                     if(!reader.Read()) {
                         return false;
                     }
@@ -155,7 +156,7 @@ namespace EnergonSoftware.Database.Objects
             _status = (Status)reader.GetInt32(AccountsTable["status"].Id);
         }
 
-        public void Insert(DatabaseConnection connection)
+        public async Task Insert(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountsTable.Name
                 + "(active, username" + ", passwordMD5" + ", passwordSHA512" + ", status)"
@@ -166,12 +167,12 @@ namespace EnergonSoftware.Database.Objects
                 connection.AddParameter(command, "passwordMD5", PasswordMD5);
                 connection.AddParameter(command, "passwordSHA512", PasswordSHA512);
                 connection.AddParameter(command, "status", Status);
-                command.ExecuteNonQuery();
+                await Task.Run(() => command.ExecuteNonQuery());
                 Id = connection.LastInsertRowId;
             }
         }
 
-        public void Update(DatabaseConnection connection)
+        public async Task Update(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("UPDATE " + AccountsTable.Name
                 + " SET active=@active, sessionEndPoint=@sessionEndPoint, sessionid=@sessionid, status=@status WHERE id=@id"))
@@ -181,16 +182,16 @@ namespace EnergonSoftware.Database.Objects
                 connection.AddParameter(command, "sessionid", SessionId);
                 connection.AddParameter(command, "status", Status);
                 connection.AddParameter(command, "id", Id);
-                command.ExecuteNonQuery();
+                await Task.Run(() => command.ExecuteNonQuery());
             }
             Clean();
         }
 
-        public void Delete(DatabaseConnection connection)
+        public async Task Delete(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountsTable.Name + " WHERE id=@id")) {
                 connection.AddParameter(command, "id", Id);
-                command.ExecuteNonQuery();
+                await Task.Run(() => command.ExecuteNonQuery());
             }
         }
 

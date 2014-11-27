@@ -11,7 +11,7 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
         {
         }
 
-        protected override Task OnHandleMessage(IMessage message)
+        protected override void OnHandleMessage(IMessage message)
         {
             throw new MessageHandlerException("Test Exception");
         }

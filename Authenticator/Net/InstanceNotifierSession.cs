@@ -1,7 +1,6 @@
 ﻿using System.Net.Sockets;
 
 using EnergonSoftware.Core.MessageHandlers;
-using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
 
@@ -37,7 +36,7 @@ namespace EnergonSoftware.Authenticator.Net
                 Logger.Debug("Instance notifier session " + Id + " read " + count + " bytes");
             }
 
-            ProcessMessages(this, _listener, processor);
+            QueueMessages(this, _listener, processor);
         }
     }
 }

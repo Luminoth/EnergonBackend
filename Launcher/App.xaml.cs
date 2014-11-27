@@ -24,7 +24,6 @@ namespace EnergonSoftware.Launcher
         private static readonly ILog Logger = LogManager.GetLogger(typeof(App));
 
         private static volatile bool _quit;
-        private static Thread _idleThread;
 
         private static SessionManager _sessions = new SessionManager();
         private static OvermindSession _overmindSession;
@@ -73,34 +72,28 @@ namespace EnergonSoftware.Launcher
 #endregion
 
 #region Event Handlers
-        private void Application_Startup(object sender, StartupEventArgs e)
+        private async void Application_Startup(object sender, StartupEventArgs e)
         {
             ConfigureLogging();
             ConfigureThreading();
             Common.InitFilesystem();
 
-            UpdateChecker.Instance.CheckForUpdates();
+            await UpdateChecker.Instance.CheckForUpdates();
 
             _sessions.Start(new MessageHandlerFactory());
 
             // have to run this in a separate thread
             // so that we don't lock up the UI
             Logger.Info("Starting idle thread...");
-            _idleThread = new Thread(new ThreadStart(OnIdle));
-            _idleThread.Start();
+            await Task.Run(() => OnIdle());
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
             Logger.Info("Exiting...");
+            _quit = true;
 
             _sessions.Stop();
-
-            _quit = true;
-            if(null != _idleThread) {
-                Logger.Info("Waiting for idle thread to stop...");
-                _idleThread.Join();
-            }
 
             Logger.Info("Goodbye!");
         }

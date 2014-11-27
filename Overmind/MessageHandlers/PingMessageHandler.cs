@@ -15,13 +15,9 @@ namespace EnergonSoftware.Overmind.MessageHandlers
             _session = session;
         }
 
-        protected override Task OnHandleMessage(IMessage message)
+        protected override void OnHandleMessage(IMessage message)
         {
-            return new Task(() =>
-                {
-                    _session.Ping();
-                }
-            );
+            _session.Ping();
         }
     }
 }

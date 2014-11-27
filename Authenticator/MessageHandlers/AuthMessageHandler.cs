@@ -44,42 +44,38 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             _session = session;
         }
 
-        protected override Task OnHandleMessage(IMessage message)
+        protected async override void OnHandleMessage(IMessage message)
         {
-            return new Task(() =>
-                {
-                    EventLogger.Instance.RequestEvent(_session.RemoteEndPoint);
-                    if(_session.Authenticated || _session.Authenticating) {
-                        _session.Failure("Already Authenticating");
-                        return;
-                    }
+            await EventLogger.Instance.RequestEvent(_session.RemoteEndPoint);
+            if(_session.Authenticated || _session.Authenticating) {
+                await _session.Failure("Already Authenticating");
+                return;
+            }
 
-                    AuthMessage auth = (AuthMessage)message;
-                    if(Common.AuthVersion != auth.Version) {
-                        _session.Failure("Bad Version");
-                        return;
-                    }
+            AuthMessage auth = (AuthMessage)message;
+            if(Common.AuthVersion != auth.Version) {
+                await _session.Failure("Bad Version");
+                return;
+            }
 
-                    Nonce nonce = new Nonce(ConfigurationManager.AppSettings["authRealm"], Convert.ToInt32(ConfigurationManager.AppSettings["authExpiry"]));
+            Nonce nonce = new Nonce(ConfigurationManager.AppSettings["authRealm"], Convert.ToInt32(ConfigurationManager.AppSettings["authExpiry"]));
 
-                    string challenge;
-                    switch(auth.MechanismType)
-                    {
-                    /*case AuthType.DigestMD5:
-                        challenge = BuildDigestMD5Challenge(nonce);
-                        break;*/
-                    case AuthType.DigestSHA512:
-                        challenge = BuildDigestSHA512Challenge(nonce);
-                        break;
-                    default:
-                        _session.Failure("Unsupported Mechanism");
-                        return;
-                    }
+            string challenge;
+            switch(auth.MechanismType)
+            {
+            /*case AuthType.DigestMD5:
+                challenge = BuildDigestMD5Challenge(nonce);
+                break;*/
+            case AuthType.DigestSHA512:
+                challenge = BuildDigestSHA512Challenge(nonce);
+                break;
+            default:
+                await _session.Failure("Unsupported Mechanism");
+                return;
+            }
 
-                    Logger.Debug("Session " + _session.Id + " generated challenge: " + challenge);
-                    _session.Challenge(auth.MechanismType, nonce, challenge);
-                }
-            );
+            Logger.Debug("Session " + _session.Id + " generated challenge: " + challenge);
+            _session.Challenge(auth.MechanismType, nonce, challenge);
         }
     }
 }

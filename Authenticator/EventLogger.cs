@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Database;
 using EnergonSoftware.Database.Objects.Events;
@@ -17,48 +18,44 @@ namespace EnergonSoftware.Authenticator
         public static EventLogger Instance { get { return _instance; } }
 #endregion
 
-        private readonly object _lock = new object();
-
-        public void RequestEvent(EndPoint origin)
+        public async Task RequestEvent(EndPoint origin)
         {
             AuthEvent evt = new AuthEvent(AuthEventType.Request);
             evt.Origin = origin.ToString();
-            LogEvent(evt);
+            await LogEvent(evt);
         }
 
-        public void BeginEvent(EndPoint origin, string username)
+        public async Task BeginEvent(EndPoint origin, string username)
         {
             AuthEvent evt = new AuthEvent(AuthEventType.Begin);
             evt.Origin = origin.ToString();
             evt.Account = username;
-            LogEvent(evt);
+            await LogEvent(evt);
         }
 
-        public void SuccessEvent(EndPoint origin, string username)
+        public async Task SuccessEvent(EndPoint origin, string username)
         {
             AuthEvent evt = new AuthEvent(AuthEventType.Success);
             evt.Origin = origin.ToString();
             evt.Account = username;
-            LogEvent(evt);
+            await LogEvent(evt);
         }
 
-        public void FailedEvent(EndPoint origin, string username, string reason)
+        public async Task FailedEvent(EndPoint origin, string username, string reason)
         {
             AuthEvent evt = new AuthEvent(AuthEventType.Failure);
             evt.Origin = origin.ToString();
             evt.Account = username;
             evt.Reason = reason;
-            LogEvent(evt);
+            await LogEvent(evt);
         }
 
         // TODO: move this to a base class
-        private void LogEvent(Event evt)
+        private async Task LogEvent(Event evt)
         {
-            lock(_lock) {
-                Logger.Debug("Logging event: " + evt);
-                using(DatabaseConnection connection = DatabaseManager.AcquireDatabaseConnection()) {
-                    evt.Insert(connection);
-                }
+            Logger.Debug("Logging event: " + evt);
+            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnection()) {
+                await evt.Insert(connection);
             }
         }
 

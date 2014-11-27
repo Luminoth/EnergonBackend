@@ -36,7 +36,7 @@ namespace EnergonSoftware.Overmind.Net
                 Logger.Debug("Instance notifier session " + Id + " read " + count + " bytes");
             }
 
-            ProcessMessages(this, _listener, processor);
+            QueueMessages(this, _listener, processor);
         }
     }
 }

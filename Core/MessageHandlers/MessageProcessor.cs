@@ -23,7 +23,7 @@ namespace EnergonSoftware.Core.MessageHandlers
         private ConcurrentDictionary<int, ConcurrentQueue<MessageQueueContext>> _messageQueue = new ConcurrentDictionary<int, ConcurrentQueue<MessageQueueContext>>();
         private IMessageHandlerFactory _factory;
 
-        private Task _task;
+private Task _task;
         private volatile bool _running;
 
         public MessageProcessor()
@@ -62,17 +62,14 @@ namespace EnergonSoftware.Core.MessageHandlers
             return _messageQueue.TryRemove(sessionId, out queue);
         }
 
-        public void Start(IMessageHandlerFactory factory)
+        public /*async Task*/ void Start(IMessageHandlerFactory factory)
         {
             Logger.Debug("Starting message processor...");
             _factory = factory;
 
             _running = true;
-            _task = Task.Factory.StartNew(() =>
-                {
-                    Run();
-                }
-            );
+_task = Task.Factory.StartNew(() => Run());
+            //await Task.Run(() => Run());
         }
 
         public void Stop()
@@ -83,13 +80,12 @@ namespace EnergonSoftware.Core.MessageHandlers
 
             Logger.Debug("Stopping message processor...");
             _running = false;
-
-            _task.Wait();
+_task.Wait();
 
             Logger.Debug("Clearing message queue...");
             _messageQueue.Clear();
             _factory = null;
-            _task = null;
+_task = null;
         }
 
         private void Run()

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Common;
+using System.Threading.Tasks;
 
 namespace EnergonSoftware.Database.Objects.Events
 {
@@ -26,9 +27,9 @@ namespace EnergonSoftware.Database.Objects.Events
             }
         );
 
-        public static void CreateTable(DatabaseConnection connection)
+        public static async Task CreateTable(DatabaseConnection connection)
         {
-            AuthEventsTable.Create(connection);
+            await AuthEventsTable.Create(connection);
         }
 
         public readonly AuthEventType Type;
@@ -47,7 +48,7 @@ namespace EnergonSoftware.Database.Objects.Events
             Type = type;
         }
 
-        public override void Insert(DatabaseConnection connection)
+        public override async Task Insert(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("INSERT INTO " + AuthEventsTable.Name
                 + "(timestamp, type, origin, account, reason)"
@@ -58,7 +59,7 @@ namespace EnergonSoftware.Database.Objects.Events
                 connection.AddParameter(command, "origin", Origin);
                 connection.AddParameter(command, "account", Account);
                 connection.AddParameter(command, "reason", Reason);
-                command.ExecuteNonQuery();
+                await Task.Run(() => command.ExecuteNonQuery());
                 Id = connection.LastInsertRowId;
             }
         }

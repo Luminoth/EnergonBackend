@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Util;
 
@@ -23,8 +24,9 @@ namespace EnergonSoftware.Database.Objects.Events
             Timestamp = Time.CurrentTimeMs;
         }
 
-        public bool Read(DatabaseConnection connection)
+        public async Task<bool> Read(DatabaseConnection connection)
         {
+            await Task.Delay(0);
             return false;
         }
 
@@ -32,14 +34,16 @@ namespace EnergonSoftware.Database.Objects.Events
         {
         }
 
-        public abstract void Insert(DatabaseConnection connection);
+        public abstract Task Insert(DatabaseConnection connection);
 
-        public void Update(DatabaseConnection connection)
+        public async Task Update(DatabaseConnection connection)
         {
+            await Task.Delay(0);
         }
 
-        public void Delete(DatabaseConnection connection)
+        public async Task Delete(DatabaseConnection connection)
         {
+            await Task.Delay(0);
         }
     }
 }

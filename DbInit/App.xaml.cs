@@ -35,39 +35,38 @@ namespace EnergonSoftware.DbInit
 #endregion
 
 #region Database
-        public Task<bool> InitializeDatabase()
+        public async Task<bool> InitializeDatabase()
         {
-            return Task<bool>.Factory.StartNew(() =>
-                {
-                    Running = true;
-                    try {
-                        ConnectionStringSettings connectionSettings = ConfigurationManager.ConnectionStrings["energonsoftware"];
+            Running = true;
+            try {
+                ConnectionStringSettings connectionSettings = ConfigurationManager.ConnectionStrings["energonsoftware"];
 
-                        Logger.Info("Creating database...");
-                        if(!CreateDatabase(connectionSettings)) {
-                            Logger.Error("Failed to create database!");
-                            return false;
-                        }
-
-                        Logger.Info("Populating database...");
-                        using(DatabaseConnection connection = AcquireDatabaseConnection(connectionSettings)) {
-                            CreateEventsTables(connection);
-
-                            CreateAccountsTables(connection);
-                            InsertAccountsData(connection);
-                            VerifyAccountsData(connection);
-                        }
-
-                        return true;
-                    } finally {
-                        Running = false;
-                    }
+                Logger.Info("Creating database...");
+                if(!(await CreateDatabase(connectionSettings))) {
+                    Logger.Error("Failed to create database!");
+                    return false;
                 }
-            );
+
+                Logger.Info("Populating database...");
+                using(DatabaseConnection connection = await AcquireDatabaseConnection(connectionSettings)) {
+                    await CreateEventsTables(connection);
+
+                    await CreateAccountsTables(connection);
+                    await InsertAccountsData(connection);
+                    await VerifyAccountsData(connection);
+                }
+
+                return true;
+            } catch(Exception e) {
+                Logger.Error("Failed to create database!", e);
+                return false;
+            } finally {
+                Running = false;
+            }
         }
 
         // TODO: this kind of assumes we're using SQLite and we shouldn't do that
-        private bool CreateDatabase(ConnectionStringSettings connectionSettings)
+        private async Task<bool> CreateDatabase(ConnectionStringSettings connectionSettings)
         {
             string dataSource = DatabaseConnection.ParseDataSource(connectionSettings);
             if(File.Exists(dataSource)) {
@@ -76,35 +75,35 @@ namespace EnergonSoftware.DbInit
                 File.Delete(backupfilename);
                 File.Move(dataSource, backupfilename);
             }
-            return DatabaseConnection.CreateDatabase(connectionSettings);
+            return await DatabaseConnection.CreateDatabase(connectionSettings);
         }
 
-        private DatabaseConnection AcquireDatabaseConnection(ConnectionStringSettings connectionSettings)
+        private async Task<DatabaseConnection> AcquireDatabaseConnection(ConnectionStringSettings connectionSettings)
         {
             DatabaseConnection connection = new DatabaseConnection(connectionSettings);
-            connection.Open();
+            await connection.Open();
             return connection;
         }
 #endregion
 
 #region Events Table
-        private void CreateEventsTables(DatabaseConnection connection)
+        private async Task CreateEventsTables(DatabaseConnection connection)
         {
             Logger.Info("Creating event tables...");
-            AuthEvent.CreateTable(connection);
-            LoginEvent.CreateTable(connection);
+            await AuthEvent.CreateTable(connection);
+            await LoginEvent.CreateTable(connection);
         }
 #endregion
 
 #region Accounts Table
-        private void CreateAccountsTables(DatabaseConnection connection)
+        private async Task CreateAccountsTables(DatabaseConnection connection)
         {
             Logger.Info("Creating account tables...");
-            AccountInfo.CreateTable(connection);
-            AccountFriend.CreateTable(connection);
+            await AccountInfo.CreateTable(connection);
+            await AccountFriend.CreateTable(connection);
         }
 
-        private void InsertAccountsData(DatabaseConnection connection)
+        private async Task InsertAccountsData(DatabaseConnection connection)
         {
             Logger.Info("Inserting account data...");
 
@@ -115,29 +114,29 @@ namespace EnergonSoftware.DbInit
             shaneAccount.Active = true;
             shaneAccount.Username = "shane";
             shaneAccount.SetPassword(authRealm, "password");
-            shaneAccount.Insert(connection);
+            await shaneAccount.Insert(connection);
             Logger.Info("Inserted new account: " + shaneAccount);
 
             AccountInfo testAccount1 = new AccountInfo();
             testAccount1.Active = true;
             testAccount1.Username = "test1";
             testAccount1.SetPassword(authRealm, "password");
-            testAccount1.Insert(connection);
+            await testAccount1.Insert(connection);
             Logger.Info("Inserted new account: " + testAccount1);
 
             AccountFriend friend = new AccountFriend();
             friend.Account = shaneAccount.Id;
             friend.Friend = testAccount1.Id;
-            friend.Insert(connection);
+            await friend.Insert(connection);
             Logger.Info("Inserted new account friend: " + friend);
         }
 
-        private void VerifyAccountsData(DatabaseConnection connection)
+        private async Task VerifyAccountsData(DatabaseConnection connection)
         {
             Logger.Info("Verifying account data...");
 
             AccountInfo account = new AccountInfo("shane");
-            account.Read(connection);
+            await account.Read(connection);
             Logger.Info("Read account: " + account);
         }
 #endregion
@@ -147,6 +146,12 @@ namespace EnergonSoftware.DbInit
         {
             ConfigureLogging();
             Common.InitFilesystem();
+
+            /*if(!DatabaseConnection.TestDatabaseConnection(ConfigurationManager.ConnectionStrings["energonsoftware"])) {
+                Logger.Fatal("Could not connect to database!");
+                MessageBox.Show("Could not connect to database!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown();
+            }*/
         }
 #endregion
 

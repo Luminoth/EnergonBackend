@@ -36,10 +36,10 @@ namespace EnergonSoftware.Overmind
 
         public void Start(string[] args)
         {
-            OnStart(args);
+            Task.Run(() => OnStart(args)).Wait();
         }
 
-        protected async override void OnStart(string[] args)
+        protected override void OnStart(string[] args)
         {
             Logger.Info("Starting " + ServiceName + " with guid=" + UniqueId + "...");
 
@@ -76,7 +76,7 @@ namespace EnergonSoftware.Overmind
 
             InstanceNotifier.Instance.Startup();
 
-            await Run();
+            Task.Run(() => Run()).Wait();
         }
 
         protected override void OnStop()
@@ -99,26 +99,22 @@ namespace EnergonSoftware.Overmind
             _diagnosticServer.Stop();
         }
 
-        private Task Run()
+        private void Run()
         {
-            return Task.Factory.StartNew(() =>
-                {
-                    while(Running) {
-                        try {
-                            InstanceNotifier.Instance.Run();
+            while(Running) {
+                try {
+                    InstanceNotifier.Instance.Run();
 
-                            _loginListener.Poll(_loginSessions);
+                    _loginListener.Poll(_loginSessions);
 
-                            _loginSessions.PollAndRun();
-                            _loginSessions.Cleanup();
-                        } catch(Exception e) {
-                            Logger.Fatal("Unhandled Exception!", e);
-                            Stop();
-                        }
-                        Thread.Sleep(0);
-                    }
+                    _loginSessions.PollAndRun();
+                    _loginSessions.Cleanup();
+                } catch(Exception e) {
+                    Logger.Fatal("Unhandled Exception!", e);
+                    Stop();
                 }
-            );
+                Thread.Sleep(0);
+            }
         }   
     }
 }

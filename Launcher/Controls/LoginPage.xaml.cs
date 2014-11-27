@@ -34,10 +34,10 @@ namespace EnergonSoftware.Launcher.Controls
             ClearPassword();
         }
 
-        private void OnVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private async void OnVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if(IsVisible) {
-                NewsChecker.Instance.UpdateNews();
+                await NewsChecker.Instance.UpdateNews();
             }
         }
 #endregion

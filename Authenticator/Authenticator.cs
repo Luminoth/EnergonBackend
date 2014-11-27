@@ -24,10 +24,10 @@ namespace EnergonSoftware.Authenticator
 
         public bool Running { get; private set; }
 
-        private HttpServer _diagnosticServer = new HttpServer();
+        private readonly HttpServer _diagnosticServer = new HttpServer();
 
-        private SocketListener _listener = new SocketListener(new AuthSessionFactory());
-        private SessionManager _sessions = new SessionManager();
+        private readonly SocketListener _listener = new SocketListener(new AuthSessionFactory());
+        private readonly SessionManager _sessions = new SessionManager();
 
         public Authenticator()
         {
@@ -36,10 +36,10 @@ namespace EnergonSoftware.Authenticator
 
         public void Start(string[] args)
         {
-            OnStart(args);
+            Task.Run(() => OnStart(args)).Wait();
         }
 
-        protected async override void OnStart(string[] args)
+        protected override void OnStart(string[] args)
         {
             Logger.Info("Starting " + ServiceName + " with guid=" + UniqueId + "...");
 
@@ -76,7 +76,7 @@ namespace EnergonSoftware.Authenticator
 
             InstanceNotifier.Instance.Startup();
 
-            await Run();
+            Task.Run(() => Run()).Wait();
         }
 
         protected override void OnStop()
@@ -99,26 +99,22 @@ namespace EnergonSoftware.Authenticator
             _diagnosticServer.Stop();
         }
 
-        private Task Run()
+        private void Run()
         {
-            return Task.Factory.StartNew(() =>
-                {
-                    while(Running) {
-                        try {
-                            InstanceNotifier.Instance.Run();
+            while(Running) {
+                try {
+                    InstanceNotifier.Instance.Run();
 
-                            _listener.Poll(_sessions);
+                    _listener.Poll(_sessions);
 
-                            _sessions.PollAndRun();
-                            _sessions.Cleanup();
-                        } catch(Exception e) {
-                            Logger.Fatal("Unhandled Exception!", e);
-                            Stop();
-                        }
-                        Thread.Sleep(0);
-                    }
+                    _sessions.PollAndRun();
+                    _sessions.Cleanup();
+                } catch(Exception e) {
+                    Logger.Fatal("Unhandled Exception!", e);
+                    Stop();
                 }
-            );
+                Thread.Sleep(0);
+            }
         }
     }
 }

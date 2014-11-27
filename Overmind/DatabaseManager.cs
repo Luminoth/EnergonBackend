@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Database;
 
@@ -6,11 +8,16 @@ namespace EnergonSoftware.Overmind
 {
     internal static class DatabaseManager
     {
-        public static DatabaseConnection AcquireDatabaseConnection()
+        public static async Task<DatabaseConnection> AcquireDatabaseConnection()
         {
             DatabaseConnection connection = new DatabaseConnection(ConfigurationManager.ConnectionStrings["energonsoftware"]);
-            connection.Open();
+            await connection.Open();
             return connection;
+        }
+
+        public static bool TestDatabaseConnection()
+        {
+            return DatabaseConnection.TestDatabaseConnection(ConfigurationManager.ConnectionStrings["energonsoftware"]);
         }
     }
 }

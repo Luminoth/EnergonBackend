@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Common;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core;
 
@@ -18,17 +19,17 @@ namespace EnergonSoftware.Database.Objects
 
         public static string TableName { get { return AccountFriendsTable.Name; } }
 
-        public static void CreateTable(DatabaseConnection connection)
+        public static async Task CreateTable(DatabaseConnection connection)
         {
-            AccountFriendsTable.Create(connection);
+            await AccountFriendsTable.Create(connection);
         }
 
-        public static void DeleteAll(DatabaseConnection connection, long accountId)
+        public static async Task DeleteAll(DatabaseConnection connection, long accountId)
         {
             using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountFriendsTable.Name + " WHERE account=@account OR friend=@friend")) {
                 connection.AddParameter(command, "account", accountId);
                 connection.AddParameter(command, "friend", accountId);
-                command.ExecuteNonQuery();
+                await Task.Run(() => command.ExecuteNonQuery());
             }
         }
 
@@ -59,8 +60,9 @@ namespace EnergonSoftware.Database.Objects
             _friend = friend;
         }
 
-        public bool Read(DatabaseConnection connection)
+        public async Task<bool> Read(DatabaseConnection connection)
         {
+            await Task.Delay(0);
             return false;
         }
 
@@ -70,42 +72,43 @@ namespace EnergonSoftware.Database.Objects
             _friend = reader.GetInt32(AccountFriendsTable["friend"].Id);
         }
 
-        public void Insert(DatabaseConnection connection)
+        public async Task Insert(DatabaseConnection connection)
         {
             // account -> friend
             using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountFriendsTable.Name + "(account, friend) VALUES(@account, @friend)")) {
                 connection.AddParameter(command, "account", Account);
                 connection.AddParameter(command, "friend", Friend);
-                command.ExecuteNonQuery();
+                await Task.Run(() => command.ExecuteNonQuery());
             }
 
             // friend -> account
             using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountFriendsTable.Name + "(account, friend) VALUES(@account, @friend)")) {
                 connection.AddParameter(command, "account", Friend);
                 connection.AddParameter(command, "friend", Account);
-                command.ExecuteNonQuery();
+                await Task.Run(() => command.ExecuteNonQuery());
             }
         }
 
-        public void Delete(DatabaseConnection connection)
+        public async Task Delete(DatabaseConnection connection)
         {
             // account -> friend
             using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountFriendsTable.Name + " WHERE account=@account AND friend=@friend")) {
                 connection.AddParameter(command, "account", Account);
                 connection.AddParameter(command, "friend", Friend);
-                command.ExecuteNonQuery();
+                await Task.Run(() => command.ExecuteNonQuery());
             }
 
             // friend -> account
             using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountFriendsTable.Name + " WHERE account=@account AND friend=@friend")) {
                 connection.AddParameter(command, "account", Friend);
                 connection.AddParameter(command, "friend", Account);
-                command.ExecuteNonQuery();
+                await Task.Run(() => command.ExecuteNonQuery());
             }
         }
 
-        public void Update(DatabaseConnection connection)
+        public async Task Update(DatabaseConnection connection)
         {
+            await Task.Delay(0);
             Clean();
         }
 

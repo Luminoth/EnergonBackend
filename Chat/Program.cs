@@ -30,9 +30,6 @@ namespace EnergonSoftware.Chat
                 };
 
                 chat.Start(args);
-                while(chat.Running) {
-                    Thread.Sleep(0);
-                }
             }
         }
     }

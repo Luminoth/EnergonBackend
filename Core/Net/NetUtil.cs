@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace EnergonSoftware.Core.Net
 {
@@ -93,7 +94,7 @@ namespace EnergonSoftware.Core.Net
         public static bool ConnectAsync(string host, int port, AsyncConnectEventArgs args)
         {
             bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);
-            IPHostEntry hostEntry = Dns.GetHostEntry(host);
+            IPHostEntry hostEntry = Task.Factory.StartNew(() => Dns.GetHostEntry(host)).Result;
 
             int idx = -1;
             for(int i=0; i<hostEntry.AddressList.Length; ++i) {
@@ -129,7 +130,7 @@ namespace EnergonSoftware.Core.Net
         {
             bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);
 
-            IPHostEntry hostEntry = Dns.GetHostEntry(host);
+            IPHostEntry hostEntry = Task.Factory.StartNew(() => Dns.GetHostEntry(host)).Result;
             foreach(IPAddress address in hostEntry.AddressList) {
                 if(AddressFamily.InterNetwork != address.AddressFamily && (AddressFamily.InterNetworkV6 != address.AddressFamily || !useIPv6)) {
                     continue;
@@ -138,7 +139,7 @@ namespace EnergonSoftware.Core.Net
                 EndPoint endPoint = new IPEndPoint(address, port);
                 Socket socket = new Socket(endPoint.AddressFamily, socketType, protocolType);
                 try {
-                    socket.Connect(endPoint);
+                    Task.Factory.StartNew(() => socket.Connect(endPoint)).Wait();
                 } catch(SocketException) {
                     continue;
                 }
@@ -171,7 +172,7 @@ namespace EnergonSoftware.Core.Net
 // TODO: support ipv6 here
             socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(group));
             socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, ttl);
-            socket.Connect(endPoint);
+            Task.Factory.StartNew(() => socket.Connect(endPoint)).Wait();
 
             return socket;
         }

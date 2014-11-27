@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 using log4net;
 
@@ -13,15 +14,13 @@ namespace EnergonSoftware.Core.Net
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpServer));
 
-        private Thread _thread;
         private HttpListener _listener = new HttpListener();
+private Task _task;
 
         public string DefaultIndex { get; set; }
 
         public HttpServer()
         {
-            _thread = new Thread(new ThreadStart(Run));
-
             DefaultIndex = "/index.html";
         }
 
@@ -30,14 +29,15 @@ namespace EnergonSoftware.Core.Net
             _listener.Close();
         }
 
-        public void Start(List<string> prefixes)
+        public /*async Task*/ void Start(List<string> prefixes)
         {
             Logger.Debug("Starting HttpServer...");
 
             prefixes.ForEach(prefix => _listener.Prefixes.Add(prefix));
 
             _listener.Start();
-            _thread.Start();
+_task = Task.Factory.StartNew(() => Run());
+            //await Task.Run(() => Run());
         }
 
         public void Stop()
@@ -45,7 +45,8 @@ namespace EnergonSoftware.Core.Net
             Logger.Debug("Stopping HttpServer...");
 
             _listener.Stop();
-            _thread.Join();
+_task.Wait();
+_task = null;
         }
 
         private void Run()
@@ -54,6 +55,7 @@ namespace EnergonSoftware.Core.Net
                 while(_listener.IsListening) {
                     HttpListenerContext context = _listener.GetContext();
                     HandleRequest(context.Request, context.Response);
+                    Thread.Sleep(0);
                 }
             } catch(HttpListenerException e) {
                 if(995 != e.ErrorCode) {
@@ -74,7 +76,7 @@ namespace EnergonSoftware.Core.Net
                 response.ContentEncoding = encoding;
             }
 
-            byte[] data = ReadContent(request.RawUrl, encoding);
+            byte[] data = Task.Factory.StartNew(() => ReadContent(request.RawUrl, encoding)).Result;
             if(null == data) {
                 Logger.Debug("Content not found!");
                 response.StatusCode = (int)HttpStatusCode.NotFound;

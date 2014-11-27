@@ -42,7 +42,7 @@ namespace EnergonSoftware.Launcher
         public static NewsChecker Instance { get { return _instance; } }
 #endregion
 
-        public async void UpdateNews()
+        public async Task UpdateNews()
         {
             // TODO: use string resources here
             Logger.Info("Updating news...");
