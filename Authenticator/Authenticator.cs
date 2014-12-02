@@ -10,12 +10,13 @@ using EnergonSoftware.Authenticator.MessageHandlers;
 using EnergonSoftware.Authenticator.Net;
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Util;
 
 using log4net;
 
 namespace EnergonSoftware.Authenticator
 {
-    internal sealed partial class Authenticator : ServiceBase
+    internal sealed partial class Authenticator : ServiceWrapper, IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Authenticator));
 
@@ -34,10 +35,19 @@ namespace EnergonSoftware.Authenticator
             InitializeComponent();
         }
 
-        public void Start(string[] args)
+#region Dispose
+        protected override void Dispose(bool disposing)
         {
-            Task.Run(() => OnStart(args)).Wait();
+            if(disposing) {
+                if(components != null) {
+                    components.Dispose();
+                }
+
+                _diagnosticServer.Dispose();
+            }
+            base.Dispose(disposing);
         }
+#endregion
 
         protected override void OnStart(string[] args)
         {

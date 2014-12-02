@@ -49,12 +49,12 @@ namespace EnergonSoftware.Launcher.Net
             AuthStage = AuthenticationStage.NotAuthenticated;
         }
 
-        private void OnConnectFailedCallback(SocketError error)
+        private void OnConnectFailedCallback(object sender, ConnectEventArgs e)
         {
-            AuthFailed("Failed to connect to the authentication server: " + error);
+            AuthFailed("Failed to connect to the authentication server: " + e.Error);
         }
 
-        private void OnConnectSuccessCallback()
+        private void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
         {
             BeginAuth();
         }

@@ -37,6 +37,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -86,8 +87,12 @@
     <Compile Include="Util\EnumDescription.cs" />
     <Compile Include="Util\MemoryBuffer.cs" />
     <Compile Include="Util\Nonce.cs" />
+    <Compile Include="Util\ServiceWrapper.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Util\SessionId.cs" />
     <Compile Include="Util\Time.cs" />
+    <Compile Include="Util\Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

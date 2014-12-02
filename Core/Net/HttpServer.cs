@@ -24,10 +24,20 @@ private Task _task;
             DefaultIndex = "/index.html";
         }
 
+#region Dispose
         public void Dispose()
         {
-            _listener.Close();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        private void Dispose(bool disposing)
+        {
+            if(disposing) {
+                _listener.Close();
+            }
+        }
+#endregion
 
         public /*async Task*/ void Start(List<string> prefixes)
         {

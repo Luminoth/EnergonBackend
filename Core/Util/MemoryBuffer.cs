@@ -12,9 +12,9 @@ namespace EnergonSoftware.Core.Util
 
         public readonly Stream Buffer;
         public int Capacity { get { return ((MemoryStream)Buffer).Capacity; } }
-        public long Length { get { return Buffer.Length; } }
-        public long Position { get { return Buffer.Position; } }
-        public long Remaining { get { return Length - Position; } }
+        public int Length { get { return (int)Buffer.Length; } }
+        public int Position { get { return (int)Buffer.Position; } }
+        public int Remaining { get { return Length - Position; } }
         public bool HasRemaining { get { return Remaining > 0; } }
 
         public MemoryBuffer()
@@ -37,10 +37,20 @@ namespace EnergonSoftware.Core.Util
             Buffer = new MemoryStream(capacity);
         }
 
+#region Dispose
         public void Dispose()
         {
-            Buffer.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        private void Dispose(bool disposing)
+        {
+            if(disposing) {
+                Buffer.Dispose();
+            }
+        }
+#endregion
 
         public void Write(byte[] value, int offset, int count)
         {
@@ -49,10 +59,10 @@ namespace EnergonSoftware.Core.Util
             }
         }
 
-        public void Read(byte[] value, int offset, int count)
+        public int Read(byte[] value, int offset, int count)
         {
             lock(_lock) {
-                Buffer.Read(value, offset, count);
+                return Buffer.Read(value, offset, count);
             }
         }
 

@@ -51,12 +51,22 @@ namespace EnergonSoftware.Core.Net
             Socket = socket;
         }
 
+#region Dispose
         public void Dispose()
         {
-            if(null != _socket) {
-                _socket.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if(disposing) {
+                if(null != _socket) {
+                    _socket.Dispose();
+                }
             }
         }
+#endregion
 
         public int PollAndRead()
         {
@@ -66,20 +76,6 @@ namespace EnergonSoftware.Core.Net
                     LastMessageTime = Time.CurrentTimeMs;
                 }
                 return count;
-            }
-        }
-
-        public void BufferData(byte[] data)
-        {
-            lock(_lock) {
-                _reader.BufferData(data);
-            }
-        }
-
-        public void BufferData(byte[] data, int offset, int count)
-        {
-            lock(_lock) {
-                _reader.BufferData(data, offset, count);
             }
         }
 

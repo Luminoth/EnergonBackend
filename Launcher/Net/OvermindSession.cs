@@ -34,12 +34,12 @@ namespace EnergonSoftware.Launcher.Net
             Ping();
         }
 
-        private void OnConnectFailedCallback(SocketError error)
+        private void OnConnectFailedCallback(object sender, ConnectEventArgs e)
         {
-            Error("Failed to connect to the overmind server: " + error);
+            Error("Failed to connect to the overmind server: " + e.Error);
         }
 
-        private void OnConnectSuccessCallback()
+        private void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
         {
             Login();
         }

@@ -82,10 +82,20 @@ namespace EnergonSoftware.Database
             Connection.ConnectionString = connectionSettings.ConnectionString;
         }
 
+#region Dispose
         public void Dispose()
         {
-            Connection.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        private void Dispose(bool disposing)
+        {
+            if(disposing) {
+                Connection.Dispose();
+            }
+        }
+#endregion
 
         public async Task Open()
         {

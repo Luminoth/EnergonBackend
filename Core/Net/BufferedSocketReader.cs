@@ -10,8 +10,6 @@ namespace EnergonSoftware.Core.Net
 {
     public sealed class BufferedSocketReader : IDisposable
     {
-        private readonly object _lock = new object();
-
         private readonly Socket _socket;
         public readonly MemoryBuffer Buffer = new MemoryBuffer();
 
@@ -24,10 +22,20 @@ namespace EnergonSoftware.Core.Net
             _socket = socket;
         }
 
+#region Dispose
         public void Dispose()
         {
-            Buffer.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        private void Dispose(bool disposing)
+        {
+            if(disposing) {
+                Buffer.Dispose();
+            }
+        }
+#endregion
 
         // reads from the socket as long
         // as there is data to be read
@@ -35,27 +43,15 @@ namespace EnergonSoftware.Core.Net
         // or -1 on socket closed
         public int PollAndRead()
         {
-            lock(_lock) {
-                int count = 0;
-                while(_socket.Poll(100, SelectMode.SelectRead)) {
-                    int len = Read();
-                    if(len <= 0) {
-                        return count > 0 ? count : -1;
-                    }
-                    count += len;
+            int count = 0;
+            while(_socket.Poll(100, SelectMode.SelectRead)) {
+                int len = Read();
+                if(len <= 0) {
+                    return count > 0 ? count : -1;
                 }
-                return count;
+                count += len;
             }
-        }
-
-        public void BufferData(byte[] data)
-        {
-            Buffer.Write(data, 0, data.Length);
-        }
-
-        public void BufferData(byte[] data, int offset, int count)
-        {
-            Buffer.Write(data, offset, count);
+            return count;
         }
 
         private int Read()
@@ -66,7 +62,7 @@ namespace EnergonSoftware.Core.Net
                 return len;
             }
 
-            BufferData(data, 0, len);
+            Buffer.Write(data, 0, len);
             return len;
         }
     }

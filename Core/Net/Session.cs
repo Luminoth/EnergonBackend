@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 
 using log4net;
@@ -43,16 +44,16 @@ namespace EnergonSoftware.Core.Net
         }
 
 #region Events
-        public delegate void OnConnectSuccessHandler();
+        public delegate void OnConnectSuccessHandler(object sender, ConnectEventArgs e);
         public event OnConnectSuccessHandler OnConnectSuccess;
         
-        public delegate void OnConnectFailedHandler(SocketError error);
+        public delegate void OnConnectFailedHandler(object sender, ConnectEventArgs e);
         public event OnConnectFailedHandler OnConnectFailed;
 
-        public delegate void OnDisconnectHandler(string reason);
+        public delegate void OnDisconnectHandler(object sender, DisconnectEventArgs e);
         public event OnDisconnectHandler OnDisconnect;
 
-        public delegate void OnErrorHandler(string error);
+        public delegate void OnErrorHandler(object sender, ErrorEventArgs e);
         public event OnErrorHandler OnError;
 #endregion
 
@@ -111,33 +112,43 @@ namespace EnergonSoftware.Core.Net
             Timeout = -1;
         }
 
+#region Dispose
         public void Dispose()
         {
-            _socketState.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        private void OnConnectAsyncFailedCallback(SocketError error)
+        protected virtual void Dispose(bool disposing)
         {
-            Logger.Error("Session " + Id + " connect failed: " + error);
+            if(disposing) {
+                _socketState.Dispose();
+            }
+        }
+#endregion
 
-            Disconnect(error.ToString());
+        private void OnConnectAsyncFailedCallback(object sender, ConnectEventArgs e)
+        {
+            Logger.Error("Session " + Id + " connect failed: " + e.Error);
+
+            Disconnect(e.Error.ToString());
 
             if(null != OnConnectFailed) {
-                OnConnectFailed(error);
+                OnConnectFailed(sender, e);
             }
         }
 
-        private void OnConnectAsyncSuccessCallback(Socket socket)
+        private void OnConnectAsyncSuccessCallback(object sender, ConnectEventArgs e)
         {
-            Logger.Info("Connected session " + Id + " to " + socket.RemoteEndPoint);
+            Logger.Info("Connected session " + Id + " to " + e.Socket.RemoteEndPoint);
 
             lock(_lock) {
-                _socketState.Socket = socket;
+                _socketState.Socket = e.Socket;
                 _socketState.Connecting = false;
             }
 
             if(null != OnConnectSuccess) {
-                OnConnectSuccess();
+                OnConnectSuccess(sender, e);
             }
         }
 
@@ -149,7 +160,10 @@ namespace EnergonSoftware.Core.Net
                 _socketState.Connecting = true;
             }
 
-            AsyncConnectEventArgs args = new AsyncConnectEventArgs();
+            AsyncConnectEventArgs args = new AsyncConnectEventArgs()
+            {
+                Sender = this,
+            };
             args.OnConnectFailed += OnConnectAsyncFailedCallback;
             args.OnConnectSuccess += OnConnectAsyncSuccessCallback;
             Task.Factory.StartNew(() => NetUtil.ConnectAsync(host, port, args)).Wait();
@@ -181,7 +195,7 @@ namespace EnergonSoftware.Core.Net
                     _socketState.ShutdownAndClose(false);
 
                     if(null != OnDisconnect) {
-                        OnDisconnect(reason);
+                        OnDisconnect(this, new DisconnectEventArgs() { Reason = reason });
                     }
                 }
             }
@@ -207,17 +221,10 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public void BufferData(byte[] data)
+        public void BufferWrite(byte[] data, int offset, int count)
         {
             lock(_lock) {
-                _socketState.BufferData(data);
-            }
-        }
-
-        public void BufferData(byte[] data, int offset, int count)
-        {
-            lock(_lock) {
-                _socketState.BufferData(data, offset, count);
+                _socketState.Buffer.Write(data, offset, count);
             }
         }
 
@@ -288,7 +295,7 @@ namespace EnergonSoftware.Core.Net
             Disconnect(error);
 
             if(null != OnError) {
-                OnError(error);
+                OnError(this, new ErrorEventArgs() { Error = error });
             }
         }
 
@@ -298,7 +305,7 @@ namespace EnergonSoftware.Core.Net
             Disconnect(error);
 
             if(null != OnError) {
-                OnError(error);
+                OnError(this, new ErrorEventArgs() { Error = error, Exception = ex });
             }
         }
 
@@ -308,7 +315,7 @@ namespace EnergonSoftware.Core.Net
             Disconnect(ex.Message);
 
             if(null != OnError) {
-                OnError(ex.Message);
+                OnError(this, new ErrorEventArgs() { Exception = ex });
             }
         }
     }

@@ -8,6 +8,7 @@ using System.Windows.Interop;
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Util;
 using EnergonSoftware.Launcher.MessageHandlers;
 using EnergonSoftware.Launcher.Net;
 
@@ -44,22 +45,10 @@ namespace EnergonSoftware.Launcher
             }
         }
 
-#region Initialization
         private void ConfigureLogging()
         {
             XmlConfigurator.Configure();
         }
-
-        private void ConfigureThreading()
-        {
-            int workerThreads, ioThreads;
-            ThreadPool.GetMinThreads(out workerThreads, out ioThreads);
-            ThreadPool.SetMinThreads(Convert.ToInt32(ConfigurationManager.AppSettings["minWorkerThreads"]), ioThreads);
-
-            ThreadPool.GetMaxThreads(out workerThreads, out ioThreads);
-            ThreadPool.SetMaxThreads(Convert.ToInt32(ConfigurationManager.AppSettings["maxWorkerThreads"]), ioThreads);
-        }
-#endregion
 
 #region UI Helpers
         public void OnError(string message, string title)
@@ -75,7 +64,6 @@ namespace EnergonSoftware.Launcher
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
             ConfigureLogging();
-            ConfigureThreading();
             Common.InitFilesystem();
 
             await UpdateChecker.Instance.CheckForUpdates();
@@ -113,15 +101,15 @@ namespace EnergonSoftware.Launcher
             _sessions.Add(_overmindSession);
         }
 
-        private void OnDisconnectCallback(string reason)
+        private void OnDisconnectCallback(object sender, DisconnectEventArgs e)
         {
-            Logger.Debug("Disconnected: " + reason);
+            Logger.Debug("Disconnected: " + e.Reason);
             //OnError(reason, "Disconnected!");
         }
 
-        private void OnErrorCallback(string error)
+        private void OnErrorCallback(object sender, ErrorEventArgs e)
         {
-            OnError(error, "Error!");
+            OnError(e.Error, "Error!");
             Logout();
         }
 #endregion

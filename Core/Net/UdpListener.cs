@@ -69,14 +69,14 @@ namespace EnergonSoftware.Core.Net
                         byte[] data;
                         Socket remote = Accept(socket, out data);
                         if(manager.Contains(remote.RemoteEndPoint)) {
-                            manager.Get(remote.RemoteEndPoint).BufferData(data);
+                            manager.Get(remote.RemoteEndPoint).BufferWrite(data, 0, data.Length);
                             return;
                         }
 
                         Logger.Info("New connection from " + remote.RemoteEndPoint);
 
                         Session session = _factory.CreateSession(remote, manager);
-                        session.BufferData(data);
+                        session.BufferWrite(data, 0, data.Length);
                         manager.Add(session);
                     }
                 }

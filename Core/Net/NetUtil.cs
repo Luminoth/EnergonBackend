@@ -6,15 +6,28 @@ using System.Threading.Tasks;
 
 namespace EnergonSoftware.Core.Net
 {
+    public sealed class ConnectEventArgs : EventArgs
+    {
+        public Socket Socket { get; set; }
+        public SocketError Error { get; set; }
+    }
+
+    public sealed class DisconnectEventArgs : EventArgs
+    {
+        public string Reason { get; set; }
+    }
+
     public sealed class AsyncConnectEventArgs
     {
 #region Events
-        public delegate void OnConnectSuccessHandler(Socket socket);
+        public delegate void OnConnectSuccessHandler(object sender, ConnectEventArgs e);
         public event OnConnectSuccessHandler OnConnectSuccess;
-        
-        public delegate void OnConnectFailedHandler(SocketError error);
+
+        public delegate void OnConnectFailedHandler(object sender, ConnectEventArgs e);
         public event OnConnectFailedHandler OnConnectFailed;
 #endregion
+
+        public object Sender { get; set; }
 
         public AsyncConnectEventArgs()
         {
@@ -23,14 +36,14 @@ namespace EnergonSoftware.Core.Net
         public void ConnectSuccess(Socket socket)
         {
             if(null != OnConnectSuccess) {
-                OnConnectSuccess(socket);
+                OnConnectSuccess(Sender, new ConnectEventArgs() { Socket = socket });
             }
         }
 
         public void ConnectFailed(SocketError error)
         {
             if(null != OnConnectFailed) {
-                OnConnectFailed(error);
+                OnConnectFailed(Sender, new ConnectEventArgs() { Error = error });
             }
         }
     }

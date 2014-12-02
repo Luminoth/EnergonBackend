@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Util;
 using EnergonSoftware.Overmind.MessageHandlers;
 using EnergonSoftware.Overmind.Net;
 
@@ -15,7 +16,7 @@ using log4net;
 
 namespace EnergonSoftware.Overmind
 {
-    internal sealed partial class Overmind : ServiceBase
+    internal sealed partial class Overmind : ServiceWrapper, IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Overmind));
 
@@ -24,20 +25,29 @@ namespace EnergonSoftware.Overmind
 
         public bool Running { get; private set; }
 
-        private HttpServer _diagnosticServer = new HttpServer();
+        private readonly HttpServer _diagnosticServer = new HttpServer();
 
-        private SocketListener _loginListener = new SocketListener(new LoginSessionFactory());
-        private SessionManager _loginSessions = new SessionManager();
+        private readonly SocketListener _loginListener = new SocketListener(new LoginSessionFactory());
+        private readonly SessionManager _loginSessions = new SessionManager();
 
         public Overmind()
         {
             InitializeComponent();
         }
 
-        public void Start(string[] args)
+#region Dispose
+        protected override void Dispose(bool disposing)
         {
-            Task.Run(() => OnStart(args)).Wait();
+            if(disposing) {
+                if(components != null) {
+                    components.Dispose();
+                }
+
+                _diagnosticServer.Dispose();
+            }
+            base.Dispose(disposing);
         }
+#endregion
 
         protected override void OnStart(string[] args)
         {

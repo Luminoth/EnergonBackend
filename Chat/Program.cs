@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.ServiceProcess;
 using System.Threading;
+using System.Threading.Tasks;
 
 using log4net;
+using log4net.Config;
 
 namespace EnergonSoftware.Chat
 {
@@ -11,26 +14,31 @@ namespace EnergonSoftware.Chat
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Program));
 
+        public const string EventLogSource = "Energon Software Chat";
+        public static readonly EventLog ServiceEventLogger = new EventLog();
+
+        private static void ConfigureLogging()
+        {
+            /*if(!EventLog.SourceExists(EventLogSource))  {         
+                EventLog.CreateEventSource(EventLogSource, "Energon Software");
+            }*/
+            ServiceEventLogger.Source = EventLogSource;
+
+            XmlConfigurator.Configure();
+        }
+
         internal static void Main(string[] args)
         {
-            if(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"])) {
-                ServiceBase[] services = new ServiceBase[] 
-                { 
-                    new Chat()
-                };
-                ServiceBase.Run(services);
-            } else {
-                Chat chat = new Chat();
+            ConfigureLogging();
 
-                Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e)
+            Chat chat = new Chat();
+            Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
                 {
                     Logger.Info("Caught CancelKeyPress, stopping...");
                     chat.Stop();
                     e.Cancel = true;
                 };
-
-                chat.Start(args);
-            }
+            chat.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
         }
     }
 }
