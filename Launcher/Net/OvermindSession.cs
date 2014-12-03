@@ -70,12 +70,6 @@ namespace EnergonSoftware.Launcher.Net
         {
             LogoutMessage message = new LogoutMessage();
             SendMessage(message);
-            Disconnect();
-
-            ClientState.Instance.LoggingIn = false;
-            ClientState.Instance.LoggedIn = false;
-
-            ClientState.Instance.CurrentPage = ClientState.Page.Login;
         }
 
         public void Ping()

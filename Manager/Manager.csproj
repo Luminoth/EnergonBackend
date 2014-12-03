@@ -74,6 +74,9 @@
     <Compile Include="Manager.Designer.cs">
       <DependentUpon>Manager.cs</DependentUpon>
     </Compile>
+    <Compile Include="MessageHandlers\InstanceNotifierMessageHandlerFactory.cs" />
+    <Compile Include="Net\InstanceNotifier.cs" />
+    <Compile Include="Net\InstanceNotifierSession.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

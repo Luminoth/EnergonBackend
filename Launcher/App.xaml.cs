@@ -104,7 +104,7 @@ namespace EnergonSoftware.Launcher
             _chatSession = new ChatSession(_sessions);
             _chatSession.OnDisconnect += OnDisconnectCallback;
             _chatSession.OnError += OnErrorCallback;
-            _chatSession.BeginConnect(ConfigurationManager.AppSettings["chatHost"], Convert.ToInt32(ConfigurationManager.AppSettings["chatPort"]);
+            _chatSession.BeginConnect(ConfigurationManager.AppSettings["chatHost"], Convert.ToInt32(ConfigurationManager.AppSettings["chatPort"]));
             _sessions.Add(_chatSession);
         }
 
@@ -141,9 +141,19 @@ namespace EnergonSoftware.Launcher
         {
             if(null != _overmindSession) {
                 Logger.Info("Logging out...");
+
+                _chatSession.Disconnect();
+                _chatSession = null;
+
                 _overmindSession.Logout();
+                _overmindSession.Disconnect();
                 _overmindSession = null;
             }
+
+            ClientState.Instance.LoggingIn = false;
+            ClientState.Instance.LoggedIn = false;
+
+            ClientState.Instance.CurrentPage = ClientState.Page.Login;
         }
     }
 }

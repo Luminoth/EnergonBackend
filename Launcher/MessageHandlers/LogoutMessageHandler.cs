@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using System.Windows;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
@@ -17,8 +18,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers
 
         protected override void OnHandleMessage(IMessage message)
         {
-            // TODO: should this log *everything* out?
-            _session.Logout();
+            ((App)Application.Current).Logout();
         }
     }
 }
