@@ -86,7 +86,7 @@ namespace EnergonSoftware.Overmind
 
             InstanceNotifier.Instance.Startup();
 
-            Task.Run(() => Run()).Wait();
+            Run();
         }
 
         protected override void OnStop()

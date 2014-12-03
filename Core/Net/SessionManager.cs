@@ -30,7 +30,7 @@ namespace EnergonSoftware.Core.Net
         public void Start(IMessageHandlerFactory factory)
         {
             lock(_lock) {
-                Task.Factory.StartNew(() => _processor.Start(factory)).Wait();
+                _processor.Start(factory);
             }
         }
 
@@ -114,7 +114,7 @@ namespace EnergonSoftware.Core.Net
                         }
 
                         if(session.Connected) {
-                            Task.Factory.StartNew(() => session.Run(_processor)).Wait();
+                            session.Run(_processor);
                         }
                     }
                 );

@@ -74,6 +74,8 @@
     <Compile Include="Chat.Designer.cs">
       <DependentUpon>Chat.cs</DependentUpon>
     </Compile>
+    <Compile Include="MessageHandlers\ChatMessageHandlerFactory.cs" />
+    <Compile Include="Net\ChatSession.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

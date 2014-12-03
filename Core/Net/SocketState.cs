@@ -95,7 +95,9 @@ namespace EnergonSoftware.Core.Net
                 }
 
                 Socket.Shutdown(SocketShutdown.Both);
-                Socket.Disconnect(reuseSocket);
+                if(Socket.Connected) {
+                    Socket.Disconnect(reuseSocket);
+                }
                 Socket.Close();
             }
         }

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ServiceProcess;
+using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Chat.MessageHandlers;
+using EnergonSoftware.Chat.Net;
+using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 
@@ -21,6 +24,9 @@ namespace EnergonSoftware.Chat
         public bool Running { get; private set; }
 
         private readonly HttpServer _diagnosticServer = new HttpServer();
+
+        private readonly SocketListener _listener = new SocketListener(new ChatSessionFactory());
+        private readonly SessionManager _sessions = new SessionManager();
 
         public Chat()
         {
@@ -45,19 +51,40 @@ namespace EnergonSoftware.Chat
         {
             Logger.Info("Starting " + ServiceName + " with guid=" + UniqueId + "...");
 
+            ListenAddressesConfigurationSection listenAddresses = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("listenAddresses");
+            if(null == listenAddresses || listenAddresses.ListenAddresses.Count < 1) {
+                Logger.Error("No configured listen addresses!");
+                Stop();
+                return;
+            }
+
             Logger.Debug("Starting diagnostic interface...");
             _diagnosticServer.Start(new List<string>() { "http://localhost:9003/" });
+
+            Logger.Debug("Starting session manager...");
+            _sessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
+            _sessions.Start(new ChatMessageHandlerFactory());
+
+            Logger.Debug("Opening listener sockets...");
+            _listener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
+            _listener.CreateSockets(listenAddresses.ListenAddresses);
 
             Logger.Info("Running...");
             Running = true;
 
-            Task.Run(() => Run()).Wait();
+            Run();
         }
 
         protected override void OnStop()
         {
             Logger.Info("Stopping " + ServiceName + " with guid=" + UniqueId + "...");
             Running = false;
+
+            Logger.Debug("Closing listener sockets...");
+            _listener.CloseSockets();
+
+            Logger.Debug("Stopping session manager...");
+            _sessions.Stop();
 
             Logger.Debug("Stopping diagnostic interface...");
             _diagnosticServer.Stop();
@@ -66,6 +93,15 @@ namespace EnergonSoftware.Chat
         private void Run()
         {
             while(Running) {
+                try {
+                    _listener.Poll(_sessions);
+
+                    _sessions.PollAndRun();
+                    _sessions.Cleanup();
+                } catch(Exception e) {
+                    Logger.Fatal("Unhandled Exception!", e);
+                    Stop();
+                }
                 Thread.Sleep(0);
             }
         }

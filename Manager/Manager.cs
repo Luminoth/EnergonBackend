@@ -51,7 +51,7 @@ namespace EnergonSoftware.Manager
             Logger.Info("Running...");
             Running = true;
 
-            Task.Run(() => Run()).Wait();
+            Run();
         }
 
         protected override void OnStop()

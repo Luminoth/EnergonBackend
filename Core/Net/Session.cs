@@ -166,7 +166,7 @@ namespace EnergonSoftware.Core.Net
             };
             args.OnConnectFailed += OnConnectAsyncFailedCallback;
             args.OnConnectSuccess += OnConnectAsyncSuccessCallback;
-            Task.Factory.StartNew(() => NetUtil.ConnectAsync(host, port, args)).Wait();
+            NetUtil.ConnectAsync(host, port, args);
         }
 
         public void Connect(string host, int port, SocketType socketType, ProtocolType protocolType)
@@ -231,12 +231,12 @@ namespace EnergonSoftware.Core.Net
         public void Run(MessageProcessor processor)
         {
             lock(_lock) {
-                Task.Factory.StartNew(() => QueueMessages(this, _socketState, processor)).Wait();
+                QueueMessages(this, _socketState, processor);
 
                 // TODO: we need a way to say "hey, this handler is taking WAY too long,
                 // dump an error and kill the session"
 
-                Task.Factory.StartNew(() => OnRun(processor)).Wait();
+                OnRun(processor);
             }
         }
 
@@ -277,7 +277,7 @@ namespace EnergonSoftware.Core.Net
                     if(null == _messageHandler) {
                         return false;
                     }
-                    Task.Factory.StartNew(() => _messageHandler.HandleMessage(message)).Wait();
+                    _messageHandler.HandleMessage(message);
                 } catch(MessageHandlerException e) {
                     Logger.Error("Error handling message", e);
                     return false;

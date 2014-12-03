@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Net.Sockets;
-using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -86,7 +84,7 @@ namespace EnergonSoftware.Authenticator
 
             InstanceNotifier.Instance.Startup();
 
-            Task.Run(() => Run()).Wait();
+            Run();
         }
 
         protected override void OnStop()

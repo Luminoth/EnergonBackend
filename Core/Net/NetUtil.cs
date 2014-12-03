@@ -152,7 +152,7 @@ namespace EnergonSoftware.Core.Net
                 EndPoint endPoint = new IPEndPoint(address, port);
                 Socket socket = new Socket(endPoint.AddressFamily, socketType, protocolType);
                 try {
-                    Task.Factory.StartNew(() => socket.Connect(endPoint)).Wait();
+                    socket.Connect(endPoint);
                 } catch(SocketException) {
                     continue;
                 }
@@ -185,7 +185,7 @@ namespace EnergonSoftware.Core.Net
 // TODO: support ipv6 here
             socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(group));
             socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, ttl);
-            Task.Factory.StartNew(() => socket.Connect(endPoint)).Wait();
+            socket.Connect(endPoint);
 
             return socket;
         }
