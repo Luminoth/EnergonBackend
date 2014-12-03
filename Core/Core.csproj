@@ -54,6 +54,7 @@
     <Compile Include="Messages\Auth\FailureMessage.cs" />
     <Compile Include="Messages\Auth\ResponseMessage.cs" />
     <Compile Include="Messages\Auth\SuccessMessage.cs" />
+    <Compile Include="Messages\Chat\OnlineMessage.cs" />
     <Compile Include="Messages\Formatter\BinaryMessageFormatter.cs" />
     <Compile Include="Messages\Formatter\MessageFormatter.cs" />
     <Compile Include="Messages\Formatter\MessageSerializable.cs" />

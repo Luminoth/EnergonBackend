@@ -58,8 +58,18 @@ namespace EnergonSoftware.Chat
                 return;
             }
 
+            ListenAddressesConfigurationSection instanceNotifierListenAddresses = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("instanceNotifierAddresses");
+            if(null == instanceNotifierListenAddresses || instanceNotifierListenAddresses.ListenAddresses.Count < 1) {
+                Logger.Error("No configured instance notifier addresses!");
+                Stop();
+                return;
+            }
+
             Logger.Debug("Starting diagnostic interface...");
             _diagnosticServer.Start(new List<string>() { "http://localhost:9003/" });
+
+            Logger.Info("Starting instance notifier...");
+            InstanceNotifier.Instance.Start(instanceNotifierListenAddresses.ListenAddresses);
 
             Logger.Debug("Starting session manager...");
             _sessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
@@ -72,6 +82,8 @@ namespace EnergonSoftware.Chat
             Logger.Info("Running...");
             Running = true;
 
+            InstanceNotifier.Instance.Startup();
+
             Run();
         }
 
@@ -80,11 +92,16 @@ namespace EnergonSoftware.Chat
             Logger.Info("Stopping " + ServiceName + " with guid=" + UniqueId + "...");
             Running = false;
 
+            InstanceNotifier.Instance.Shutdown();
+
             Logger.Debug("Closing listener sockets...");
             _listener.CloseSockets();
 
             Logger.Debug("Stopping session manager...");
             _sessions.Stop();
+
+            Logger.Debug("Stopping instance notifier...");
+            InstanceNotifier.Instance.Stop();
 
             Logger.Debug("Stopping diagnostic interface...");
             _diagnosticServer.Stop();
@@ -94,6 +111,8 @@ namespace EnergonSoftware.Chat
         {
             while(Running) {
                 try {
+                    InstanceNotifier.Instance.Run();
+
                     _listener.Poll(_sessions);
 
                     _sessions.PollAndRun();

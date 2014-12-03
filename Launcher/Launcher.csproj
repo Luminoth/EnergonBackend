@@ -115,6 +115,7 @@
     <Compile Include="MessageHandlers\MessageHandlerFactory.cs" />
     <Compile Include="MessageHandlers\PingMessageHandler.cs" />
     <Compile Include="Net\AuthSession.cs" />
+    <Compile Include="Net\ChatSession.cs" />
     <Compile Include="Net\OvermindSession.cs" />
     <Compile Include="NewsChecker.cs" />
     <Compile Include="UpdateChecker.cs" />

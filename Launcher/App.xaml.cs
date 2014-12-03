@@ -28,6 +28,7 @@ namespace EnergonSoftware.Launcher
 
         private static SessionManager _sessions = new SessionManager();
         private static OvermindSession _overmindSession;
+        private static ChatSession _chatSession;
 
         private static void OnIdle()
         {
@@ -99,6 +100,12 @@ namespace EnergonSoftware.Launcher
             _overmindSession.OnError += OnErrorCallback;
             _overmindSession.BeginConnect(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"]));
             _sessions.Add(_overmindSession);
+
+            _chatSession = new ChatSession(_sessions);
+            _chatSession.OnDisconnect += OnDisconnectCallback;
+            _chatSession.OnError += OnErrorCallback;
+            _chatSession.BeginConnect(ConfigurationManager.AppSettings["chatHost"], Convert.ToInt32(ConfigurationManager.AppSettings["chatPort"]);
+            _sessions.Add(_chatSession);
         }
 
         private void OnDisconnectCallback(object sender, DisconnectEventArgs e)
