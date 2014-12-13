@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 
@@ -28,20 +29,6 @@ namespace EnergonSoftware.Core.Net
         private static int _nextId = 0;
         private static int NextId { get { return ++_nextId; } }
 #endregion
-
-        protected static void QueueMessages(Session session, SocketState socketState, MessageProcessor processor)
-        {
-            NetworkMessage message = NetworkMessage.Parse(socketState.Buffer, session.Formatter);
-            while(null != message) {
-                Logger.Debug("Session " + session.Id + " parsed message type: " + message.Payload.Type);
-                processor.QueueMessage(session, message.Payload);
-                message = NetworkMessage.Parse(socketState.Buffer, session.Formatter);
-            }
-
-            if(session.HasMessageHandler && session.MessageHandler.Finished) {
-                session.MessageHandler = null;
-            }
-        }
 
 #region Events
         public delegate void OnConnectSuccessHandler(object sender, ConnectEventArgs e);
@@ -174,7 +161,7 @@ namespace EnergonSoftware.Core.Net
             Logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
 
             lock(_lock) {
-                _socketState.Socket = Task.Factory.StartNew(() => NetUtil.Connect(host, port, socketType, protocolType)).Result;
+                _socketState.Socket = NetUtil.Connect(host, port, socketType, protocolType);
             }
         }
 
@@ -183,7 +170,7 @@ namespace EnergonSoftware.Core.Net
             Logger.Info("Session " + Id + " connecting to multicast group " + group + ":" + port + "...");
 
             lock(_lock) {
-                _socketState.Socket = Task.Factory.StartNew(() => NetUtil.ConnectMulticast(group, port, ttl)).Result;
+                _socketState.Socket = NetUtil.ConnectMulticast(group, port, ttl);
             }
         }
 
@@ -228,19 +215,22 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public void Run(MessageProcessor processor)
+        public void Run(MessageProcessor processor, IMessageParser parser)
         {
             lock(_lock) {
-                QueueMessages(this, _socketState, processor);
+                processor.ParseMessages(this, parser, _socketState.Buffer, Formatter);
 
                 // TODO: we need a way to say "hey, this handler is taking WAY too long,
                 // dump an error and kill the session"
+                if(HasMessageHandler && MessageHandler.Finished) {
+                    MessageHandler = null;
+                }
 
-                OnRun(processor);
+                OnRun(processor, parser);
             }
         }
 
-        protected virtual void OnRun(MessageProcessor processor)
+        protected virtual void OnRun(MessageProcessor processor, IMessageParser parser)
         {
         }
 

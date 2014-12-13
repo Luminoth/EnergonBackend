@@ -4,7 +4,10 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Util;
 
 using log4net;
 
@@ -64,6 +67,16 @@ private Task _task;
                 return true;
             }
             return false;
+        }
+
+        public void ParseMessages(Session session, IMessageParser parser, MemoryBuffer buffer, IMessageFormatter formatter)
+        {
+            MessagePacket packet = parser.Parse(buffer, formatter);
+            while(null != packet) {
+                Logger.Debug("Session " + session.Id + " parsed message type: " + packet.Payload.Type);
+                QueueMessage(session, packet.Payload);
+                packet = parser.Parse(buffer, formatter);
+            }
         }
 
         public bool RemoveSession(int sessionId)

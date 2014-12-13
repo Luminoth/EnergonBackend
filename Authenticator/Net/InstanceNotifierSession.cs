@@ -2,6 +2,7 @@
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
 
 using log4net;
@@ -29,14 +30,14 @@ namespace EnergonSoftware.Authenticator.Net
             _listener = listener;
         }
 
-        protected override void OnRun(MessageProcessor processor)
+        protected override void OnRun(MessageProcessor processor, IMessageParser parser)
         {
             int count = _listener.PollAndRead();
             if(count > 0) {
                 Logger.Debug("Instance notifier session " + Id + " read " + count + " bytes");
             }
 
-            QueueMessages(this, _listener, processor);
+            processor.ParseMessages(this, parser, _listener.Buffer, Formatter);
         }
     }
 }

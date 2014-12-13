@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 
@@ -28,7 +29,7 @@ namespace EnergonSoftware.Launcher.Net
         {
         }
 
-        protected override void OnRun(MessageProcessor processor)
+        protected override void OnRun(MessageProcessor processor, IMessageParser parser)
         {
             Ping();
         }

@@ -3,28 +3,18 @@ using System.IO;
 using System.Linq;
 
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Util;
 
 namespace EnergonSoftware.Core.Messages
 {
-    /*
-     * Packet Format:
-     *      ID | TYPE | PAYLOAD LENGTH | PAYLOAD | TERMINATOR
-     */
-    [Serializable]
-    public class NetworkMessage : IComparable
+    public class NetworkMessageParser : IMessageParser
     {
-        private const int MaxPayloadSize = ushort.MaxValue;
-        private static readonly byte[] Terminator = new byte[] { (byte)'\r', (byte)'\n', 0 };
+        public NetworkMessageParser()
+        {
+        }
 
-#region Id Generator
-        private static int _nextId = 0;
-        private static int NextId { get { return ++_nextId; } }
-#endregion
-
-        // returns null if not enough data was available
-        // throws MessageException if deserialization failed
-        public static NetworkMessage Parse(MemoryBuffer buffer, IMessageFormatter formatter)
+        public MessagePacket Parse(MemoryBuffer buffer, IMessageFormatter formatter)
         {
             buffer.Flip();
             if(!buffer.HasRemaining) {
@@ -41,19 +31,27 @@ namespace EnergonSoftware.Core.Messages
             buffer.Compact();
             return packet;
         }
+    }
 
-        public int Id { get; private set; }
-        public IMessage Payload { get; set; }
-        public bool HasPayload { get { return null != Payload; } }
+    /*
+     * Packet Format:
+     *      MARKER | ID | TYPE | PAYLOAD LENGTH | PAYLOAD | TERMINATOR
+     */
+    [Serializable]
+    public sealed class NetworkMessage : MessagePacket
+    {
+        private const int MaxPayloadSize = ushort.MaxValue;
+        private static readonly byte[] Marker = new byte[] { (byte)'E', (byte)'S', (byte)'N', (byte)'M', 0 };
+        private static readonly byte[] Terminator = new byte[] { (byte)'\r', (byte)'\n', 0 };
 
         public NetworkMessage()
         {
-            Id = NextId;
         }
 
-        public byte[] Serialize(IMessageFormatter formatter)
+        public override byte[] Serialize(IMessageFormatter formatter)
         {
             using(MemoryStream stream = new MemoryStream()) {
+                formatter.Write(Marker, 0, Marker.Length, stream);
                 formatter.WriteInt(Id, stream);
 
                 if(!HasPayload) {
@@ -79,10 +77,14 @@ namespace EnergonSoftware.Core.Messages
             }
         }
 
-        // returns false if not enough data was available
-        // throws MessageException if deserialization failed
-        public bool DeSerialize(MemoryBuffer buffer, IMessageFormatter formatter)
+        public override bool DeSerialize(MemoryBuffer buffer, IMessageFormatter formatter)
         {
+            byte[] marker = new byte[Marker.Length];
+            buffer.Read(marker, 0, marker.Length);
+            if(!marker.SequenceEqual(Marker)) {
+                throw new MessageException("Invalid marker!");
+            }
+
             Id = formatter.ReadInt(buffer.Buffer);
 
             string type = formatter.ReadString(buffer.Buffer);
@@ -113,15 +115,6 @@ namespace EnergonSoftware.Core.Messages
             }
 
             return true;
-        }
-
-        public int CompareTo(object obj)
-        {
-            NetworkMessage rhs = obj as NetworkMessage;
-            if(null == rhs) {
-                return 0;
-            }
-            return (int)(Id - rhs.Id);
         }
 
         public override string ToString()

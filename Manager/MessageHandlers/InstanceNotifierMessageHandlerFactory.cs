@@ -1,5 +1,5 @@
 ﻿using EnergonSoftware.Core.MessageHandlers;
-using EnergonSoftware.Core.Messages.Notifications;
+using EnergonSoftware.Core.Messages.Notification;
 using EnergonSoftware.Core.Net;
 
 namespace EnergonSoftware.Manager.MessageHandlers

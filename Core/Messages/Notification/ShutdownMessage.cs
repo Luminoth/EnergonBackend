@@ -3,18 +3,18 @@ using System.IO;
 
 using EnergonSoftware.Core.Messages.Formatter;
 
-namespace EnergonSoftware.Core.Messages.Notifications
+namespace EnergonSoftware.Core.Messages.Notification
 {
     [Serializable]
-    public sealed class StartupMessage : INotificationMessage
+    public sealed class ShutdownMessage : INotificationMessage
     {
-        public const string MessageType = "startup";
+        public const string MessageType = "shutdown";
         public string Type { get { return MessageType; } }
 
         public string ServiceName { get; set; }
         public string ServiceId { get; set; }
 
-        public StartupMessage() : base()
+        public ShutdownMessage() : base()
         {
         }
 
@@ -32,7 +32,7 @@ namespace EnergonSoftware.Core.Messages.Notifications
 
         public override string ToString()
         {
-            return "StartupMessage(ServiceName=" + ServiceName + ", ServiceId=" + ServiceId + ")";
+            return "ShutdownMessage(ServiceName=" + ServiceName + ", ServiceId=" + ServiceId + ")";
         }
     }
 }

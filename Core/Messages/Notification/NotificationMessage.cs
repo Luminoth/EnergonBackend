@@ -2,7 +2,7 @@
 
 using EnergonSoftware.Core.Messages.Formatter;
 
-namespace EnergonSoftware.Core.Messages.Notifications
+namespace EnergonSoftware.Core.Messages.Notification
 {
     public interface INotificationMessage : IMessage
     {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Messages.Parser;
 
 using log4net;
 
@@ -19,6 +20,7 @@ namespace EnergonSoftware.Core.Net
  
         private readonly List<Session> _sessions = new List<Session>();
         private readonly MessageProcessor _processor = new MessageProcessor();
+        private readonly IMessageParser _parser = new NetworkMessageParser();
 
         public long SessionTimeout { get; set; }
 
@@ -114,7 +116,7 @@ namespace EnergonSoftware.Core.Net
                         }
 
                         if(session.Connected) {
-                            session.Run(_processor);
+                            session.Run(_processor, _parser);
                         }
                     }
                 );
