@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Util;
 
-namespace EnergonSoftware.Database.Objects.Events
+namespace EnergonSoftware.Database.Models.Events
 {
     public abstract class Event : IDatabaseObject
     {

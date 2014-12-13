@@ -62,6 +62,10 @@ namespace EnergonSoftware.Database
         public Tuple<string, string> References { get { return _references; } }
         public bool HasForeignKey { get { return null != _references; } }
 
+        private ColumnDescription()
+        {
+        }
+
         public ColumnDescription(string name, DatabaseType type)
         {
             Name = name;
@@ -120,6 +124,10 @@ namespace EnergonSoftware.Database
 
         public readonly string Name;
         public ColumnDescription this[string key] { get { return _columns[key]; } }
+
+        private TableDescription()
+        {
+        }
 
         public TableDescription(string name, List<ColumnDescription> columns)
         {

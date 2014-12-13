@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core;
 
-namespace EnergonSoftware.Database.Objects
+namespace EnergonSoftware.Database.Models
 {
     public sealed class AccountFriend : IDatabaseObject
     {
@@ -52,12 +52,6 @@ namespace EnergonSoftware.Database.Objects
         {
             _account = -1;
             _friend = -1;
-        }
-
-        public AccountFriend(long account, long friend)
-        {
-            _account = account;
-            _friend = friend;
         }
 
         public async Task<bool> Read(DatabaseConnection connection)

@@ -12,7 +12,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers
         {
         }
 
-        protected override void OnHandleMessage(IMessage message)
+        protected override void OnHandleMessage(IMessage message, Session session)
         {
         }
     }

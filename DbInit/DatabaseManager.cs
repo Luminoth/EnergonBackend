@@ -4,8 +4,8 @@ using System.IO;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Database;
-using EnergonSoftware.Database.Objects;
-using EnergonSoftware.Database.Objects.Events;
+using EnergonSoftware.Database.Models;
+using EnergonSoftware.Database.Models.Events;
 
 using log4net;
 
@@ -88,7 +88,7 @@ namespace EnergonSoftware.DbInit
         {
             Logger.Info("Verifying account data...");
 
-            AccountInfo account = new AccountInfo("shane");
+            AccountInfo account = new AccountInfo() { Username = "shane", };
             await account.Read(connection);
             Logger.Info("Read account: " + account);
         }

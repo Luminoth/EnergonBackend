@@ -1,15 +1,17 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 using EnergonSoftware.Core.Messages.Formatter;
 
 namespace EnergonSoftware.Core.Messages.Chat
 {
-    public sealed class OnlineMessage : IMessage
+    [Serializable]
+    public sealed class StatusMessage : IMessage
     {
-        public const string MessageType = "online";
+        public const string MessageType = "status";
         public string Type { get { return MessageType; } }
 
-        public OnlineMessage()
+        public StatusMessage()
         {
         }
 

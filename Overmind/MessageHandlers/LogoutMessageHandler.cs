@@ -2,22 +2,21 @@
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Net;
 using EnergonSoftware.Overmind.Net;
 
 namespace EnergonSoftware.Overmind.MessageHandlers
 {
     internal sealed class LogoutMessageHandler : MessageHandler
     {
-        private readonly LoginSession _session;
-
-        internal LogoutMessageHandler(LoginSession session)
+        internal LogoutMessageHandler()
         {
-            _session = session;
         }
 
-        protected async override void OnHandleMessage(IMessage message)
+        protected async override void OnHandleMessage(IMessage message, Session session)
         {
-            await _session.Logout();
+            LoginSession loginSession = (LoginSession)session;
+            await loginSession.Logout();
         }
     }
 }

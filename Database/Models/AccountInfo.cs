@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core;
-using EnergonSoftware.Core.Account;
+using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.Util.Crypt;
 
-namespace EnergonSoftware.Database.Objects
+namespace EnergonSoftware.Database.Models
 {
     public sealed class AccountInfo : IDatabaseObject
     {
@@ -21,9 +22,10 @@ namespace EnergonSoftware.Database.Objects
                 { new ColumnDescription("username", DatabaseType.Text).SetNotNull() },
                 { new ColumnDescription("passwordMD5", DatabaseType.Text).SetNotNull() },
                 { new ColumnDescription("passwordSHA512", DatabaseType.Text).SetNotNull() },
-                { new ColumnDescription("sessionEndPoint", DatabaseType.Text) },
+                { new ColumnDescription("endPoint", DatabaseType.Text) },
                 { new ColumnDescription("sessionid", DatabaseType.Text) },
-                { new ColumnDescription("status", DatabaseType.Integer) },
+                { new ColumnDescription("visibility", DatabaseType.Integer).SetNotNull() },
+                { new ColumnDescription("status", DatabaseType.Text) },
             }
         );
 
@@ -34,21 +36,21 @@ namespace EnergonSoftware.Database.Objects
             await AccountsTable.Create(connection);
         }
 
-        public static async Task<List<Friend>> ReadFriends(DatabaseConnection connection, long accountId)
+        public static async Task<List<Account>> ReadFriends(DatabaseConnection connection, long accountId)
         {
-            List<Friend> friends = new List<Friend>();
+            List<Account> friends = new List<Account>();
 
-            using(DbCommand command = connection.BuildCommand("SELECT id, username, status FROM " + AccountsTable.Name + " WHERE id IN"
+            using(DbCommand command = connection.BuildCommand("SELECT id, username, visibility, status FROM " + AccountsTable.Name + " WHERE id IN"
                 + " (SELECT friend FROM " + AccountFriend.TableName + " where account=@account) AND active=1"))
             {
                 connection.AddParameter(command, "account", accountId);
                 using(DbDataReader reader = await Task.Run(() => command.ExecuteReader())) {
                     while(reader.Read()) {
-                        friends.Add(new Friend()
+                        friends.Add(new Account()
                             {
-                                Id = reader.GetInt32(0),
-                                Name = reader.GetString(1),
-                                Status = (Status)reader.GetInt32(2),
+                                Username = reader.GetString(1),
+                                Visibility = (Visibility)reader.GetInt32(2),
+                                Status = reader.GetString(3),
                             }
                         );
                     }
@@ -80,29 +82,21 @@ namespace EnergonSoftware.Database.Objects
         public string PasswordMD5 { get; private set; }
         public string PasswordSHA512 { get; private set; }
 
-        private string _sessionEndPoint;
-        public string SessionEndPoint { get { return _sessionEndPoint; } set { _sessionEndPoint = value; Dirty = true; } }
+        private string _endPoint;
+        public string EndPoint { get { return _endPoint; } set { _endPoint = value; Dirty = true; } }
 
         private string _sessionid;
         public string SessionId { get { return _sessionid; } set { _sessionid = value; Dirty = true; } }
 
-        private Status _status = Status.Offline;
-        public Status Status { get { return _status; } set { _status = value; Dirty = true; } }
+        private Visibility _visibility = Visibility.Offline;
+        public Visibility Visibility { get { return _visibility; } set { _visibility = value; Dirty = true; } }
+
+        private string _status;
+        public string Status { get { return _status; } set { _status = value; Dirty = true; } }
 
         public AccountInfo()
         {
             Id = -1;
-        }
-
-        public AccountInfo(long id)
-        {
-            Id = id;
-        }
-
-        public AccountInfo(string username)
-        {
-            Id = -1;
-            _username = username;
         }
 
         public void SetPassword(string realm, string password)
@@ -145,27 +139,32 @@ namespace EnergonSoftware.Database.Objects
             PasswordMD5 = reader.GetString(AccountsTable["passwordMD5"].Id);
             PasswordSHA512 = reader.GetString(AccountsTable["passwordSHA512"].Id);
 
-            if(!reader.IsDBNull(AccountsTable["sessionEndPoint"].Id)) {
-                _sessionEndPoint = reader.GetString(AccountsTable["sessionEndPoint"].Id);
+            if(!reader.IsDBNull(AccountsTable["endPoint"].Id)) {
+                _endPoint = reader.GetString(AccountsTable["endPoint"].Id);
             }
 
             if(!reader.IsDBNull(AccountsTable["sessionid"].Id)) {
                 _sessionid = reader.GetString(AccountsTable["sessionid"].Id);
             }
 
-            _status = (Status)reader.GetInt32(AccountsTable["status"].Id);
+            _visibility = (Visibility)reader.GetInt32(AccountsTable["visibility"].Id);
+
+            if(!reader.IsDBNull(AccountsTable["status"].Id)) {
+                _status = reader.GetString(AccountsTable["status"].Id);
+            }
         }
 
         public async Task Insert(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountsTable.Name
-                + "(active, username" + ", passwordMD5" + ", passwordSHA512" + ", status)"
-                + " VALUES(@active, @username" + ", @passwordMD5" + ", @passwordSHA512" + ", @status)"))
+                + "(active, username, passwordMD5, passwordSHA512, visibility, status)"
+                + " VALUES(@active, @username, @passwordMD5, @passwordSHA512, @visibility, @status)"))
             {
                 connection.AddParameter(command, "active", Active);
                 connection.AddParameter(command, "username", Username);
                 connection.AddParameter(command, "passwordMD5", PasswordMD5);
                 connection.AddParameter(command, "passwordSHA512", PasswordSHA512);
+                connection.AddParameter(command, "visibility", Visibility);
                 connection.AddParameter(command, "status", Status);
                 await Task.Run(() => command.ExecuteNonQuery());
                 Id = connection.LastInsertRowId;
@@ -175,11 +174,12 @@ namespace EnergonSoftware.Database.Objects
         public async Task Update(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("UPDATE " + AccountsTable.Name
-                + " SET active=@active, sessionEndPoint=@sessionEndPoint, sessionid=@sessionid, status=@status WHERE id=@id"))
+                + " SET active=@active, endPoint=@endPoint, sessionid=@sessionid, visibility=@visibility, status=@status WHERE id=@id"))
             {
                 connection.AddParameter(command, "active", Active);
-                connection.AddParameter(command, "sessionEndPoint", SessionEndPoint);
+                connection.AddParameter(command, "endPoint", EndPoint);
                 connection.AddParameter(command, "sessionid", SessionId);
+                connection.AddParameter(command, "visibility", Visibility);
                 connection.AddParameter(command, "status", Status);
                 connection.AddParameter(command, "id", Id);
                 await Task.Run(() => command.ExecuteNonQuery());
@@ -195,11 +195,28 @@ namespace EnergonSoftware.Database.Objects
             }
         }
 
+        public Account ToAccount()
+        {
+            string[] endPoint = EndPoint.Split(':');
+            if(2 != endPoint.Length) {
+                throw new FormatException("Invalid EndPoint!");
+            }
+
+            return new Account()
+            {
+                Id = Id,
+                Username = Username,
+                SessionId = SessionId,
+                EndPoint = new IPEndPoint(IPAddress.Parse(endPoint[0]), Convert.ToInt32(endPoint[1])),
+                Visibility = Visibility,
+            };
+        }
+
         public override string ToString()
         {
             return "Account(id: " + Id + ", active: " + Active
                 + ", username: " + Username + ", passwordMD5: " + PasswordMD5 + ", passwordSHA512: " + PasswordSHA512
-                + ", sessionEndPoint: " + SessionEndPoint + ", sessionid: " + SessionId + ", status: " + Status + ")";
+                + ", endPoint: " + EndPoint + ", sessionid: " + SessionId + ", visibility: " + Visibility + ", status: " + Status + ")";
         }
     }
 }

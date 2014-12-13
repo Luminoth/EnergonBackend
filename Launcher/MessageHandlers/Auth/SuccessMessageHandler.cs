@@ -3,23 +3,23 @@
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
+using EnergonSoftware.Core.Net;
 using EnergonSoftware.Launcher.Net;
 
 namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 {
     internal sealed class SuccessMessageHandler : MessageHandler
     {
-        private readonly AuthSession _session;
-
-        internal SuccessMessageHandler(AuthSession session)
+        internal SuccessMessageHandler()
         {
-            _session = session;
         }
         
-        protected override void OnHandleMessage(IMessage message)
+        protected override void OnHandleMessage(IMessage message, Session session)
         {
             SuccessMessage success = (SuccessMessage)message;
-            _session.AuthSuccess(success.SessionId);
+            AuthSession authSession = (AuthSession)session;
+
+            authSession.AuthSuccess(success.SessionId);
         }
     }
 }

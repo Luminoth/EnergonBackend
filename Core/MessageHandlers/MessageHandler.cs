@@ -11,7 +11,7 @@ namespace EnergonSoftware.Core.MessageHandlers
 {
     public interface IMessageHandlerFactory
     {
-        MessageHandler NewHandler(string type, Session session);
+        MessageHandler NewHandler(string type);
     }
 
     public class MessageHandler
@@ -23,9 +23,9 @@ public bool Finished { get { return null != _task && _task.IsCompleted; } }
         /*private long _startTime, _finishTime;
         public long RuntimeMs { get { return Finished ? _finishTime - _startTime : Time.CurrentTimeMs - _startTime; } }*/
 
-        public /*async Task*/ void HandleMessage(IMessage message)
+        public /*async Task*/ void HandleMessage(IMessage message, Session session)
         {
-_task = Task.Factory.StartNew(() => OnHandleMessage(message));
+_task = Task.Factory.StartNew(() => OnHandleMessage(message, session));
             /*Finished = false;
             _startTime = Time.CurrentTimeMs;
             await Task.Run(() => OnHandleMessage(message));
@@ -33,7 +33,7 @@ _task = Task.Factory.StartNew(() => OnHandleMessage(message));
             Finished = true;*/
         }
 
-        protected virtual void OnHandleMessage(IMessage message)
+        protected virtual void OnHandleMessage(IMessage message, Session session)
         {
         }
     }

@@ -10,6 +10,16 @@ using log4net;
 
 namespace EnergonSoftware.Core.MessageHandlers
 {
+/*
+ * TODO: move the queue into the Session
+ * give the processor the SessionManager
+ * for each session in the manager
+ *  check for a handler, if there isn't one and a message is waiting, spin a new one
+ */
+
+// TODO: reevaluate if this class is even necessary
+// why doesn't each Session just handle it's shit?
+
     public sealed class MessageProcessor
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageProcessor));

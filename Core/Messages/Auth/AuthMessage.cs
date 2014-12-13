@@ -1,10 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Util;
 
 namespace EnergonSoftware.Core.Messages.Auth
 {
+    [Serializable]
     public sealed class AuthMessage : IMessage
     {
         public const string MessageType = "auth";

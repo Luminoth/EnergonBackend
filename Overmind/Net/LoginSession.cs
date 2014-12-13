@@ -7,7 +7,7 @@ using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
-using EnergonSoftware.Database.Objects;
+using EnergonSoftware.Database.Models;
 
 using log4net;
 

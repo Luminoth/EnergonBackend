@@ -6,7 +6,7 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
 {
     internal sealed class MessageHandlerFactory : IMessageHandlerFactory
     {
-        public MessageHandler NewHandler(string type, Session session)
+        public MessageHandler NewHandler(string type)
         {
             switch(type)
             {

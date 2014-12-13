@@ -1,7 +1,7 @@
 ﻿using System.Data.Common;
 using System.Threading.Tasks;
 
-namespace EnergonSoftware.Database.Objects
+namespace EnergonSoftware.Database.Models
 {
     public interface IDatabaseObject
     {

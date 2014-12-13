@@ -10,7 +10,7 @@ using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Database;
-using EnergonSoftware.Database.Objects;
+using EnergonSoftware.Database.Models;
 
 using log4net;
 
@@ -82,7 +82,7 @@ namespace EnergonSoftware.Authenticator.Net
             await EventLogger.Instance.SuccessEvent(RemoteEndPoint, AccountInfo.Username);
 
             AccountInfo.SessionId = sessionid;
-            AccountInfo.SessionEndPoint = RemoteEndPoint.ToString();
+            AccountInfo.EndPoint = RemoteEndPoint.ToString();
 
             using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnection()) {
                 await AccountInfo.Update(connection);

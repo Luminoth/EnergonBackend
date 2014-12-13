@@ -2,6 +2,7 @@
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Net;
 
 namespace EnergonSoftware.Core.Test.MessageHandlers
 {
@@ -11,7 +12,7 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
         {
         }
 
-        protected override void OnHandleMessage(IMessage message)
+        protected override void OnHandleMessage(IMessage message, Session session)
         {
             throw new MessageHandlerException("Test Exception");
         }

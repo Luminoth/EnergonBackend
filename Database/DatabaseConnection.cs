@@ -72,6 +72,10 @@ namespace EnergonSoftware.Database
             }
         }
 
+        private DatabaseConnection()
+        {
+        }
+
         public DatabaseConnection(ConnectionStringSettings connectionSettings)
         {
             ConnectionSettings = connectionSettings;

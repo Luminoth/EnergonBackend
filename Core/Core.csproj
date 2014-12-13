@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Accounts\Account.cs" />
+    <Compile Include="Accounts\Visibility.cs" />
     <Compile Include="Auth.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="Configuration\ListenAddressConfiguration.cs" />
@@ -54,7 +56,7 @@
     <Compile Include="Messages\Auth\FailureMessage.cs" />
     <Compile Include="Messages\Auth\ResponseMessage.cs" />
     <Compile Include="Messages\Auth\SuccessMessage.cs" />
-    <Compile Include="Messages\Chat\OnlineMessage.cs" />
+    <Compile Include="Messages\Chat\StatusMessage.cs" />
     <Compile Include="Messages\Formatter\BinaryMessageFormatter.cs" />
     <Compile Include="Messages\Formatter\MessageFormatter.cs" />
     <Compile Include="Messages\Formatter\MessageSerializable.cs" />
@@ -68,12 +70,12 @@
     <Compile Include="Messages\Overmind\LoginMessage.cs" />
     <Compile Include="Messages\Overmind\LogoutMessage.cs" />
     <Compile Include="Messages\PingMessage.cs" />
+    <Compile Include="Net\AuthenticatedSession.cs" />
     <Compile Include="Net\BufferedSocketReader.cs" />
     <Compile Include="Net\HttpServer.cs" />
     <Compile Include="Net\UdpListener.cs" />
     <Compile Include="Net\NetUtil.cs" />
     <Compile Include="Messages\NetworkMessage.cs" />
-    <Compile Include="Account\Friend.cs" />
     <Compile Include="Net\Session.cs" />
     <Compile Include="Net\SessionManager.cs" />
     <Compile Include="Net\SocketListener.cs" />

@@ -11,6 +11,7 @@ namespace EnergonSoftware.Core.Messages
      * Packet Format:
      *      ID | TYPE | PAYLOAD LENGTH | PAYLOAD | TERMINATOR
      */
+    [Serializable]
     public class NetworkMessage : IComparable
     {
         private const int MaxPayloadSize = ushort.MaxValue;

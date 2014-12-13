@@ -1,9 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 using EnergonSoftware.Core.Messages.Formatter;
 
 namespace EnergonSoftware.Core.Messages.Overmind
 {
+    [Serializable]
     public sealed class LoginMessage : IMessage
     {
         public const string MessageType = "login";

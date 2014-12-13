@@ -1,9 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 using EnergonSoftware.Core.Messages.Formatter;
 
 namespace EnergonSoftware.Core.Messages.Notifications
 {
+    [Serializable]
     public sealed class ShutdownMessage : INotificationMessage
     {
         public const string MessageType = "shutdown";

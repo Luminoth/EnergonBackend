@@ -273,11 +273,11 @@ namespace EnergonSoftware.Core.Net
                 Logger.Debug("Processing message with type=" + message.Type + " for session id=" + Id + "...");
 
                 try {
-                    _messageHandler = factory.NewHandler(message.Type, this);
+                    _messageHandler = factory.NewHandler(message.Type);
                     if(null == _messageHandler) {
                         return false;
                     }
-                    _messageHandler.HandleMessage(message);
+                    _messageHandler.HandleMessage(message, this);
                 } catch(MessageHandlerException e) {
                     Logger.Error("Error handling message", e);
                     return false;

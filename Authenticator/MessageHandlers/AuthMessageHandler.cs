@@ -8,6 +8,7 @@ using EnergonSoftware.Core;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
+using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 
 using log4net;
@@ -37,24 +38,24 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 + ",qop=\"auth\",charset=utf-8,algorithm=sha512-sess";
         }
 
-        private readonly AuthSession _session;
 
-        internal AuthMessageHandler(AuthSession session)
+        internal AuthMessageHandler()
         {
-            _session = session;
         }
 
-        protected async override void OnHandleMessage(IMessage message)
+        protected async override void OnHandleMessage(IMessage message, Session session)
         {
-            await EventLogger.Instance.RequestEvent(_session.RemoteEndPoint);
-            if(_session.Authenticated || _session.Authenticating) {
-                await _session.Failure("Already Authenticating");
+            AuthSession authSession = (AuthSession)session;
+
+            await EventLogger.Instance.RequestEvent(authSession.RemoteEndPoint);
+            if(authSession.Authenticated || authSession.Authenticating) {
+                await authSession.Failure("Already Authenticating");
                 return;
             }
 
             AuthMessage auth = (AuthMessage)message;
             if(Common.AuthVersion != auth.Version) {
-                await _session.Failure("Bad Version");
+                await authSession.Failure("Bad Version");
                 return;
             }
 
@@ -70,12 +71,12 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 challenge = BuildDigestSHA512Challenge(nonce);
                 break;
             default:
-                await _session.Failure("Unsupported Mechanism");
+                await authSession.Failure("Unsupported Mechanism");
                 return;
             }
 
-            Logger.Debug("Session " + _session.Id + " generated challenge: " + challenge);
-            _session.Challenge(auth.MechanismType, nonce, challenge);
+            Logger.Debug("Session " + authSession.Id + " generated challenge: " + challenge);
+            authSession.Challenge(auth.MechanismType, nonce, challenge);
         }
     }
 }

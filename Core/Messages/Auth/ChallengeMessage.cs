@@ -1,9 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 using EnergonSoftware.Core.Messages.Formatter;
 
 namespace EnergonSoftware.Core.Messages.Auth
 {
+    [Serializable]
     public sealed class ChallengeMessage : IMessage
     {
         public const string MessageType = "challenge";

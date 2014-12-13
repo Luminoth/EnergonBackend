@@ -1,9 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 using EnergonSoftware.Core.Messages.Formatter;
 
 namespace EnergonSoftware.Core.Messages
 {
+    [Serializable]
     public sealed class PingMessage : IMessage
     {
         public const string MessageType = "ping";

@@ -2,10 +2,11 @@
 using System.Data.Common;
 using System.Threading.Tasks;
 
-namespace EnergonSoftware.Database.Objects.Events
+namespace EnergonSoftware.Database.Models.Events
 {
     public enum AuthEventType
     {
+        Invalid,
         Request,
         Begin,
         Success,
@@ -42,6 +43,11 @@ namespace EnergonSoftware.Database.Objects.Events
 
         private string _reason;
         public string Reason { get { return _reason; } set { _reason = value; Dirty = true; } }
+
+        private AuthEvent()
+        {
+            Type = AuthEventType.Invalid;
+        }
 
         public AuthEvent(AuthEventType type)
         {

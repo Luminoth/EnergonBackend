@@ -3,7 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Database;
-using EnergonSoftware.Database.Objects.Events;
+using EnergonSoftware.Database.Models.Events;
 
 using log4net;
 
