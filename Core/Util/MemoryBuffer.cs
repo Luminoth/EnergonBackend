@@ -59,6 +59,15 @@ namespace EnergonSoftware.Core.Util
             }
         }
 
+        public int Peek(byte[] value, int offset, int count)
+        {
+            lock(_lock) {
+                int read = Buffer.Read(value, offset, count);
+                Buffer.Seek(-read, SeekOrigin.Current);
+                return read;
+            }
+        }
+
         public int Read(byte[] value, int offset, int count)
         {
             lock(_lock) {

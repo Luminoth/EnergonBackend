@@ -1,10 +1,11 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
@@ -13,28 +14,19 @@ using log4net;
 
 namespace EnergonSoftware.Core.MessageHandlers
 {
-/*
- * TODO: move the queue into the Session
- * give the processor the SessionManager
- * for each session in the manager
- *  check for a handler, if there isn't one and a message is waiting, spin a new one
- */
-
-// TODO: reevaluate if this class is even necessary
-// why doesn't each Session just handle it's shit?
+// change this to be owned by the session
+// so do we need to even hold a reference back to the
+// session with *each* message? or just hold it in the processor?
 
     public sealed class MessageProcessor
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageProcessor));
 
-        private class MessageQueueContext
-        {
-            public Session Session { get; set; }
-            public IMessage Message { get; set; }
-        }
+        private Session _session;
+        private ConcurrentQueue<IMessage> _messageQueue = new ConcurrentQueue<IMessage>();
 
-        private ConcurrentDictionary<int, ConcurrentQueue<MessageQueueContext>> _messageQueue = new ConcurrentDictionary<int, ConcurrentQueue<MessageQueueContext>>();
-        private IMessageHandlerFactory _factory;
+        private IMessageHandlerFactory _messageHandlerFactory;
+        private MessageHandler _messageHandler;
 
 private Task _task;
         private volatile bool _running;
@@ -43,52 +35,31 @@ private Task _task;
         {
         }
 
-        public int GetQueueSize(int sessionId)
+        public int GetQueueSize()
         {
-            ConcurrentQueue<MessageQueueContext> queue;
-            if(_messageQueue.TryGetValue(sessionId, out queue)) {
-                return queue.Count;
-            }
-            return 0;
+            return _messageQueue.Count;
         }
 
-        public bool QueueMessage(Session session, IMessage message)
+        public void QueueMessage(IMessage message)
         {
-            _messageQueue.TryAdd(session.Id, new ConcurrentQueue<MessageQueueContext>());
-
-            ConcurrentQueue<MessageQueueContext> queue;
-            if(_messageQueue.TryGetValue(session.Id, out queue)) {
-                queue.Enqueue(new MessageQueueContext()
-                    {
-                        Session = session,
-                        Message = message,
-                    }
-                );
-                return true;
-            }
-            return false;
+            _messageQueue.Enqueue(message);
         }
 
-        public void ParseMessages(Session session, IMessageParser parser, MemoryBuffer buffer, IMessageFormatter formatter)
+        public void ParseMessages(IMessagePacketParser parser, MemoryBuffer buffer, IMessageFormatter formatter)
         {
             MessagePacket packet = parser.Parse(buffer, formatter);
             while(null != packet) {
-                Logger.Debug("Session " + session.Id + " parsed message type: " + packet.Payload.Type);
-                QueueMessage(session, packet.Payload);
+                Logger.Debug("Session " + _session.Id + " parsed message type: " + packet.Payload.Type);
+                QueueMessage(packet.Payload);
                 packet = parser.Parse(buffer, formatter);
             }
         }
 
-        public bool RemoveSession(int sessionId)
-        {
-            ConcurrentQueue<MessageQueueContext> queue;
-            return _messageQueue.TryRemove(sessionId, out queue);
-        }
-
-        public /*async Task*/ void Start(IMessageHandlerFactory factory)
+        public /*async Task*/ void Start(Session session, IMessageHandlerFactory factory)
         {
             Logger.Debug("Starting message processor...");
-            _factory = factory;
+            _session = session;
+            _messageHandlerFactory = factory;
 
             _running = true;
 _task = Task.Factory.StartNew(() => Run());
@@ -106,31 +77,54 @@ _task = Task.Factory.StartNew(() => Run());
 _task.Wait();
 
             Logger.Debug("Clearing message queue...");
-            _messageQueue.Clear();
-            _factory = null;
+            _messageQueue = new ConcurrentQueue<IMessage>();
+            _messageHandlerFactory = null;
 _task = null;
         }
 
         private void Run()
         {
             while(_running) {
-                foreach(var sessionQueue in _messageQueue) {
-                    MessageQueueContext context;
-                    if(sessionQueue.Value.TryPeek(out context)) {
-                        if(context.Session.HasMessageHandler) {
-                            continue;
-                        }
+                // TODO: we need a way to say "hey, this handler is taking WAY too long,
+                // dump an error and kill the session"
+                if(null != _messageHandler && _messageHandler.Finished) {
+                    _messageHandler = null;
+                }
 
-                        if(sessionQueue.Value.TryDequeue(out context)) {
-                            context.Session.HandleMessage(_factory, context.Message);
-                        }
-                    }
+                IMessage message;
+                if(null == _messageHandler && _messageQueue.TryDequeue(out message)) {
+                    HandleMessage(_messageHandlerFactory, message);
                 }
 
                 Thread.Sleep(0);
             }
 
             // TODO: cleanup any currently running handlers
+        }
+
+        private bool HandleMessage(IMessageHandlerFactory factory, IMessage message)
+        {
+            if(null != _messageHandler && !_messageHandler.Finished) {
+                Logger.Warn("Attempted to handle new message before handler completed!");
+                return false;
+            }
+
+            Logger.Debug("Processing message with type=" + message.Type + " for session id=" + _session.Id + "...");
+
+            try {
+                _messageHandler = factory.NewHandler(message.Type);
+                if(null == _messageHandler) {
+                    return false;
+                }
+                _messageHandler.HandleMessage(message, _session);
+            } catch(MessageHandlerException e) {
+                Logger.Error("Error handling message", e);
+                return false;
+            } catch(Exception e) {
+                Logger.Error("Unhandled message processing exception!", e);
+                return false;
+            }
+            return true;
         }
     }
 }

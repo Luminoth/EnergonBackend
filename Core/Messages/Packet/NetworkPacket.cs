@@ -3,48 +3,23 @@ using System.IO;
 using System.Linq;
 
 using EnergonSoftware.Core.Messages.Formatter;
-using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Util;
 
-namespace EnergonSoftware.Core.Messages
+namespace EnergonSoftware.Core.Messages.Packet
 {
-    public class NetworkMessageParser : IMessageParser
-    {
-        public NetworkMessageParser()
-        {
-        }
-
-        public MessagePacket Parse(MemoryBuffer buffer, IMessageFormatter formatter)
-        {
-            buffer.Flip();
-            if(!buffer.HasRemaining) {
-                buffer.Reset();
-                return null;
-            }
-
-            NetworkMessage packet = new NetworkMessage();
-            if(!packet.DeSerialize(buffer, formatter)) {
-                buffer.Reset();
-                return null;
-            }
-
-            buffer.Compact();
-            return packet;
-        }
-    }
-
     /*
      * Packet Format:
      *      MARKER | ID | TYPE | PAYLOAD LENGTH | PAYLOAD | TERMINATOR
      */
     [Serializable]
-    public sealed class NetworkMessage : MessagePacket
+    public sealed class NetworkPacket : MessagePacket
     {
+        public static readonly byte[] Marker = new byte[] { (byte)'E', (byte)'S', (byte)'N', (byte)'M', 0 };
+
         private const int MaxPayloadSize = ushort.MaxValue;
-        private static readonly byte[] Marker = new byte[] { (byte)'E', (byte)'S', (byte)'N', (byte)'M', 0 };
         private static readonly byte[] Terminator = new byte[] { (byte)'\r', (byte)'\n', 0 };
 
-        public NetworkMessage()
+        public NetworkPacket()
         {
         }
 

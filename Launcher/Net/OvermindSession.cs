@@ -30,7 +30,7 @@ namespace EnergonSoftware.Launcher.Net
         {
         }
 
-        protected override void OnRun(MessageProcessor processor, IMessageParser parser)
+        protected override void OnRun(MessageProcessor processor, IMessagePacketParser parser)
         {
             Ping();
         }

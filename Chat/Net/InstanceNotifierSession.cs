@@ -30,7 +30,7 @@ namespace EnergonSoftware.Chat.Net
             _listener = listener;
         }
 
-        protected override void OnRun(MessageProcessor processor, IMessageParser parser)
+        protected override void OnRun(MessageProcessor processor, IMessagePacketParser parser)
         {
             int count = _listener.PollAndRead();
             if(count > 0) {

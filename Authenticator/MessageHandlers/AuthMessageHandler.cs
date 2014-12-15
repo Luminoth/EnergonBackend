@@ -38,7 +38,6 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 + ",qop=\"auth\",charset=utf-8,algorithm=sha512-sess";
         }
 
-
         internal AuthMessageHandler()
         {
         }

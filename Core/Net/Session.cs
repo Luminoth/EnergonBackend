@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
@@ -49,6 +50,9 @@ namespace EnergonSoftware.Core.Net
         public readonly int Id;
         private readonly SessionManager _manager;
 
+        private readonly MessageProcessor _processor = new MessageProcessor();
+        protected abstract IMessageFormatter Formatter { get; }
+
 #region Network Properties
         private readonly SocketState _socketState;
         public EndPoint RemoteEndPoint { get { return _socketState.RemoteEndPoint; } }
@@ -60,14 +64,6 @@ namespace EnergonSoftware.Core.Net
 
         public long Timeout { get; set; }
         public bool TimedOut { get { return Timeout < 0 ? false : Time.CurrentTimeMs >= (_socketState.LastMessageTime + Timeout); } }
-#endregion
-
-#region Message Properties
-        private MessageHandler _messageHandler;
-        public bool HasMessageHandler { get { return null != _messageHandler; } }
-        private MessageHandler MessageHandler { get { return _messageHandler; } set { _messageHandler = value; } }
-
-        protected abstract IMessageFormatter Formatter { get; }
 #endregion
 
         private Session()
@@ -215,22 +211,16 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public void Run(MessageProcessor processor, IMessageParser parser)
+        public void Run(IMessagePacketParser parser)
         {
             lock(_lock) {
-                processor.ParseMessages(this, parser, _socketState.Buffer, Formatter);
+                _processor.ParseMessages(parser, _socketState.Buffer, Formatter);
 
-                // TODO: we need a way to say "hey, this handler is taking WAY too long,
-                // dump an error and kill the session"
-                if(HasMessageHandler && MessageHandler.Finished) {
-                    MessageHandler = null;
-                }
-
-                OnRun(processor, parser);
+                OnRun(parser);
             }
         }
 
-        protected virtual void OnRun(MessageProcessor processor, IMessageParser parser)
+        protected virtual void OnRun(IMessagePacketParser parser)
         {
         }
 
@@ -241,7 +231,8 @@ namespace EnergonSoftware.Core.Net
                     return;
                 }
 
-                NetworkMessage packet = new NetworkMessage();
+                // TODO: don't assume NetworkPacket here
+                MessagePacket packet = new NetworkPacket();
                 packet.Payload = message;
 
                 Logger.Debug("Sending network message: " + packet);
@@ -249,33 +240,6 @@ namespace EnergonSoftware.Core.Net
                 byte[] bytes = packet.Serialize(Formatter);
                 Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
                 _socketState.Send(bytes);
-            }
-        }
-
-        public bool HandleMessage(IMessageHandlerFactory factory, IMessage message)
-        {
-            lock(_lock) {
-                if(HasMessageHandler && !_messageHandler.Finished) {
-                    Logger.Warn("Attempted to handle new message before handler completed!");
-                    return false;
-                }
-
-                Logger.Debug("Processing message with type=" + message.Type + " for session id=" + Id + "...");
-
-                try {
-                    _messageHandler = factory.NewHandler(message.Type);
-                    if(null == _messageHandler) {
-                        return false;
-                    }
-                    _messageHandler.HandleMessage(message, this);
-                } catch(MessageHandlerException e) {
-                    Logger.Error("Error handling message", e);
-                    return false;
-                } catch(Exception e) {
-                    Logger.Error("Unhandled message processing exception!", e);
-                    return false;
-                }
-                return true;
             }
         }
 

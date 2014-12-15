@@ -19,8 +19,7 @@ namespace EnergonSoftware.Core.Net
         private readonly object _lock = new object();
  
         private readonly List<Session> _sessions = new List<Session>();
-        private readonly MessageProcessor _processor = new MessageProcessor();
-        private readonly IMessageParser _parser = new NetworkMessageParser();
+        private readonly IMessagePacketParser _parser = new NetworkPacketParser();
 
         public long SessionTimeout { get; set; }
 
@@ -85,7 +84,6 @@ namespace EnergonSoftware.Core.Net
                 count = _sessions.RemoveAll(session =>
                     {
                         if(!session.Connecting && !session.Connected) {
-                            _processor.RemoveSession(session.Id);
                             return true;
                         }
                         return false;
@@ -116,7 +114,7 @@ namespace EnergonSoftware.Core.Net
                         }
 
                         if(session.Connected) {
-                            session.Run(_processor, _parser);
+                            session.Run(_parser);
                         }
                     }
                 );
