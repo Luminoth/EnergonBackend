@@ -121,7 +121,7 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public void SendMessage(IMessage message)
+        public void BroadcastMessage(IMessage message)
         {
             lock(_lock) {
                 _sessions.ForEach(session => session.SendMessage(message));
