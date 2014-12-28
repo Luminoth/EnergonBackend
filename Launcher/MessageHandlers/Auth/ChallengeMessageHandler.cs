@@ -98,10 +98,10 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 
         protected override void OnHandleMessage(IMessage message, Session session)
         {
-            ChallengeMessage challenge = (ChallengeMessage)message;
+            ChallengeMessage challengeMessage = (ChallengeMessage)message;
             AuthSession authSession = (AuthSession)session;
 
-            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(challenge.Challenge));
+            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(challengeMessage.Challenge));
             Logger.Debug("Decoded challenge: " + decoded);
 
             switch(authSession.AuthStage)

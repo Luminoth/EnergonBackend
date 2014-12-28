@@ -99,9 +99,9 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 return;
             }
 
-            ResponseMessage response = (ResponseMessage)message;
+            ResponseMessage responseMessage = (ResponseMessage)message;
 
-            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(response.Response));
+            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(responseMessage.Response));
             Logger.Debug("Decoded response: " + decoded);
 
             Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(decoded);

@@ -93,7 +93,7 @@ namespace EnergonSoftware.Authenticator
             Logger.Debug("Closing listener sockets...");
             _listener.CloseSockets();
 
-            Logger.Debug("Stopping session manager...");
+            Logger.Debug("Disconnecting sessions...");
             _sessions.DisconnectAll();
 
             Logger.Debug("Stopping instance notifier...");

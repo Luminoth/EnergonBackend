@@ -51,11 +51,13 @@ namespace EnergonSoftware.DbInit
 
         public async void ButtonInitialize_Click(object sender, RoutedEventArgs e)
         {
-            SetStatusBarText("Running...");
             OutputText.Clear();
+            SetStatusBarText("Running...");
+
             ((App)Application.Current).Running = true;
             await DatabaseManager.InitializeDatabase();
             ((App)Application.Current).Running = false;
+
             SetStatusBarText("Success!");
         }
 

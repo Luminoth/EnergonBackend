@@ -9,14 +9,14 @@ namespace EnergonSoftware.Core.Messages.Packet
 {
     /*
      * Packet Format:
-     *      MARKER | ID | TYPE | PAYLOAD LENGTH | PAYLOAD | TERMINATOR
+     *      MARKER | ID | TYPE | CONTENT LENGTH | CONTENT | TERMINATOR
      */
     [Serializable]
     public sealed class NetworkPacket : MessagePacket
     {
         public static readonly byte[] Marker = new byte[] { (byte)'E', (byte)'S', (byte)'N', (byte)'M', 0 };
 
-        private const int MaxPayloadSize = ushort.MaxValue;
+        private const int MaxContentLength = ushort.MaxValue;
         private static readonly byte[] Terminator = new byte[] { (byte)'\r', (byte)'\n', 0 };
 
         public const string PacketType = "network";
@@ -32,17 +32,17 @@ namespace EnergonSoftware.Core.Messages.Packet
                 formatter.Write(Marker, 0, Marker.Length, stream);
                 formatter.WriteInt(Id, stream);
 
-                if(!HasPayload) {
+                if(!HasContent) {
                     formatter.WriteString("null", stream);
                     formatter.WriteInt(0, stream);
                 } else {
-                    formatter.WriteString(Payload.Type, stream);
+                    formatter.WriteString(Content.Type, stream);
                     using(MemoryStream mstream = new MemoryStream()) {
-                        Payload.Serialize(mstream, formatter);
+                        Content.Serialize(mstream, formatter);
 
                         byte[] bytes = mstream.ToArray();
-                        if(bytes.Length > MaxPayloadSize) {
-                            throw new MessageException("Packet payload is too large!");
+                        if(bytes.Length > MaxContentLength) {
+                            throw new MessageException("Packet content is too large!");
                         }
 
                         formatter.WriteInt(bytes.Length, stream);
@@ -66,23 +66,23 @@ namespace EnergonSoftware.Core.Messages.Packet
             Id = formatter.ReadInt(buffer.Buffer);
 
             string type = formatter.ReadString(buffer.Buffer);
-            Payload = MessageFactory.Create(type);
+            Content = MessageFactory.Create(type);
 
-            int payloadLength = formatter.ReadInt(buffer.Buffer);
-            if(payloadLength > MaxPayloadSize) {
-                throw new MessageException("Invalid packet payload length: " + payloadLength);
+            int contentLength = formatter.ReadInt(buffer.Buffer);
+            if(contentLength > MaxContentLength) {
+                throw new MessageException("Invalid packet content length: " + contentLength);
             }
 
-            int expectedLength = payloadLength + Terminator.Length;
+            int expectedLength = contentLength + Terminator.Length;
             if(expectedLength > buffer.Remaining) {
                 return false;
             }
 
-            if(null != Payload) {
+            if(null != Content) {
                 try {
-                    Payload.DeSerialize(buffer.Buffer, formatter);
+                    Content.DeSerialize(buffer.Buffer, formatter);
                 } catch(Exception e) {
-                    throw new MessageException("Exception while deserializing payload", e);
+                    throw new MessageException("Exception while deserializing content", e);
                 }
             }
 
@@ -97,7 +97,7 @@ namespace EnergonSoftware.Core.Messages.Packet
 
         public override string ToString()
         {
-            return "NetworkMessage(Id: " + Id + ", Payload: " + Payload + ")";
+            return "NetworkMessage(Id: " + Id + ", Content: " + Content + ")";
         }
     }
 }

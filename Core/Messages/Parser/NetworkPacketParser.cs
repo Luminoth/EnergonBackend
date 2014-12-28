@@ -10,6 +10,11 @@ namespace EnergonSoftware.Core.Messages.Parser
         {
         }
 
+        public MessagePacket Create()
+        {
+            return new NetworkPacket();
+        }
+
         public MessagePacket Parse(MemoryBuffer buffer, IMessageFormatter formatter)
         {
             buffer.Flip();

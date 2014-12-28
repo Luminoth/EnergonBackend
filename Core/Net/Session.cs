@@ -52,9 +52,9 @@ namespace EnergonSoftware.Core.Net
         public abstract IMessagePacketParser Parser { get; }
         public abstract IMessageFormatter Formatter { get; }
         public abstract IMessageHandlerFactory HandlerFactory { get; }
-#endregion
 
         protected readonly MessageProcessor Processor;
+#endregion
 
 #region Network Properties
         private readonly SocketState _socketState;
@@ -223,11 +223,10 @@ namespace EnergonSoftware.Core.Net
                     return;
                 }
 
-                // TODO: don't assume NetworkPacket here
-                MessagePacket packet = MessagePacketFactory.Create(NetworkPacket.PacketType);
-                packet.Payload = message;
+                MessagePacket packet = Parser.Create();
+                packet.Content = message;
 
-                Logger.Debug("Sending network message: " + packet);
+                Logger.Debug("Sending packet: " + packet);
 
                 byte[] bytes = packet.Serialize(Formatter);
                 Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");

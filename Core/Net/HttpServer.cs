@@ -15,6 +15,8 @@ namespace EnergonSoftware.Core.Net
         private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpServer));
 
         private HttpListener _listener = new HttpListener();
+
+private volatile bool _running = false;
 private Task _task;
 
         public string DefaultIndex { get; set; }
@@ -52,6 +54,10 @@ _task = Task.Factory.StartNew(() => Run());
 
         public void Stop()
         {
+            if(!_running) {
+                return;
+            }
+
             Logger.Debug("Stopping HttpServer...");
 
             _listener.Stop();
@@ -62,6 +68,7 @@ _task = null;
         private void Run()
         {
             try {
+                _running = true;
                 while(_listener.IsListening) {
                     HttpListenerContext context = _listener.GetContext();
                     HandleRequest(context.Request, context.Response);
@@ -73,6 +80,8 @@ _task = null;
                 }
             } catch(Exception e) {
                 Logger.Fatal("Unhandled Exception!", e);
+            } finally {
+                _running = false;
             }
         }
 

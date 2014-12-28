@@ -12,7 +12,6 @@ namespace EnergonSoftware.Core.Test.Messages
     {
         public const string MessageType = "exception";
         public string Type { get { return MessageType; } }
-        public Account Account { get { return null; } set { } }
 
         public ExceptionMessage()
         {

@@ -22,16 +22,16 @@ namespace EnergonSoftware.Overmind.MessageHandlers
 
         protected async override void OnHandleMessage(IMessage message, Session session)
         {
-            LoginMessage login = (LoginMessage)message;
+            LoginMessage loginMessage = (LoginMessage)message;
             LoginSession loginSession = (LoginSession)session;
-            await EventLogger.Instance.LoginRequestEvent(loginSession.RemoteEndPoint, login.Username);
+            await EventLogger.Instance.LoginRequestEvent(loginSession.RemoteEndPoint, loginMessage.Username);
 
-            Logger.Info("New login attempt from user=" + login.Username + " and endpoint=" + loginSession.RemoteEndPoint);
+            Logger.Info("New login attempt from user=" + loginMessage.Username + " and endpoint=" + loginSession.RemoteEndPoint);
 
-            AccountInfo account = new AccountInfo() { Username = login.Username };
+            AccountInfo account = new AccountInfo() { Username = loginMessage.Username };
             using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnection()) {
                 if(!await account.Read(connection)) {
-                    await loginSession.LoginFailure(login.Username, "Bad Username");
+                    await loginSession.LoginFailure(loginMessage.Username, "Bad Username");
                     return;
                 }
             }
@@ -41,7 +41,7 @@ namespace EnergonSoftware.Overmind.MessageHandlers
                 return;
             }
 
-            if(!account.SessionId.Equals(login.Ticket, System.StringComparison.InvariantCultureIgnoreCase)) {
+            if(!account.SessionId.Equals(loginMessage.Ticket, System.StringComparison.InvariantCultureIgnoreCase)) {
                 await loginSession.LoginFailure(account.Username, "Invalid SessionId");
                 return;
             }

@@ -17,8 +17,8 @@ namespace EnergonSoftware.Core.Messages.Packet
 
         public int Id { get; protected set; }
 
-        public IMessage Payload { get; set; }
-        public bool HasPayload { get { return null != Payload; } }
+        public IMessage Content { get; set; }
+        public bool HasContent { get { return null != Content; } }
 
         public MessagePacket()
         {
@@ -35,19 +35,6 @@ namespace EnergonSoftware.Core.Messages.Packet
                 return 0;
             }
             return (int)(Id - rhs.Id);
-        }
-    }
-
-    public static class MessagePacketFactory
-    {
-        public static MessagePacket Create(string type)
-        {
-            switch(type)
-            {
-            case NetworkPacket.PacketType:
-                return new NetworkPacket();
-            }
-            throw new MessageException("Unsupported packet type for construction: " + type);
         }
     }
 }

@@ -16,10 +16,10 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 
         protected override void OnHandleMessage(IMessage message, Session session)
         {
-            FailureMessage failure = (FailureMessage)message;
+            FailureMessage failureMessage = (FailureMessage)message;
             AuthSession authSession = (AuthSession)session;
 
-            authSession.AuthFailed(failure.Reason);
+            authSession.AuthFailed(failureMessage.Reason);
         }
     }
 }

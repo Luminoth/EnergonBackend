@@ -53,15 +53,15 @@ private Task _task;
         {
             MessagePacket packet = _session.Parser.Parse(buffer, _session.Formatter);
             while(null != packet) {
-                Logger.Debug("Session " + _session.Id + " parsed message type: " + packet.Payload.Type);
-                QueueMessage(packet.Payload);
+                Logger.Debug("Session " + _session.Id + " parsed message type: " + packet.Content.Type);
+                QueueMessage(packet.Content);
                 packet = _session.Parser.Parse(buffer, _session.Formatter);
             }
         }
 
         public /*async Task*/ void Start()
         {
-            Logger.Debug("Starting message processor...");
+            Logger.Debug("Starting message processor for session " + _session.Id + "...");
 
             _running = true;
 _task = Task.Factory.StartNew(() => Run());
@@ -74,11 +74,10 @@ _task = Task.Factory.StartNew(() => Run());
                 return;
             }
 
-            Logger.Debug("Stopping message processor...");
+            Logger.Debug("Stopping message processor for session " + _session.Id + "...");
             _running = false;
 _task.Wait();
 
-            Logger.Debug("Clearing message queue...");
             _messageQueue = new ConcurrentQueue<IMessage>();
 _task = null;
         }
@@ -106,11 +105,11 @@ _task = null;
         private bool HandleMessage(IMessage message)
         {
             if(null != _messageHandler && !_messageHandler.Finished) {
-                Logger.Warn("Attempted to handle new message before handler completed!");
+                Logger.Warn("Session " + _session.Id + " attempted to handle new message before handler completed!");
                 return false;
             }
 
-            Logger.Debug("Processing message with type=" + message.Type + " for session id=" + _session.Id + "...");
+            Logger.Debug("Processing message with type=" + message.Type + " for session " + _session.Id + "...");
 
             try {
                 _messageHandler = _session.HandlerFactory.Create(message.Type);
@@ -119,10 +118,10 @@ _task = null;
                 }
                 _messageHandler.HandleMessage(message, _session);
             } catch(MessageHandlerException e) {
-                Logger.Error("Error handling message", e);
+                Logger.Error("Error handling message for session " + _session.Id, e);
                 return false;
             } catch(Exception e) {
-                Logger.Error("Unhandled message processing exception!", e);
+                Logger.Error("Unhandled message processing exception for session + " + _session.Id + "!", e);
                 return false;
             }
             return true;

@@ -6,6 +6,7 @@ namespace EnergonSoftware.Core.Messages.Parser
 {
     public interface IMessagePacketParser
     {
+        MessagePacket Create();
         MessagePacket Parse(MemoryBuffer buffer, IMessageFormatter formatter);
     }
 }

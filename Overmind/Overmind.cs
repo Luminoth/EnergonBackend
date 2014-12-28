@@ -95,7 +95,7 @@ namespace EnergonSoftware.Overmind
             Logger.Debug("Closing listener sockets...");
             _loginListener.CloseSockets();
 
-            Logger.Debug("Stopping session manager...");
+            Logger.Debug("Disconnecting sessions...");
             _loginSessions.DisconnectAll();
 
             Logger.Debug("Stopping instance notifier...");

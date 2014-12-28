@@ -52,8 +52,8 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 return;
             }
 
-            AuthMessage auth = (AuthMessage)message;
-            if(Common.AuthVersion != auth.Version) {
+            AuthMessage authMessage = (AuthMessage)message;
+            if(Common.AuthVersion != authMessage.Version) {
                 await authSession.Failure("Bad Version");
                 return;
             }
@@ -61,7 +61,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             Nonce nonce = new Nonce(ConfigurationManager.AppSettings["authRealm"], Convert.ToInt32(ConfigurationManager.AppSettings["authExpiry"]));
 
             string challenge;
-            switch(auth.MechanismType)
+            switch(authMessage.MechanismType)
             {
             /*case AuthType.DigestMD5:
                 challenge = BuildDigestMD5Challenge(nonce);
@@ -75,7 +75,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             }
 
             Logger.Debug("Session " + authSession.Id + " generated challenge: " + challenge);
-            authSession.Challenge(auth.MechanismType, nonce, challenge);
+            authSession.Challenge(authMessage.MechanismType, nonce, challenge);
         }
     }
 }
