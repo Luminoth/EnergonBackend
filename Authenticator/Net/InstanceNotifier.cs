@@ -27,16 +27,12 @@ namespace EnergonSoftware.Authenticator.Net
 
         public void Start(ListenAddressConfigurationElementCollection listenAddresses)
         {
-            Logger.Debug("Starting instance notifier session manager...");
-            _sessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
-            _sessions.Start(new InstanceNotifierMessageHandlerFactory());
-
-            Logger.Debug("Opening multicast sockets...");
+            Logger.Debug("Opening instance notifier sockets...");
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
                 Socket listener = NetUtil.CreateMulticastListener(listenAddress.InterfaceAddress, listenAddress.Port,
                     listenAddress.MulticastGroupIPAddress, listenAddress.MulticastTTL);
 
-                Session sender = new InstanceNotifierSession(_sessions, new SocketState(listener));
+                Session sender = new InstanceNotifierSession(new SocketState(listener));
                 sender.ConnectMulticast(listenAddress.MulticastGroupIPAddress, listenAddress.Port, listenAddress.MulticastTTL);
                 _sessions.Add(sender);
             }
@@ -44,8 +40,8 @@ namespace EnergonSoftware.Authenticator.Net
 
         public void Stop()
         {
-            Logger.Debug("Stopping instance notifier session manager...");
-            _sessions.Stop();
+            Logger.Debug("Disconnecting instance notifier sessions...");
+            _sessions.DisconnectAll();
         }
 
         public void Run()
@@ -59,7 +55,7 @@ namespace EnergonSoftware.Authenticator.Net
             StartupMessage message = new StartupMessage();
             message.ServiceName = Authenticator.ServiceId;
             message.ServiceId = Authenticator.UniqueId.ToString();
-            _sessions.SendMessage(message);
+            _sessions.BroadcastMessage(message);
         }
 
         public void Shutdown()
@@ -67,7 +63,7 @@ namespace EnergonSoftware.Authenticator.Net
             ShutdownMessage message = new ShutdownMessage();
             message.ServiceName = Authenticator.ServiceId;
             message.ServiceId = Authenticator.UniqueId.ToString();
-            _sessions.SendMessage(message);
+            _sessions.BroadcastMessage(message);
         }
 
         public void Authenticating(string username, EndPoint endpoint)

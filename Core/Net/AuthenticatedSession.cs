@@ -8,11 +8,7 @@ namespace EnergonSoftware.Core.Net
     {
         public Account Account { get; set; }
 
-        public AuthenticatedSession(SessionManager manager) : base(manager)
-        {
-        }
-
-        public AuthenticatedSession(Socket socket, SessionManager manager) : base(socket, manager)
+        public AuthenticatedSession(Socket socket) : base(socket)
         {
         }
     }

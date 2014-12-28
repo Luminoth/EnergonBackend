@@ -5,7 +5,7 @@ namespace EnergonSoftware.Chat.MessageHandlers
 {
     internal sealed class ChatMessageHandlerFactory : IMessageHandlerFactory
     {
-        public MessageHandler NewHandler(string type)
+        public MessageHandler Create(string type)
         {
             switch(type)
             {

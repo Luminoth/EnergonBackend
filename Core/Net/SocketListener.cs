@@ -22,10 +22,8 @@ namespace EnergonSoftware.Core.Net
             SocketBacklog = 10;
         }
 
-        public SocketListener(ISessionFactory factory)
+        public SocketListener(ISessionFactory factory) : this()
         {
-            SocketBacklog = 10;
-
             _factory = factory;
         }
 
@@ -58,7 +56,7 @@ namespace EnergonSoftware.Core.Net
                         Socket remote = socket.Accept();
                         Logger.Info("New connection from " + remote.RemoteEndPoint);
 
-                        Session session = _factory.CreateSession(remote, manager);
+                        Session session = _factory.Create(remote);
                         manager.Add(session);
                     }
                 }

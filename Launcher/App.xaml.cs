@@ -69,8 +69,6 @@ namespace EnergonSoftware.Launcher
 
             await UpdateChecker.Instance.CheckForUpdates();
 
-            _sessions.Start(new MessageHandlerFactory());
-
             // have to run this in a separate thread
             // so that we don't lock up the UI
             Logger.Info("Starting idle thread...");
@@ -82,7 +80,7 @@ namespace EnergonSoftware.Launcher
             Logger.Info("Exiting...");
             _quit = true;
 
-            _sessions.Stop();
+            _sessions.DisconnectAll();
 
             Logger.Info("Goodbye!");
         }
@@ -95,13 +93,13 @@ namespace EnergonSoftware.Launcher
 
         private void OnAuthSuccessCallback()
         {
-            _overmindSession = new OvermindSession(_sessions);
+            _overmindSession = new OvermindSession();
             _overmindSession.OnDisconnect += OnDisconnectCallback;
             _overmindSession.OnError += OnErrorCallback;
             _overmindSession.BeginConnect(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"]));
             _sessions.Add(_overmindSession);
 
-            _chatSession = new ChatSession(_sessions);
+            _chatSession = new ChatSession();
             _chatSession.OnDisconnect += OnDisconnectCallback;
             _chatSession.OnError += OnErrorCallback;
             _chatSession.BeginConnect(ConfigurationManager.AppSettings["chatHost"], Convert.ToInt32(ConfigurationManager.AppSettings["chatPort"]));
@@ -128,7 +126,7 @@ namespace EnergonSoftware.Launcher
             ClientState.Instance.Password = password;
             ClientState.Instance.LoggingIn = true;
 
-            AuthSession session = new AuthSession(_sessions);
+            AuthSession session = new AuthSession();
             session.OnAuthFailed += OnAuthFailedCallback;
             session.OnAuthSuccess += OnAuthSuccessCallback;
             session.OnDisconnect += OnDisconnectCallback;

@@ -7,7 +7,7 @@ namespace EnergonSoftware.Overmind.MessageHandlers
 {
     internal sealed class OvermindMessageHandlerFactory : IMessageHandlerFactory
     {
-        public MessageHandler NewHandler(string type)
+        public MessageHandler Create(string type)
         {
             switch(type)
             {

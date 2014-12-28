@@ -37,16 +37,14 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
         public void Initialize()
         {
             _manager = new SessionManager();
-            _manager.Start(new MessageHandlerFactory());
-
-            _session = new TestSession(_manager);
+            _session = new TestSession();
             _manager.Add(_session);
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            _manager.Stop();
+            _manager.DisconnectAll();
         }
 
         [TestMethod]

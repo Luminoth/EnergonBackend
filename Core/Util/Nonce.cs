@@ -14,7 +14,11 @@ namespace EnergonSoftware.Core.Util
         public readonly long CreationTime;
         public bool Expired { get { return ExpiryMS < 0 ? false : Time.CurrentTimeMs >= (CreationTime + ExpiryMS); } }
 
-        public Nonce(string realm, int expiry)
+        private Nonce()
+        {
+        }
+
+        public Nonce(string realm, int expiry) : this()
         {
             Realm = realm;
             ExpiryMS = expiry;
@@ -23,7 +27,7 @@ namespace EnergonSoftware.Core.Util
             NonceHash = new SHA512().HashHex(NonceValue);
         }
 
-        public Nonce(string realm, string nonce, int expiry)
+        public Nonce(string realm, string nonce, int expiry) : this()
         {
             Realm = realm;
             ExpiryMS = expiry;

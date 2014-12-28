@@ -17,7 +17,7 @@ namespace EnergonSoftware.Core.Net
         {
         }
 
-        public BufferedSocketReader(Socket socket)
+        public BufferedSocketReader(Socket socket) : this()
         {
             _socket = socket;
         }

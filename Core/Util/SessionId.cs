@@ -15,7 +15,11 @@ namespace EnergonSoftware.Core.Util
         public readonly long CreationTime;
         public bool Expired { get { return ExpiryMS < 0 ? false : Time.CurrentTimeMs >= (CreationTime + ExpiryMS); } }
 
-        public SessionId(string secret, int expiry = -1)
+        private SessionId()
+        {
+        }
+
+        public SessionId(string secret, int expiry = -1) : this()
         {
             Secret = secret;
             ExpiryMS = expiry;
@@ -35,7 +39,7 @@ namespace EnergonSoftware.Core.Util
             SessionID = Convert.ToBase64String(encrypted);
         }
 
-        public SessionId(string password, string sessionId, int expiry = -1)
+        public SessionId(string password, string sessionId, int expiry = -1) : this()
         {
 /*
  *     // unencode the value

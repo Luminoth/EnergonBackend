@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 
 using log4net;
@@ -19,41 +20,13 @@ namespace EnergonSoftware.Core.Net
         private readonly object _lock = new object();
  
         private readonly List<Session> _sessions = new List<Session>();
-        private readonly IMessagePacketParser _parser = new NetworkPacketParser();
-
-        public long SessionTimeout { get; set; }
-
-        public SessionManager()
-        {
-            SessionTimeout = -1;
-        }
-
-        public void Start(IMessageHandlerFactory factory)
-        {
-            lock(_lock) {
-                _processor.Start(factory);
-            }
-        }
-
-        public void Stop()
-        {
-            lock(_lock) {
-                Logger.Info("Closing all sessions...");
-                DisconnectAll();
-                _sessions.Clear();
-
-                _processor.Stop();
-            }
-        }
 
         public void Add(Session session)
         {
             lock(_lock) {
-                session.Timeout = SessionTimeout;
                 _sessions.Add(session);
-
-                Logger.Info("Added new session: " + session.Id);
             }
+            Logger.Info("Added new session: " + session.Id);
         }
 
         public bool Contains(EndPoint remoteEndpoint)
@@ -72,8 +45,10 @@ namespace EnergonSoftware.Core.Net
 
         public void DisconnectAll()
         {
+            Logger.Info("Disconnecting all sessions...");
             lock(_lock) {
                 _sessions.ForEach(session => session.Disconnect());
+                _sessions.Clear();
             }
         }
 
@@ -114,7 +89,7 @@ namespace EnergonSoftware.Core.Net
                         }
 
                         if(session.Connected) {
-                            session.Run(_parser);
+                            session.Run();
                         }
                     }
                 );

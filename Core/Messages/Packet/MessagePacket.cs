@@ -13,6 +13,8 @@ namespace EnergonSoftware.Core.Messages.Packet
         private static int NextId { get { return ++_nextId; } }
 #endregion
 
+        public abstract string Type { get; }
+
         public int Id { get; protected set; }
 
         public IMessage Payload { get; set; }
@@ -33,6 +35,19 @@ namespace EnergonSoftware.Core.Messages.Packet
                 return 0;
             }
             return (int)(Id - rhs.Id);
+        }
+    }
+
+    public static class MessagePacketFactory
+    {
+        public static MessagePacket Create(string type)
+        {
+            switch(type)
+            {
+            case NetworkPacket.PacketType:
+                return new NetworkPacket();
+            }
+            throw new MessageException("Unsupported packet type for construction: " + type);
         }
     }
 }

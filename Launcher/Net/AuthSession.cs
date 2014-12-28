@@ -4,7 +4,9 @@ using EnergonSoftware.Core;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
+using EnergonSoftware.Launcher.MessageHandlers;
 
 using log4net;
 
@@ -37,14 +39,11 @@ namespace EnergonSoftware.Launcher.Net
 
         public string RspAuth { get; private set; }
 
-        protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
+        public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override IMessageHandlerFactory HandlerFactory { get { return new MessageHandlerFactory(); } }
 
-        public AuthSession(SessionManager manager) : base(manager)
-        {
-            AuthStage = AuthenticationStage.NotAuthenticated;
-        }
-
-        private AuthSession(Socket socket, SessionManager manager) : base(socket, manager)
+        public AuthSession() : base()
         {
             AuthStage = AuthenticationStage.NotAuthenticated;
         }

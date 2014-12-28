@@ -19,7 +19,10 @@ namespace EnergonSoftware.Core.Messages.Packet
         private const int MaxPayloadSize = ushort.MaxValue;
         private static readonly byte[] Terminator = new byte[] { (byte)'\r', (byte)'\n', 0 };
 
-        public NetworkPacket()
+        public const string PacketType = "network";
+        public override string Type { get { return PacketType; } }
+
+        public NetworkPacket() : base()
         {
         }
 
@@ -63,7 +66,7 @@ namespace EnergonSoftware.Core.Messages.Packet
             Id = formatter.ReadInt(buffer.Buffer);
 
             string type = formatter.ReadString(buffer.Buffer);
-            Payload = MessageFactory.CreateMessage(type);
+            Payload = MessageFactory.Create(type);
 
             int payloadLength = formatter.ReadInt(buffer.Buffer);
             if(payloadLength > MaxPayloadSize) {

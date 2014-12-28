@@ -2,32 +2,31 @@
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Test.MessageHandlers;
 
 namespace EnergonSoftware.Core.Test.Net
 {
     internal sealed class TestSessionFactory : ISessionFactory
     {
-        public Session CreateSession(SessionManager manager)
+        public Session Create(Socket socket)
         {
-            return new TestSession(manager);
-        }
-
-        public Session CreateSession(Socket socket, SessionManager manager)
-        {
-            return new TestSession(socket, manager);
+            return new TestSession(socket);
         }
     }
 
     internal sealed class TestSession : Session
     {
-        protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
+        public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override IMessageHandlerFactory HandlerFactory { get { return new MessageHandlerFactory(); } }
 
-        public TestSession(SessionManager manager) : base(manager)
+        public TestSession() : base()
         {
         }
 
-        public TestSession(Socket socket, SessionManager manager) : base(socket, manager)
+        public TestSession(Socket socket) : base(socket)
         {
         }
     }

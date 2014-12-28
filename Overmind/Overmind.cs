@@ -73,10 +73,6 @@ namespace EnergonSoftware.Overmind
             Logger.Info("Starting instance notifier...");
             InstanceNotifier.Instance.Start(instanceNotifierListenAddresses.ListenAddresses);
 
-            Logger.Debug("Starting session manager...");
-            _loginSessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
-            _loginSessions.Start(new OvermindMessageHandlerFactory());
-
             Logger.Debug("Opening listener sockets...");
             _loginListener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
             _loginListener.CreateSockets(listenAddresses.ListenAddresses);
@@ -100,7 +96,7 @@ namespace EnergonSoftware.Overmind
             _loginListener.CloseSockets();
 
             Logger.Debug("Stopping session manager...");
-            _loginSessions.Stop();
+            _loginSessions.DisconnectAll();
 
             Logger.Debug("Stopping instance notifier...");
             InstanceNotifier.Instance.Stop();

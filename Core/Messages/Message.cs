@@ -12,7 +12,7 @@ namespace EnergonSoftware.Core.Messages
 
     public static class MessageFactory
     {
-        public static IMessage CreateMessage(string type)
+        public static IMessage Create(string type)
         {
             switch(type)
             {

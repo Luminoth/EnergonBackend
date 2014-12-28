@@ -45,9 +45,8 @@ namespace EnergonSoftware.Core.Net
             Id = NextId;
         }
 
-        public SocketState(Socket socket)
+        public SocketState(Socket socket) : this()
         {
-            Id = NextId;
             Socket = socket;
         }
 

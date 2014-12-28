@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Configuration;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Authenticator.MessageHandlers;
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Database;
@@ -18,14 +21,11 @@ namespace EnergonSoftware.Authenticator.Net
 {
     internal sealed class AuthSessionFactory : ISessionFactory
     {
-        public Session CreateSession(SessionManager manager)
+        public Session Create(Socket socket)
         {
-            return new AuthSession(manager);
-        }
-
-        public Session CreateSession(Socket socket, SessionManager manager)
-        {
-            return new AuthSession(socket, manager);
+            AuthSession session = new AuthSession(socket);
+            session.Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
+            return session;
         }
     }
 
@@ -39,14 +39,11 @@ namespace EnergonSoftware.Authenticator.Net
 
         public AccountInfo AccountInfo { get; private set; }
 
-        protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
+        public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override IMessageHandlerFactory HandlerFactory { get { return new AuthMessageHandlerFactory(); } }
 
-        public AuthSession(SessionManager manager) : base(manager)
-        {
-            AuthType = AuthType.None;
-        }
-
-        public AuthSession(Socket socket, SessionManager manager) : base(socket, manager)
+        public AuthSession(Socket socket) : base(socket)
         {
             AuthType = AuthType.None;
         }

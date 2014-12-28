@@ -19,7 +19,7 @@ namespace EnergonSoftware.Core.Net
         {
         }
 
-        public UdpListener(ISessionFactory factory)
+        public UdpListener(ISessionFactory factory) : this()
         {
             _factory = factory;
         }
@@ -75,7 +75,7 @@ namespace EnergonSoftware.Core.Net
 
                         Logger.Info("New connection from " + remote.RemoteEndPoint);
 
-                        Session session = _factory.CreateSession(remote, manager);
+                        Session session = _factory.Create(remote);
                         session.BufferWrite(data, 0, data.Length);
                         manager.Add(session);
                     }

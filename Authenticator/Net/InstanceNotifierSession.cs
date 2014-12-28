@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 
+using EnergonSoftware.Authenticator.MessageHandlers;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
@@ -15,29 +16,27 @@ namespace EnergonSoftware.Authenticator.Net
 
         private readonly SocketState _listener;
 
-        protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
+        public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override IMessageHandlerFactory HandlerFactory { get { return new InstanceNotifierMessageHandlerFactory(); } }
 
-        private InstanceNotifierSession(SessionManager manager) : base(manager)
+        private InstanceNotifierSession(Socket socket) : base(socket)
         {
         }
 
-        private InstanceNotifierSession(Socket socket, SessionManager manager) : base(socket, manager)
-        {
-        }
-
-        public InstanceNotifierSession(SessionManager manager, SocketState listener) : base(manager)
+        public InstanceNotifierSession(SocketState listener) : base()
         {
             _listener = listener;
         }
 
-        protected override void OnRun(MessageProcessor processor, IMessagePacketParser parser)
+        protected override void OnRun()
         {
             int count = _listener.PollAndRead();
             if(count > 0) {
                 Logger.Debug("Instance notifier session " + Id + " read " + count + " bytes");
             }
 
-            processor.ParseMessages(this, parser, _listener.Buffer, Formatter);
+            Processor.ParseMessages(_listener.Buffer);
         }
     }
 }

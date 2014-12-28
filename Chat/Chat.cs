@@ -71,10 +71,6 @@ namespace EnergonSoftware.Chat
             Logger.Info("Starting instance notifier...");
             InstanceNotifier.Instance.Start(instanceNotifierListenAddresses.ListenAddresses);
 
-            Logger.Debug("Starting session manager...");
-            _sessions.SessionTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
-            _sessions.Start(new ChatMessageHandlerFactory());
-
             Logger.Debug("Opening listener sockets...");
             _listener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
             _listener.CreateSockets(listenAddresses.ListenAddresses);
@@ -98,7 +94,7 @@ namespace EnergonSoftware.Chat
             _listener.CloseSockets();
 
             Logger.Debug("Stopping session manager...");
-            _sessions.Stop();
+            _sessions.DisconnectAll();
 
             Logger.Debug("Stopping instance notifier...");
             InstanceNotifier.Instance.Stop();

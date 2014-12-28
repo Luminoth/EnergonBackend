@@ -8,6 +8,7 @@ using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
+using EnergonSoftware.Launcher.MessageHandlers;
 
 using log4net;
 
@@ -19,17 +20,15 @@ namespace EnergonSoftware.Launcher.Net
 
         private bool ShouldPing { get { return 0 == LastMessageTime ? false : Time.CurrentTimeMs > (LastMessageTime + Convert.ToInt64(ConfigurationManager.AppSettings["chatPingRate"])); } }
 
-        protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
+        public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override IMessageHandlerFactory HandlerFactory { get { return new MessageHandlerFactory(); } }
 
-        public ChatSession(SessionManager manager) : base(manager)
+        public ChatSession() : base()
         {
         }
 
-        private ChatSession(Socket socket, SessionManager manager) : base(socket, manager)
-        {
-        }
-
-        protected override void OnRun(MessageProcessor processor, IMessagePacketParser parser)
+        protected override void OnRun()
         {
             Ping();
         }

@@ -18,8 +18,7 @@ namespace EnergonSoftware.Core.Net
 {
     public interface ISessionFactory
     {
-        Session CreateSession(SessionManager manager);
-        Session CreateSession(Socket socket, SessionManager manager);
+        Session Create(Socket socket);
     }
 
     public abstract class Session : IDisposable
@@ -48,10 +47,14 @@ namespace EnergonSoftware.Core.Net
         private readonly object _lock = new object();
 
         public readonly int Id;
-        private readonly SessionManager _manager;
 
-        private readonly MessageProcessor _processor = new MessageProcessor();
-        protected abstract IMessageFormatter Formatter { get; }
+#region Message Properties
+        public abstract IMessagePacketParser Parser { get; }
+        public abstract IMessageFormatter Formatter { get; }
+        public abstract IMessageHandlerFactory HandlerFactory { get; }
+#endregion
+
+        protected readonly MessageProcessor Processor;
 
 #region Network Properties
         private readonly SocketState _socketState;
@@ -66,33 +69,21 @@ namespace EnergonSoftware.Core.Net
         public bool TimedOut { get { return Timeout < 0 ? false : Time.CurrentTimeMs >= (_socketState.LastMessageTime + Timeout); } }
 #endregion
 
-        private Session()
+        protected Session()
         {
             Id = NextId;
+
+            Processor = new MessageProcessor(this);
+            Processor.Start();
 
             _socketState = new SocketState();
 
             Timeout = -1;
         }
 
-        public Session(SessionManager manager)
+        public Session(Socket socket) : this()
         {
-            Id = NextId;
-            _manager = manager;
-
-            _socketState = new SocketState();
-
-            Timeout = -1;
-        }
-
-        public Session(Socket socket, SessionManager manager)
-        {
-            Id = NextId;
-            _manager = manager;
-
             _socketState = new SocketState(socket);
-
-            Timeout = -1;
         }
 
 #region Dispose
@@ -105,6 +96,7 @@ namespace EnergonSoftware.Core.Net
         protected virtual void Dispose(bool disposing)
         {
             if(disposing) {
+                Processor.Stop();
                 _socketState.Dispose();
             }
         }
@@ -211,16 +203,16 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public void Run(IMessagePacketParser parser)
+        public void Run()
         {
             lock(_lock) {
-                _processor.ParseMessages(parser, _socketState.Buffer, Formatter);
+                Processor.ParseMessages(_socketState.Buffer);
 
-                OnRun(parser);
+                OnRun();
             }
         }
 
-        protected virtual void OnRun(IMessagePacketParser parser)
+        protected virtual void OnRun()
         {
         }
 
@@ -232,7 +224,7 @@ namespace EnergonSoftware.Core.Net
                 }
 
                 // TODO: don't assume NetworkPacket here
-                MessagePacket packet = new NetworkPacket();
+                MessagePacket packet = MessagePacketFactory.Create(NetworkPacket.PacketType);
                 packet.Payload = message;
 
                 Logger.Debug("Sending network message: " + packet);

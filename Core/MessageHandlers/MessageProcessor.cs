@@ -22,17 +22,21 @@ namespace EnergonSoftware.Core.MessageHandlers
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageProcessor));
 
-        private Session _session;
+        private readonly Session _session;
         private ConcurrentQueue<IMessage> _messageQueue = new ConcurrentQueue<IMessage>();
 
-        private IMessageHandlerFactory _messageHandlerFactory;
         private MessageHandler _messageHandler;
 
 private Task _task;
         private volatile bool _running;
 
-        public MessageProcessor()
+        private MessageProcessor()
         {
+        }
+
+        public MessageProcessor(Session session) : this()
+        {
+            _session = session;
         }
 
         public int GetQueueSize()
@@ -45,21 +49,19 @@ private Task _task;
             _messageQueue.Enqueue(message);
         }
 
-        public void ParseMessages(IMessagePacketParser parser, MemoryBuffer buffer, IMessageFormatter formatter)
+        public void ParseMessages(MemoryBuffer buffer)
         {
-            MessagePacket packet = parser.Parse(buffer, formatter);
+            MessagePacket packet = _session.Parser.Parse(buffer, _session.Formatter);
             while(null != packet) {
                 Logger.Debug("Session " + _session.Id + " parsed message type: " + packet.Payload.Type);
                 QueueMessage(packet.Payload);
-                packet = parser.Parse(buffer, formatter);
+                packet = _session.Parser.Parse(buffer, _session.Formatter);
             }
         }
 
-        public /*async Task*/ void Start(Session session, IMessageHandlerFactory factory)
+        public /*async Task*/ void Start()
         {
             Logger.Debug("Starting message processor...");
-            _session = session;
-            _messageHandlerFactory = factory;
 
             _running = true;
 _task = Task.Factory.StartNew(() => Run());
@@ -78,7 +80,6 @@ _task.Wait();
 
             Logger.Debug("Clearing message queue...");
             _messageQueue = new ConcurrentQueue<IMessage>();
-            _messageHandlerFactory = null;
 _task = null;
         }
 
@@ -93,7 +94,7 @@ _task = null;
 
                 IMessage message;
                 if(null == _messageHandler && _messageQueue.TryDequeue(out message)) {
-                    HandleMessage(_messageHandlerFactory, message);
+                    HandleMessage(message);
                 }
 
                 Thread.Sleep(0);
@@ -102,7 +103,7 @@ _task = null;
             // TODO: cleanup any currently running handlers
         }
 
-        private bool HandleMessage(IMessageHandlerFactory factory, IMessage message)
+        private bool HandleMessage(IMessage message)
         {
             if(null != _messageHandler && !_messageHandler.Finished) {
                 Logger.Warn("Attempted to handle new message before handler completed!");
@@ -112,7 +113,7 @@ _task = null;
             Logger.Debug("Processing message with type=" + message.Type + " for session id=" + _session.Id + "...");
 
             try {
-                _messageHandler = factory.NewHandler(message.Type);
+                _messageHandler = _session.HandlerFactory.Create(message.Type);
                 if(null == _messageHandler) {
                     return false;
                 }

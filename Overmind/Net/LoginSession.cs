@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Configuration;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Database.Models;
+using EnergonSoftware.Overmind.MessageHandlers;
 
 using log4net;
 
@@ -15,14 +18,11 @@ namespace EnergonSoftware.Overmind.Net
 {
     internal sealed class LoginSessionFactory : ISessionFactory
     {
-        public Session CreateSession(SessionManager manager)
+        public Session Create(Socket socket)
         {
-            return new LoginSession(manager);
-        }
-
-        public Session CreateSession(Socket socket, SessionManager manager)
-        {
-            return new LoginSession(socket, manager);
+            LoginSession session = new LoginSession(socket);
+            session.Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
+            return session;
         }
     }
 
@@ -30,13 +30,11 @@ namespace EnergonSoftware.Overmind.Net
     {
         public AccountInfo AccountInfo { get; private set; }
 
-        protected override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
+        public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override IMessageHandlerFactory HandlerFactory { get { return new OvermindMessageHandlerFactory(); } }
 
-        public LoginSession(SessionManager manager) : base(manager)
-        {
-        }
-
-        public LoginSession(Socket socket, SessionManager manager) : base(socket, manager)
+        public LoginSession(Socket socket) : base(socket)
         {
         }
 

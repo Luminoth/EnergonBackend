@@ -11,7 +11,7 @@ namespace EnergonSoftware.Core.MessageHandlers
 {
     public interface IMessageHandlerFactory
     {
-        MessageHandler NewHandler(string type);
+        MessageHandler Create(string type);
     }
 
     public class MessageHandler
