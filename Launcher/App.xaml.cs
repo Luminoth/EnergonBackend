@@ -26,7 +26,7 @@ namespace EnergonSoftware.Launcher
 
         private static volatile bool _quit;
 
-        private static SessionManager _sessions = new SessionManager();
+        private static readonly SessionManager _sessions = new SessionManager();
         private static OvermindSession _overmindSession;
         private static ChatSession _chatSession;
 

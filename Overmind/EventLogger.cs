@@ -14,7 +14,7 @@ namespace EnergonSoftware.Overmind
         private static readonly ILog Logger = LogManager.GetLogger(typeof(EventLogger));
 
 #region Singleton
-        private static EventLogger _instance = new EventLogger();
+        private static readonly EventLogger _instance = new EventLogger();
         public static EventLogger Instance { get { return _instance; } }
 #endregion
 

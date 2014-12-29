@@ -69,10 +69,11 @@ namespace EnergonSoftware.Launcher.Net
         {
             Logger.Info("Authenticating as user '" + ClientState.Instance.Username + "'...");
 
-            AuthMessage message = new AuthMessage();
-            message.MechanismType = AuthType.DigestSHA512;
-            SendMessage(message);
-
+            SendMessage(new AuthMessage()
+                {
+                    MechanismType = AuthType.DigestSHA512,
+                }
+            );
             AuthStage = AuthenticationStage.Begin;
         }
 
@@ -80,18 +81,17 @@ namespace EnergonSoftware.Launcher.Net
         {
             RspAuth = rspAuth;
 
-            ResponseMessage message = new ResponseMessage();
-            message.Response = response;
-            SendMessage(message);
-
+            SendMessage(new ResponseMessage()
+                {
+                    Response = response,
+                }
+            );
             AuthStage = AuthenticationStage.Challenge;
         }
 
         public void AuthFinalize()
         {
-            ResponseMessage response = new ResponseMessage();
-            SendMessage(response);
-
+            SendMessage(new ResponseMessage());
             AuthStage = AuthenticationStage.Finalize;
         }
 

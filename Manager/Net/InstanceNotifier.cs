@@ -19,11 +19,11 @@ namespace EnergonSoftware.Manager.Net
         private static readonly ILog Logger = LogManager.GetLogger(typeof(InstanceNotifier));
 
 #region Singleton
-        private static InstanceNotifier _instance = new InstanceNotifier();
+        private static readonly InstanceNotifier _instance = new InstanceNotifier();
         public static InstanceNotifier Instance { get { return _instance; } }
 #endregion
 
-        private SessionManager _sessions = new SessionManager();
+        private readonly SessionManager _sessions = new SessionManager();
 
         public void Start(ListenAddressConfigurationElementCollection listenAddresses)
         {
@@ -52,18 +52,22 @@ namespace EnergonSoftware.Manager.Net
 
         public void Startup()
         {
-            StartupMessage message = new StartupMessage();
-            message.ServiceName = Manager.ServiceId;
-            message.ServiceId = Manager.UniqueId.ToString();
-            _sessions.BroadcastMessage(message);
+            _sessions.BroadcastMessage(new StartupMessage()
+                {
+                    ServiceName = Manager.ServiceId,
+                    ServiceId = Manager.UniqueId.ToString(),
+                }
+            );
         }
 
         public void Shutdown()
         {
-            ShutdownMessage message = new ShutdownMessage();
-            message.ServiceName = Manager.ServiceId;
-            message.ServiceId = Manager.UniqueId.ToString();
-            _sessions.BroadcastMessage(message);
+            _sessions.BroadcastMessage(new ShutdownMessage()
+                {
+                    ServiceName = Manager.ServiceId,
+                    ServiceId = Manager.UniqueId.ToString(),
+                }
+            );
         }
 
         private InstanceNotifier()

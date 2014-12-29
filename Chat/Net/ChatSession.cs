@@ -14,9 +14,10 @@ namespace EnergonSoftware.Chat.Net
     {
         public Session Create(Socket socket)
         {
-            ChatSession session = new ChatSession(socket);
-            session.Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
-            return session;
+            return new ChatSession(socket)
+            {
+                Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
+            };
         }
     }
 

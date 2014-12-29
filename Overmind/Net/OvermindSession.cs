@@ -20,9 +20,10 @@ namespace EnergonSoftware.Overmind.Net
     {
         public Session Create(Socket socket)
         {
-            OvermindSession session = new OvermindSession(socket);
-            session.Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
-            return session;
+            return new OvermindSession(socket)
+            {
+                Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
+            };
         }
     }
 
@@ -40,8 +41,7 @@ namespace EnergonSoftware.Overmind.Net
 
         public void Ping()
         {
-            PingMessage ping = new PingMessage();
-            SendMessage(ping);
+            SendMessage(new PingMessage());
         }
 
         public void Logout()

@@ -38,7 +38,7 @@ namespace EnergonSoftware.Launcher
         private static readonly ILog Logger = LogManager.GetLogger(typeof(NewsChecker));
 
 #region Singleton
-        private static NewsChecker _instance = new NewsChecker();
+        private static readonly NewsChecker _instance = new NewsChecker();
         public static NewsChecker Instance { get { return _instance; } }
 #endregion
 

@@ -55,30 +55,38 @@ namespace EnergonSoftware.DbInit
             string authRealm = ConfigurationManager.AppSettings["authRealm"];
             Logger.Debug("Using authRealm='" + authRealm + "'");
 
-            AccountInfo shaneAccount = new AccountInfo();
-            shaneAccount.Active = true;
-            shaneAccount.Username = "shane";
+            AccountInfo shaneAccount = new AccountInfo()
+            {
+                Active = true,
+                Username = "shane",
+            };
             shaneAccount.SetPassword(authRealm, "password");
             await shaneAccount.Insert(connection);
             Logger.Info("Inserted new account: " + shaneAccount);
 
-            AccountInfo testAccount1 = new AccountInfo();
-            testAccount1.Active = true;
-            testAccount1.Username = "test1";
+            AccountInfo testAccount1 = new AccountInfo()
+            {
+                Active = true,
+                Username = "test1",
+            };
             testAccount1.SetPassword(authRealm, "password");
             await testAccount1.Insert(connection);
             Logger.Info("Inserted new account: " + testAccount1);
 
-            AccountInfo testAccount2 = new AccountInfo();
-            testAccount2.Active = true;
-            testAccount2.Username = "test2";
+            AccountInfo testAccount2 = new AccountInfo()
+            {
+                Active = true,
+                Username = "test2",
+            };
             testAccount2.SetPassword(authRealm, "password");
             await testAccount2.Insert(connection);
             Logger.Info("Inserted new account: " + testAccount2);
 
-            AccountFriend friend = new AccountFriend();
-            friend.Account = testAccount1.Id;
-            friend.Friend = testAccount2.Id;
+            AccountFriend friend = new AccountFriend()
+            {
+                Account = testAccount1.Id,
+                Friend = testAccount2.Id,
+            };
             await friend.Insert(connection);
             Logger.Info("Inserted new account friend: " + friend);
         }

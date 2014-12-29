@@ -119,8 +119,8 @@ namespace EnergonSoftware.Database
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(TableDescription));
 
-        private Dictionary<string, ColumnDescription> _columns = new Dictionary<string, ColumnDescription>();
-        private List<string> _primaryKeys = new List<string>();
+        private readonly Dictionary<string, ColumnDescription> _columns = new Dictionary<string, ColumnDescription>();
+        private readonly List<string> _primaryKeys = new List<string>();
 
         public readonly string Name;
         public ColumnDescription this[string key] { get { return _columns[key]; } }

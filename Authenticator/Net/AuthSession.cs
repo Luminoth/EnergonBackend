@@ -23,9 +23,10 @@ namespace EnergonSoftware.Authenticator.Net
     {
         public Session Create(Socket socket)
         {
-            AuthSession session = new AuthSession(socket);
-            session.Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
-            return session;
+            return new AuthSession(socket)
+            {
+                Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
+            };
         }
     }
 
@@ -56,9 +57,11 @@ namespace EnergonSoftware.Authenticator.Net
             Authenticating = true;
             Authenticated = false;
 
-            ChallengeMessage message = new ChallengeMessage();
-            message.Challenge = Convert.ToBase64String(Encoding.UTF8.GetBytes(challenge));
-            SendMessage(message);
+            SendMessage(new ChallengeMessage()
+                {
+                    Challenge = Convert.ToBase64String(Encoding.UTF8.GetBytes(challenge)),
+                }
+            );
         }
 
         public void Challenge(string challenge, AccountInfo accountInfo)
@@ -68,9 +71,11 @@ namespace EnergonSoftware.Authenticator.Net
             AccountInfo = accountInfo;
             Authenticated = true;
 
-            ChallengeMessage message = new ChallengeMessage();
-            message.Challenge = Convert.ToBase64String(Encoding.UTF8.GetBytes(challenge));
-            SendMessage(message);
+            SendMessage(new ChallengeMessage()
+                {
+                    Challenge = Convert.ToBase64String(Encoding.UTF8.GetBytes(challenge)),
+                }
+            );
         }
 
         public async Task Success(string sessionid)
@@ -85,10 +90,11 @@ namespace EnergonSoftware.Authenticator.Net
                 await AccountInfo.Update(connection);
             }
 
-            SuccessMessage message = new SuccessMessage();
-            message.SessionId = sessionid;
-            SendMessage(message);
-
+            SendMessage(new SuccessMessage()
+                {
+                    SessionId = sessionid,
+                }
+            );
             Disconnect();
         }
 
@@ -102,10 +108,11 @@ namespace EnergonSoftware.Authenticator.Net
 
             AccountInfo = null;
 
-            FailureMessage message = new FailureMessage();
-            message.Reason = reason;
-            SendMessage(message);
-
+            SendMessage(new FailureMessage()
+                {
+                    Reason = reason,
+                }
+            );
             Disconnect();
         }
     }

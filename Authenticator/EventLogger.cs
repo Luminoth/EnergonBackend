@@ -14,40 +14,48 @@ namespace EnergonSoftware.Authenticator
         private static readonly ILog Logger = LogManager.GetLogger(typeof(EventLogger));
 
 #region Singleton
-        private static EventLogger _instance = new EventLogger();
+        private static readonly EventLogger _instance = new EventLogger();
         public static EventLogger Instance { get { return _instance; } }
 #endregion
 
         public async Task RequestEvent(EndPoint origin)
         {
-            AuthEvent evt = new AuthEvent(AuthEventType.Request);
-            evt.Origin = origin.ToString();
-            await LogEvent(evt);
+            await LogEvent(new AuthEvent(AuthEventType.Request)
+                {
+                    Origin = origin.ToString(),
+                }
+            );
         }
 
         public async Task BeginEvent(EndPoint origin, string username)
         {
-            AuthEvent evt = new AuthEvent(AuthEventType.Begin);
-            evt.Origin = origin.ToString();
-            evt.Account = username;
-            await LogEvent(evt);
+            await LogEvent(new AuthEvent(AuthEventType.Begin)
+                {
+                    Origin = origin.ToString(),
+                    Account = username,
+                }
+            );
         }
 
         public async Task SuccessEvent(EndPoint origin, string username)
         {
-            AuthEvent evt = new AuthEvent(AuthEventType.Success);
-            evt.Origin = origin.ToString();
-            evt.Account = username;
-            await LogEvent(evt);
+            await LogEvent(new AuthEvent(AuthEventType.Success)
+                {
+                    Origin = origin.ToString(),
+                    Account = username,
+                }
+            );
         }
 
         public async Task FailedEvent(EndPoint origin, string username, string reason)
         {
-            AuthEvent evt = new AuthEvent(AuthEventType.Failure);
-            evt.Origin = origin.ToString();
-            evt.Account = username;
-            evt.Reason = reason;
-            await LogEvent(evt);
+            await LogEvent(new AuthEvent(AuthEventType.Failure)
+                {
+                    Origin = origin.ToString(),
+                    Account = username,
+                    Reason = reason,
+                }
+            );
         }
 
         // TODO: move this to a base class

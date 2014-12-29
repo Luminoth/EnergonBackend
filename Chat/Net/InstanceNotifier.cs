@@ -19,11 +19,11 @@ namespace EnergonSoftware.Chat.Net
         private static readonly ILog Logger = LogManager.GetLogger(typeof(InstanceNotifier));
 
 #region Singleton
-        private static InstanceNotifier _instance = new InstanceNotifier();
+        private static readonly InstanceNotifier _instance = new InstanceNotifier();
         public static InstanceNotifier Instance { get { return _instance; } }
 #endregion
 
-        private SessionManager _sessions = new SessionManager();
+        private readonly SessionManager _sessions = new SessionManager();
 
         public void Start(ListenAddressConfigurationElementCollection listenAddresses)
         {
@@ -52,18 +52,22 @@ namespace EnergonSoftware.Chat.Net
 
         public void Startup()
         {
-            StartupMessage message = new StartupMessage();
-            message.ServiceName = Chat.ServiceId;
-            message.ServiceId = Chat.UniqueId.ToString();
-            _sessions.BroadcastMessage(message);
+            _sessions.BroadcastMessage(new StartupMessage()
+                {
+                    ServiceName = Chat.ServiceId,
+                    ServiceId = Chat.UniqueId.ToString(),
+                }
+            );
         }
 
         public void Shutdown()
         {
-            ShutdownMessage message = new ShutdownMessage();
-            message.ServiceName = Chat.ServiceId;
-            message.ServiceId = Chat.UniqueId.ToString();
-            _sessions.BroadcastMessage(message);
+            _sessions.BroadcastMessage(new ShutdownMessage()
+                {
+                    ServiceName = Chat.ServiceId,
+                    ServiceId = Chat.UniqueId.ToString(),
+                }
+            );
         }
 
         private InstanceNotifier()

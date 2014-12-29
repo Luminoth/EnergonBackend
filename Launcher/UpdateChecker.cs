@@ -41,7 +41,7 @@ namespace EnergonSoftware.Launcher
         private static readonly ILog Logger = LogManager.GetLogger(typeof(UpdateChecker));
 
 #region Singleton
-        private static UpdateChecker _instance = new UpdateChecker();
+        private static readonly UpdateChecker _instance = new UpdateChecker();
         public static UpdateChecker Instance { get { return _instance; } }
 #endregion
 

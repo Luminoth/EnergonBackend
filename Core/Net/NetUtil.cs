@@ -95,9 +95,11 @@ namespace EnergonSoftware.Core.Net
             EndPoint endPoint = new IPEndPoint(address, context.Port);
             context.Socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
-            SocketAsyncEventArgs ea = new SocketAsyncEventArgs();
-            ea.RemoteEndPoint = endPoint;
-            ea.UserToken = context;
+            SocketAsyncEventArgs ea = new SocketAsyncEventArgs()
+            {
+                RemoteEndPoint = endPoint,
+                UserToken = context,
+            };
             ea.Completed += ConnectAsyncCallback;
             context.Socket.ConnectAsync(ea);
 
@@ -126,11 +128,13 @@ namespace EnergonSoftware.Core.Net
                 return false;
             }
 
-            AsyncConnectContext context = new AsyncConnectContext();
-            context.EventHandler = args;
-            context.AddressList = hostEntry.AddressList;
-            context.CurrentAddressIdx = idx;
-            context.Port = port;
+            AsyncConnectContext context = new AsyncConnectContext()
+            {
+                EventHandler = args,
+                AddressList = hostEntry.AddressList,
+                CurrentAddressIdx = idx,
+                Port = port,
+            };
 
             if(!DoConnectAsync(context)) {
                 context.EventHandler.ConnectFailed(SocketError.HostNotFound);

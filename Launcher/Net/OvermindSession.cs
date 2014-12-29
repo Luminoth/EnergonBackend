@@ -2,8 +2,10 @@
 using System.Configuration;
 using System.Net.Sockets;
 
+using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
@@ -40,6 +42,8 @@ namespace EnergonSoftware.Launcher.Net
 
         private void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
         {
+            SetVisibility(Visibility.Online);
+
             ClientState.Instance.LoggingIn = false;
             ClientState.Instance.LoggedIn = true;
 
@@ -55,8 +59,7 @@ namespace EnergonSoftware.Launcher.Net
 
         public void Logout()
         {
-            LogoutMessage message = new LogoutMessage();
-            SendMessage(message);
+            SendMessage(new LogoutMessage());
         }
 
         public void Ping()
@@ -65,8 +68,16 @@ namespace EnergonSoftware.Launcher.Net
                 return;
             }
 
-            PingMessage message = new PingMessage();
-            SendMessage(message);
+            SendMessage(new PingMessage());
+        }
+
+        public void SetVisibility(Visibility visibility)
+        {
+            SendMessage(new VisibilityMessage()
+                {
+                    Visibility = visibility,
+                }
+            );
         }
     }
 }
