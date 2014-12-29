@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Net.Sockets;
-using System.ServiceProcess;
 using System.Threading;
-using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
-using EnergonSoftware.Overmind.MessageHandlers;
 using EnergonSoftware.Overmind.Net;
 
 using log4net;
@@ -27,8 +23,8 @@ namespace EnergonSoftware.Overmind
 
         private readonly HttpServer _diagnosticServer = new HttpServer();
 
-        private readonly SocketListener _loginListener = new SocketListener(new LoginSessionFactory());
-        private readonly SessionManager _loginSessions = new SessionManager();
+        private readonly SocketListener _listener = new SocketListener(new OvermindSessionFactory());
+        private readonly SessionManager _sessions = new SessionManager();
 
         public Overmind()
         {
@@ -74,8 +70,9 @@ namespace EnergonSoftware.Overmind
             InstanceNotifier.Instance.Start(instanceNotifierListenAddresses.ListenAddresses);
 
             Logger.Debug("Opening listener sockets...");
-            _loginListener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
-            _loginListener.CreateSockets(listenAddresses.ListenAddresses);
+            _listener.MaxConnections = listenAddresses.MaxConnections;
+            _listener.SocketBacklog = listenAddresses.Backlog;
+            _listener.CreateSockets(listenAddresses.ListenAddresses);
 
             Logger.Info("Running...");
             Running = true;
@@ -93,10 +90,10 @@ namespace EnergonSoftware.Overmind
             InstanceNotifier.Instance.Shutdown();
 
             Logger.Debug("Closing listener sockets...");
-            _loginListener.CloseSockets();
+            _listener.CloseSockets();
 
             Logger.Debug("Disconnecting sessions...");
-            _loginSessions.DisconnectAll();
+            _sessions.DisconnectAll();
 
             Logger.Debug("Stopping instance notifier...");
             InstanceNotifier.Instance.Stop();
@@ -111,10 +108,10 @@ namespace EnergonSoftware.Overmind
                 try {
                     InstanceNotifier.Instance.Run();
 
-                    _loginListener.Poll(_loginSessions);
+                    _listener.Poll(_sessions);
 
-                    _loginSessions.PollAndRun();
-                    _loginSessions.Cleanup();
+                    _sessions.PollAndRun();
+                    _sessions.Cleanup();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();

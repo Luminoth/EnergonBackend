@@ -60,17 +60,19 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 
             Nonce nonce = new Nonce(ConfigurationManager.AppSettings["authRealm"], Convert.ToInt32(ConfigurationManager.AppSettings["authExpiry"]));
 
-            string challenge;
+            string challenge = string.Empty;
             switch(authMessage.MechanismType)
             {
-            /*case AuthType.DigestMD5:
-                challenge = BuildDigestMD5Challenge(nonce);
+            case AuthType.DigestMD5:
+                /*challenge = BuildDigestMD5Challenge(nonce);
                 break;*/
+await authSession.Failure("MD5 mechanism not supported!");
+return;
             case AuthType.DigestSHA512:
                 challenge = BuildDigestSHA512Challenge(nonce);
                 break;
             default:
-                await authSession.Failure("Unsupported Mechanism");
+                await authSession.Failure("Unsupported mechanism");
                 return;
             }
 

@@ -66,10 +66,6 @@ namespace EnergonSoftware.Overmind.Net
             _sessions.BroadcastMessage(message);
         }
 
-        public void Login(string username, EndPoint endpoint)
-        {
-        }
-
         public void Logout(string username)
         {
         }

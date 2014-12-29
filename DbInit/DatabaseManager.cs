@@ -37,7 +37,6 @@ namespace EnergonSoftware.DbInit
         {
             Logger.Info("Creating event tables...");
             await AuthEvent.CreateTable(connection);
-            await LoginEvent.CreateTable(connection);
         }
 #endregion
 

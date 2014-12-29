@@ -58,10 +58,7 @@ namespace EnergonSoftware.Core.Net
             lock(_lock) {
                 count = _sessions.RemoveAll(session =>
                     {
-                        if(!session.Connecting && !session.Connected) {
-                            return true;
-                        }
-                        return false;
+                        return !session.Connecting && !session.Connected;
                     }
                 );
             }

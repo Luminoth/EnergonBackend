@@ -1,6 +1,5 @@
 ﻿using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Overmind;
 using EnergonSoftware.Core.Net;
 
 namespace EnergonSoftware.Overmind.MessageHandlers
@@ -13,8 +12,6 @@ namespace EnergonSoftware.Overmind.MessageHandlers
             {
             case PingMessage.MessageType:
                 return new PingMessageHandler();
-            case LoginMessage.MessageType:
-                return new LoginMessageHandler();
             case LogoutMessage.MessageType:
                 return new LogoutMessageHandler();
             }

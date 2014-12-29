@@ -1,7 +1,6 @@
 ﻿using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Notification;
-using EnergonSoftware.Core.Messages.Overmind;
 
 namespace EnergonSoftware.Core.Messages
 {
@@ -28,6 +27,8 @@ namespace EnergonSoftware.Core.Messages
             /* misc */
             case PingMessage.MessageType:
                 return new PingMessage();
+            case LogoutMessage.MessageType:
+                return new LogoutMessage();
 
             /* auth */
             case AuthMessage.MessageType:
@@ -40,12 +41,6 @@ namespace EnergonSoftware.Core.Messages
                 return new ResponseMessage();
             case SuccessMessage.MessageType:
                 return new SuccessMessage();
-
-            /* overmind */
-            case LoginMessage.MessageType:
-                return new LoginMessage();
-            case LogoutMessage.MessageType:
-                return new LogoutMessage();
             }
             throw new MessageException("Unsupported message type for construction: " + type);
         }

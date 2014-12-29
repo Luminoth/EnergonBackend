@@ -15,8 +15,8 @@ namespace EnergonSoftware.Overmind.MessageHandlers
 
         protected override void OnHandleMessage(IMessage message, Session session)
         {
-            LoginSession loginSession = (LoginSession)session;
-            loginSession.Ping();
+            OvermindSession overmindSession = (OvermindSession)session;
+            overmindSession.Ping();
         }
     }
 }

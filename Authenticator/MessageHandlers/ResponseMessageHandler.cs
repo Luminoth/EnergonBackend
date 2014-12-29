@@ -53,12 +53,14 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             string expected = string.Empty, rspauth = string.Empty;
             switch(session.AuthType)
             {
-            /*case Heroes.Core.AuthType.DigestMD5:
-                Logger.Debug("Handling MD5 response...");
+            case EnergonSoftware.Core.AuthType.DigestMD5:
+                /*Logger.Debug("Handling MD5 response...");
                 //Logger.Debug("passwordHash=" + account.PasswordMD5);
                 expected = EnergonSoftware.Core.Auth.DigestClientResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI);
                 rspauth = EnergonSoftware.Core.Auth.DigestServerResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI);
                 break;*/
+await session.Failure("MD5 auth type not supported!");
+return;
             case EnergonSoftware.Core.AuthType.DigestSHA512:
                 Logger.Debug("Handling SHA512 response...");
                 //Logger.Debug("passwordHash=" + account.PasswordSHA512);
@@ -66,7 +68,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 rspauth = EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI);
                 break;
             default:
-                await session.Failure("Unsupported Auth Type");
+                await session.Failure("Unsupported auth type!");
                 return;
             }
 

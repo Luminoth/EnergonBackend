@@ -5,7 +5,6 @@ using System.Net.Sockets;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
-using EnergonSoftware.Core.Messages.Overmind;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
@@ -41,7 +40,10 @@ namespace EnergonSoftware.Launcher.Net
 
         private void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
         {
-            Login();
+            ClientState.Instance.LoggingIn = false;
+            ClientState.Instance.LoggedIn = true;
+
+            ClientState.Instance.CurrentPage = ClientState.Page.Main;
         }
 
         public void BeginConnect(string host, int port)
@@ -49,21 +51,6 @@ namespace EnergonSoftware.Launcher.Net
             OnConnectSuccess += OnConnectSuccessCallback;
             OnConnectFailed += OnConnectFailedCallback;
             ConnectAsync(host, port);
-        }
-
-        private void Login()
-        {
-            Logger.Info("Logging in...");
-
-            LoginMessage message = new LoginMessage();
-            message.Username = ClientState.Instance.Username;
-            message.Ticket = ClientState.Instance.Ticket;
-            SendMessage(message);
-
-            ClientState.Instance.LoggingIn = false;
-            ClientState.Instance.LoggedIn = true;
-
-            ClientState.Instance.CurrentPage = ClientState.Page.Main;
         }
 
         public void Logout()

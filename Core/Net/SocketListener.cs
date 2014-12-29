@@ -15,10 +15,12 @@ namespace EnergonSoftware.Core.Net
         private readonly List<Socket> _listenSockets = new List<Socket>();
         private readonly ISessionFactory _factory;
 
+        public int MaxConnections { get; set; }
         public int SocketBacklog { get; set; }
 
         private SocketListener()
         {
+            MaxConnections = -1;
             SocketBacklog = 10;
         }
 
@@ -32,12 +34,16 @@ namespace EnergonSoftware.Core.Net
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
                 Logger.Info("Listening on address " + listenAddress + "...");
 
-                IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
-                Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                socket.Bind(endpoint);
-                socket.Listen(SocketBacklog);
-                _listenSockets.Add(socket);
+                try {
+                    IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
+                    Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    socket.Bind(endpoint);
+                    socket.Listen(SocketBacklog);
+                    _listenSockets.Add(socket);
+                } catch(SocketException e) {
+                    Logger.Error("Exception creating socket!", e);
+                }
             }
         }
 
@@ -52,12 +58,22 @@ namespace EnergonSoftware.Core.Net
         {
             _listenSockets.ForEach(socket =>
                 {
-                    if(socket.Poll(100, SelectMode.SelectRead)) {
-                        Socket remote = socket.Accept();
-                        Logger.Info("New connection from " + remote.RemoteEndPoint);
+                    try {
+                        if(socket.Poll(100, SelectMode.SelectRead)) {
+                            Socket remote = socket.Accept();
+                            Logger.Info("New connection from " + remote.RemoteEndPoint);
 
-                        Session session = _factory.Create(remote);
-                        manager.Add(session);
+                            if(MaxConnections >= 0 && _listenSockets.Count >= MaxConnections) {
+                                Logger.Info("Max connections exceeded, denying new connection!");
+                                remote.Close();
+                            } else {
+                                Logger.Debug("Allowing new connection...");
+                                Session session = _factory.Create(remote);
+                                manager.Add(session);
+                            }
+                        }
+                    } catch(SocketException e) {
+                        Logger.Error("Exception polling sockets!", e);
                     }
                 }
             );

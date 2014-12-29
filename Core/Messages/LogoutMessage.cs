@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
 
-using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.Messages.Formatter;
 
-namespace EnergonSoftware.Core.Messages.Overmind
+namespace EnergonSoftware.Core.Messages
 {
     [Serializable]
     public sealed class LogoutMessage : IMessage

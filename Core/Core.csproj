@@ -68,8 +68,7 @@
     <Compile Include="Messages\Notification\NotificationMessage.cs" />
     <Compile Include="Messages\Notification\ShutdownMessage.cs" />
     <Compile Include="Messages\Notification\StartupMessage.cs" />
-    <Compile Include="Messages\Overmind\LoginMessage.cs" />
-    <Compile Include="Messages\Overmind\LogoutMessage.cs" />
+    <Compile Include="Messages\LogoutMessage.cs" />
     <Compile Include="Messages\Parser\MessagePacketParser.cs" />
     <Compile Include="Messages\Parser\NetworkPacketParser.cs" />
     <Compile Include="Messages\PingMessage.cs" />

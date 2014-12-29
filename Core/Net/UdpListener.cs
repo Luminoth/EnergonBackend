@@ -29,11 +29,15 @@ namespace EnergonSoftware.Core.Net
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
                 Logger.Info("Listening on address " + listenAddress + "...");
 
-                IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
-                Socket socket = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                socket.Bind(endpoint);
-                _listenSockets.Add(socket);
+                try {
+                    IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
+                    Socket socket = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    socket.Bind(endpoint);
+                    _listenSockets.Add(socket);
+                } catch(SocketException e) {
+                    Logger.Error("Exception creating socket!", e);
+                }
             }
         }
 
@@ -65,19 +69,23 @@ namespace EnergonSoftware.Core.Net
         {
             _listenSockets.ForEach(socket =>
                 {
-                    if(socket.Poll(100, SelectMode.SelectRead)) {
-                        byte[] data;
-                        Socket remote = Accept(socket, out data);
-                        if(manager.Contains(remote.RemoteEndPoint)) {
-                            manager.Get(remote.RemoteEndPoint).BufferWrite(data, 0, data.Length);
-                            return;
+                    try {
+                        if(socket.Poll(100, SelectMode.SelectRead)) {
+                            byte[] data;
+                            Socket remote = Accept(socket, out data);
+                            if(manager.Contains(remote.RemoteEndPoint)) {
+                                manager.Get(remote.RemoteEndPoint).BufferWrite(data, 0, data.Length);
+                                return;
+                            }
+
+                            Logger.Info("New connection from " + remote.RemoteEndPoint);
+
+                            Session session = _factory.Create(remote);
+                            session.BufferWrite(data, 0, data.Length);
+                            manager.Add(session);
                         }
-
-                        Logger.Info("New connection from " + remote.RemoteEndPoint);
-
-                        Session session = _factory.Create(remote);
-                        session.BufferWrite(data, 0, data.Length);
-                        manager.Add(session);
+                    } catch(SocketException e) {
+                        Logger.Error("Exception polling sockets!", e);
                     }
                 }
             );

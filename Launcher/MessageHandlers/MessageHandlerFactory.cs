@@ -1,8 +1,6 @@
 ﻿using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
-using EnergonSoftware.Core.Messages.Overmind;
-using EnergonSoftware.Core.Net;
 using EnergonSoftware.Launcher.MessageHandlers.Auth;
 
 namespace EnergonSoftware.Launcher.MessageHandlers

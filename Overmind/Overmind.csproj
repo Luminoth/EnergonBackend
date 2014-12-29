@@ -77,12 +77,11 @@
     <Compile Include="EventLogger.cs" />
     <Compile Include="MessageHandlers\InstanceNotifierMessageHandlerFactory.cs" />
     <Compile Include="Net\InstanceNotifier.cs" />
-    <Compile Include="MessageHandlers\LoginMessageHandler.cs" />
     <Compile Include="MessageHandlers\LogoutMessageHandler.cs" />
     <Compile Include="MessageHandlers\OvermindMessageHandlerFactory.cs" />
     <Compile Include="MessageHandlers\PingMessageHandler.cs" />
     <Compile Include="Net\InstanceNotifierSession.cs" />
-    <Compile Include="Net\LoginSession.cs" />
+    <Compile Include="Net\OvermindSession.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Overmind.cs">

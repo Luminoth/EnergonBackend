@@ -16,17 +16,17 @@ using log4net;
 
 namespace EnergonSoftware.Overmind.Net
 {
-    internal sealed class LoginSessionFactory : ISessionFactory
+    internal sealed class OvermindSessionFactory : ISessionFactory
     {
         public Session Create(Socket socket)
         {
-            LoginSession session = new LoginSession(socket);
+            OvermindSession session = new OvermindSession(socket);
             session.Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
             return session;
         }
     }
 
-    internal sealed class LoginSession : Session
+    internal sealed class OvermindSession : Session
     {
         public AccountInfo AccountInfo { get; private set; }
 
@@ -34,7 +34,7 @@ namespace EnergonSoftware.Overmind.Net
         public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
         public override IMessageHandlerFactory HandlerFactory { get { return new OvermindMessageHandlerFactory(); } }
 
-        public LoginSession(Socket socket) : base(socket)
+        public OvermindSession(Socket socket) : base(socket)
         {
         }
 
@@ -44,25 +44,9 @@ namespace EnergonSoftware.Overmind.Net
             SendMessage(ping);
         }
 
-        public async Task LoginFailure(string username, string reason)
-        {
-            await EventLogger.Instance.LoginFailedEvent(RemoteEndPoint, username, reason);
-
-            Disconnect();
-        }
-
-        public async Task LoginSuccess(AccountInfo account)
-        {
-            InstanceNotifier.Instance.Login(account.Username, RemoteEndPoint);
-            await EventLogger.Instance.LoginSuccessEvent(RemoteEndPoint, account.Username);
-
-            AccountInfo = account;
-        }
-
-        public async Task Logout()
+        public void Logout()
         {
             InstanceNotifier.Instance.Logout(AccountInfo.Username);
-            await EventLogger.Instance.LogoutEvent(RemoteEndPoint, AccountInfo.Username);
 
             Disconnect();
         }

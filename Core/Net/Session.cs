@@ -166,11 +166,15 @@ namespace EnergonSoftware.Core.Net
         {
             lock(_lock) {
                 if(Connected) {
-                    Logger.Info("Session " + Id + " disconnecting: " + reason);
-                    _socketState.ShutdownAndClose(false);
+                    try {
+                        Logger.Info("Session " + Id + " disconnecting: " + reason);
+                        _socketState.ShutdownAndClose(false);
 
-                    if(null != OnDisconnect) {
-                        OnDisconnect(this, new DisconnectEventArgs() { Reason = reason });
+                        if(null != OnDisconnect) {
+                            OnDisconnect(this, new DisconnectEventArgs() { Reason = reason });
+                        }
+                    } catch(SocketException e) {
+                        Logger.Error("Error disconnecting socket!", e);
                     }
                 }
             }
@@ -206,9 +210,13 @@ namespace EnergonSoftware.Core.Net
         public void Run()
         {
             lock(_lock) {
-                Processor.ParseMessages(_socketState.Buffer);
+                try {
+                    Processor.ParseMessages(_socketState.Buffer);
 
-                OnRun();
+                    OnRun();
+                } catch(MessageException e) {
+                    Error("Exception while parsing messages!", e);
+                }
             }
         }
 
@@ -223,14 +231,20 @@ namespace EnergonSoftware.Core.Net
                     return;
                 }
 
-                MessagePacket packet = Parser.Create();
-                packet.Content = message;
+                try {
+                    MessagePacket packet = Parser.Create();
+                    packet.Content = message;
 
-                Logger.Debug("Sending packet: " + packet);
+                    Logger.Debug("Sending packet: " + packet);
 
-                byte[] bytes = packet.Serialize(Formatter);
-                Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
-                _socketState.Send(bytes);
+                    byte[] bytes = packet.Serialize(Formatter);
+                    Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
+                    _socketState.Send(bytes);
+                } catch(SocketException e) {
+                    Error("Error sending message!", e);
+                } catch(MessageException e) {
+                    Error("Error sending message!", e);
+                }
             }
         }
 

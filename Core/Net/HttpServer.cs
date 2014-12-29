@@ -14,7 +14,7 @@ namespace EnergonSoftware.Core.Net
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpServer));
 
-        private HttpListener _listener = new HttpListener();
+        private readonly HttpListener _listener = new HttpListener();
 
 private volatile bool _running = false;
 private Task _task;

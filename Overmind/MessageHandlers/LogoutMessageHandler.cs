@@ -13,10 +13,10 @@ namespace EnergonSoftware.Overmind.MessageHandlers
         {
         }
 
-        protected async override void OnHandleMessage(IMessage message, Session session)
+        protected override void OnHandleMessage(IMessage message, Session session)
         {
-            LoginSession loginSession = (LoginSession)session;
-            await loginSession.Logout();
+            OvermindSession overmindSession = (OvermindSession)session;
+            overmindSession.Logout();
         }
     }
 }

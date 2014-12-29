@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Threading;
-using System.Threading.Tasks;
 
-using EnergonSoftware.Authenticator.MessageHandlers;
 using EnergonSoftware.Authenticator.Net;
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
@@ -72,7 +70,8 @@ namespace EnergonSoftware.Authenticator
             InstanceNotifier.Instance.Start(instanceNotifierListenAddresses.ListenAddresses);
 
             Logger.Debug("Opening listener sockets...");
-            _listener.SocketBacklog = Convert.ToInt32(ConfigurationManager.AppSettings["socketBacklog"]);
+            _listener.MaxConnections = listenAddresses.MaxConnections;
+            _listener.SocketBacklog = listenAddresses.Backlog;
             _listener.CreateSockets(listenAddresses.ListenAddresses);
 
             Logger.Info("Running...");
