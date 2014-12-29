@@ -102,11 +102,11 @@ _task = null;
             // TODO: cleanup any currently running handlers
         }
 
-        private bool HandleMessage(IMessage message)
+        private void HandleMessage(IMessage message)
         {
             if(null != _messageHandler && !_messageHandler.Finished) {
-                Logger.Warn("Session " + _session.Id + " attempted to handle new message before handler completed!");
-                return false;
+                _session.InternalError("Session " + _session.Id + " attempted to handle new message before handler completed!");
+                return;
             }
 
             Logger.Debug("Processing message with type=" + message.Type + " for session " + _session.Id + "...");
@@ -114,17 +114,17 @@ _task = null;
             try {
                 _messageHandler = _session.HandlerFactory.Create(message.Type);
                 if(null == _messageHandler) {
-                    return false;
+                    _session.InternalError("Session " + _session.Id + " could not create handler for message type: " + message.Type);
+                    return;
                 }
                 _messageHandler.HandleMessage(message, _session);
             } catch(MessageHandlerException e) {
-                Logger.Error("Error handling message for session " + _session.Id, e);
-                return false;
+                _session.InternalError("Error handling message for session " + _session.Id, e);
+                return;
             } catch(Exception e) {
-                Logger.Error("Unhandled message processing exception for session + " + _session.Id + "!", e);
-                return false;
+                _session.InternalError("Unhandled message processing exception for session + " + _session.Id + "!", e);
+                return;
             }
-            return true;
         }
     }
 }

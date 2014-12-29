@@ -76,6 +76,7 @@
     <Compile Include="DatabaseManager.cs" />
     <Compile Include="EventLogger.cs" />
     <Compile Include="MessageHandlers\InstanceNotifierMessageHandlerFactory.cs" />
+    <Compile Include="MessageHandlers\VisibilityMessageHandler.cs" />
     <Compile Include="Net\InstanceNotifier.cs" />
     <Compile Include="MessageHandlers\LogoutMessageHandler.cs" />
     <Compile Include="MessageHandlers\OvermindMessageHandlerFactory.cs" />

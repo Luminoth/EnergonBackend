@@ -51,6 +51,7 @@
     <Compile Include="Common.cs" />
     <Compile Include="Configuration\ListenAddressConfiguration.cs" />
     <Compile Include="MessageHandlers\MessageProcessor.cs" />
+    <Compile Include="Messages\AuthenticatedMessage.cs" />
     <Compile Include="Messages\Auth\AuthMessage.cs" />
     <Compile Include="Messages\Auth\ChallengeMessage.cs" />
     <Compile Include="Messages\Auth\FailureMessage.cs" />

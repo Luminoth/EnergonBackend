@@ -1,4 +1,5 @@
 ﻿using EnergonSoftware.Core.Messages.Auth;
+using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Notification;
 
@@ -41,6 +42,10 @@ namespace EnergonSoftware.Core.Messages
                 return new ResponseMessage();
             case SuccessMessage.MessageType:
                 return new SuccessMessage();
+
+            /* chat */
+            case VisibilityMessage.MessageType:
+                return new VisibilityMessage();
             }
             throw new MessageException("Unsupported message type for construction: " + type);
         }

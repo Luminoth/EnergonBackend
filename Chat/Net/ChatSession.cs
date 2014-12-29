@@ -4,6 +4,7 @@ using System.Net.Sockets;
 
 using EnergonSoftware.Chat.MessageHandlers;
 using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
@@ -21,7 +22,7 @@ namespace EnergonSoftware.Chat.Net
         }
     }
 
-    internal sealed class ChatSession : Session
+    internal sealed class ChatSession : AuthenticatedSession
     {
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
@@ -29,6 +30,11 @@ namespace EnergonSoftware.Chat.Net
 
         public ChatSession(Socket socket) : base(socket)
         {
+        }
+
+        public void Ping()
+        {
+            SendMessage(new PingMessage());
         }
     }
 }

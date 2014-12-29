@@ -65,6 +65,8 @@ namespace EnergonSoftware.Launcher.Net
         {
             SendMessage(new VisibilityMessage()
                 {
+                    Username = ClientState.Instance.Username,
+                    SessionId = ClientState.Instance.Ticket,
                     Visibility = visibility,
                 }
             );

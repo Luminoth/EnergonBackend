@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Configuration;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
-using EnergonSoftware.Core.Util;
-using EnergonSoftware.Database.Models;
 using EnergonSoftware.Overmind.MessageHandlers;
 
-using log4net;
 
 namespace EnergonSoftware.Overmind.Net
 {
@@ -27,10 +23,8 @@ namespace EnergonSoftware.Overmind.Net
         }
     }
 
-    internal sealed class OvermindSession : Session
+    internal sealed class OvermindSession : AuthenticatedSession
     {
-        public AccountInfo AccountInfo { get; private set; }
-
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
         public override IMessageHandlerFactory HandlerFactory { get { return new OvermindMessageHandlerFactory(); } }
@@ -46,7 +40,7 @@ namespace EnergonSoftware.Overmind.Net
 
         public void Logout()
         {
-            InstanceNotifier.Instance.Logout(AccountInfo.Username);
+            InstanceNotifier.Instance.Logout(Account.Username);
 
             Disconnect();
         }

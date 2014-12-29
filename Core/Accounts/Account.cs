@@ -28,6 +28,7 @@ namespace EnergonSoftware.Core.Accounts
             // Id not serialized
             formatter.WriteString(Username, stream);
             formatter.WriteInt((int)Visibility, stream);
+            formatter.WriteString(Status, stream);
         }
 
         public void DeSerialize(Stream stream, IMessageFormatter formatter)
@@ -35,6 +36,7 @@ namespace EnergonSoftware.Core.Accounts
             // Id not serialized
             Username = formatter.ReadString(stream);
             Visibility = (Visibility)formatter.ReadInt(stream);
+            Status = formatter.ReadString(stream);
         }
 
         public override bool Equals(object obj)
@@ -48,7 +50,9 @@ namespace EnergonSoftware.Core.Accounts
                 return false;
             }
 
-            return Username == account.Username && SessionId == account.SessionId && EndPoint == account.EndPoint;
+            return Username.Equals(account.Username, StringComparison.InvariantCultureIgnoreCase)
+                && SessionId.Equals(account.SessionId, StringComparison.InvariantCultureIgnoreCase)
+                && EndPoint.Equals(account.EndPoint);
         }
 
         public override int GetHashCode()

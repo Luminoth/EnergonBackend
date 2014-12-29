@@ -7,10 +7,13 @@ using EnergonSoftware.Core.Messages.Formatter;
 namespace EnergonSoftware.Core.Messages.Chat
 {
     [Serializable]
-    public sealed class VisibilityMessage : IMessage
+    public sealed class VisibilityMessage : IAuthenticatedMessage
     {
         public const string MessageType = "visibility";
         public string Type { get { return MessageType; } }
+
+        public string Username { get; set; }
+        public string SessionId { get; set; }
 
         public Visibility Visibility { get; set; }
 
@@ -20,11 +23,15 @@ namespace EnergonSoftware.Core.Messages.Chat
 
         public void Serialize(Stream stream, IMessageFormatter formatter)
         {
+            formatter.WriteString(Username, stream);
+            formatter.WriteString(SessionId, stream);
             formatter.WriteInt((int)Visibility, stream);
         }
 
         public void DeSerialize(Stream stream, IMessageFormatter formatter)
         {
+            Username = formatter.ReadString(stream);
+            SessionId = formatter.ReadString(stream);
             Visibility = (Visibility)formatter.ReadInt(stream);
         }
 

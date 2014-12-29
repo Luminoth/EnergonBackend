@@ -23,8 +23,19 @@ public bool Finished { get { return null != _task && _task.IsCompleted; } }
         /*private long _startTime, _finishTime;
         public long RuntimeMs { get { return Finished ? _finishTime - _startTime : Time.CurrentTimeMs - _startTime; } }*/
 
+        private void Authenticate(IAuthenticatedMessage message, AuthenticatedSession session)
+        {
+            if(null != message && null != session) {
+                if(!session.Authenticate(message.Username, message.SessionId)) {
+                    throw new MessageHandlerException("Session is not authenticated!");
+                }
+            }
+        }
+
         public /*async Task*/ void HandleMessage(IMessage message, Session session)
         {
+            Authenticate(message as IAuthenticatedMessage, session as AuthenticatedSession);
+
 _task = Task.Factory.StartNew(() => OnHandleMessage(message, session));
             /*Finished = false;
             _startTime = Time.CurrentTimeMs;

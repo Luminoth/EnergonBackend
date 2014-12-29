@@ -1,5 +1,7 @@
 ﻿using EnergonSoftware.Chat.Net;
 using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Messages.Chat;
 
 namespace EnergonSoftware.Chat.MessageHandlers
 {
@@ -9,6 +11,10 @@ namespace EnergonSoftware.Chat.MessageHandlers
         {
             switch(type)
             {
+            case PingMessage.MessageType:
+                return new PingMessageHandler();
+            case VisibilityMessage.MessageType:
+                return new VisibilityMessageHandler();
             }
             throw new MessageHandlerException("Unsupported message type: " + type);
         }

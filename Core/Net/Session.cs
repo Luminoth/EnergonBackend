@@ -248,6 +248,39 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
+#region Internal Errors
+        public void InternalError(string error)
+        {
+            Logger.Error("Session " + Id + " encountered an internal error: " + error);
+            Disconnect("Internal Error");
+
+            if(null != OnError) {
+                OnError(this, new ErrorEventArgs() { Error = error });
+            }
+        }
+
+        public void InternalError(string error, Exception ex)
+        {
+            Logger.Error("Session " + Id + " encountered an internal error: " + error, ex);
+            Disconnect("Internal Error");
+
+            if(null != OnError) {
+                OnError(this, new ErrorEventArgs() { Error = error, Exception = ex });
+            }
+        }
+
+        public void InternalError(Exception ex)
+        {
+            Logger.Error("Session " + Id + " encountered an internal error", ex);
+            Disconnect("Internal Error");
+
+            if(null != OnError) {
+                OnError(this, new ErrorEventArgs() { Exception = ex });
+            }
+        }
+#endregion
+
+#region Errors
         public void Error(string error)
         {
             Logger.Error("Session " + Id + " encountered an error: " + error);
@@ -278,4 +311,5 @@ namespace EnergonSoftware.Core.Net
             }
         }
     }
+#endregion
 }

@@ -59,7 +59,12 @@ namespace EnergonSoftware.Launcher.Net
 
         public void Logout()
         {
-            SendMessage(new LogoutMessage());
+            SendMessage(new LogoutMessage()
+                {
+                    Username = ClientState.Instance.Username,
+                    SessionId = ClientState.Instance.Ticket,
+                }
+            );
         }
 
         public void Ping()
@@ -75,6 +80,8 @@ namespace EnergonSoftware.Launcher.Net
         {
             SendMessage(new VisibilityMessage()
                 {
+                    Username = ClientState.Instance.Username,
+                    SessionId = ClientState.Instance.Ticket,
                     Visibility = visibility,
                 }
             );

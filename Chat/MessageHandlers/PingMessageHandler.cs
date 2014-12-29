@@ -1,9 +1,9 @@
-﻿using EnergonSoftware.Core.MessageHandlers;
+﻿using EnergonSoftware.Chat.Net;
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net;
-using EnergonSoftware.Overmind.Net;
 
-namespace EnergonSoftware.Overmind.MessageHandlers
+namespace EnergonSoftware.Chat.MessageHandlers
 {
     internal sealed class PingMessageHandler : MessageHandler
     {
@@ -13,8 +13,8 @@ namespace EnergonSoftware.Overmind.MessageHandlers
 
         protected override void OnHandleMessage(IMessage message, Session session)
         {
-            OvermindSession overmindSession = (OvermindSession)session;
-            overmindSession.Ping();
+            ChatSession chatSession = (ChatSession)session;
+            chatSession.Ping();
         }
     }
 }

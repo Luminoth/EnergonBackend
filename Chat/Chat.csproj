@@ -76,6 +76,8 @@
     </Compile>
     <Compile Include="MessageHandlers\ChatMessageHandlerFactory.cs" />
     <Compile Include="MessageHandlers\InstanceNotifierMessageHandlerFactory.cs" />
+    <Compile Include="MessageHandlers\PingMessageHandler.cs" />
+    <Compile Include="MessageHandlers\VisibilityMessageHandler.cs" />
     <Compile Include="Net\ChatSession.cs" />
     <Compile Include="Net\InstanceNotifier.cs" />
     <Compile Include="Net\InstanceNotifierSession.cs" />
