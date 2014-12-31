@@ -9,7 +9,6 @@ using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Overmind.MessageHandlers;
 
-
 namespace EnergonSoftware.Overmind.Net
 {
     internal sealed class OvermindSessionFactory : ISessionFactory
@@ -33,14 +32,18 @@ namespace EnergonSoftware.Overmind.Net
         {
         }
 
-        public void Ping()
+        public void Login(string username, string sessionid)
         {
-            SendMessage(new PingMessage());
         }
 
         public void Logout()
         {
             Disconnect();
+        }
+
+        public void Ping()
+        {
+            SendMessage(new PingMessage());
         }
     }
 }

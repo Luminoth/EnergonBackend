@@ -16,6 +16,8 @@ namespace EnergonSoftware.Core.Messages.Notification
 
         public StartupMessage() : base()
         {
+            ServiceName = string.Empty;
+            ServiceId = string.Empty;
         }
 
         public void Serialize(Stream stream, IMessageFormatter formatter)

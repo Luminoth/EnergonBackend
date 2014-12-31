@@ -80,6 +80,8 @@ namespace EnergonSoftware.Launcher
             Logger.Info("Exiting...");
             _quit = true;
 
+            // TODO: logout?
+
             _sessions.DisconnectAll();
 
             Logger.Info("Goodbye!");
@@ -140,11 +142,10 @@ namespace EnergonSoftware.Launcher
             if(null != _overmindSession) {
                 Logger.Info("Logging out...");
 
-                _chatSession.Disconnect();
+                _chatSession.Logout();
                 _chatSession = null;
 
                 _overmindSession.Logout();
-                _overmindSession.Disconnect();
                 _overmindSession = null;
             }
 

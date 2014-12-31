@@ -42,6 +42,8 @@ namespace EnergonSoftware.Launcher.Net
 
         private void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
         {
+            Login();
+
             SetVisibility(Visibility.Online);
         }
 
@@ -50,6 +52,27 @@ namespace EnergonSoftware.Launcher.Net
             OnConnectSuccess += OnConnectSuccessCallback;
             OnConnectFailed += OnConnectFailedCallback;
             ConnectAsync(host, port);
+        }
+
+        private void Login()
+        {
+            SendMessage(new LoginMessage()
+                {
+                    Username = ClientState.Instance.Username,
+                    SessionId = ClientState.Instance.Ticket,
+                }
+            );
+        }
+
+        public void Logout()
+        {
+            SendMessage(new LogoutMessage()
+                {
+                    Username = ClientState.Instance.Username,
+                    SessionId = ClientState.Instance.Ticket,
+                }
+            );
+            Disconnect();
         }
 
         public void Ping()

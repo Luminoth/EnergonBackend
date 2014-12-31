@@ -8,10 +8,6 @@ namespace EnergonSoftware.Core.Messages.Formatter
     // TODO: should this lock the stream maybe?
     public sealed class BinaryMessageFormatter : IMessageFormatter
     {
-        public BinaryMessageFormatter()
-        {
-        }
-
         public void WriteString(string value, Stream stream)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(value);

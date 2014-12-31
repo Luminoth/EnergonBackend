@@ -1,6 +1,5 @@
 ﻿using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Core.Net;
 
 namespace EnergonSoftware.Overmind.MessageHandlers
@@ -13,10 +12,10 @@ namespace EnergonSoftware.Overmind.MessageHandlers
             {
             case PingMessage.MessageType:
                 return new PingMessageHandler();
+            case LoginMessage.MessageType:
+                return new LoginMessageHandler();
             case LogoutMessage.MessageType:
                 return new LogoutMessageHandler();
-            case VisibilityMessage.MessageType:
-                return new VisibilityMessageHandler();
             }
             throw new MessageHandlerException("Unsupported message type: " + type);
         }

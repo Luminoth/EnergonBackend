@@ -22,10 +22,6 @@ namespace EnergonSoftware.Core.Messages.Packet
         public const string PacketType = "network";
         public override string Type { get { return PacketType; } }
 
-        public NetworkPacket() : base()
-        {
-        }
-
         public override byte[] Serialize(IMessageFormatter formatter)
         {
             using(MemoryStream stream = new MemoryStream()) {

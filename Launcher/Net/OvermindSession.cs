@@ -42,7 +42,7 @@ namespace EnergonSoftware.Launcher.Net
 
         private void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
         {
-            SetVisibility(Visibility.Online);
+            Login();
 
             ClientState.Instance.LoggingIn = false;
             ClientState.Instance.LoggedIn = true;
@@ -57,6 +57,16 @@ namespace EnergonSoftware.Launcher.Net
             ConnectAsync(host, port);
         }
 
+        private void Login()
+        {
+            SendMessage(new LoginMessage()
+                {
+                    Username = ClientState.Instance.Username,
+                    SessionId = ClientState.Instance.Ticket,
+                }
+            );
+        }
+
         public void Logout()
         {
             SendMessage(new LogoutMessage()
@@ -65,6 +75,7 @@ namespace EnergonSoftware.Launcher.Net
                     SessionId = ClientState.Instance.Ticket,
                 }
             );
+            Disconnect();
         }
 
         public void Ping()
@@ -74,17 +85,6 @@ namespace EnergonSoftware.Launcher.Net
             }
 
             SendMessage(new PingMessage());
-        }
-
-        public void SetVisibility(Visibility visibility)
-        {
-            SendMessage(new VisibilityMessage()
-                {
-                    Username = ClientState.Instance.Username,
-                    SessionId = ClientState.Instance.Ticket,
-                    Visibility = visibility,
-                }
-            );
         }
     }
 }

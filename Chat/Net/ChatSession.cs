@@ -32,6 +32,15 @@ namespace EnergonSoftware.Chat.Net
         {
         }
 
+        public void Login(string username, string sessionid)
+        {
+        }
+
+        public void Logout()
+        {
+            Disconnect();
+        }
+
         public void Ping()
         {
             SendMessage(new PingMessage());

@@ -6,10 +6,6 @@ namespace EnergonSoftware.Core.Messages.Parser
 {
     public sealed class NetworkPacketParser : IMessagePacketParser
     {
-        public NetworkPacketParser()
-        {
-        }
-
         public MessagePacket Create()
         {
             return new NetworkPacket();

@@ -28,6 +28,8 @@ namespace EnergonSoftware.Core.Messages
             /* misc */
             case PingMessage.MessageType:
                 return new PingMessage();
+            case LoginMessage.MessageType:
+                return new LoginMessage();
             case LogoutMessage.MessageType:
                 return new LogoutMessage();
 

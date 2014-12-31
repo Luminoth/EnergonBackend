@@ -16,6 +16,8 @@ namespace EnergonSoftware.Core.Messages
 
         public LogoutMessage()
         {
+            Username = string.Empty;
+            SessionId = string.Empty;
         }
 
         public void Serialize(Stream stream, IMessageFormatter formatter)

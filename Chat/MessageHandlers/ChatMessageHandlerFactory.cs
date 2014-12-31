@@ -13,6 +13,10 @@ namespace EnergonSoftware.Chat.MessageHandlers
             {
             case PingMessage.MessageType:
                 return new PingMessageHandler();
+            case LoginMessage.MessageType:
+                return new LoginMessageHandler();
+            case LogoutMessage.MessageType:
+                return new LogoutMessageHandler();
             case VisibilityMessage.MessageType:
                 return new VisibilityMessageHandler();
             }

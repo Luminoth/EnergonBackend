@@ -61,6 +61,7 @@
     <Compile Include="Messages\Formatter\BinaryMessageFormatter.cs" />
     <Compile Include="Messages\Formatter\MessageFormatter.cs" />
     <Compile Include="Messages\Formatter\MessageSerializable.cs" />
+    <Compile Include="Messages\LoginMessage.cs" />
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessageException.cs" />
     <Compile Include="MessageHandlers\MessageHandler.cs" />
