@@ -22,5 +22,8 @@ namespace EnergonSoftware.Core.Net
                 }
             );
         }
+
+        public abstract void Login(string username, string sessionid);
+        public abstract void Logout();
     }
 }
