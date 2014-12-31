@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Messages;
@@ -44,10 +45,14 @@ namespace EnergonSoftware.Overmind.Net
             _sessions.DisconnectAll();
         }
 
-        public void Run()
+        public async Task Run()
         {
-            _sessions.PollAndRun();
-            _sessions.Cleanup();
+            await Task.Run(() =>
+                {
+                    _sessions.PollAndRun();
+                    _sessions.Cleanup();
+                }
+            );
         }
 
         public void Startup()
@@ -68,10 +73,6 @@ namespace EnergonSoftware.Overmind.Net
                     ServiceId = Overmind.UniqueId.ToString(),
                 }
             );
-        }
-
-        public void Logout(string username)
-        {
         }
 
         private InstanceNotifier()

@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Chat.MessageHandlers;
 using EnergonSoftware.Core.Configuration;
@@ -44,10 +45,14 @@ namespace EnergonSoftware.Chat.Net
             _sessions.DisconnectAll();
         }
 
-        public void Run()
+        public async Task Run()
         {
-            _sessions.PollAndRun();
-            _sessions.Cleanup();
+            await Task.Run(() =>
+                {
+                    _sessions.PollAndRun();
+                    _sessions.Cleanup();
+                }
+            );
         }
 
         public void Startup()

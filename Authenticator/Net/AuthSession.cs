@@ -32,6 +32,8 @@ namespace EnergonSoftware.Authenticator.Net
 
     internal sealed class AuthSession : Session
     {
+        private readonly object _lock = new object();
+
         public AuthType AuthType { get; private set; }
         public Nonce AuthNonce { get; private set; }
 
@@ -51,11 +53,13 @@ namespace EnergonSoftware.Authenticator.Net
 
         public void Challenge(AuthType type, Nonce nonce, string challenge)
         {
-            AuthType = type;
-            AuthNonce = nonce;
+            lock(_lock) {
+                AuthType = type;
+                AuthNonce = nonce;
 
-            Authenticating = true;
-            Authenticated = false;
+                Authenticating = true;
+                Authenticated = false;
+            }
 
             SendMessage(new ChallengeMessage()
                 {
@@ -64,12 +68,14 @@ namespace EnergonSoftware.Authenticator.Net
             );
         }
 
-        public void Challenge(string challenge, AccountInfo accountInfo)
+        public async Task Challenge(string challenge, AccountInfo accountInfo)
         {
-            InstanceNotifier.Instance.Authenticating(accountInfo.Username, RemoteEndPoint);
+            await InstanceNotifier.Instance.Authenticating(accountInfo.Username, RemoteEndPoint);
 
-            AccountInfo = accountInfo;
-            Authenticated = true;
+            lock(_lock) {
+                AccountInfo = accountInfo;
+                Authenticated = true;
+            }
 
             SendMessage(new ChallengeMessage()
                 {
@@ -80,11 +86,13 @@ namespace EnergonSoftware.Authenticator.Net
 
         public async Task Success(string sessionid)
         {
-            InstanceNotifier.Instance.Authenticated(AccountInfo.Username, sessionid, RemoteEndPoint);
+            await InstanceNotifier.Instance.Authenticated(AccountInfo.Username, sessionid, RemoteEndPoint);
             await EventLogger.Instance.SuccessEvent(RemoteEndPoint, AccountInfo.Username);
 
-            AccountInfo.SessionId = sessionid;
-            AccountInfo.EndPoint = RemoteEndPoint.ToString();
+            lock(_lock) {
+                AccountInfo.SessionId = sessionid;
+                AccountInfo.EndPoint = RemoteEndPoint.ToString();
+            }
 
             using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnection()) {
                 await AccountInfo.Update(connection);
@@ -95,6 +103,7 @@ namespace EnergonSoftware.Authenticator.Net
                     SessionId = sessionid,
                 }
             );
+
             Disconnect();
         }
 
@@ -106,13 +115,16 @@ namespace EnergonSoftware.Authenticator.Net
             // might be a malicious login attempt against an account
             // that is already using a legitimate ticket
 
-            AccountInfo = null;
+            lock(_lock) {
+                AccountInfo = null;
+            }
 
             SendMessage(new FailureMessage()
                 {
                     Reason = reason,
                 }
             );
+
             Disconnect();
         }
     }

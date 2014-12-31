@@ -40,8 +40,6 @@ namespace EnergonSoftware.Overmind.Net
 
         public void Logout()
         {
-            InstanceNotifier.Instance.Logout(Account.Username);
-
             Disconnect();
         }
     }

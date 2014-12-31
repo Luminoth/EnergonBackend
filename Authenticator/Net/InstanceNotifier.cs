@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Authenticator.MessageHandlers;
 using EnergonSoftware.Core.Configuration;
@@ -44,10 +45,14 @@ namespace EnergonSoftware.Authenticator.Net
             _sessions.DisconnectAll();
         }
 
-        public void Run()
+        public async Task Run()
         {
-            _sessions.PollAndRun();
-            _sessions.Cleanup();
+            await Task.Run(() =>
+                {
+                    _sessions.PollAndRun();
+                    _sessions.Cleanup();
+                }
+            );
         }
 
         public void Startup()
@@ -70,12 +75,14 @@ namespace EnergonSoftware.Authenticator.Net
             );
         }
 
-        public void Authenticating(string username, EndPoint endpoint)
+        public async Task Authenticating(string username, EndPoint endpoint)
         {
+            await Task.Delay(0);
         }
 
-        public void Authenticated(string username, string sessionId, EndPoint endpoint)
+        public async Task Authenticated(string username, string sessionId, EndPoint endpoint)
         {
+            await Task.Delay(0);
         }
 
         private InstanceNotifier()

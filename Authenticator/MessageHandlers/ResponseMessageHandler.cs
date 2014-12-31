@@ -56,16 +56,16 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             case EnergonSoftware.Core.AuthType.DigestMD5:
                 /*Logger.Debug("Handling MD5 response...");
                 //Logger.Debug("passwordHash=" + account.PasswordMD5);
-                expected = EnergonSoftware.Core.Auth.DigestClientResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI);
-                rspauth = EnergonSoftware.Core.Auth.DigestServerResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI);
+                expected = await Task.Run(() => EnergonSoftware.Core.Auth.DigestClientResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI));
+                rspauth = await Task.Run(() => EnergonSoftware.Core.Auth.DigestServerResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI));
                 break;*/
 await session.Failure("MD5 auth type not supported!");
 return;
             case EnergonSoftware.Core.AuthType.DigestSHA512:
                 Logger.Debug("Handling SHA512 response...");
                 //Logger.Debug("passwordHash=" + account.PasswordSHA512);
-                expected = EnergonSoftware.Core.Auth.DigestClientResponse(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI);
-                rspauth = EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI);
+                expected = await Task.Run(() => EnergonSoftware.Core.Auth.DigestClientResponse(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI));
+                rspauth = await Task.Run(() => EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI));
                 break;
             default:
                 await session.Failure("Unsupported auth type!");
@@ -79,7 +79,7 @@ return;
 
             string challenge = "rspauth=" + rspauth;
             Logger.Info("Session " + session.Id + " authenticated account '" + username + "', sending response: " + rspauth);
-            session.Challenge(challenge, account);
+            await session.Challenge(challenge, account);
         }
 
         protected async override void OnHandleMessage(IMessage message, Session session)
@@ -103,7 +103,7 @@ return;
 
             ResponseMessage responseMessage = (ResponseMessage)message;
 
-            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(responseMessage.Response));
+            string decoded = await Task.Run(() => Encoding.UTF8.GetString(Convert.FromBase64String(responseMessage.Response)));
             Logger.Debug("Decoded response: " + decoded);
 
             Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(decoded);

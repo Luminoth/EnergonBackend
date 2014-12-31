@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Threading;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Authenticator.Net;
 using EnergonSoftware.Core.Configuration;
@@ -105,13 +106,19 @@ namespace EnergonSoftware.Authenticator
         private void Run()
         {
             while(Running) {
+                List<Task> tasks = new List<Task>();
                 try {
-                    InstanceNotifier.Instance.Run();
+                    tasks.Add(Task.Run(() => InstanceNotifier.Instance.Run()));
+                    tasks.Add(Task.Run(() =>
+                        {
+                            _listener.Poll(_sessions);
 
-                    _listener.Poll(_sessions);
+                            _sessions.PollAndRun();
+                            _sessions.Cleanup();
+                        }
+                    ));
 
-                    _sessions.PollAndRun();
-                    _sessions.Cleanup();
+                    Task.WhenAll(tasks).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();

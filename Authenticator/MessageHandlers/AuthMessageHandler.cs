@@ -47,6 +47,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             AuthSession authSession = (AuthSession)session;
 
             await EventLogger.Instance.RequestEvent(authSession.RemoteEndPoint);
+
             if(authSession.Authenticated || authSession.Authenticating) {
                 await authSession.Failure("Already Authenticating");
                 return;

@@ -49,7 +49,7 @@ private Task _task;
             _messageQueue.Enqueue(message);
         }
 
-        public void ParseMessages(MemoryBuffer buffer)
+        public /*async Task*/ void ParseMessages(MemoryBuffer buffer)
         {
             MessagePacket packet = _session.Parser.Parse(buffer, _session.Formatter);
             while(null != packet) {
