@@ -40,31 +40,16 @@ namespace EnergonSoftware.Chat.Net
         {
         }
 
-        public override void Login(string username, string sessionid)
+        protected override void LookupAccount(string username)
         {
-            AccountInfo accountInfo = new AccountInfo() { Username = username };
+            Logger.Debug("Looking up account for username=" + username);
+            AccountInfo account = new AccountInfo() { Username = username };
             using(DatabaseConnection connection = Task.Run(() => DatabaseManager.AcquireDatabaseConnection()).Result) {
-                if(!Task.Run(() => accountInfo.Read(connection)).Result) {
-                    Logger.Warn("Invalid login username=" + username);
-                    Disconnect();
+                if(!Task.Run(() => account.Read(connection)).Result) {
                     return;
                 }
             }
-            Account = accountInfo.ToAccount();
-
-            EnergonSoftware.Core.Accounts.Account account = new Account() { Username = username, SessionId = sessionid, EndPoint = RemoteEndPoint };
-            if(!Authenticate(account)) {
-                Logger.Warn("Invalid login account: " + account + ", expected: " + Account);
-                Disconnect();
-                return;
-            }
-        }
-
-        public override void Logout()
-        {
-            Disconnect();
-
-            Account = null;
+            Account = account.ToAccount();
         }
 
         public void Ping()

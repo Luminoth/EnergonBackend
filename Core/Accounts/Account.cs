@@ -59,5 +59,10 @@ namespace EnergonSoftware.Core.Accounts
         {
             return base.GetHashCode();
         }
+
+        public override string ToString()
+        {
+            return "Account(Id=" + Id + ", Username=" + Username + ", SessionId=" + SessionId + ", EndPoint=" + EndPoint + ", Visibility=" + Visibility + ", Status=" + Status + ")";
+        }
     }
 }
