@@ -12,9 +12,14 @@ namespace EnergonSoftware.Core.Net
         {
         }
 
+        public bool Authenticate(Account account)
+        {
+            return null != Account && null != account && Account.Equals(account);
+        }
+
         public bool Authenticate(string username, string sessionid)
         {
-            return null != Account && Account.Equals(new Account()
+            return Authenticate(new Account()
                 {
                     Username = username,
                     SessionId = sessionid,
