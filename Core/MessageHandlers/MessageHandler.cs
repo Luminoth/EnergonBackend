@@ -16,12 +16,10 @@ namespace EnergonSoftware.Core.MessageHandlers
 
     public class MessageHandler
     {
-private Task _task;
-public bool Finished { get { return null != _task && _task.IsCompleted; } }
-        //public bool Finished { get; private set; }
+        public bool Finished { get; private set; }
 
-        /*private long _startTime, _finishTime;
-        public long RuntimeMs { get { return Finished ? _finishTime - _startTime : Time.CurrentTimeMs - _startTime; } }*/
+        private long _startTime, _finishTime;
+        public long RuntimeMs { get { return Finished ? _finishTime - _startTime : Time.CurrentTimeMs - _startTime; } }
 
         private void Authenticate(IAuthenticatedMessage message, AuthenticatedSession session)
         {
@@ -32,16 +30,15 @@ public bool Finished { get { return null != _task && _task.IsCompleted; } }
             }
         }
 
-        public /*async Task*/ void HandleMessage(IMessage message, Session session)
+        public async Task HandleMessage(IMessage message, Session session)
         {
             Authenticate(message as IAuthenticatedMessage, session as AuthenticatedSession);
 
-_task = Task.Factory.StartNew(() => OnHandleMessage(message, session));
-            /*Finished = false;
+            Finished = false;
             _startTime = Time.CurrentTimeMs;
-            await Task.Run(() => OnHandleMessage(message));
+            await Task.Run(() => OnHandleMessage(message, session));
             _finishTime = Time.CurrentTimeMs;
-            Finished = true;*/
+            Finished = true;
         }
 
         protected virtual void OnHandleMessage(IMessage message, Session session)

@@ -14,21 +14,17 @@ using log4net;
 
 namespace EnergonSoftware.Core.MessageHandlers
 {
-// change this to be owned by the session
-// so do we need to even hold a reference back to the
-// session with *each* message? or just hold it in the processor?
-
     public sealed class MessageProcessor
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageProcessor));
 
         private readonly Session _session;
-        private ConcurrentQueue<IMessage> _messageQueue = new ConcurrentQueue<IMessage>();
 
-        private MessageHandler _messageHandler;
+        private /*readonly*/ ConcurrentQueue<IMessage> _messageQueue = new ConcurrentQueue<IMessage>();
+        private readonly AutoResetEvent _messageQueueEvent = new AutoResetEvent(false);
 
-private Task _task;
         private volatile bool _running;
+        private Task _task;
 
         private MessageProcessor()
         {
@@ -47,25 +43,25 @@ private Task _task;
         public void QueueMessage(IMessage message)
         {
             _messageQueue.Enqueue(message);
+            _messageQueueEvent.Set();
         }
 
-        public /*async Task*/ void ParseMessages(MemoryBuffer buffer)
+        public async Task ParseMessages(MemoryBuffer buffer)
         {
-            MessagePacket packet = _session.Parser.Parse(buffer, _session.Formatter);
+            MessagePacket packet = await Task.Run(() => _session.Parser.Parse(buffer, _session.Formatter));
             while(null != packet) {
                 Logger.Debug("Session " + _session.Id + " parsed message type: " + packet.Content.Type);
                 QueueMessage(packet.Content);
-                packet = _session.Parser.Parse(buffer, _session.Formatter);
+                packet = await Task.Run(() => _session.Parser.Parse(buffer, _session.Formatter));
             }
         }
 
-        public /*async Task*/ void Start()
+        public void Start()
         {
             Logger.Debug("Starting message processor for session " + _session.Id + "...");
 
             _running = true;
-_task = Task.Factory.StartNew(() => Run());
-            //await Task.Run(() => Run());
+            _task = Task.Run(() => Run());
         }
 
         public void Stop()
@@ -75,49 +71,39 @@ _task = Task.Factory.StartNew(() => Run());
             }
 
             Logger.Debug("Stopping message processor for session " + _session.Id + "...");
+
             _running = false;
-_task.Wait();
+            _messageQueueEvent.Set();
+
+            _task.Wait();
+            _task = null;
 
             _messageQueue = new ConcurrentQueue<IMessage>();
-_task = null;
         }
 
-        private void Run()
+        private async Task Run()
         {
             while(_running) {
-                // TODO: we need a way to say "hey, this handler is taking WAY too long,
-                // dump an error and kill the session"
-                if(null != _messageHandler && _messageHandler.Finished) {
-                    _messageHandler = null;
-                }
+                _messageQueueEvent.WaitOne();
 
                 IMessage message;
-                if(null == _messageHandler && _messageQueue.TryDequeue(out message)) {
-                    HandleMessage(message);
+                while(_running && _messageQueue.TryDequeue(out message)) {
+                    await HandleMessage(message);
                 }
-
-                Thread.Sleep(0);
             }
-
-            // TODO: cleanup any currently running handlers
         }
 
-        private void HandleMessage(IMessage message)
+        private async Task HandleMessage(IMessage message)
         {
-            if(null != _messageHandler && !_messageHandler.Finished) {
-                _session.InternalError("Session " + _session.Id + " attempted to handle new message before handler completed!");
-                return;
-            }
-
             Logger.Debug("Processing message with type=" + message.Type + " for session " + _session.Id + "...");
 
             try {
-                _messageHandler = _session.HandlerFactory.Create(message.Type);
-                if(null == _messageHandler) {
+                MessageHandler messageHandler = _session.HandlerFactory.Create(message.Type);
+                if(null == messageHandler) {
                     _session.InternalError("Session " + _session.Id + " could not create handler for message type: " + message.Type);
                     return;
                 }
-                _messageHandler.HandleMessage(message, _session);
+                await messageHandler.HandleMessage(message, _session);
             } catch(MessageHandlerException e) {
                 _session.InternalError("Error handling message for session " + _session.Id, e);
                 return;

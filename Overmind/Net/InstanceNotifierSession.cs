@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages.Formatter;
@@ -31,12 +32,12 @@ namespace EnergonSoftware.Overmind.Net
 
         protected override void OnRun()
         {
-            int count = _listener.PollAndRead();
+            int count = Task.Run(() => _listener.PollAndRead()).Result;
             if(count > 0) {
                 Logger.Debug("Instance notifier session " + Id + " read " + count + " bytes");
             }
 
-            Processor.ParseMessages(_listener.Buffer);
+            Task.Run(() => Processor.ParseMessages(_listener.Buffer)).Wait();
         }
     }
 }

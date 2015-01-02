@@ -43,11 +43,6 @@ namespace EnergonSoftware.Launcher.Net
         private void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
         {
             Login();
-
-            ClientState.Instance.LoggingIn = false;
-            ClientState.Instance.LoggedIn = true;
-
-            ClientState.Instance.CurrentPage = ClientState.Page.Main;
         }
 
         public void BeginConnect(string host, int port)

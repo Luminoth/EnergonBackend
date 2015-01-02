@@ -1,4 +1,6 @@
-﻿using EnergonSoftware.Overmind.Net;
+﻿using System.Threading.Tasks;
+
+using EnergonSoftware.Overmind.Net;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net;
@@ -15,7 +17,7 @@ namespace EnergonSoftware.Overmind.MessageHandlers
         {
             LoginMessage loginMessage = (LoginMessage)message;
             OvermindSession overmindSession = (OvermindSession)session;
-            overmindSession.Login(loginMessage.Username, loginMessage.SessionId);
+            Task.Run(() => overmindSession.Login(loginMessage.Username, loginMessage.SessionId)).Wait();
         }
     }
 }

@@ -6,8 +6,7 @@ namespace EnergonSoftware.Core.Util.Crypt
 {
     public static class ECDSA
     {
-        // Unity's mono doesn't have support for CngKey :\
-        /*public static byte[] Sign(string data, CngKey privKey, CngAlgorithm algorithm)
+        public static byte[] Sign(string data, CngKey privKey, CngAlgorithm algorithm)
         {
             using(ECDsaCng dsa = new ECDsaCng(privKey)) {
                 dsa.HashAlgorithm = algorithm;
@@ -21,6 +20,6 @@ namespace EnergonSoftware.Core.Util.Crypt
                 dsa.HashAlgorithm = algorithm;
                 return dsa.VerifyData(data, signature);
             }
-        }*/
+        }
     }
 }

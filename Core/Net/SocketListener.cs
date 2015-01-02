@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Configuration;
 
@@ -50,20 +51,20 @@ namespace EnergonSoftware.Core.Net
         public void CloseSockets()
         {
             Logger.Info("Closing listen sockets...");
-            _listenSockets.ForEach(s => s.Close());
+            Parallel.ForEach<Socket>(_listenSockets, socket => socket.Close());
             _listenSockets.Clear();
         }
 
         public void Poll(SessionManager manager)
         {
-            _listenSockets.ForEach(socket =>
+            Parallel.ForEach<Socket>(_listenSockets, socket =>
                 {
                     try {
                         if(socket.Poll(100, SelectMode.SelectRead)) {
                             Socket remote = socket.Accept();
                             Logger.Info("New connection from " + remote.RemoteEndPoint);
 
-                            if(MaxConnections >= 0 && _listenSockets.Count >= MaxConnections) {
+                            if(MaxConnections >= 0 && manager.Count >= MaxConnections) {
                                 Logger.Info("Max connections exceeded, denying new connection!");
                                 remote.Close();
                             } else {

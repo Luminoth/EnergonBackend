@@ -111,6 +111,7 @@
     <Compile Include="MessageHandlers\Auth\ChallengeMessageHandler.cs" />
     <Compile Include="MessageHandlers\Auth\FailureMessageHandler.cs" />
     <Compile Include="MessageHandlers\Auth\SuccessMessageHandler.cs" />
+    <Compile Include="MessageHandlers\LoginMessageHandler.cs" />
     <Compile Include="MessageHandlers\LogoutMessageHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandlerFactory.cs" />
     <Compile Include="MessageHandlers\PingMessageHandler.cs" />

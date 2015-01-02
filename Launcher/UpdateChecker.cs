@@ -79,7 +79,7 @@ namespace EnergonSoftware.Launcher
                     UpdateFailed = false;
                     Updated = true;
 
-                    await Task.Delay(2000);
+await Task.Delay(2000);
                     ClientState.Instance.CurrentPage = ClientState.Page.Login;
                 } else {
                     UpdateStatus = "Error contacting update server: " + response.ReasonPhrase;

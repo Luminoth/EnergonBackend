@@ -109,7 +109,7 @@ namespace EnergonSoftware.Core.Net
         public static bool ConnectAsync(string host, int port, AsyncConnectEventArgs args)
         {
             bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);
-            IPHostEntry hostEntry = Task.Factory.StartNew(() => Dns.GetHostEntry(host)).Result;
+            IPHostEntry hostEntry = Task.Run(() => Dns.GetHostEntry(host)).Result;
 
             int idx = -1;
             for(int i=0; i<hostEntry.AddressList.Length; ++i) {
@@ -147,7 +147,7 @@ namespace EnergonSoftware.Core.Net
         {
             bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);
 
-            IPHostEntry hostEntry = Task.Factory.StartNew(() => Dns.GetHostEntry(host)).Result;
+            IPHostEntry hostEntry = Task.Run(() => Dns.GetHostEntry(host)).Result;
             foreach(IPAddress address in hostEntry.AddressList) {
                 if(AddressFamily.InterNetwork != address.AddressFamily && (AddressFamily.InterNetworkV6 != address.AddressFamily || !useIPv6)) {
                     continue;

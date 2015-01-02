@@ -45,14 +45,10 @@ namespace EnergonSoftware.Manager.Net
             _sessions.DisconnectAll();
         }
 
-        public async Task Run()
+        public void Run()
         {
-            await Task.Run(() =>
-                {
-                    _sessions.PollAndRun();
-                    _sessions.Cleanup();
-                }
-            );
+            _sessions.PollAndRun();
+            _sessions.Cleanup();
         }
 
         public void Startup()

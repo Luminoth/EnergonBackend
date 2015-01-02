@@ -106,23 +106,25 @@ namespace EnergonSoftware.Chat
         private void Run()
         {
             while(Running) {
-                List<Task> tasks = new List<Task>();
                 try {
-                    tasks.Add(Task.Run(() => InstanceNotifier.Instance.Run()));
-                    tasks.Add(Task.Run(() =>
+                    Task.WhenAll(new Task[]
                         {
-                            _listener.Poll(_sessions);
+                            Task.Run(() => InstanceNotifier.Instance.Run()),
+                            Task.Run(() =>
+                                {
+                                    _listener.Poll(_sessions);
 
-                            _sessions.PollAndRun();
-                            _sessions.Cleanup();
+                                    _sessions.PollAndRun();
+                                    _sessions.Cleanup();
+                                }
+                            ),
                         }
-                    ));
-
-                    Task.WhenAll(tasks).Wait();
+                    ).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();
                 }
+
                 Thread.Sleep(0);
             }
         }

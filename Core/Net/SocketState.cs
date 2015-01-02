@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Util;
 
@@ -17,14 +18,11 @@ namespace EnergonSoftware.Core.Net
         private static int NextId { get { return ++_nextId; } }
 #endregion
 
-        private readonly object _lock = new object();
-
         public readonly int Id;
 
         private Socket _socket;
         public Socket Socket
         {
-            private get { return _socket; }
             set {
                 _socket = value;
                 _reader = null == _socket ? null : new BufferedSocketReader(_socket);
@@ -67,38 +65,32 @@ namespace EnergonSoftware.Core.Net
         }
 #endregion
 
-        public int PollAndRead()
+        public async Task<int> PollAndRead()
         {
-            lock(_lock) {
-                int count = _reader.PollAndRead();
-                if(count > 0) {
-                    LastMessageTime = Time.CurrentTimeMs;
-                }
-                return count;
+            int count = await Task.Run(() => _reader.PollAndRead());
+            if(count > 0) {
+                LastMessageTime = Time.CurrentTimeMs;
             }
+            return count;
         }
 
         public int Send(byte[] buffer)
         {
-            lock(_lock) {
-                Logger.Debug("Socket state " + Id + " sending " + buffer.Length + " bytes");
-                return Socket.Send(buffer);
-            }
+            Logger.Debug("Socket state " + Id + " sending " + buffer.Length + " bytes");
+            return _socket.Send(buffer);
         }
 
         public void ShutdownAndClose(bool reuseSocket)
         {
-            lock(_lock) {
-                if(null == _socket) {
-                    return;
-                }
-
-                Socket.Shutdown(SocketShutdown.Both);
-                if(Socket.Connected) {
-                    Socket.Disconnect(reuseSocket);
-                }
-                Socket.Close();
+            if(null == _socket) {
+                return;
             }
+
+            _socket.Shutdown(SocketShutdown.Both);
+            if(_socket.Connected) {
+                _socket.Disconnect(reuseSocket);
+            }
+            _socket.Close();
         }
     }
 }

@@ -50,9 +50,12 @@ namespace EnergonSoftware.Core.Accounts
                 return false;
             }
 
+            IPEndPoint thisEndPoint = (IPEndPoint)EndPoint;
+            IPEndPoint otherEndPoint = (IPEndPoint)account.EndPoint;
+
             return Username.Equals(account.Username, StringComparison.InvariantCultureIgnoreCase)
                 && SessionId.Equals(account.SessionId, StringComparison.InvariantCultureIgnoreCase)
-                && EndPoint.Equals(account.EndPoint);
+                && thisEndPoint.Address.Equals(otherEndPoint.Address);
         }
 
         public override int GetHashCode()

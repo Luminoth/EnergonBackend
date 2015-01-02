@@ -16,8 +16,8 @@ namespace EnergonSoftware.Core.Net
 
         private readonly HttpListener _listener = new HttpListener();
 
-private volatile bool _running = false;
-private Task _task;
+        private volatile bool _running = false;
+        private Task _task;
 
         public string DefaultIndex { get; set; }
 
@@ -41,15 +41,14 @@ private Task _task;
         }
 #endregion
 
-        public /*async Task*/ void Start(List<string> prefixes)
+        public void Start(List<string> prefixes)
         {
             Logger.Debug("Starting HttpServer...");
 
             prefixes.ForEach(prefix => _listener.Prefixes.Add(prefix));
 
             _listener.Start();
-_task = Task.Factory.StartNew(() => Run());
-            //await Task.Run(() => Run());
+            _task = Task.Run(() => Run());
         }
 
         public void Stop()
@@ -61,18 +60,17 @@ _task = Task.Factory.StartNew(() => Run());
             Logger.Debug("Stopping HttpServer...");
 
             _listener.Stop();
-_task.Wait();
-_task = null;
+            _task.Wait();
+            _task = null;
         }
 
-        private void Run()
+        private async Task Run()
         {
             try {
                 _running = true;
                 while(_listener.IsListening) {
-                    HttpListenerContext context = _listener.GetContext();
-                    HandleRequest(context.Request, context.Response);
-                    Thread.Sleep(0);
+                    HttpListenerContext context = await _listener.GetContextAsync();
+                    await HandleRequest(context.Request, context.Response);
                 }
             } catch(HttpListenerException e) {
                 if(995 != e.ErrorCode) {
@@ -85,7 +83,7 @@ _task = null;
             }
         }
 
-        private void HandleRequest(HttpListenerRequest request, HttpListenerResponse response)
+        private async Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response)
         {
             Logger.Debug("New HttpListenerRequest: " + request.Url);
 
@@ -95,7 +93,7 @@ _task = null;
                 response.ContentEncoding = encoding;
             }
 
-            byte[] data = Task.Factory.StartNew(() => ReadContent(request.RawUrl, encoding)).Result;
+            byte[] data = await ReadContent(request.RawUrl, encoding);
             if(null == data) {
                 Logger.Debug("Content not found!");
                 response.StatusCode = (int)HttpStatusCode.NotFound;
@@ -107,7 +105,7 @@ _task = null;
             response.OutputStream.Close();
         }
 
-        private byte[] ReadContent(string url, Encoding encoding)
+        private async Task<byte[]> ReadContent(string url, Encoding encoding)
         {
             if("/" == url) {
                 url = DefaultIndex;
@@ -116,6 +114,7 @@ _task = null;
             Logger.Debug("Reading content for url=" + url);
             if(DefaultIndex == url) {
                 string data = "<html><head><title>HttpServer Test</title></head><body>Hello World!</body></html>";
+                await Task.Delay(1);
                 return encoding.GetBytes(data);
             }
             return null;

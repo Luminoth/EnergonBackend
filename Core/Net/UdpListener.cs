@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Configuration;
 
@@ -15,8 +16,11 @@ namespace EnergonSoftware.Core.Net
         private readonly List<Socket> _listenSockets = new List<Socket>();
         private readonly ISessionFactory _factory;
 
+        public int MaxConnections { get; set; }
+
         private UdpListener()
         {
+            MaxConnections = -1;
         }
 
         public UdpListener(ISessionFactory factory) : this()
@@ -44,7 +48,7 @@ namespace EnergonSoftware.Core.Net
         public void CloseSockets()
         {
             Logger.Info("Closing listen sockets...");
-            _listenSockets.ForEach(s => s.Close());
+            Parallel.ForEach<Socket>(_listenSockets, socket => socket.Close());
             _listenSockets.Clear();
         }
 
@@ -67,7 +71,7 @@ namespace EnergonSoftware.Core.Net
 
         public void Poll(SessionManager manager)
         {
-            _listenSockets.ForEach(socket =>
+            Parallel.ForEach<Socket>(_listenSockets, socket =>
                 {
                     try {
                         if(socket.Poll(100, SelectMode.SelectRead)) {
@@ -79,10 +83,14 @@ namespace EnergonSoftware.Core.Net
                             }
 
                             Logger.Info("New connection from " + remote.RemoteEndPoint);
-
-                            Session session = _factory.Create(remote);
-                            session.BufferWrite(data, 0, data.Length);
-                            manager.Add(session);
+                            if(MaxConnections >= 0 && manager.Count >= MaxConnections) {
+                                Logger.Info("Max connections exceeded, denying new connection!");
+                                remote.Close();
+                            } else {
+                                Session session = _factory.Create(remote);
+                                session.BufferWrite(data, 0, data.Length);
+                                manager.Add(session);
+                            }
                         }
                     } catch(SocketException e) {
                         Logger.Error("Exception polling sockets!", e);

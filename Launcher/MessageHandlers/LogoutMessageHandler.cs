@@ -1,10 +1,8 @@
-﻿using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net;
-using EnergonSoftware.Launcher.Net;
 
 namespace EnergonSoftware.Launcher.MessageHandlers
 {

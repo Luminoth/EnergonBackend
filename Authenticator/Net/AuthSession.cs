@@ -32,8 +32,6 @@ namespace EnergonSoftware.Authenticator.Net
 
     internal sealed class AuthSession : Session
     {
-        private readonly object _lock = new object();
-
         public AuthType AuthType { get; private set; }
         public Nonce AuthNonce { get; private set; }
 
@@ -53,13 +51,11 @@ namespace EnergonSoftware.Authenticator.Net
 
         public void Challenge(AuthType type, Nonce nonce, string challenge)
         {
-            lock(_lock) {
-                AuthType = type;
-                AuthNonce = nonce;
+            AuthType = type;
+            AuthNonce = nonce;
 
-                Authenticating = true;
-                Authenticated = false;
-            }
+            Authenticating = true;
+            Authenticated = false;
 
             SendMessage(new ChallengeMessage()
                 {
@@ -72,10 +68,8 @@ namespace EnergonSoftware.Authenticator.Net
         {
             await InstanceNotifier.Instance.Authenticating(accountInfo.Username, RemoteEndPoint);
 
-            lock(_lock) {
-                AccountInfo = accountInfo;
-                Authenticated = true;
-            }
+            AccountInfo = accountInfo;
+            Authenticated = true;
 
             SendMessage(new ChallengeMessage()
                 {
@@ -89,10 +83,8 @@ namespace EnergonSoftware.Authenticator.Net
             await InstanceNotifier.Instance.Authenticated(AccountInfo.Username, sessionid, RemoteEndPoint);
             await EventLogger.Instance.SuccessEvent(RemoteEndPoint, AccountInfo.Username);
 
-            lock(_lock) {
-                AccountInfo.SessionId = sessionid;
-                AccountInfo.EndPoint = RemoteEndPoint.ToString();
-            }
+            AccountInfo.SessionId = sessionid;
+            AccountInfo.EndPoint = RemoteEndPoint.ToString();
 
             using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnection()) {
                 await AccountInfo.Update(connection);
@@ -115,9 +107,7 @@ namespace EnergonSoftware.Authenticator.Net
             // might be a malicious login attempt against an account
             // that is already using a legitimate ticket
 
-            lock(_lock) {
-                AccountInfo = null;
-            }
+            AccountInfo = null;
 
             SendMessage(new FailureMessage()
                 {

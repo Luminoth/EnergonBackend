@@ -24,7 +24,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
         {
         }
 
-        private void HandleChallengeState(AuthSession session, string message)
+        private async Task HandleChallengeState(AuthSession session, string message)
         {
             Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(message);
             if(null == values || 0 == values.Count) {
@@ -54,7 +54,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             
                 string nonce = values["nonce"].Trim(new char[] { '"' });
                 string qop = values["qop"].Trim(new char[] { '"' });
-                string rsp = EnergonSoftware.Core.Auth.DigestClientResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI);
+                string rsp = await EnergonSoftware.Core.Auth.DigestClientResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI);
             
                 string msg = "username=\"" + ClientState.Instance.Username + "\","
                     + "realm=" + realm + ","
@@ -67,8 +67,8 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                         + "charset=" + charset;
                 Logger.Debug("Generated response: " + msg);
 
-                session.AuthResponse(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)),
-                    EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI));
+                string rspAuth = await EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI);
+                session.AuthResponse(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)), rspAuth);
             } catch(KeyNotFoundException e) {
                 session.Error("Invalid challenge: " + e.Message);
             }
@@ -107,7 +107,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             switch(authSession.AuthStage)
             {
             case AuthenticationStage.Begin:
-                HandleChallengeState(authSession, decoded);
+                Task.Run(() => HandleChallengeState(authSession, decoded)).Wait();
                 break;
             case AuthenticationStage.Challenge:
                 HandleResponseState(authSession, decoded);

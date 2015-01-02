@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.Messages;
@@ -19,7 +20,6 @@ namespace EnergonSoftware.Core.Net
 
         public bool Authenticate(Account account)
         {
-            Logger.Debug("Authenticating account: " + account);
             return null != Account && null != account && Account.Equals(account);
         }
 
@@ -36,22 +36,26 @@ namespace EnergonSoftware.Core.Net
 
         protected abstract void LookupAccount(string username);
 
-        public void Login(string username, string sessionid)
+        public async Task Login(string username, string sessionid)
         {
             Logger.Info("Login request from username=" + username + ", with sessionid=" + sessionid);
             Account = null;
 
-            LookupAccount(username);
+            await Task.Run(() => LookupAccount(username));
             if(null == Account) {
                 Error("Invalid login: " + username);
                 return;
             }
 
             EnergonSoftware.Core.Accounts.Account account = new Account() { Username = username, SessionId = sessionid, EndPoint = RemoteEndPoint };
+            Logger.Debug("Authenticating login account: " + account);
             if(!Authenticate(account)) {
                 Error("Invalid login account: " + account + ", expected: " + Account);
                 return;
             }
+
+            Logger.Info("Login for username=" + username + " successful!");
+            SendMessage(new LoginMessage());
         }
 
         public void Logout()

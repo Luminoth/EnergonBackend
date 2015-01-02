@@ -13,6 +13,8 @@ namespace EnergonSoftware.Launcher.MessageHandlers
             {
             case PingMessage.MessageType:
                 return new PingMessageHandler();
+            case LoginMessage.MessageType:
+                return new LoginMessageHandler();
             case LogoutMessage.MessageType:
                 return new LogoutMessageHandler();
             case ChallengeMessage.MessageType:

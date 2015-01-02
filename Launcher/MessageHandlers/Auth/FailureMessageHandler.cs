@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-using EnergonSoftware.Core.MessageHandlers;
+﻿using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Net;

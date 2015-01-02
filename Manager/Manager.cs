@@ -86,11 +86,12 @@ namespace EnergonSoftware.Manager
         private void Run()
         {
             while(Running) {
-                List<Task> tasks = new List<Task>();
                 try {
-                    tasks.Add(Task.Run(() => InstanceNotifier.Instance.Run()));
-
-                    Task.WhenAll(tasks).Wait();
+                    Task.WhenAll(new Task[]
+                        {
+                            Task.Run(() => InstanceNotifier.Instance.Run()),
+                        }
+                    ).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();

@@ -44,8 +44,6 @@ namespace EnergonSoftware.Core.Net
         public event OnErrorHandler OnError;
 #endregion
 
-        private readonly object _lock = new object();
-
         public readonly int Id;
 
 #region Message Properties
@@ -73,12 +71,12 @@ namespace EnergonSoftware.Core.Net
         {
             Id = NextId;
 
-            Processor = new MessageProcessor(this);
-            Processor.Start();
-
             _socketState = new SocketState();
 
             Timeout = -1;
+
+            Processor = new MessageProcessor(this);
+            Processor.Start();
         }
 
         public Session(Socket socket) : this()
@@ -116,11 +114,8 @@ namespace EnergonSoftware.Core.Net
         private void OnConnectAsyncSuccessCallback(object sender, ConnectEventArgs e)
         {
             Logger.Info("Connected session " + Id + " to " + e.Socket.RemoteEndPoint);
-
-            lock(_lock) {
-                _socketState.Socket = e.Socket;
-                _socketState.Connecting = false;
-            }
+            _socketState.Socket = e.Socket;
+            _socketState.Connecting = false;
 
             if(null != OnConnectSuccess) {
                 OnConnectSuccess(sender, e);
@@ -130,10 +125,7 @@ namespace EnergonSoftware.Core.Net
         public void ConnectAsync(string host, int port)
         {
             Logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
-
-            lock(_lock) {
-                _socketState.Connecting = true;
-            }
+            _socketState.Connecting = true;
 
             AsyncConnectEventArgs args = new AsyncConnectEventArgs()
             {
@@ -147,76 +139,63 @@ namespace EnergonSoftware.Core.Net
         public void Connect(string host, int port, SocketType socketType, ProtocolType protocolType)
         {
             Logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
-
-            lock(_lock) {
-                _socketState.Socket = NetUtil.Connect(host, port, socketType, protocolType);
-            }
+            _socketState.Socket = NetUtil.Connect(host, port, socketType, protocolType);
         }
 
         public void ConnectMulticast(IPAddress group, int port, int ttl)
         {
             Logger.Info("Session " + Id + " connecting to multicast group " + group + ":" + port + "...");
-
-            lock(_lock) {
-                _socketState.Socket = NetUtil.ConnectMulticast(group, port, ttl);
-            }
+            _socketState.Socket = NetUtil.ConnectMulticast(group, port, ttl);
         }
 
         public void Disconnect(string reason=null)
         {
-            lock(_lock) {
-                if(Connected) {
-                    try {
-                        Logger.Info("Session " + Id + " disconnecting: " + reason);
-                        _socketState.ShutdownAndClose(false);
+            if(!Connected) {
+                return;
+            }
 
-                        if(null != OnDisconnect) {
-                            OnDisconnect(this, new DisconnectEventArgs() { Reason = reason });
-                        }
-                    } catch(SocketException e) {
-                        Logger.Error("Error disconnecting socket!", e);
-                    }
+            try {
+                Logger.Info("Session " + Id + " disconnecting: " + reason);
+                _socketState.ShutdownAndClose(false);
+
+                if(null != OnDisconnect) {
+                    OnDisconnect(this, new DisconnectEventArgs() { Reason = reason });
                 }
+            } catch(SocketException e) {
+                Logger.Error("Error disconnecting socket!", e);
             }
         }
 
-        public int PollAndRead()
+        public async Task<int> PollAndRead()
         {
-            lock(_lock) {
-                if(!Connected) {
-                    return -1;
-                }
+            if(!Connected) {
+                return -1;
+            }
 
-                try {
-                    int count = _socketState.PollAndRead();
-                    if(count > 0) {
-                        Logger.Debug("Session " + Id + " read " + count + " bytes");
-                    }
-                    return count;
-                } catch(SocketException e) {
-                    Error(e);
-                    return -1;
+            try {
+                int count = await _socketState.PollAndRead();
+                if(count > 0) {
+                    Logger.Debug("Session " + Id + " read " + count + " bytes");
                 }
+                return count;
+            } catch(SocketException e) {
+                Error(e);
+                return -1;
             }
         }
 
         public void BufferWrite(byte[] data, int offset, int count)
         {
-            lock(_lock) {
-                _socketState.Buffer.Write(data, offset, count);
-            }
+            _socketState.Buffer.Write(data, offset, count);
         }
 
-        public void Run()
+        public async Task Run()
         {
-            lock(_lock) {
-                try {
-                    Processor.ParseMessages(_socketState.Buffer);
-
-                    OnRun();
-                } catch(MessageException e) {
-                    Error("Exception while parsing messages!", e);
-                }
+            try {
+                await Processor.ParseMessages(_socketState.Buffer);
+                await Task.Run(() => OnRun());
+            } catch(MessageException e) {
+                Error("Exception while parsing messages!", e);
             }
         }
 
@@ -226,25 +205,23 @@ namespace EnergonSoftware.Core.Net
 
         public void SendMessage(IMessage message)
         {
-            lock(_lock) {
-                if(!Connected) {
-                    return;
-                }
+            if(!Connected) {
+                return;
+            }
 
-                try {
-                    MessagePacket packet = Parser.Create();
-                    packet.Content = message;
+            try {
+                MessagePacket packet = Parser.Create();
+                packet.Content = message;
 
-                    Logger.Debug("Sending packet: " + packet);
+                Logger.Debug("Sending packet: " + packet);
 
-                    byte[] bytes = packet.Serialize(Formatter);
-                    Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
-                    _socketState.Send(bytes);
-                } catch(SocketException e) {
-                    Error("Error sending message!", e);
-                } catch(MessageException e) {
-                    Error("Error sending message!", e);
-                }
+                byte[] bytes = packet.Serialize(Formatter);
+                Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
+                _socketState.Send(bytes);
+            } catch(SocketException e) {
+                Error("Error sending message!", e);
+            } catch(MessageException e) {
+                Error("Error sending message!", e);
             }
         }
 

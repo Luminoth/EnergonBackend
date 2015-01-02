@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Chat.MessageHandlers;
 using EnergonSoftware.Core.MessageHandlers;
@@ -31,12 +32,12 @@ namespace EnergonSoftware.Chat.Net
 
         protected override void OnRun()
         {
-            int count = _listener.PollAndRead();
+            int count = Task.Run(() => _listener.PollAndRead()).Result;
             if(count > 0) {
                 Logger.Debug("Instance notifier session " + Id + " read " + count + " bytes");
             }
 
-            Processor.ParseMessages(_listener.Buffer);
+            Task.Run(() => Processor.ParseMessages(_listener.Buffer)).Wait();
         }
     }
 }
