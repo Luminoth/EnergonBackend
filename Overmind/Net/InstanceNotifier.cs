@@ -19,14 +19,11 @@ namespace EnergonSoftware.Overmind.Net
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(InstanceNotifier));
 
-#region Singleton
-        private static readonly InstanceNotifier _instance = new InstanceNotifier();
-        public static InstanceNotifier Instance { get { return _instance; } }
-#endregion
+        public static readonly InstanceNotifier Instance = new InstanceNotifier();
 
         private readonly SessionManager _sessions = new SessionManager();
 
-        public void Start(ListenAddressConfigurationElementCollection listenAddresses)
+        public async Task StartAsync(ListenAddressConfigurationElementCollection listenAddresses)
         {
             Logger.Debug("Opening instance notifier sockets...");
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
@@ -34,7 +31,7 @@ namespace EnergonSoftware.Overmind.Net
                     listenAddress.MulticastGroupIPAddress, listenAddress.MulticastTTL);
 
                 Session sender = new InstanceNotifierSession(new SocketState(listener));
-                sender.ConnectMulticast(listenAddress.MulticastGroupIPAddress, listenAddress.Port, listenAddress.MulticastTTL);
+                await sender.ConnectMulticastAsync(listenAddress.MulticastGroupIPAddress, listenAddress.Port, listenAddress.MulticastTTL).ConfigureAwait(false);
                 _sessions.Add(sender);
             }
         }
@@ -45,30 +42,30 @@ namespace EnergonSoftware.Overmind.Net
             _sessions.DisconnectAll();
         }
 
-        public void Run()
+        public async Task RunAsync()
         {
-            _sessions.PollAndRun();
+            await _sessions.PollAndRunAsync().ConfigureAwait(false);
             _sessions.Cleanup();
         }
 
-        public void Startup()
+        public async Task StartupAsync()
         {
-            _sessions.BroadcastMessage(new StartupMessage()
+            await _sessions.BroadcastMessageAsync(new StartupMessage()
                 {
                     ServiceName = Overmind.ServiceId,
                     ServiceId = Overmind.UniqueId.ToString(),
                 }
-            );
+            ).ConfigureAwait(false);
         }
 
-        public void Shutdown()
+        public async Task ShutdownAsync()
         {
-            _sessions.BroadcastMessage(new ShutdownMessage()
+            await _sessions.BroadcastMessageAsync(new ShutdownMessage()
                 {
                     ServiceName = Overmind.ServiceId,
                     ServiceId = Overmind.UniqueId.ToString(),
                 }
-            );
+            ).ConfigureAwait(false);
         }
 
         private InstanceNotifier()

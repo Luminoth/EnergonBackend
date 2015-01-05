@@ -24,7 +24,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
         {
         }
 
-        private async Task HandleChallengeState(AuthSession session, string message)
+        private async Task HandleChallengeStateAsync(AuthSession session, string message)
         {
             Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(message);
             if(null == values || 0 == values.Count) {
@@ -45,16 +45,16 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 string digestURI = realm + "/" + ConfigurationManager.AppSettings["authHost"];
 
                 Logger.Debug("Authenticating " + ClientState.Instance.Username + ":" + realm + ":***");
-                string passwordHash = new SHA512().DigestPassword(
+                string passwordHash = await new SHA512().DigestPasswordAsync(
                     ClientState.Instance.Username,
                     realm,
                     ClientState.Instance.Password
-                );
+                ).ConfigureAwait(false);
                 Logger.Debug("passwordHash=" + passwordHash);
-            
+
                 string nonce = values["nonce"].Trim(new char[] { '"' });
                 string qop = values["qop"].Trim(new char[] { '"' });
-                string rsp = await EnergonSoftware.Core.Auth.DigestClientResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI);
+                string rsp = await EnergonSoftware.Core.Auth.DigestClientResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI).ConfigureAwait(false);
             
                 string msg = "username=\"" + ClientState.Instance.Username + "\","
                     + "realm=" + realm + ","
@@ -67,14 +67,14 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                         + "charset=" + charset;
                 Logger.Debug("Generated response: " + msg);
 
-                string rspAuth = await EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI);
-                session.AuthResponse(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)), rspAuth);
+                string rspAuth = await EnergonSoftware.Core.Auth.DigestServerResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI).ConfigureAwait(false);
+                await session.AuthResponseAsync(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)), rspAuth).ConfigureAwait(false);
             } catch(KeyNotFoundException e) {
                 session.Error("Invalid challenge: " + e.Message);
             }
         }
 
-        private void HandleResponseState(AuthSession session, string message)
+        private async Task HandleResponseStateAsync(AuthSession session, string message)
         {
             Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(message);
             if(null == values || 0 == values.Count) {
@@ -89,14 +89,14 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                     return;
                 }
 
-                session.AuthFinalize();
+                await session.AuthFinalizeAsync().ConfigureAwait(false);
             } catch(KeyNotFoundException e) {
                 session.Error("Invalid challenge: " + e.Message);
                 return;
             }
         }
 
-        protected override void OnHandleMessage(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
         {
             ChallengeMessage challengeMessage = (ChallengeMessage)message;
             AuthSession authSession = (AuthSession)session;
@@ -107,10 +107,10 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             switch(authSession.AuthStage)
             {
             case AuthenticationStage.Begin:
-                Task.Run(() => HandleChallengeState(authSession, decoded)).Wait();
+                await HandleChallengeStateAsync(authSession, decoded).ConfigureAwait(false);
                 break;
             case AuthenticationStage.Challenge:
-                HandleResponseState(authSession, decoded);
+                await HandleResponseStateAsync(authSession, decoded).ConfigureAwait(false);
                 break;
             default:
                 authSession.Error("Unexpected auth stage: " + authSession.AuthStage);

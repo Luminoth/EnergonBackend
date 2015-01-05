@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Util;
 
@@ -41,11 +42,11 @@ namespace EnergonSoftware.Core.Net
         // as there is data to be read
         // returns the total number of bytes read
         // or -1 on socket closed
-        public int PollAndRead()
+        public async Task<int> PollAndReadAsync()
         {
             int count = 0;
             while(_socket.Poll(100, SelectMode.SelectRead)) {
-                int len = Read();
+                int len = await ReadAsync().ConfigureAwait(false);
                 if(len <= 0) {
                     return count > 0 ? count : -1;
                 }
@@ -54,7 +55,7 @@ namespace EnergonSoftware.Core.Net
             return count;
         }
 
-        private int Read()
+        private async Task<int> ReadAsync()
         {
             byte[] data = new byte[_socket.Available];
             int len = _socket.Receive(data);
@@ -62,7 +63,7 @@ namespace EnergonSoftware.Core.Net
                 return len;
             }
 
-            Buffer.Write(data, 0, len);
+            await Buffer.WriteAsync(data, 0, len).ConfigureAwait(false);
             return len;
         }
     }

@@ -37,12 +37,9 @@ namespace EnergonSoftware.Launcher
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(NewsChecker));
 
-#region Singleton
-        private static readonly NewsChecker _instance = new NewsChecker();
-        public static NewsChecker Instance { get { return _instance; } }
-#endregion
+        public static readonly NewsChecker Instance = new NewsChecker();
 
-        public async Task UpdateNews()
+        public async Task UpdateNewsAsync()
         {
             // TODO: use string resources here
             Logger.Info("Updating news...");
@@ -52,16 +49,16 @@ namespace EnergonSoftware.Launcher
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                HttpResponseMessage response = await client.GetAsync("news/launcher");
+                HttpResponseMessage response = await client.GetAsync("news/launcher").ConfigureAwait(false);
                 if(response.IsSuccessStatusCode) {
                     List<News> news = new List<News>();
-                    using(Stream stream = await response.Content.ReadAsStreamAsync()) {
+                    using(Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false)) {
                         DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<News>));
                         news = (List<News>)serializer.ReadObject(stream);
                     }
                     Logger.Debug("Read news: " + string.Join(",", (object[])news.ToArray()));
 
-await Task.Delay(2000);
+await Task.Delay(2000).ConfigureAwait(false);
                     if(news.Count < 1) {
                         ClientState.Instance.News = "No news updates!";
                     } else {

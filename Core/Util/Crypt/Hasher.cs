@@ -1,14 +1,15 @@
 ﻿using System.Text;
+using System.Threading.Tasks;
 
 namespace EnergonSoftware.Core.Util.Crypt
 {
     public abstract class Hasher
     {
-        public abstract byte[] Hash(string value);
+        public abstract Task<byte[]> HashAsync(string value);
 
-        public string HashHex(string value)
+        public async Task<string> HashHexAsync(string value)
         {
-            byte[] digest = Hash(value);
+            byte[] digest = await HashAsync(value).ConfigureAwait(false);
 
             StringBuilder builder = new StringBuilder();
             foreach(byte b in digest) {

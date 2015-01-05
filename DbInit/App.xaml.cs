@@ -26,12 +26,12 @@ namespace EnergonSoftware.DbInit
         }
 
 #region Event Handlers
-        private void Application_Startup(object sender, StartupEventArgs e)
+        private /*async*/ void Application_Startup(object sender, StartupEventArgs e)
         {
             ConfigureLogging();
             Common.InitFilesystem();
 
-            /*if(!DatabaseManager.TestDatabaseConnection()) {
+            /*if(!DatabaseManager.TestDatabaseConnectionAsync().Result) {
                 Logger.Fatal("Could not connect to database!");
                 MessageBox.Show("Could not connect to database!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.Shutdown();

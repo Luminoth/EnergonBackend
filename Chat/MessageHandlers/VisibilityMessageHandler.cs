@@ -1,4 +1,6 @@
-﻿using EnergonSoftware.Core.MessageHandlers;
+﻿using System.Threading.Tasks;
+
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net;
 
@@ -10,8 +12,9 @@ namespace EnergonSoftware.Chat.MessageHandlers
         {
         }
 
-        protected override void OnHandleMessage(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
         {
+            await Task.Delay(0).ConfigureAwait(false);
         }
     }
 }

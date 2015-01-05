@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Net.Sockets.Fakes;
 using System.Text;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Net;
 
@@ -14,50 +15,50 @@ namespace EnergonSoftware.Core.Test.Net
     {
         private static readonly byte[] TestData = Encoding.UTF8.GetBytes("Test Data");
 
-        private static void TestPollAndRead(BufferedSocketReader reader)
+        private static async Task TestPollAndReadAsync(BufferedSocketReader reader)
         {
             // TODO: find a way to force the stub to give us some data
 
-            int count = reader.PollAndRead();
+            int count = await reader.PollAndReadAsync().ConfigureAwait(false);
             Assert.AreEqual(0, count);
         }
 
         [TestMethod]
-        public void TestPollAndReadTcp4()
+        public async Task TestPollAndReadTcp4Async()
         {
             using(StubSocket socket = new StubSocket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
                 using(BufferedSocketReader reader = new BufferedSocketReader(socket)) {
-                    TestPollAndRead(reader);
+                    await TestPollAndReadAsync(reader).ConfigureAwait(false);
                 }
             }
         }
 
         [TestMethod]
-        public void TestPollAndReadTcp6()
+        public async Task TestPollAndReadTcp6Async()
         {
             using(StubSocket socket = new StubSocket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp)) {
                 using(BufferedSocketReader reader = new BufferedSocketReader(socket)) {
-                    TestPollAndRead(reader);
+                    await TestPollAndReadAsync(reader).ConfigureAwait(false);
                 }
             }
         }
 
         [TestMethod]
-        public void TestPollAndReadUdp4()
+        public async Task TestPollAndReadUdp4Async()
         {
             using(StubSocket socket = new StubSocket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)) {
                 using(BufferedSocketReader reader = new BufferedSocketReader(socket)) {
-                    TestPollAndRead(reader);
+                    await TestPollAndReadAsync(reader).ConfigureAwait(false);
                 }
             }
         }
 
         [TestMethod]
-        public void TestPollAndReadUdp6()
+        public async Task TestPollAndReadUdp6Async()
         {
             using(StubSocket socket = new StubSocket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp)) {
                 using(BufferedSocketReader reader = new BufferedSocketReader(socket)) {
-                    TestPollAndRead(reader);
+                    await TestPollAndReadAsync(reader).ConfigureAwait(false);
                 }
             }
         }

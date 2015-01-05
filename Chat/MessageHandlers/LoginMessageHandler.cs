@@ -13,11 +13,11 @@ namespace EnergonSoftware.Chat.MessageHandlers
         {
         }
 
-        protected override void OnHandleMessage(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
         {
             LoginMessage loginMessage = (LoginMessage)message;
             ChatSession chatSession = (ChatSession)session;
-            Task.Run(() => chatSession.Login(loginMessage.Username, loginMessage.SessionId)).Wait();
+            await chatSession.LoginAsync(loginMessage.Username, loginMessage.SessionId).ConfigureAwait(false);
         }
     }
 }

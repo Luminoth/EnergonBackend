@@ -34,33 +34,39 @@ namespace EnergonSoftware.Core.Net
             );
         }
 
-        protected abstract void LookupAccount(string username);
+        protected abstract Task<Account> LookupAccountAsync(string username);
 
-        public async Task Login(string username, string sessionid)
+        public async Task LoginAsync(string username, string sessionid)
         {
             Logger.Info("Login request from username=" + username + ", with sessionid=" + sessionid);
-            Account = null;
 
-            await Task.Run(() => LookupAccount(username));
-            if(null == Account) {
+            Account lookupAccount = await LookupAccountAsync(username).ConfigureAwait(false);
+            if(null == lookupAccount) {
                 Error("Invalid login: " + username);
                 return;
             }
+            Account = lookupAccount;
 
-            EnergonSoftware.Core.Accounts.Account account = new Account() { Username = username, SessionId = sessionid, EndPoint = RemoteEndPoint };
-            Logger.Debug("Authenticating login account: " + account);
-            if(!Authenticate(account)) {
-                Error("Invalid login account: " + account + ", expected: " + Account);
+            EnergonSoftware.Core.Accounts.Account loginAccount = new Account()
+            {
+                Username = username,
+                SessionId = sessionid,
+                EndPoint = RemoteEndPoint
+            };
+
+            Logger.Debug("Authenticating login account: " + loginAccount);
+            if(!Authenticate(loginAccount)) {
+                Error("Invalid login account: " + loginAccount + ", expected: " + Account);
                 return;
             }
 
             Logger.Info("Login for username=" + username + " successful!");
-            SendMessage(new LoginMessage());
+            await SendMessageAsync(new LoginMessage()).ConfigureAwait(false);
         }
 
-        public void Logout()
+        public async Task LogoutAsync()
         {
-            SendMessage(new LogoutMessage());
+            await SendMessageAsync(new LogoutMessage()).ConfigureAwait(false);
 
             Disconnect();
 

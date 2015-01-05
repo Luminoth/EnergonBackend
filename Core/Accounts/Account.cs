@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Messages.Formatter;
 
@@ -23,20 +24,20 @@ namespace EnergonSoftware.Core.Accounts
             Visibility = Visibility.Offline;
         }
 
-        public void Serialize(Stream stream, IMessageFormatter formatter)
+        public async Task SerializeAsync(Stream stream, IMessageFormatter formatter)
         {
             // Id not serialized
-            formatter.WriteString(Username, stream);
-            formatter.WriteInt((int)Visibility, stream);
-            formatter.WriteString(Status, stream);
+            await formatter.WriteStringAsync(Username, stream).ConfigureAwait(false);
+            await formatter.WriteIntAsync((int)Visibility, stream).ConfigureAwait(false);
+            await formatter.WriteStringAsync(Status, stream).ConfigureAwait(false);
         }
 
-        public void DeSerialize(Stream stream, IMessageFormatter formatter)
+        public async Task DeSerializeAsync(Stream stream, IMessageFormatter formatter)
         {
             // Id not serialized
-            Username = formatter.ReadString(stream);
-            Visibility = (Visibility)formatter.ReadInt(stream);
-            Status = formatter.ReadString(stream);
+            Username = await formatter.ReadStringAsync(stream).ConfigureAwait(false);
+            Visibility = (Visibility)await formatter.ReadIntAsync(stream).ConfigureAwait(false);
+            Status = await formatter.ReadStringAsync(stream).ConfigureAwait(false);
         }
 
         public override bool Equals(object obj)

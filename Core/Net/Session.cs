@@ -95,6 +95,8 @@ namespace EnergonSoftware.Core.Net
         {
             if(disposing) {
                 Processor.Stop();
+                Processor.Dispose();
+
                 _socketState.Dispose();
             }
         }
@@ -122,7 +124,7 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public void ConnectAsync(string host, int port)
+        public async Task ConnectAsync(string host, int port)
         {
             Logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
             _socketState.Connecting = true;
@@ -133,19 +135,19 @@ namespace EnergonSoftware.Core.Net
             };
             args.OnConnectFailed += OnConnectAsyncFailedCallback;
             args.OnConnectSuccess += OnConnectAsyncSuccessCallback;
-            NetUtil.ConnectAsync(host, port, args);
+            await NetUtil.ConnectAsync(host, port, args).ConfigureAwait(false);
         }
 
-        public void Connect(string host, int port, SocketType socketType, ProtocolType protocolType)
+        public async Task ConnectAsync(string host, int port, SocketType socketType, ProtocolType protocolType)
         {
             Logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
-            _socketState.Socket = NetUtil.Connect(host, port, socketType, protocolType);
+            _socketState.Socket = await NetUtil.ConnectAsync(host, port, socketType, protocolType).ConfigureAwait(false);
         }
 
-        public void ConnectMulticast(IPAddress group, int port, int ttl)
+        public async Task ConnectMulticastAsync(IPAddress group, int port, int ttl)
         {
             Logger.Info("Session " + Id + " connecting to multicast group " + group + ":" + port + "...");
-            _socketState.Socket = NetUtil.ConnectMulticast(group, port, ttl);
+            _socketState.Socket = await NetUtil.ConnectMulticastAsync(group, port, ttl).ConfigureAwait(false);
         }
 
         public void Disconnect(string reason=null)
@@ -166,14 +168,14 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public async Task<int> PollAndRead()
+        public async Task<int> PollAndReadAsync()
         {
             if(!Connected) {
                 return -1;
             }
 
             try {
-                int count = await _socketState.PollAndRead();
+                int count = await _socketState.PollAndReadAsync().ConfigureAwait(false);
                 if(count > 0) {
                     Logger.Debug("Session " + Id + " read " + count + " bytes");
                 }
@@ -184,26 +186,27 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public void BufferWrite(byte[] data, int offset, int count)
+        public async Task BufferWriteAsync(byte[] data, int offset, int count)
         {
-            _socketState.Buffer.Write(data, offset, count);
+            await _socketState.Buffer.WriteAsync(data, offset, count).ConfigureAwait(false);
         }
 
-        public async Task Run()
+        public async Task RunAsync()
         {
             try {
-                await Processor.ParseMessages(_socketState.Buffer);
-                await Task.Run(() => OnRun());
+                await Processor.ParseMessagesAsync(_socketState.Buffer).ConfigureAwait(false);
+                await OnRunAsync().ConfigureAwait(false);
             } catch(MessageException e) {
                 Error("Exception while parsing messages!", e);
             }
         }
 
-        protected virtual void OnRun()
+        protected async virtual Task OnRunAsync()
         {
+            await Task.Delay(0).ConfigureAwait(false);
         }
 
-        public void SendMessage(IMessage message)
+        public async Task SendMessageAsync(IMessage message)
         {
             if(!Connected) {
                 return;
@@ -215,9 +218,9 @@ namespace EnergonSoftware.Core.Net
 
                 Logger.Debug("Sending packet: " + packet);
 
-                byte[] bytes = packet.Serialize(Formatter);
+                byte[] bytes = await packet.SerializeAsync(Formatter).ConfigureAwait(false);
                 Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
-                _socketState.Send(bytes);
+                await _socketState.SendAsync(bytes).ConfigureAwait(false);
             } catch(SocketException e) {
                 Error("Error sending message!", e);
             } catch(MessageException e) {

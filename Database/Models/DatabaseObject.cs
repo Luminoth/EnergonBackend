@@ -8,11 +8,11 @@ namespace EnergonSoftware.Database.Models
         bool Dirty { get; set; }
         void Clean();
 
-        Task<bool> Read(DatabaseConnection connection);
+        Task<bool> ReadAsync(DatabaseConnection connection);
         void Load(DbDataReader reader);
 
-        Task Insert(DatabaseConnection connection);
-        Task Update(DatabaseConnection connection);
-        Task Delete(DatabaseConnection connection);
+        Task InsertAsync(DatabaseConnection connection);
+        Task UpdateAsync(DatabaseConnection connection);
+        Task DeleteAsync(DatabaseConnection connection);
     }
 }

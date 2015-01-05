@@ -28,16 +28,16 @@ namespace EnergonSoftware.Launcher.Controls
 #endregion
 
 #region Event Handlers
-        private void ButtonLogin_Click(object sender, RoutedEventArgs evt)
+        private async void ButtonLogin_Click(object sender, RoutedEventArgs evt)
         {
-            ((App)Application.Current).Login(Password.Password);
+            await ((App)Application.Current).LoginAsync(Password.Password);
             ClearPassword();
         }
 
         private async void OnVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if(IsVisible) {
-                await NewsChecker.Instance.UpdateNews();
+                await NewsChecker.Instance.UpdateNewsAsync();
             }
         }
 #endregion

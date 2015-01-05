@@ -64,13 +64,18 @@ namespace EnergonSoftware.Core.Net
             _task = null;
         }
 
-        private async Task Run()
+        private void Run()
+        {
+            RunAsync().Wait();
+        }
+
+        private async Task RunAsync()
         {
             try {
                 _running = true;
                 while(_listener.IsListening) {
-                    HttpListenerContext context = await _listener.GetContextAsync();
-                    await HandleRequest(context.Request, context.Response);
+                    HttpListenerContext context = await _listener.GetContextAsync().ConfigureAwait(false);
+                    await HandleRequestAsync(context.Request, context.Response).ConfigureAwait(false);
                 }
             } catch(HttpListenerException e) {
                 if(995 != e.ErrorCode) {
@@ -83,7 +88,7 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        private async Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response)
+        private async Task HandleRequestAsync(HttpListenerRequest request, HttpListenerResponse response)
         {
             Logger.Debug("New HttpListenerRequest: " + request.Url);
 
@@ -93,19 +98,19 @@ namespace EnergonSoftware.Core.Net
                 response.ContentEncoding = encoding;
             }
 
-            byte[] data = await ReadContent(request.RawUrl, encoding);
+            byte[] data = await ReadContentAsync(request.RawUrl, encoding).ConfigureAwait(false);
             if(null == data) {
                 Logger.Debug("Content not found!");
                 response.StatusCode = (int)HttpStatusCode.NotFound;
             } else {
                 response.StatusCode = (int)HttpStatusCode.OK;
                 response.ContentLength64 = data.Length;
-                response.OutputStream.Write(data, 0, data.Length);
+                await response.OutputStream.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
             }
             response.OutputStream.Close();
         }
 
-        private async Task<byte[]> ReadContent(string url, Encoding encoding)
+        private async Task<byte[]> ReadContentAsync(string url, Encoding encoding)
         {
             if("/" == url) {
                 url = DefaultIndex;
@@ -113,8 +118,8 @@ namespace EnergonSoftware.Core.Net
 
             Logger.Debug("Reading content for url=" + url);
             if(DefaultIndex == url) {
-                string data = "<html><head><title>HttpServer Test</title></head><body>Hello World!</body></html>";
-                await Task.Delay(1);
+string data = "<html><head><title>HttpServer Test</title></head><body>Hello World!</body></html>";
+await Task.Delay(1).ConfigureAwait(false);
                 return encoding.GetBytes(data);
             }
             return null;

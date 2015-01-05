@@ -13,57 +13,54 @@ namespace EnergonSoftware.Authenticator
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(EventLogger));
 
-#region Singleton
-        private static readonly EventLogger _instance = new EventLogger();
-        public static EventLogger Instance { get { return _instance; } }
-#endregion
+        public static readonly EventLogger Instance = new EventLogger();
 
-        public async Task RequestEvent(EndPoint origin)
+        public async Task RequestEventAsync(EndPoint origin)
         {
-            await LogEvent(new AuthEvent(AuthEventType.Request)
+            await LogEventAsync(new AuthEvent(AuthEventType.Request)
                 {
                     Origin = origin.ToString(),
                 }
-            );
+            ).ConfigureAwait(false);
         }
 
-        public async Task BeginEvent(EndPoint origin, string username)
+        public async Task BeginEventAsync(EndPoint origin, string username)
         {
-            await LogEvent(new AuthEvent(AuthEventType.Begin)
+            await LogEventAsync(new AuthEvent(AuthEventType.Begin)
                 {
                     Origin = origin.ToString(),
                     Account = username,
                 }
-            );
+            ).ConfigureAwait(false);
         }
 
-        public async Task SuccessEvent(EndPoint origin, string username)
+        public async Task SuccessEventAsync(EndPoint origin, string username)
         {
-            await LogEvent(new AuthEvent(AuthEventType.Success)
+            await LogEventAsync(new AuthEvent(AuthEventType.Success)
                 {
                     Origin = origin.ToString(),
                     Account = username,
                 }
-            );
+            ).ConfigureAwait(false);
         }
 
-        public async Task FailedEvent(EndPoint origin, string username, string reason)
+        public async Task FailedEventAsync(EndPoint origin, string username, string reason)
         {
-            await LogEvent(new AuthEvent(AuthEventType.Failure)
+            await LogEventAsync(new AuthEvent(AuthEventType.Failure)
                 {
                     Origin = origin.ToString(),
                     Account = username,
                     Reason = reason,
                 }
-            );
+            ).ConfigureAwait(false);
         }
 
         // TODO: move this to a base class
-        private async Task LogEvent(Event evt)
+        private async Task LogEventAsync(Event evt)
         {
             Logger.Debug("Logging event: " + evt);
-            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnection()) {
-                await evt.Insert(connection);
+            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
+                await evt.InsertAsync(connection).ConfigureAwait(false);
             }
         }
 

@@ -30,14 +30,14 @@ namespace EnergonSoftware.Chat.Net
             _listener = listener;
         }
 
-        protected override void OnRun()
+        protected async override Task OnRunAsync()
         {
-            int count = Task.Run(() => _listener.PollAndRead()).Result;
+            int count = await _listener.PollAndReadAsync().ConfigureAwait(false);
             if(count > 0) {
                 Logger.Debug("Instance notifier session " + Id + " read " + count + " bytes");
             }
 
-            Task.Run(() => Processor.ParseMessages(_listener.Buffer)).Wait();
+            await Processor.ParseMessagesAsync(_listener.Buffer).ConfigureAwait(false);
         }
     }
 }

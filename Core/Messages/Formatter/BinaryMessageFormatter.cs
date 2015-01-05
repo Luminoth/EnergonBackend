@@ -2,121 +2,121 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EnergonSoftware.Core.Messages.Formatter
 {
-    // TODO: should this lock the stream maybe?
     public sealed class BinaryMessageFormatter : IMessageFormatter
     {
-        public void WriteString(string value, Stream stream)
+        public async Task WriteStringAsync(string value, Stream stream)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(value);
-            WriteInt(bytes.Length, stream);
-            Write(bytes, 0, bytes.Length, stream);
+            await WriteIntAsync(bytes.Length, stream).ConfigureAwait(false);
+            await WriteAsync(bytes, 0, bytes.Length, stream).ConfigureAwait(false);
         }
 
-        public void WriteByte(byte value, Stream stream)
+        public async Task WriteByteAsync(byte value, Stream stream)
         {
-            Write(new byte[1] { value }, 0, 1, stream);
+            await WriteAsync(new byte[1] { value }, 0, 1, stream).ConfigureAwait(false);
         }
 
-        public void WriteBool(bool value, Stream stream)
+        public async Task WriteBoolAsync(bool value, Stream stream)
         {
-            WriteByte((byte)(value ? 1 : 0), stream);
+            await WriteByteAsync((byte)(value ? 1 : 0), stream).ConfigureAwait(false);
         }
 
-        public void WriteInt(int value, Stream stream)
-        {
-            byte[] bytes = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(value));
-            Write(bytes, 0, bytes.Length, stream);
-        }
-
-        public void WriteLong(long value, Stream stream)
+        public async Task WriteIntAsync(int value, Stream stream)
         {
             byte[] bytes = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(value));
-            Write(bytes, 0, bytes.Length, stream);
+            await WriteAsync(bytes, 0, bytes.Length, stream).ConfigureAwait(false);
         }
 
-        public void WriteFloat(float value, Stream stream)
+        public async Task WriteLongAsync(long value, Stream stream)
+        {
+            byte[] bytes = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(value));
+            await WriteAsync(bytes, 0, bytes.Length, stream).ConfigureAwait(false);
+        }
+
+        public async Task WriteFloatAsync(float value, Stream stream)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             if(BitConverter.IsLittleEndian) {
                 Array.Reverse(bytes);
             }
-            Write(bytes, 0, bytes.Length, stream);
+            await WriteAsync(bytes, 0, bytes.Length, stream).ConfigureAwait(false);
         }
 
-        public void WriteDouble(double value, Stream stream)
+        public async Task WriteDoubleAsync(double value, Stream stream)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             if(BitConverter.IsLittleEndian) {
                 Array.Reverse(bytes);
             }
-            Write(bytes, 0, bytes.Length, stream);
+            await WriteAsync(bytes, 0, bytes.Length, stream).ConfigureAwait(false);
         }
 
-        public void Write(byte[] value, int offset, int count, Stream stream)
+        public async Task WriteAsync(byte[] value, int offset, int count, Stream stream)
         {
-            stream.Write(value, offset, count);
+            await stream.WriteAsync(value, offset, count).ConfigureAwait(false);
         }
 
-        public string ReadString(Stream stream)
+        public async Task<string> ReadStringAsync(Stream stream)
         {
-            int length = ReadInt(stream);
+            int length = await ReadIntAsync(stream).ConfigureAwait(false);
             byte[] bytes = new byte[length];
-            Read(bytes, 0, bytes.Length, stream);
+            await ReadAsync(bytes, 0, bytes.Length, stream).ConfigureAwait(false);
             return Encoding.UTF8.GetString(bytes);
         }
 
-        public byte ReadByte(Stream stream)
+        public async Task<byte> ReadByteAsync(Stream stream)
         {
             byte[] bytes = new byte[1];
-            Read(bytes, 0, bytes.Length, stream);
+            await ReadAsync(bytes, 0, bytes.Length, stream).ConfigureAwait(false);
             return bytes[0];
         }
 
-        public bool ReadBool(Stream stream)
+        public async Task<bool> ReadBoolAsync(Stream stream)
         {
-            return 0 != ReadByte(stream);
+            return 0 != await ReadByteAsync(stream).ConfigureAwait(false);
         }
 
-        public int ReadInt(Stream stream)
+        public async Task<int> ReadIntAsync(Stream stream)
         {
             byte[] bytes = new byte[4];
-            Read(bytes, 0, bytes.Length, stream);
+            await ReadAsync(bytes, 0, bytes.Length, stream).ConfigureAwait(false);
             return IPAddress.NetworkToHostOrder(BitConverter.ToInt32(bytes, 0));
         }
 
-        public long ReadLong(Stream stream)
+        public async Task<long> ReadLongAsync(Stream stream)
         {
             byte[] bytes = new byte[8];
-            Read(bytes, 0, bytes.Length, stream);
+            await ReadAsync(bytes, 0, bytes.Length, stream).ConfigureAwait(false);
             return IPAddress.NetworkToHostOrder(BitConverter.ToInt64(bytes, 0));
         }
 
-        public float ReadFloat(Stream stream)
+        public async Task<float> ReadFloatAsync(Stream stream)
         {
             byte[] bytes = new byte[4];
-            Read(bytes, 0, bytes.Length, stream);
+            await ReadAsync(bytes, 0, bytes.Length, stream).ConfigureAwait(false);
             if(BitConverter.IsLittleEndian) {
                 Array.Reverse(bytes);
             }
             return BitConverter.ToSingle(bytes, 0);
         }
 
-        public double ReadDouble(Stream stream)
+        public async Task<double> ReadDoubleAsync(Stream stream)
         {
             byte[] bytes = new byte[8];
-            Read(bytes, 0, bytes.Length, stream);
+            await ReadAsync(bytes, 0, bytes.Length, stream).ConfigureAwait(false);
             if(BitConverter.IsLittleEndian) {
                 Array.Reverse(bytes);
             }
             return BitConverter.ToDouble(bytes, 0);
         }
 
-        public void Read(byte[] value, int offset, int count, Stream stream)
+        public async Task ReadAsync(byte[] value, int offset, int count, Stream stream)
         {
-            stream.Read(value, offset, count);
+            await stream.ReadAsync(value, offset, count).ConfigureAwait(false);
         }
     }
 }

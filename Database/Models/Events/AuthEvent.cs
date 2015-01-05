@@ -28,9 +28,9 @@ namespace EnergonSoftware.Database.Models.Events
             }
         );
 
-        public static async Task CreateTable(DatabaseConnection connection)
+        public static async Task CreateTableAsync(DatabaseConnection connection)
         {
-            await AuthEventsTable.Create(connection);
+            await AuthEventsTable.CreateAsync(connection).ConfigureAwait(false);
         }
 
         public readonly AuthEventType Type;
@@ -54,7 +54,7 @@ namespace EnergonSoftware.Database.Models.Events
             Type = type;
         }
 
-        public override async Task Insert(DatabaseConnection connection)
+        public override async Task InsertAsync(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("INSERT INTO " + AuthEventsTable.Name
                 + "(timestamp, type, origin, account, reason)"
@@ -65,7 +65,7 @@ namespace EnergonSoftware.Database.Models.Events
                 connection.AddParameter(command, "origin", Origin);
                 connection.AddParameter(command, "account", Account);
                 connection.AddParameter(command, "reason", Reason);
-                await Task.Run(() => command.ExecuteNonQuery());
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                 Id = connection.LastInsertRowId;
             }
         }

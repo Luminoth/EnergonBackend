@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 
-using EnergonSoftware.Overmind.Net;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net;
+using EnergonSoftware.Overmind.Net;
 
 namespace EnergonSoftware.Overmind.MessageHandlers
 {
@@ -13,11 +13,11 @@ namespace EnergonSoftware.Overmind.MessageHandlers
         {
         }
 
-        protected override void OnHandleMessage(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
         {
             LoginMessage loginMessage = (LoginMessage)message;
             OvermindSession overmindSession = (OvermindSession)session;
-            Task.Run(() => overmindSession.Login(loginMessage.Username, loginMessage.SessionId)).Wait();
+            await overmindSession.LoginAsync(loginMessage.Username, loginMessage.SessionId).ConfigureAwait(false);
         }
     }
 }

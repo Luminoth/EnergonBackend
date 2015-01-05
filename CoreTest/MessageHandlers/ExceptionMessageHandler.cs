@@ -12,7 +12,7 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
         {
         }
 
-        protected override void OnHandleMessage(IMessage message, Session session)
+        protected override Task OnHandleMessageAsync(IMessage message, Session session)
         {
             throw new MessageHandlerException("Test Exception");
         }

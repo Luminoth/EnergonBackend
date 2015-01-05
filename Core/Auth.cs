@@ -36,32 +36,32 @@ namespace EnergonSoftware.Core
             return values;
         }
 
-        public static async Task<string> DigestClientResponse(Digest digest, string passwordHash, string nonce, string nc, string qop, string cnonce, string digestURI)
+        public static async Task<string> DigestClientResponseAsync(Digest digest, string passwordHash, string nonce, string nc, string qop, string cnonce, string digestURI)
         {
             string a1 = passwordHash + ":" + nonce + ":" + cnonce;
-            string ha1 = await Task.Run(() => digest.HashHex(a1));
+            string ha1 = await digest.HashHexAsync(a1).ConfigureAwait(false);
 
             string a2 = "AUTHENTICATE:" + digestURI;
-            string ha2 = await Task.Run(() => digest.HashHex(a2));
+            string ha2 = await digest.HashHexAsync(a2).ConfigureAwait(false);
 
             string s = nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2;
             string k = ha1 + ":" + s;
 
-            return await Task.Run(() => digest.HashHex(k));
+            return await digest.HashHexAsync(k).ConfigureAwait(false);
         }
 
-        public static async Task<string> DigestServerResponse(Digest digest, string passwordHash, string nonce, string nc, string qop, string cnonce, string digestURI)
+        public static async Task<string> DigestServerResponseAsync(Digest digest, string passwordHash, string nonce, string nc, string qop, string cnonce, string digestURI)
         {
             string a1 = passwordHash + ":" + nonce + ":" + cnonce;
-            string ha1 = await Task.Run(() => digest.HashHex(a1));
+            string ha1 = await digest.HashHexAsync(a1).ConfigureAwait(false);
 
             string a2 = ":" + digestURI;
-            string ha2 = await Task.Run(() => digest.HashHex(a2));
+            string ha2 = await digest.HashHexAsync(a2).ConfigureAwait(false);
 
             string s = nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2;
             string k = ha1 + ":" + s;
 
-            return await Task.Run(() => digest.HashHex(k));
+            return await digest.HashHexAsync(k).ConfigureAwait(false);
         }
     }
 }

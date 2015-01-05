@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.MessageHandlers;
@@ -48,54 +49,56 @@ namespace EnergonSoftware.Launcher.Net
             AuthStage = AuthenticationStage.NotAuthenticated;
         }
 
-        private void OnConnectFailedCallback(object sender, ConnectEventArgs e)
+        private async void OnConnectFailedCallback(object sender, ConnectEventArgs e)
         {
-            AuthFailed("Failed to connect to the authentication server: " + e.Error);
+            await AuthFailedAsync("Failed to connect to the authentication server: " + e.Error).ConfigureAwait(false);
         }
 
-        private void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
+        private async void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
         {
-            BeginAuth();
+            await BeginAuthAsync().ConfigureAwait(false);
         }
 
-        public void BeginConnect(string host, int port)
+        public async Task BeginConnectAsync(string host, int port)
         {
             OnConnectSuccess += OnConnectSuccessCallback;
             OnConnectFailed += OnConnectFailedCallback;
-            ConnectAsync(host, port);
+            await ConnectAsync(host, port).ConfigureAwait(false);
         }
 
-        private void BeginAuth()
+        private async Task BeginAuthAsync()
         {
             Logger.Info("Authenticating as user '" + ClientState.Instance.Username + "'...");
 
-            SendMessage(new AuthMessage()
+            await SendMessageAsync(new AuthMessage()
                 {
                     MechanismType = AuthType.DigestSHA512,
                 }
-            );
+            ).ConfigureAwait(false);
+
             AuthStage = AuthenticationStage.Begin;
         }
 
-        public void AuthResponse(string response, string rspAuth)
+        public async Task AuthResponseAsync(string response, string rspAuth)
         {
             RspAuth = rspAuth;
 
-            SendMessage(new ResponseMessage()
+            await SendMessageAsync(new ResponseMessage()
                 {
                     Response = response,
                 }
-            );
+            ).ConfigureAwait(false);
+
             AuthStage = AuthenticationStage.Challenge;
         }
 
-        public void AuthFinalize()
+        public async Task AuthFinalizeAsync()
         {
-            SendMessage(new ResponseMessage());
+            await SendMessageAsync(new ResponseMessage()).ConfigureAwait(false);
             AuthStage = AuthenticationStage.Finalize;
         }
 
-        public void AuthSuccess(string ticket)
+        public async Task AuthSuccessAsync(string ticket)
         {
             Logger.Info("Authentication successful!");
             Logger.Debug("Ticket=" + ticket);
@@ -109,9 +112,10 @@ namespace EnergonSoftware.Launcher.Net
             }
 
             Disconnect();
+            await Task.Delay(0).ConfigureAwait(false);
         }
 
-        public void AuthFailed(string reason)
+        public async Task AuthFailedAsync(string reason)
         {
             Logger.Warn("Authentication failed: " + reason);
 
@@ -123,6 +127,7 @@ namespace EnergonSoftware.Launcher.Net
             }
 
             Disconnect();
+            await Task.Delay(0).ConfigureAwait(false);
         }
     }
 }

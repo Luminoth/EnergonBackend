@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Util;
 
@@ -12,19 +13,19 @@ namespace EnergonSoftware.Core.Test.Util
     {
         private static readonly byte[] TestData = Encoding.UTF8.GetBytes("Test Data");
 
-        private static void TestWrite(MemoryBuffer buffer, byte[] data)
+        private static async Task TestWriteAsync(MemoryBuffer buffer, byte[] data)
         {
             int length = buffer.Length;
 
-            buffer.Write(data, 0, data.Length);
+            await buffer.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
             Assert.AreEqual(length + data.Length, buffer.Position);
             Assert.AreEqual(length + data.Length, buffer.Length);
         }
 
-        private static void TestRead(MemoryBuffer buffer, byte[] expected)
+        private static async Task TestReadAsync(MemoryBuffer buffer, byte[] expected)
         {
             byte[] data = new byte[buffer.Length];
-            buffer.Read(data, 0, data.Length);
+            await buffer.ReadAsync(data, 0, data.Length).ConfigureAwait(false);
             CollectionAssert.AreEqual(expected, data);
         }
 
@@ -38,33 +39,33 @@ namespace EnergonSoftware.Core.Test.Util
         }
 
         [TestMethod]
-        public void TestRead()
+        public async Task TestReadAsync()
         {
             using(MemoryBuffer buffer = new MemoryBuffer()) {
-                TestWrite(buffer, TestData);
+                await TestWriteAsync(buffer, TestData).ConfigureAwait(false);
                 TestFlip(buffer);
-                TestRead(buffer, TestData);
+                await TestReadAsync(buffer, TestData).ConfigureAwait(false);
             }
         }
 
         [TestMethod]
-        public void TestCompact()
+        public async Task TestCompactAsync()
         {
             using(MemoryBuffer buffer = new MemoryBuffer()) {
-                TestWrite(buffer, TestData);
-                TestWrite(buffer, TestData);
+                await TestWriteAsync(buffer, TestData).ConfigureAwait(false);
+                await TestWriteAsync(buffer, TestData).ConfigureAwait(false);
                 TestFlip(buffer);
-                TestRead(buffer, TestData);
+                await TestReadAsync(buffer, TestData).ConfigureAwait(false);
 
 // TODO: test compact!
             }
         }
 
         [TestMethod]
-        public void TestWriteClear()
+        public async Task TestWriteClearAsync()
         {
             using(MemoryBuffer buffer = new MemoryBuffer()) {
-                TestWrite(buffer, TestData);
+                await TestWriteAsync(buffer, TestData).ConfigureAwait(false);
 
                 buffer.Clear();
                 Assert.AreEqual(0, buffer.Position);
@@ -73,10 +74,10 @@ namespace EnergonSoftware.Core.Test.Util
         }
 
         [TestMethod]
-        public void TestReset()
+        public async Task TestResetAsync()
         {
             using(MemoryBuffer buffer = new MemoryBuffer()) {
-                TestWrite(buffer, TestData);
+                await TestWriteAsync(buffer, TestData).ConfigureAwait(false);
 
                 int length = buffer.Length;
 

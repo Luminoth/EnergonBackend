@@ -51,33 +51,36 @@ namespace EnergonSoftware.Core.Net
         public void CloseSockets()
         {
             Logger.Info("Closing listen sockets...");
-            Parallel.ForEach<Socket>(_listenSockets, socket => socket.Close());
+            _listenSockets.ForEach(socket => socket.Close());
             _listenSockets.Clear();
         }
 
-        public void Poll(SessionManager manager)
+        private void Poll(Socket socket, SessionManager manager)
         {
-            Parallel.ForEach<Socket>(_listenSockets, socket =>
-                {
-                    try {
-                        if(socket.Poll(100, SelectMode.SelectRead)) {
-                            Socket remote = socket.Accept();
-                            Logger.Info("New connection from " + remote.RemoteEndPoint);
+            try {
+                if(socket.Poll(100, SelectMode.SelectRead)) {
+                    Socket remote = socket.Accept();
+                    Logger.Info("New connection from " + remote.RemoteEndPoint);
 
-                            if(MaxConnections >= 0 && manager.Count >= MaxConnections) {
-                                Logger.Info("Max connections exceeded, denying new connection!");
-                                remote.Close();
-                            } else {
-                                Logger.Debug("Allowing new connection...");
-                                Session session = _factory.Create(remote);
-                                manager.Add(session);
-                            }
-                        }
-                    } catch(SocketException e) {
-                        Logger.Error("Exception polling sockets!", e);
+                    if(MaxConnections >= 0 && manager.Count >= MaxConnections) {
+                        Logger.Info("Max connections exceeded, denying new connection!");
+                        remote.Close();
+                    } else {
+                        Logger.Debug("Allowing new connection...");
+                        Session session = _factory.Create(remote);
+                        manager.Add(session);
                     }
                 }
-            );
+            } catch(SocketException e) {
+                Logger.Error("Exception polling sockets!", e);
+            }
+        }
+
+        public async Task PollAsync(SessionManager manager)
+        {
+            List<Task> tasks = new List<Task>();
+            _listenSockets.ForEach(socket => tasks.Add(Task.Run(() => Poll(socket, manager))));
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }
 }

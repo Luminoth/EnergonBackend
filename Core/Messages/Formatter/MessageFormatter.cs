@@ -1,25 +1,26 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace EnergonSoftware.Core.Messages.Formatter
 {
     public interface IMessageFormatter
     {
-        void WriteString(string value, Stream stream);
-        void WriteByte(byte value, Stream stream);
-        void WriteBool(bool value, Stream stream);
-        void WriteInt(int value, Stream stream);
-        void WriteLong(long value, Stream stream);
-        void WriteFloat(float value, Stream stream);
-        void WriteDouble(double value, Stream stream);
-        void Write(byte[] value, int offset, int count, Stream stream);
+        Task WriteStringAsync(string value, Stream stream);
+        Task WriteByteAsync(byte value, Stream stream);
+        Task WriteBoolAsync(bool value, Stream stream);
+        Task WriteIntAsync(int value, Stream stream);
+        Task WriteLongAsync(long value, Stream stream);
+        Task WriteFloatAsync(float value, Stream stream);
+        Task WriteDoubleAsync(double value, Stream stream);
+        Task WriteAsync(byte[] value, int offset, int count, Stream stream);
 
-        string ReadString(Stream stream);
-        byte ReadByte(Stream stream);
-        bool ReadBool(Stream stream);
-        int ReadInt(Stream stream);
-        long ReadLong(Stream stream);
-        float ReadFloat(Stream stream);
-        double ReadDouble(Stream stream);
-        void Read(byte[] value, int offset, int count, Stream stream);
+        Task<string> ReadStringAsync(Stream stream);
+        Task<byte> ReadByteAsync(Stream stream);
+        Task<bool> ReadBoolAsync(Stream stream);
+        Task<int> ReadIntAsync(Stream stream);
+        Task<long> ReadLongAsync(Stream stream);
+        Task<float> ReadFloatAsync(Stream stream);
+        Task<double> ReadDoubleAsync(Stream stream);
+        Task ReadAsync(byte[] value, int offset, int count, Stream stream);
     }
 }

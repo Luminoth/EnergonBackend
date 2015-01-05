@@ -14,14 +14,14 @@ using log4net;
 
 namespace EnergonSoftware.Core.MessageHandlers
 {
-    public sealed class MessageProcessor
+    public sealed class MessageProcessor : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageProcessor));
 
         private readonly Session _session;
 
-        private /*readonly*/ ConcurrentQueue<IMessage> _messageQueue = new ConcurrentQueue<IMessage>();
         private readonly AutoResetEvent _messageQueueEvent = new AutoResetEvent(false);
+        private /*readonly*/ ConcurrentQueue<IMessage> _messageQueue = new ConcurrentQueue<IMessage>();
 
         private volatile bool _running;
         private Task _task;
@@ -35,6 +35,21 @@ namespace EnergonSoftware.Core.MessageHandlers
             _session = session;
         }
 
+#region Dispose
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if(disposing) {
+                _messageQueueEvent.Dispose();
+            }
+        }
+#endregion
+
         public int GetQueueSize()
         {
             return _messageQueue.Count;
@@ -46,13 +61,13 @@ namespace EnergonSoftware.Core.MessageHandlers
             _messageQueueEvent.Set();
         }
 
-        public async Task ParseMessages(MemoryBuffer buffer)
+        public async Task ParseMessagesAsync(MemoryBuffer buffer)
         {
-            MessagePacket packet = await Task.Run(() => _session.Parser.Parse(buffer, _session.Formatter));
+            MessagePacket packet = await _session.Parser.ParseAsync(buffer, _session.Formatter).ConfigureAwait(false);
             while(null != packet) {
                 Logger.Debug("Session " + _session.Id + " parsed message type: " + packet.Content.Type);
                 QueueMessage(packet.Content);
-                packet = await Task.Run(() => _session.Parser.Parse(buffer, _session.Formatter));
+                packet = await _session.Parser.ParseAsync(buffer, _session.Formatter).ConfigureAwait(false);
             }
         }
 
@@ -81,19 +96,24 @@ namespace EnergonSoftware.Core.MessageHandlers
             _messageQueue = new ConcurrentQueue<IMessage>();
         }
 
-        private async Task Run()
+        private void Run()
+        {
+            RunAsync().Wait();
+        }
+
+        private async Task RunAsync()
         {
             while(_running) {
                 _messageQueueEvent.WaitOne();
 
                 IMessage message;
                 while(_running && _messageQueue.TryDequeue(out message)) {
-                    await HandleMessage(message);
+                    await HandleMessageAsync(message).ConfigureAwait(false);
                 }
             }
         }
 
-        private async Task HandleMessage(IMessage message)
+        private async Task HandleMessageAsync(IMessage message)
         {
             Logger.Debug("Processing message with type=" + message.Type + " for session " + _session.Id + "...");
 
@@ -103,13 +123,12 @@ namespace EnergonSoftware.Core.MessageHandlers
                     _session.InternalError("Session " + _session.Id + " could not create handler for message type: " + message.Type);
                     return;
                 }
-                await messageHandler.HandleMessage(message, _session);
+                await messageHandler.HandleMessageAsync(message, _session).ConfigureAwait(false);
+                Logger.Debug("Handler for message with type=" + message.Type + " for session " + _session.Id + " took " + messageHandler.RuntimeMs + "ms to complete");
             } catch(MessageHandlerException e) {
                 _session.InternalError("Error handling message for session " + _session.Id, e);
-                return;
             } catch(Exception e) {
                 _session.InternalError("Unhandled message processing exception for session + " + _session.Id + "!", e);
-                return;
             }
         }
     }

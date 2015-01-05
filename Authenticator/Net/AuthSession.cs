@@ -49,7 +49,7 @@ namespace EnergonSoftware.Authenticator.Net
             AuthType = AuthType.None;
         }
 
-        public void Challenge(AuthType type, Nonce nonce, string challenge)
+        public async Task ChallengeAsync(AuthType type, Nonce nonce, string challenge)
         {
             AuthType = type;
             AuthNonce = nonce;
@@ -57,51 +57,51 @@ namespace EnergonSoftware.Authenticator.Net
             Authenticating = true;
             Authenticated = false;
 
-            SendMessage(new ChallengeMessage()
+            await SendMessageAsync(new ChallengeMessage()
                 {
                     Challenge = Convert.ToBase64String(Encoding.UTF8.GetBytes(challenge)),
                 }
-            );
+            ).ConfigureAwait(false);
         }
 
-        public async Task Challenge(string challenge, AccountInfo accountInfo)
+        public async Task ChallengeAsync(string challenge, AccountInfo accountInfo)
         {
-            await InstanceNotifier.Instance.Authenticating(accountInfo.Username, RemoteEndPoint);
+            await InstanceNotifier.Instance.AuthenticatingAsync(accountInfo.Username, RemoteEndPoint).ConfigureAwait(false);
 
             AccountInfo = accountInfo;
             Authenticated = true;
 
-            SendMessage(new ChallengeMessage()
+            await SendMessageAsync(new ChallengeMessage()
                 {
                     Challenge = Convert.ToBase64String(Encoding.UTF8.GetBytes(challenge)),
                 }
-            );
+            ).ConfigureAwait(false);
         }
 
-        public async Task Success(string sessionid)
+        public async Task SuccessAsync(string sessionid)
         {
-            await InstanceNotifier.Instance.Authenticated(AccountInfo.Username, sessionid, RemoteEndPoint);
-            await EventLogger.Instance.SuccessEvent(RemoteEndPoint, AccountInfo.Username);
+            await InstanceNotifier.Instance.AuthenticatedAsync(AccountInfo.Username, sessionid, RemoteEndPoint).ConfigureAwait(false);
+            await EventLogger.Instance.SuccessEventAsync(RemoteEndPoint, AccountInfo.Username).ConfigureAwait(false);
 
             AccountInfo.SessionId = sessionid;
             AccountInfo.EndPoint = RemoteEndPoint.ToString();
 
-            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnection()) {
-                await AccountInfo.Update(connection);
+            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
+                await AccountInfo.UpdateAsync(connection).ConfigureAwait(false);
             }
 
-            SendMessage(new SuccessMessage()
+            await SendMessageAsync(new SuccessMessage()
                 {
                     SessionId = sessionid,
                 }
-            );
+            ).ConfigureAwait(false);
 
             Disconnect();
         }
 
-        public async Task Failure(string reason)
+        public async Task FailureAsync(string reason)
         {
-            await EventLogger.Instance.FailedEvent(RemoteEndPoint, null == AccountInfo ? null : AccountInfo.Username, reason);
+            await EventLogger.Instance.FailedEventAsync(RemoteEndPoint, null == AccountInfo ? null : AccountInfo.Username, reason).ConfigureAwait(false);
 
             // NOTE: we don't update the database here because this
             // might be a malicious login attempt against an account
@@ -109,11 +109,11 @@ namespace EnergonSoftware.Authenticator.Net
 
             AccountInfo = null;
 
-            SendMessage(new FailureMessage()
+            await SendMessageAsync(new FailureMessage()
                 {
                     Reason = reason,
                 }
-            );
+            ).ConfigureAwait(false);
 
             Disconnect();
         }

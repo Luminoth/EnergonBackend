@@ -15,40 +15,40 @@ namespace EnergonSoftware.DbInit
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(DatabaseManager));
 
-        public static async Task<DatabaseConnection> AcquireDatabaseConnection(ConnectionStringSettings connectionSettings)
+        public static async Task<DatabaseConnection> AcquireDatabaseConnectionAsync(ConnectionStringSettings connectionSettings)
         {
             DatabaseConnection connection = new DatabaseConnection(connectionSettings);
-            await connection.Open();
+            await connection.OpenAsync().ConfigureAwait(false);
             return connection;
         }
 
-        /*public static async Task<DatabaseConnection> AcquireDatabaseConnection()
+        /*public static async Task<DatabaseConnection> AcquireDatabaseConnectionAsync()
         {
-            return AcquireDatabaseConnection(ConfigurationManager.ConnectionStrings["energonsoftware"]);
+            return await AcquireDatabaseConnectionAsync(ConfigurationManager.ConnectionStrings["energonsoftware"]).ConfigureAwait(false);
         }*/
 
-        public static bool TestDatabaseConnection()
+        public static async Task<bool> TestDatabaseConnectionAsync()
         {
-            return DatabaseConnection.TestDatabaseConnection(ConfigurationManager.ConnectionStrings["energonsoftware"]);
+            return await DatabaseConnection.TestDatabaseConnectionAsync(ConfigurationManager.ConnectionStrings["energonsoftware"]).ConfigureAwait(false);
         }
 
 #region Events Table
-        private static async Task CreateEventsTables(DatabaseConnection connection)
+        private static async Task CreateEventsTablesAsync(DatabaseConnection connection)
         {
             Logger.Info("Creating event tables...");
-            await AuthEvent.CreateTable(connection);
+            await AuthEvent.CreateTableAsync(connection).ConfigureAwait(false);
         }
 #endregion
 
 #region Accounts Table
-        private static async Task CreateAccountsTables(DatabaseConnection connection)
+        private static async Task CreateAccountsTablesAsync(DatabaseConnection connection)
         {
             Logger.Info("Creating account tables...");
-            await AccountInfo.CreateTable(connection);
-            await AccountFriend.CreateTable(connection);
+            await AccountInfo.CreateTableAsync(connection).ConfigureAwait(false);
+            await AccountFriend.CreateTableAsync(connection).ConfigureAwait(false);
         }
 
-        private static async Task InsertAccountsData(DatabaseConnection connection)
+        private static async Task InsertAccountsDataAsync(DatabaseConnection connection)
         {
             Logger.Info("Inserting account data...");
 
@@ -61,7 +61,7 @@ namespace EnergonSoftware.DbInit
                 Username = "shane",
             };
             shaneAccount.SetPassword(authRealm, "password");
-            await shaneAccount.Insert(connection);
+            await shaneAccount.InsertAsync(connection).ConfigureAwait(false);
             Logger.Info("Inserted new account: " + shaneAccount);
 
             AccountInfo testAccount1 = new AccountInfo()
@@ -70,7 +70,7 @@ namespace EnergonSoftware.DbInit
                 Username = "test1",
             };
             testAccount1.SetPassword(authRealm, "password");
-            await testAccount1.Insert(connection);
+            await testAccount1.InsertAsync(connection).ConfigureAwait(false);
             Logger.Info("Inserted new account: " + testAccount1);
 
             AccountInfo testAccount2 = new AccountInfo()
@@ -79,7 +79,7 @@ namespace EnergonSoftware.DbInit
                 Username = "test2",
             };
             testAccount2.SetPassword(authRealm, "password");
-            await testAccount2.Insert(connection);
+            await testAccount2.InsertAsync(connection).ConfigureAwait(false);
             Logger.Info("Inserted new account: " + testAccount2);
 
             AccountFriend friend = new AccountFriend()
@@ -87,39 +87,39 @@ namespace EnergonSoftware.DbInit
                 Account = testAccount1.Id,
                 Friend = testAccount2.Id,
             };
-            await friend.Insert(connection);
+            await friend.InsertAsync(connection).ConfigureAwait(false);
             Logger.Info("Inserted new account friend: " + friend);
         }
 
-        private static async Task VerifyAccountsData(DatabaseConnection connection)
+        private static async Task VerifyAccountsDataAsync(DatabaseConnection connection)
         {
             Logger.Info("Verifying account data...");
 
             AccountInfo account = new AccountInfo() { Username = "shane", };
-            await account.Read(connection);
+            await account.ReadAsync(connection).ConfigureAwait(false);
             Logger.Info("Read account: " + account);
         }
 #endregion
 
 #region Database
-        public static async Task<bool> InitializeDatabase()
+        public static async Task<bool> InitializeDatabaseAsync()
         {
             try {
                 ConnectionStringSettings connectionSettings = ConfigurationManager.ConnectionStrings["energonsoftware"];
 
                 Logger.Info("Creating database...");
-                if(!(await CreateDatabase(connectionSettings))) {
+                if(!await CreateDatabaseAsync(connectionSettings).ConfigureAwait(false)) {
                     Logger.Error("Failed to create database!");
                     return false;
                 }
 
                 Logger.Info("Populating database...");
-                using(DatabaseConnection connection = await AcquireDatabaseConnection(connectionSettings)) {
-                    await CreateEventsTables(connection);
+                using(DatabaseConnection connection = await AcquireDatabaseConnectionAsync(connectionSettings).ConfigureAwait(false)) {
+                    await CreateEventsTablesAsync(connection).ConfigureAwait(false);
 
-                    await CreateAccountsTables(connection);
-                    await InsertAccountsData(connection);
-                    await VerifyAccountsData(connection);
+                    await CreateAccountsTablesAsync(connection).ConfigureAwait(false);
+                    await InsertAccountsDataAsync(connection).ConfigureAwait(false);
+                    await VerifyAccountsDataAsync(connection).ConfigureAwait(false);
                 }
 
                 return true;
@@ -130,16 +130,16 @@ namespace EnergonSoftware.DbInit
         }
 
         // TODO: this kind of assumes we're using SQLite and we shouldn't do that
-        private static async Task<bool> CreateDatabase(ConnectionStringSettings connectionSettings)
+        private static async Task<bool> CreateDatabaseAsync(ConnectionStringSettings connectionSettings)
         {
             string dataSource = DatabaseConnection.ParseDataSource(connectionSettings);
             if(File.Exists(dataSource)) {
                 string backupfilename = dataSource + ".bak";
                 Logger.Info("Backing up old database to " + backupfilename + "...");
-                File.Delete(backupfilename);
-                File.Move(dataSource, backupfilename);
+                await Task.Run(() => File.Delete(backupfilename)).ConfigureAwait(false);
+                await Task.Run(() => File.Move(dataSource, backupfilename)).ConfigureAwait(false);
             }
-            return await DatabaseConnection.CreateDatabase(connectionSettings);
+            return await DatabaseConnection.CreateDatabaseAsync(connectionSettings).ConfigureAwait(false);
         }
     }
 #endregion

@@ -40,10 +40,7 @@ namespace EnergonSoftware.Launcher
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(UpdateChecker));
 
-#region Singleton
-        private static readonly UpdateChecker _instance = new UpdateChecker();
-        public static UpdateChecker Instance { get { return _instance; } }
-#endregion
+        public static readonly UpdateChecker Instance = new UpdateChecker();
 
         private string _updateStatus = Properties.Resources.UpdatesLabel;
         public string UpdateStatus { get { return _updateStatus; } private set { _updateStatus = value; NotifyPropertyChanged(); } }
@@ -54,7 +51,7 @@ namespace EnergonSoftware.Launcher
         private bool _updated;
         public bool Updated { get { return _updated; } private set { _updated = value; NotifyPropertyChanged(); } }
 
-        public async Task CheckForUpdates()
+        public async Task CheckForUpdatesAsync()
         {
             // TODO: use string resources here
             Logger.Info("Checking for updates...");
@@ -64,10 +61,10 @@ namespace EnergonSoftware.Launcher
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                HttpResponseMessage response = await client.GetAsync("updates/launcher");
+                HttpResponseMessage response = await client.GetAsync("updates/launcher").ConfigureAwait(false);
                 if(response.IsSuccessStatusCode) {
                     List<Update> updates = new List<Update>();
-                    using(Stream stream = await response.Content.ReadAsStreamAsync()) {
+                    using(Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false)) {
                         DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Update>));
                         updates = (List<Update>)serializer.ReadObject(stream);
                     }
@@ -79,7 +76,7 @@ namespace EnergonSoftware.Launcher
                     UpdateFailed = false;
                     Updated = true;
 
-await Task.Delay(2000);
+await Task.Delay(2000).ConfigureAwait(false);
                     ClientState.Instance.CurrentPage = ClientState.Page.Login;
                 } else {
                     UpdateStatus = "Error contacting update server: " + response.ReasonPhrase;

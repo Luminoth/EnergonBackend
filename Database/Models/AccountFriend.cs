@@ -19,17 +19,17 @@ namespace EnergonSoftware.Database.Models
 
         public static string TableName { get { return AccountFriendsTable.Name; } }
 
-        public static async Task CreateTable(DatabaseConnection connection)
+        public static async Task CreateTableAsync(DatabaseConnection connection)
         {
-            await AccountFriendsTable.Create(connection);
+            await AccountFriendsTable.CreateAsync(connection).ConfigureAwait(false);
         }
 
-        public static async Task DeleteAll(DatabaseConnection connection, long accountId)
+        public static async Task DeleteAllAsync(DatabaseConnection connection, long accountId)
         {
             using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountFriendsTable.Name + " WHERE account=@account OR friend=@friend")) {
                 connection.AddParameter(command, "account", accountId);
                 connection.AddParameter(command, "friend", accountId);
-                await Task.Run(() => command.ExecuteNonQuery());
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
         }
 
@@ -54,9 +54,9 @@ namespace EnergonSoftware.Database.Models
             _friend = -1;
         }
 
-        public async Task<bool> Read(DatabaseConnection connection)
+        public async Task<bool> ReadAsync(DatabaseConnection connection)
         {
-            await Task.Delay(0);
+            await Task.Delay(0).ConfigureAwait(false);
             return false;
         }
 
@@ -66,43 +66,43 @@ namespace EnergonSoftware.Database.Models
             _friend = reader.GetInt32(AccountFriendsTable["friend"].Id);
         }
 
-        public async Task Insert(DatabaseConnection connection)
+        public async Task InsertAsync(DatabaseConnection connection)
         {
             // account -> friend
             using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountFriendsTable.Name + "(account, friend) VALUES(@account, @friend)")) {
                 connection.AddParameter(command, "account", Account);
                 connection.AddParameter(command, "friend", Friend);
-                await Task.Run(() => command.ExecuteNonQuery());
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
 
             // friend -> account
             using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountFriendsTable.Name + "(account, friend) VALUES(@account, @friend)")) {
                 connection.AddParameter(command, "account", Friend);
                 connection.AddParameter(command, "friend", Account);
-                await Task.Run(() => command.ExecuteNonQuery());
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
         }
 
-        public async Task Delete(DatabaseConnection connection)
+        public async Task DeleteAsync(DatabaseConnection connection)
         {
             // account -> friend
             using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountFriendsTable.Name + " WHERE account=@account AND friend=@friend")) {
                 connection.AddParameter(command, "account", Account);
                 connection.AddParameter(command, "friend", Friend);
-                await Task.Run(() => command.ExecuteNonQuery());
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
 
             // friend -> account
             using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountFriendsTable.Name + " WHERE account=@account AND friend=@friend")) {
                 connection.AddParameter(command, "account", Friend);
                 connection.AddParameter(command, "friend", Account);
-                await Task.Run(() => command.ExecuteNonQuery());
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
         }
 
-        public async Task Update(DatabaseConnection connection)
+        public async Task UpdateAsync(DatabaseConnection connection)
         {
-            await Task.Delay(0);
+            await Task.Delay(0).ConfigureAwait(false);
             Clean();
         }
 

@@ -8,16 +8,16 @@ namespace EnergonSoftware.Authenticator
 {
     internal static class DatabaseManager
     {
-        public static async Task<DatabaseConnection> AcquireDatabaseConnection()
+        public static async Task<DatabaseConnection> AcquireDatabaseConnectionAsync()
         {
             DatabaseConnection connection = new DatabaseConnection(ConfigurationManager.ConnectionStrings["energonsoftware"]);
-            await connection.Open();
+            await connection.OpenAsync().ConfigureAwait(false);
             return connection;
         }
 
-        public static bool TestDatabaseConnection()
+        public static async Task<bool> TestDatabaseConnectionAsync()
         {
-            return DatabaseConnection.TestDatabaseConnection(ConfigurationManager.ConnectionStrings["energonsoftware"]);
+            return await DatabaseConnection.TestDatabaseConnectionAsync(ConfigurationManager.ConnectionStrings["energonsoftware"]).ConfigureAwait(false);
         }
     }
 }

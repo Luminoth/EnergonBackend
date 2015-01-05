@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Util;
@@ -25,8 +26,8 @@ namespace EnergonSoftware.Core.Messages.Packet
             Id = NextId;
         }
 
-        public abstract byte[] Serialize(IMessageFormatter formatter);
-        public abstract bool DeSerialize(MemoryBuffer buffer, IMessageFormatter formatter);
+        public abstract Task<byte[]> SerializeAsync(IMessageFormatter formatter);
+        public abstract Task<bool> DeSerializeAsync(MemoryBuffer buffer, IMessageFormatter formatter);
 
         public int CompareTo(object obj)
         {
@@ -35,6 +36,25 @@ namespace EnergonSoftware.Core.Messages.Packet
                 return 0;
             }
             return (int)(Id - rhs.Id);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if(null == obj) {
+                return false;
+            }
+
+            MessagePacket packet = obj as MessagePacket;
+            if(null == packet) {
+                return false;
+            }
+
+            return Type == packet.Type && Id == packet.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

@@ -52,7 +52,7 @@ namespace EnergonSoftware.Core.Configuration
 
     public class ListenAddressesConfigurationSection : ConfigurationSection
     {
-        [ConfigurationProperty("maxConnections", DefaultValue=-1)]
+        [ConfigurationProperty("maxConnections", DefaultValue = -1)]
         public int MaxConnections { get { return (int)this["maxConnections"]; } }
 
         [ConfigurationProperty("backlog", DefaultValue=10)]

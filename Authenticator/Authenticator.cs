@@ -68,7 +68,7 @@ namespace EnergonSoftware.Authenticator
             _diagnosticServer.Start(new List<string>() { "http://localhost:9001/" });
 
             Logger.Info("Starting instance notifier...");
-            InstanceNotifier.Instance.Start(instanceNotifierListenAddresses.ListenAddresses);
+            InstanceNotifier.Instance.StartAsync(instanceNotifierListenAddresses.ListenAddresses).Wait();
 
             Logger.Debug("Opening listener sockets...");
             _listener.MaxConnections = listenAddresses.MaxConnections;
@@ -78,7 +78,7 @@ namespace EnergonSoftware.Authenticator
             Logger.Info("Running...");
             Running = true;
 
-            InstanceNotifier.Instance.Startup();
+            InstanceNotifier.Instance.StartupAsync().Wait();
 
             Run();
         }
@@ -87,8 +87,12 @@ namespace EnergonSoftware.Authenticator
         {
             Logger.Info("Stopping " + ServiceName + " with guid=" + UniqueId + "...");
             Running = false;
+        }
 
-            InstanceNotifier.Instance.Shutdown();
+        private void Cleanup()
+        {
+            Logger.Info("Cleaning up...");
+            InstanceNotifier.Instance.ShutdownAsync().Wait();
 
             Logger.Debug("Closing listener sockets...");
             _listener.CloseSockets();
@@ -103,21 +107,22 @@ namespace EnergonSoftware.Authenticator
             _diagnosticServer.Stop();
         }
 
+        private async Task PollAndRunAsync()
+        {
+            await _listener.PollAsync(_sessions).ConfigureAwait(false);
+
+            await _sessions.PollAndRunAsync().ConfigureAwait(false);
+            _sessions.Cleanup();
+        }
+
         private void Run()
         {
             while(Running) {
                 try {
                     Task.WhenAll(new Task[]
                         {
-                            Task.Run(() => InstanceNotifier.Instance.Run()),
-                            Task.Run(() =>
-                                {
-                                    _listener.Poll(_sessions);
-
-                                    _sessions.PollAndRun();
-                                    _sessions.Cleanup();
-                                }
-                            ),
+                            InstanceNotifier.Instance.RunAsync(),
+                            PollAndRunAsync(),
                         }
                     ).Wait();
                 } catch(Exception e) {
@@ -127,6 +132,8 @@ namespace EnergonSoftware.Authenticator
 
                 Thread.Sleep(0);
             }
+
+            Cleanup();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using EnergonSoftware.Core.MessageHandlers;
+﻿using System.Threading.Tasks;
+
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Overmind.Net;
@@ -11,10 +13,10 @@ namespace EnergonSoftware.Overmind.MessageHandlers
         {
         }
 
-        protected override void OnHandleMessage(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
         {
             OvermindSession overmindSession = (OvermindSession)session;
-            overmindSession.Ping();
+            await overmindSession.PingAsync().ConfigureAwait(false);
         }
     }
 }

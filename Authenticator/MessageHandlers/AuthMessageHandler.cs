@@ -42,20 +42,20 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
         {
         }
 
-        protected async override void OnHandleMessage(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
         {
             AuthSession authSession = (AuthSession)session;
 
-            await EventLogger.Instance.RequestEvent(authSession.RemoteEndPoint);
+            await EventLogger.Instance.RequestEventAsync(authSession.RemoteEndPoint).ConfigureAwait(false);
 
             if(authSession.Authenticated || authSession.Authenticating) {
-                await authSession.Failure("Already Authenticating");
+                await authSession.FailureAsync("Already Authenticating").ConfigureAwait(false);
                 return;
             }
 
             AuthMessage authMessage = (AuthMessage)message;
             if(Common.AuthVersion != authMessage.Version) {
-                await authSession.Failure("Bad Version");
+                await authSession.FailureAsync("Bad Version").ConfigureAwait(false);
                 return;
             }
 
@@ -67,18 +67,18 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             case AuthType.DigestMD5:
                 /*challenge = BuildDigestMD5Challenge(nonce);
                 break;*/
-await authSession.Failure("MD5 mechanism not supported!");
+await authSession.FailureAsync("MD5 mechanism not supported!").ConfigureAwait(false);
 return;
             case AuthType.DigestSHA512:
                 challenge = BuildDigestSHA512Challenge(nonce);
                 break;
             default:
-                await authSession.Failure("Unsupported mechanism");
+                await authSession.FailureAsync("Unsupported mechanism").ConfigureAwait(false);
                 return;
             }
 
             Logger.Debug("Session " + authSession.Id + " generated challenge: " + challenge);
-            authSession.Challenge(authMessage.MechanismType, nonce, challenge);
+            await authSession.ChallengeAsync(authMessage.MechanismType, nonce, challenge).ConfigureAwait(false);
         }
     }
 }

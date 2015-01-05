@@ -40,21 +40,21 @@ namespace EnergonSoftware.Chat.Net
         {
         }
 
-        protected override void LookupAccount(string username)
+        protected async override Task<Account> LookupAccountAsync(string username)
         {
             Logger.Debug("Looking up account for username=" + username);
             AccountInfo account = new AccountInfo() { Username = username };
-            using(DatabaseConnection connection = Task.Run(() => DatabaseManager.AcquireDatabaseConnection()).Result) {
-                if(!Task.Run(() => account.Read(connection)).Result) {
-                    return;
+            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
+                if(!await account.ReadAsync(connection).ConfigureAwait(false)) {
+                    return null;
                 }
             }
-            Account = account.ToAccount();
+            return account.ToAccount();
         }
 
-        public void Ping()
+        public async Task PingAsync()
         {
-            SendMessage(new PingMessage());
+            await SendMessageAsync(new PingMessage()).ConfigureAwait(false);
         }
     }
 }

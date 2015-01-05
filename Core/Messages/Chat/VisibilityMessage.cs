@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.Messages.Formatter;
@@ -24,18 +25,18 @@ namespace EnergonSoftware.Core.Messages.Chat
             Visibility = Accounts.Visibility.Online;
         }
 
-        public void Serialize(Stream stream, IMessageFormatter formatter)
+        public async Task SerializeAsync(Stream stream, IMessageFormatter formatter)
         {
-            formatter.WriteString(Username, stream);
-            formatter.WriteString(SessionId, stream);
-            formatter.WriteInt((int)Visibility, stream);
+            await formatter.WriteStringAsync(Username, stream).ConfigureAwait(false);
+            await formatter.WriteStringAsync(SessionId, stream).ConfigureAwait(false);
+            await formatter.WriteIntAsync((int)Visibility, stream).ConfigureAwait(false);
         }
 
-        public void DeSerialize(Stream stream, IMessageFormatter formatter)
+        public async Task DeSerializeAsync(Stream stream, IMessageFormatter formatter)
         {
-            Username = formatter.ReadString(stream);
-            SessionId = formatter.ReadString(stream);
-            Visibility = (Visibility)formatter.ReadInt(stream);
+            Username = await formatter.ReadStringAsync(stream).ConfigureAwait(false);
+            SessionId = await formatter.ReadStringAsync(stream).ConfigureAwait(false);
+            Visibility = (Visibility)await formatter.ReadIntAsync(stream).ConfigureAwait(false);
         }
 
         public override string ToString()

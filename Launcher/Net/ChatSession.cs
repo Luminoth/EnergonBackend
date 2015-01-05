@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.MessageHandlers;
@@ -30,9 +31,9 @@ namespace EnergonSoftware.Launcher.Net
         {
         }
 
-        protected override void OnRun()
+        protected async override Task OnRunAsync()
         {
-            Ping();
+            await PingAsync().ConfigureAwait(false);
         }
 
         private void OnConnectFailedCallback(object sender, ConnectEventArgs e)
@@ -40,59 +41,60 @@ namespace EnergonSoftware.Launcher.Net
             Error("Failed to connect to the overmind server: " + e.Error);
         }
 
-        private void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
+        private async void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
         {
-            Login();
+            await LoginAsync().ConfigureAwait(false);
 
-            SetVisibility(Visibility.Online);
+            await SetVisibilityAsync(Visibility.Online).ConfigureAwait(false);
         }
 
-        public void BeginConnect(string host, int port)
+        public async Task BeginConnectAsync(string host, int port)
         {
             OnConnectSuccess += OnConnectSuccessCallback;
             OnConnectFailed += OnConnectFailedCallback;
-            ConnectAsync(host, port);
+            await ConnectAsync(host, port).ConfigureAwait(false);
         }
 
-        private void Login()
+        private async Task LoginAsync()
         {
-            SendMessage(new LoginMessage()
+            await SendMessageAsync(new LoginMessage()
                 {
                     Username = ClientState.Instance.Username,
                     SessionId = ClientState.Instance.Ticket,
                 }
-            );
+            ).ConfigureAwait(false);
         }
 
-        public void Logout()
+        public async Task LogoutAsync()
         {
-            SendMessage(new LogoutMessage()
+            await SendMessageAsync(new LogoutMessage()
                 {
                     Username = ClientState.Instance.Username,
                     SessionId = ClientState.Instance.Ticket,
                 }
-            );
+            ).ConfigureAwait(false);
+
             Disconnect();
         }
 
-        public void Ping()
+        public async Task PingAsync()
         {
             if(!ShouldPing) {
                 return;
             }
 
-            SendMessage(new PingMessage());
+            await SendMessageAsync(new PingMessage()).ConfigureAwait(false);
         }
 
-        public void SetVisibility(Visibility visibility)
+        public async Task SetVisibilityAsync(Visibility visibility)
         {
-            SendMessage(new VisibilityMessage()
+            await SendMessageAsync(new VisibilityMessage()
                 {
                     Username = ClientState.Instance.Username,
                     SessionId = ClientState.Instance.Ticket,
                     Visibility = visibility,
                 }
-            );
+            ).ConfigureAwait(false);
         }
     }
 }

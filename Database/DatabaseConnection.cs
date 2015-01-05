@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data.SQLite;
+using System.Threading;
 using System.Threading.Tasks;
 
 using log4net;
@@ -24,7 +25,7 @@ namespace EnergonSoftware.Database
             return (string)builder["Data Source"];
         }
 
-        public static async Task<bool> CreateDatabase(ConnectionStringSettings connectionSettings)
+        public static async Task<bool> CreateDatabaseAsync(ConnectionStringSettings connectionSettings)
         {
             string dataSource = ParseDataSource(connectionSettings);
 
@@ -32,18 +33,18 @@ namespace EnergonSoftware.Database
             switch(connectionSettings.ProviderName)
             {
             case "System.Data.SQLite":
-                await Task.Run(() => SQLiteConnection.CreateFile(dataSource));
+                await Task.Run(() => SQLiteConnection.CreateFile(dataSource)).ConfigureAwait(false);
                 return true;
             }
 
             return false;
         }
 
-        public static bool TestDatabaseConnection(ConnectionStringSettings connectionSettings)
+        public static async Task<bool> TestDatabaseConnectionAsync(ConnectionStringSettings connectionSettings)
         {
             try {
                 using(DatabaseConnection connection = new DatabaseConnection(connectionSettings)) {
-                    Task.Run(() => connection.Open()).Wait();
+                    await connection.OpenAsync().ConfigureAwait(false);
                     return true;
                 }
             } catch(Exception e) {
@@ -52,7 +53,7 @@ namespace EnergonSoftware.Database
             }
         }
 
-        private readonly object _lock = new object();
+        private readonly Mutex _lock = new Mutex();
 
         public ConnectionStringSettings ConnectionSettings { get; private set; }
         public DbConnection Connection { get; private set; }
@@ -61,13 +62,16 @@ namespace EnergonSoftware.Database
         {
             get
             {
-                lock(_lock) {
+                _lock.WaitOne();
+                try {
                     switch(ConnectionSettings.ProviderName)
                     {
                     case "System.Data.SQLite":
                         return ((SQLiteConnection)Connection).LastInsertRowId;
                     }
                     return -1;
+                } finally {
+                    _lock.ReleaseMutex();
                 }
             }
         }
@@ -97,27 +101,30 @@ namespace EnergonSoftware.Database
         {
             if(disposing) {
                 Connection.Dispose();
+                _lock.Dispose();
             }
         }
 #endregion
 
-        public async Task Open()
+        public async Task OpenAsync()
         {
-            await Task.Run(() =>
-                {
-                    lock(_lock) {
-                        Logger.Debug("Opening " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
-                        Connection.Open();
-                    }
-                }
-            );
+            _lock.WaitOne();
+            try {
+                Logger.Debug("Opening " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
+                await Connection.OpenAsync().ConfigureAwait(false);
+            } finally {
+                _lock.ReleaseMutex();
+            }
         }
 
         public void Close()
         {
-            lock(_lock) {
+            _lock.WaitOne();
+            try {
                 Logger.Debug("Closing " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
                 Connection.Close();
+            } finally {
+                _lock.ReleaseMutex();
             }
         }
 

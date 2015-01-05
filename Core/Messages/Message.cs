@@ -49,6 +49,7 @@ namespace EnergonSoftware.Core.Messages
             case VisibilityMessage.MessageType:
                 return new VisibilityMessage();
             }
+
             throw new MessageException("Unsupported message type for construction: " + type);
         }
     }

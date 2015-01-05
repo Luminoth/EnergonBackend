@@ -106,10 +106,10 @@ namespace EnergonSoftware.Core.Net
             return true;
         }
 
-        public static bool ConnectAsync(string host, int port, AsyncConnectEventArgs args)
+        public static async Task<bool> ConnectAsync(string host, int port, AsyncConnectEventArgs args)
         {
             bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);
-            IPHostEntry hostEntry = Task.Run(() => Dns.GetHostEntry(host)).Result;
+            IPHostEntry hostEntry = await Dns.GetHostEntryAsync(host).ConfigureAwait(false);
 
             int idx = -1;
             for(int i=0; i<hostEntry.AddressList.Length; ++i) {
@@ -143,11 +143,11 @@ namespace EnergonSoftware.Core.Net
             return true;
         }
 
-        public static Socket Connect(string host, int port, SocketType socketType, ProtocolType protocolType)
+        public static async Task<Socket> ConnectAsync(string host, int port, SocketType socketType, ProtocolType protocolType)
         {
             bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);
 
-            IPHostEntry hostEntry = Task.Run(() => Dns.GetHostEntry(host)).Result;
+            IPHostEntry hostEntry = await Dns.GetHostEntryAsync(host).ConfigureAwait(false);
             foreach(IPAddress address in hostEntry.AddressList) {
                 if(AddressFamily.InterNetwork != address.AddressFamily && (AddressFamily.InterNetworkV6 != address.AddressFamily || !useIPv6)) {
                     continue;
@@ -156,7 +156,7 @@ namespace EnergonSoftware.Core.Net
                 EndPoint endPoint = new IPEndPoint(address, port);
                 Socket socket = new Socket(endPoint.AddressFamily, socketType, protocolType);
                 try {
-                    socket.Connect(endPoint);
+                    await Task.Run(() => socket.Connect(endPoint)).ConfigureAwait(false);
                 } catch(SocketException) {
                     continue;
                 }
@@ -181,7 +181,7 @@ namespace EnergonSoftware.Core.Net
             return listener;
         }
 
-        public static Socket ConnectMulticast(IPAddress group, int port, int ttl)
+        public static async Task<Socket> ConnectMulticastAsync(IPAddress group, int port, int ttl)
         {
             EndPoint endPoint = new IPEndPoint(group, port);
             Socket socket = new Socket(endPoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
@@ -189,7 +189,7 @@ namespace EnergonSoftware.Core.Net
 // TODO: support ipv6 here
             socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(group));
             socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, ttl);
-            socket.Connect(endPoint);
+            await Task.Run(() => socket.Connect(endPoint)).ConfigureAwait(false);
 
             return socket;
         }

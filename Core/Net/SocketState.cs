@@ -65,19 +65,19 @@ namespace EnergonSoftware.Core.Net
         }
 #endregion
 
-        public async Task<int> PollAndRead()
+        public async Task<int> PollAndReadAsync()
         {
-            int count = await Task.Run(() => _reader.PollAndRead());
+            int count = await _reader.PollAndReadAsync().ConfigureAwait(false);
             if(count > 0) {
                 LastMessageTime = Time.CurrentTimeMs;
             }
             return count;
         }
 
-        public int Send(byte[] buffer)
+        public async Task<int> SendAsync(byte[] buffer)
         {
             Logger.Debug("Socket state " + Id + " sending " + buffer.Length + " bytes");
-            return _socket.Send(buffer);
+            return await Task.Run(() => _socket.Send(buffer)).ConfigureAwait(false);
         }
 
         public void ShutdownAndClose(bool reuseSocket)

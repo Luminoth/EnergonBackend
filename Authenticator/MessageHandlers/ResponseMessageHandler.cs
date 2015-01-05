@@ -28,25 +28,25 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 
 // TODO: handle the case of a user authenticating a second time
 
-        private async Task CompleteAuthentication(AuthSession session)
+        private async Task CompleteAuthenticationAsync(AuthSession session)
         {
             SessionId sessionid = new SessionId(ConfigurationManager.AppSettings["sessionSecret"]);
             Logger.Info("Session " + session.Id + " generated sessionid '" + sessionid.SessionID + "' for account '" + session.AccountInfo.Username + "'");
-            await session.Success(sessionid.SessionID);
+            await session.SuccessAsync(sessionid.SessionID).ConfigureAwait(false);
         }
 
-        private async Task Authenticate(AuthSession session, string username, string nonce, string cnonce, string nc, string qop, string digestURI, string response)
+        private async Task AuthenticateAsync(AuthSession session, string username, string nonce, string cnonce, string nc, string qop, string digestURI, string response)
         {
             AccountInfo account = new AccountInfo() { Username = username };
-            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnection()) {
-                if(!await account.Read(connection)) {
-                    await session.Failure("Bad Username or Password");
+            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
+                if(!await account.ReadAsync(connection).ConfigureAwait(false)) {
+                    await session.FailureAsync("Bad Username or Password").ConfigureAwait(false);
                     return;
                 }
             }
 
             if(!account.Active) {
-                await session.Failure("Account Inactive");
+                await session.FailureAsync("Account Inactive").ConfigureAwait(false);
                 return;
             }
 
@@ -56,87 +56,87 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             case EnergonSoftware.Core.AuthType.DigestMD5:
                 /*Logger.Debug("Handling MD5 response...");
                 //Logger.Debug("passwordHash=" + account.PasswordMD5);
-                expected = await Task.Run(() => EnergonSoftware.Core.Auth.DigestClientResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI));
-                rspauth = await Task.Run(() => EnergonSoftware.Core.Auth.DigestServerResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI));
+                expected = await EnergonSoftware.Core.Auth.DigestClientResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
+                rspauth = await EnergonSoftware.Core.Auth.DigestServerResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
                 break;*/
-await session.Failure("MD5 auth type not supported!");
+await session.FailureAsync("MD5 auth type not supported!").ConfigureAwait(false);
 return;
             case EnergonSoftware.Core.AuthType.DigestSHA512:
                 Logger.Debug("Handling SHA512 response...");
                 //Logger.Debug("passwordHash=" + account.PasswordSHA512);
-                expected = await Task.Run(() => EnergonSoftware.Core.Auth.DigestClientResponse(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI));
-                rspauth = await Task.Run(() => EnergonSoftware.Core.Auth.DigestServerResponse(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI));
+                expected = await EnergonSoftware.Core.Auth.DigestClientResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
+                rspauth = await EnergonSoftware.Core.Auth.DigestServerResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
                 break;
             default:
-                await session.Failure("Unsupported auth type!");
+                await session.FailureAsync("Unsupported auth type!").ConfigureAwait(false);
                 return;
             }
 
             if(!expected.Equals(response)) {
-                await session.Failure("Bad Username or Password");
+                await session.FailureAsync("Bad Username or Password").ConfigureAwait(false);
                 return;
             }
 
             string challenge = "rspauth=" + rspauth;
             Logger.Info("Session " + session.Id + " authenticated account '" + username + "', sending response: " + rspauth);
-            await session.Challenge(challenge, account);
+            await session.ChallengeAsync(challenge, account).ConfigureAwait(false);
         }
 
-        protected async override void OnHandleMessage(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
         {
             AuthSession authSession = (AuthSession)session;
 
             if(authSession.Authenticated) {
-                await CompleteAuthentication(authSession);
+                await CompleteAuthenticationAsync(authSession).ConfigureAwait(false);
                 return;
             }
 
             if(!authSession.Authenticating) {
-                await authSession.Failure("Not Authenticating");
+                await authSession.FailureAsync("Not Authenticating").ConfigureAwait(false);
                 return;
             }
 
             if(authSession.AuthNonce.Expired) {
-                await authSession.Failure("Session Expired");
+                await authSession.FailureAsync("Session Expired").ConfigureAwait(false);
                 return;
             }
 
             ResponseMessage responseMessage = (ResponseMessage)message;
 
-            string decoded = await Task.Run(() => Encoding.UTF8.GetString(Convert.FromBase64String(responseMessage.Response)));
+            string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(responseMessage.Response));
             Logger.Debug("Decoded response: " + decoded);
 
             Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(decoded);
             if(null == values || 0 == values.Count) {
-                await authSession.Failure("Invalid Response");
+                await authSession.FailureAsync("Invalid Response").ConfigureAwait(false);
                 return;
             }
 
             try {
                 string username = values["username"].Trim(new char[] { '"' });
-                await EventLogger.Instance.BeginEvent(authSession.RemoteEndPoint, username);
+                await EventLogger.Instance.BeginEventAsync(authSession.RemoteEndPoint, username).ConfigureAwait(false);
 
                 string charset = values["charset"].Trim(new char[] { '"' });
                 if(!"utf-8".Equals(charset, StringComparison.InvariantCultureIgnoreCase)) {
-                    await authSession.Failure("Invalid Response");
+                    await authSession.FailureAsync("Invalid Response").ConfigureAwait(false);
                     return;
                 }
 
                 string qop = values["qop"].Trim(new char[] { '"' });
                 if(!"auth".Equals(qop, StringComparison.InvariantCultureIgnoreCase)) {
-                    await authSession.Failure("Invalid Response");
+                    await authSession.FailureAsync("Invalid Response").ConfigureAwait(false);
                     return;
                 }
 
                 string realm = values["realm"].Trim(new char[] { '"' });
                 if(!ConfigurationManager.AppSettings["authRealm"].Equals(realm, StringComparison.InvariantCultureIgnoreCase)) {
-                    await authSession.Failure("Invalid Response");
+                    await authSession.FailureAsync("Invalid Response").ConfigureAwait(false);
                     return;
                 }
 
                 string nonce = values["nonce"].Trim(new char[] { '"' });
                 if(!authSession.AuthNonce.NonceHash.Equals(nonce)) {
-                    await authSession.Failure("Invalid Response");
+                    await authSession.FailureAsync("Invalid Response").ConfigureAwait(false);
                     return;
                 }
 
@@ -147,9 +147,9 @@ return;
                 string nc = values["nc"].Trim(new char[] { '"' });
                 string rsp = values["response"].Trim(new char[] { '"' });
 
-                await Authenticate(authSession, username, nonce, cnonce, nc, qop, digestURI, rsp);
+                await AuthenticateAsync(authSession, username, nonce, cnonce, nc, qop, digestURI, rsp).ConfigureAwait(false);
             } catch(KeyNotFoundException) {
-                Task.Run(() => authSession.Failure("Invalid response!")).Wait();
+                authSession.FailureAsync("Invalid response!").Wait();
             }
         }
     }

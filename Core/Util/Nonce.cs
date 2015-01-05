@@ -24,7 +24,7 @@ namespace EnergonSoftware.Core.Util
             ExpiryMS = expiry;
             CreationTime = Time.CurrentTimeMs;
             NonceValue = CreationTime + ":" + Realm;
-            NonceHash = new SHA512().HashHex(NonceValue);
+            NonceHash = new SHA512().HashHexAsync(NonceValue).Result;
         }
 
         public Nonce(string realm, string nonce, int expiry) : this()
@@ -32,7 +32,7 @@ namespace EnergonSoftware.Core.Util
             Realm = realm;
             ExpiryMS = expiry;
             NonceValue = nonce;
-            NonceHash = new SHA512().HashHex(NonceValue);
+            NonceHash = new SHA512().HashHexAsync(NonceValue).Result;
 
             int idx = NonceValue.IndexOf(":");
             CreationTime = int.Parse(NonceValue.Substring(0, idx));

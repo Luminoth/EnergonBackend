@@ -40,7 +40,7 @@ namespace EnergonSoftware.Core.Net
         public void DisconnectAll()
         {
             Logger.Info("Disconnecting all sessions...");
-            Parallel.ForEach<Session>(_sessions, session => session.Disconnect());
+            _sessions.ForEach(session => session.Disconnect());
             _sessions.Clear();
         }
 
@@ -52,32 +52,37 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public void PollAndRun()
+        private async Task PollAndRunAsync(Session session)
         {
-            Parallel.ForEach<Session>(_sessions, session =>
-                {
-                    int count = Task.Run(() => session.PollAndRead()).Result;
-                    if(count < 0) {
-                        session.Disconnect("Socket closed!");
-                        return;
-                    }
+            int count = await session.PollAndReadAsync().ConfigureAwait(false);
+            if(count < 0) {
+                session.Disconnect("Socket closed!");
+                return;
+            }
 
-                    if(session.TimedOut) {
-                        Logger.Info("Session " + session.Id + " timed out!");
-                        session.Disconnect("Timed Out!");
-                        return;
-                    }
+            if(session.TimedOut) {
+                Logger.Info("Session " + session.Id + " timed out!");
+                session.Disconnect("Timed Out!");
+                return;
+            }
 
-                    if(session.Connected) {
-                        Task.Run(() => session.Run()).Wait();
-                    }
-                }
-            );
+            if(session.Connected) {
+                await session.RunAsync().ConfigureAwait(false);
+            }
         }
 
-        public void BroadcastMessage(IMessage message)
+        public async Task PollAndRunAsync()
         {
-            Parallel.ForEach<Session>(_sessions, session => session.SendMessage(message));
+            List<Task> tasks = new List<Task>();
+            _sessions.ForEach(session => tasks.Add(PollAndRunAsync(session)));
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+        }
+
+        public async Task BroadcastMessageAsync(IMessage message)
+        {
+            List<Task> tasks = new List<Task>();
+            _sessions.ForEach(session => tasks.Add(session.SendMessageAsync(message)));
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }
 }

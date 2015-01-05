@@ -31,12 +31,12 @@ namespace EnergonSoftware.Database.Models
 
         public static string TableName { get { return AccountsTable.Name; } }
 
-        public static async Task CreateTable(DatabaseConnection connection)
+        public static async Task CreateTableAsync(DatabaseConnection connection)
         {
-            await AccountsTable.Create(connection);
+            await AccountsTable.CreateAsync(connection).ConfigureAwait(false);
         }
 
-        public static async Task<List<Account>> ReadFriends(DatabaseConnection connection, long accountId)
+        public static async Task<List<Account>> ReadFriendsAsync(DatabaseConnection connection, long accountId)
         {
             List<Account> friends = new List<Account>();
 
@@ -44,8 +44,8 @@ namespace EnergonSoftware.Database.Models
                 + " (SELECT friend FROM " + AccountFriend.TableName + " where account=@account) AND active=1"))
             {
                 connection.AddParameter(command, "account", accountId);
-                using(DbDataReader reader = await Task.Run(() => command.ExecuteReader())) {
-                    while(reader.Read()) {
+                using(DbDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false)) {
+                    while(await reader.ReadAsync().ConfigureAwait(false)) {
                         friends.Add(new Account()
                             {
                                 Username = reader.GetString(1),
@@ -101,13 +101,13 @@ namespace EnergonSoftware.Database.Models
 
         public void SetPassword(string realm, string password)
         {
-            PasswordMD5 = new MD5().DigestPassword(Username, realm, password);
-            PasswordSHA512 = new SHA512().DigestPassword(Username, realm, password);
+            PasswordMD5 = new MD5().DigestPasswordAsync(Username, realm, password).Result;
+            PasswordSHA512 = new SHA512().DigestPasswordAsync(Username, realm, password).Result;
 
             Dirty = true;
         }
 
-        public async Task<bool> Read(DatabaseConnection connection)
+        public async Task<bool> ReadAsync(DatabaseConnection connection)
         {
             DbCommand command = null;
             if(Id > 0) {
@@ -119,8 +119,8 @@ namespace EnergonSoftware.Database.Models
             }
 
             using(command) {
-                using(DbDataReader reader = await Task.Run(() =>command.ExecuteReader())) {
-                    if(!reader.Read()) {
+                using(DbDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false)) {
+                    if(!await reader.ReadAsync().ConfigureAwait(false)) {
                         return false;
                     }
                     Load(reader);
@@ -154,7 +154,7 @@ namespace EnergonSoftware.Database.Models
             }
         }
 
-        public async Task Insert(DatabaseConnection connection)
+        public async Task InsertAsync(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountsTable.Name
                 + "(active, username, passwordMD5, passwordSHA512, visibility, status)"
@@ -166,12 +166,12 @@ namespace EnergonSoftware.Database.Models
                 connection.AddParameter(command, "passwordSHA512", PasswordSHA512);
                 connection.AddParameter(command, "visibility", Visibility);
                 connection.AddParameter(command, "status", Status);
-                await Task.Run(() => command.ExecuteNonQuery());
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                 Id = connection.LastInsertRowId;
             }
         }
 
-        public async Task Update(DatabaseConnection connection)
+        public async Task UpdateAsync(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("UPDATE " + AccountsTable.Name
                 + " SET active=@active, endPoint=@endPoint, sessionid=@sessionid, visibility=@visibility, status=@status WHERE id=@id"))
@@ -182,16 +182,16 @@ namespace EnergonSoftware.Database.Models
                 connection.AddParameter(command, "visibility", Visibility);
                 connection.AddParameter(command, "status", Status);
                 connection.AddParameter(command, "id", Id);
-                await Task.Run(() => command.ExecuteNonQuery());
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
             Clean();
         }
 
-        public async Task Delete(DatabaseConnection connection)
+        public async Task DeleteAsync(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountsTable.Name + " WHERE id=@id")) {
                 connection.AddParameter(command, "id", Id);
-                await Task.Run(() => command.ExecuteNonQuery());
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
         }
 

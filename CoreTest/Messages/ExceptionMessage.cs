@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.Messages;
@@ -17,12 +18,14 @@ namespace EnergonSoftware.Core.Test.Messages
         {
         }
 
-        public void Serialize(Stream stream, IMessageFormatter formatter)
+        public async Task SerializeAsync(Stream stream, IMessageFormatter formatter)
         {
+            await Task.Delay(0).ConfigureAwait(false);
         }
 
-        public void DeSerialize(Stream stream, IMessageFormatter formatter)
+        public async Task DeSerializeAsync(Stream stream, IMessageFormatter formatter)
         {
+            await Task.Delay(0).ConfigureAwait(false);
         }
     }
 }

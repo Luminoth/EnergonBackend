@@ -14,10 +14,7 @@ namespace EnergonSoftware.Launcher
             Main,
         }
 
-#region Singleton
-        private static readonly ClientState _instance = new ClientState();
-        public static ClientState Instance { get { return _instance; } }
-#endregion
+        public static readonly ClientState Instance = new ClientState();
 
         private Page _currentPage = Page.Update;
         public Page CurrentPage

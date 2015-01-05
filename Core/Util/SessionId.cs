@@ -30,11 +30,11 @@ namespace EnergonSoftware.Core.Util
             long salt2 = random.Next(10000);
 
             string value = salt1.ToString() + ":" + CreationTime + ":" + salt2;
-            string passwordHash = new EnergonSoftware.Core.Util.Crypt.SHA512().HashHex(Secret);
+            string passwordHash = new EnergonSoftware.Core.Util.Crypt.SHA512().HashHexAsync(Secret).Result;
 
             byte[] encrypted = null;
             using(Aes aes = Aes.Create()) {
-                encrypted = AES.Encrypt(passwordHash, aes.Key, aes.IV);
+                encrypted = AES.EncryptAsync(passwordHash, aes.Key, aes.IV).Result;
             }
             SessionID = Convert.ToBase64String(encrypted);
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -59,12 +58,12 @@ namespace EnergonSoftware.Manager
             _diagnosticServer.Start(new List<string>() { "http://localhost:9004/" });
 
             Logger.Info("Starting instance notifier...");
-            InstanceNotifier.Instance.Start(instanceNotifierListenAddresses.ListenAddresses);
+            InstanceNotifier.Instance.StartAsync(instanceNotifierListenAddresses.ListenAddresses).Wait();
 
             Logger.Info("Running...");
             Running = true;
 
-            InstanceNotifier.Instance.Startup();
+            InstanceNotifier.Instance.StartupAsync().Wait();
 
             Run();
         }
@@ -73,8 +72,12 @@ namespace EnergonSoftware.Manager
         {
             Logger.Info("Stopping " + ServiceName + " with guid=" + UniqueId + "...");
             Running = false;
+        }
 
-            InstanceNotifier.Instance.Shutdown();
+        private void Cleanup()
+        {
+            Logger.Info("Cleaning up...");
+            InstanceNotifier.Instance.ShutdownAsync().Wait();
 
             Logger.Debug("Stopping instance notifier...");
             InstanceNotifier.Instance.Stop();
@@ -89,15 +92,18 @@ namespace EnergonSoftware.Manager
                 try {
                     Task.WhenAll(new Task[]
                         {
-                            Task.Run(() => InstanceNotifier.Instance.Run()),
+                            InstanceNotifier.Instance.RunAsync(),
                         }
                     ).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();
                 }
+
                 Thread.Sleep(0);
             }
+
+            Cleanup();
         }
     }
 }

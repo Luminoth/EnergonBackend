@@ -55,7 +55,7 @@ namespace EnergonSoftware.DbInit
             SetStatusBarText("Running...");
 
             ((App)Application.Current).Running = true;
-            await DatabaseManager.InitializeDatabase();
+            await DatabaseManager.InitializeDatabaseAsync();
             ((App)Application.Current).Running = false;
 
             SetStatusBarText("Success!");

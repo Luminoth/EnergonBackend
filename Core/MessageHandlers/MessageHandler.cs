@@ -30,19 +30,22 @@ namespace EnergonSoftware.Core.MessageHandlers
             }
         }
 
-        public async Task HandleMessage(IMessage message, Session session)
+        public async Task HandleMessageAsync(IMessage message, Session session)
         {
             Authenticate(message as IAuthenticatedMessage, session as AuthenticatedSession);
 
             Finished = false;
             _startTime = Time.CurrentTimeMs;
-            await Task.Run(() => OnHandleMessage(message, session));
+
+            await OnHandleMessageAsync(message, session).ConfigureAwait(false);
+
             _finishTime = Time.CurrentTimeMs;
             Finished = true;
         }
 
-        protected virtual void OnHandleMessage(IMessage message, Session session)
+        protected async virtual Task OnHandleMessageAsync(IMessage message, Session session)
         {
+            await Task.Delay(0).ConfigureAwait(false);
         }
     }
 }

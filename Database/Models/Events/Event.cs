@@ -24,9 +24,9 @@ namespace EnergonSoftware.Database.Models.Events
             Timestamp = Time.CurrentTimeMs;
         }
 
-        public async Task<bool> Read(DatabaseConnection connection)
+        public async Task<bool> ReadAsync(DatabaseConnection connection)
         {
-            await Task.Delay(0);
+            await Task.Delay(0).ConfigureAwait(false);
             return false;
         }
 
@@ -34,16 +34,16 @@ namespace EnergonSoftware.Database.Models.Events
         {
         }
 
-        public abstract Task Insert(DatabaseConnection connection);
+        public abstract Task InsertAsync(DatabaseConnection connection);
 
-        public async Task Update(DatabaseConnection connection)
+        public async Task UpdateAsync(DatabaseConnection connection)
         {
-            await Task.Delay(0);
+            await Task.Delay(0).ConfigureAwait(false);
         }
 
-        public async Task Delete(DatabaseConnection connection)
+        public async Task DeleteAsync(DatabaseConnection connection)
         {
-            await Task.Delay(0);
+            await Task.Delay(0).ConfigureAwait(false);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Threading.Tasks;
+using System.Windows;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
@@ -12,9 +13,9 @@ namespace EnergonSoftware.Launcher.MessageHandlers
         {
         }
 
-        protected override void OnHandleMessage(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
         {
-            ((App)Application.Current).Logout();
+            await ((App)Application.Current).LogoutAsync().ConfigureAwait(false);
         }
     }
 }

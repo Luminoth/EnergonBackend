@@ -13,17 +13,14 @@ namespace EnergonSoftware.Chat
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(EventLogger));
 
-#region Singleton
-        private static readonly EventLogger _instance = new EventLogger();
-        public static EventLogger Instance { get { return _instance; } }
-#endregion
+        public static readonly EventLogger Instance = new EventLogger();
 
         // TODO: move this to a base class
-        private async Task LogEvent(Event evt)
+        private async Task LogEventAsync(Event evt)
         {
             Logger.Debug("Logging event: " + evt);
-            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnection()) {
-                await evt.Insert(connection);
+            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
+                await evt.InsertAsync(connection).ConfigureAwait(false);
             }
         }
 

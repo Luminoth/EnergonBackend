@@ -1,4 +1,6 @@
-﻿using EnergonSoftware.Core.MessageHandlers;
+﻿using System.Threading.Tasks;
+
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Net;
@@ -11,13 +13,13 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
         internal SuccessMessageHandler()
         {
         }
-        
-        protected override void OnHandleMessage(IMessage message, Session session)
+
+        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
         {
             SuccessMessage successMessage = (SuccessMessage)message;
             AuthSession authSession = (AuthSession)session;
 
-            authSession.AuthSuccess(successMessage.SessionId);
+            await authSession.AuthSuccessAsync(successMessage.SessionId).ConfigureAwait(false);
         }
     }
 }

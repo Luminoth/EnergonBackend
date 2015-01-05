@@ -92,10 +92,10 @@ namespace EnergonSoftware.Database
             return this;
         }
 
-        public async Task<DbDataReader> SelectAll(DatabaseConnection connection)
+        public async Task<DbDataReader> SelectAllAsync(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("SELECT " + Name + " FROM " + Table.Name)) {
-                return await Task.Run(() => command.ExecuteReader());
+                return await command.ExecuteReaderAsync().ConfigureAwait(false);
             }
         }
 
@@ -141,7 +141,7 @@ namespace EnergonSoftware.Database
             _primaryKeys.AddRange(from column in _columns.Values where column.PrimaryKey select column.Name);
         }
 
-        public async Task Create(DatabaseConnection connection)
+        public async Task CreateAsync(DatabaseConnection connection)
         {
             Logger.Info("Creating table " + Name + "...");
 
@@ -154,14 +154,14 @@ namespace EnergonSoftware.Database
             create.Append(")");
 
             using(DbCommand command = connection.BuildCommand(create.ToString())) {
-                await Task.Run(() => command.ExecuteNonQuery());
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
         }
 
-        public async Task<DbDataReader> SelectAll(DatabaseConnection connection)
+        public async Task<DbDataReader> SelectAllAsync(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("SELECT * FROM " + Name)) {
-                return await Task.Run(() => command.ExecuteReader());
+                return await command.ExecuteReaderAsync().ConfigureAwait(false);
             }
         }
     }

@@ -31,7 +31,7 @@ namespace EnergonSoftware.Overmind
         {
             ConfigureLogging();
 
-            if(!DatabaseManager.TestDatabaseConnection()) {
+            if(!DatabaseManager.TestDatabaseConnectionAsync().Result) {
                 Logger.Fatal("Could not connect to database!");
                 return;
             }

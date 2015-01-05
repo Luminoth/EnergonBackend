@@ -24,19 +24,24 @@ namespace EnergonSoftware.Launcher
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(App));
 
-        private static volatile bool _quit;
-
-        private static readonly SessionManager _sessions = new SessionManager();
+        private static readonly SessionManager Sessions = new SessionManager();
         private static OvermindSession _overmindSession;
         private static ChatSession _chatSession;
 
+        private static volatile bool _quit;
+
         private static void OnIdle()
+        {
+            OnIdleAsync().Wait();
+        }
+
+        private static async Task OnIdleAsync()
         {
             Logger.Info("**Idle mark**");
             while(!_quit) {
                 try {
-                    _sessions.PollAndRun();
-                    _sessions.Cleanup();
+                    await Sessions.PollAndRunAsync().ConfigureAwait(false);
+                    Sessions.Cleanup();
                 } catch(Exception e) {
                     Logger.Info("Unhandled Exception!", e);
                     ((App)Application.Current).OnError(e.Message, "Unhandled Exception!");
@@ -67,7 +72,7 @@ namespace EnergonSoftware.Launcher
             ConfigureLogging();
             Common.InitFilesystem();
 
-            await UpdateChecker.Instance.CheckForUpdates();
+            await UpdateChecker.Instance.CheckForUpdatesAsync();
 
             // have to run this in a separate thread
             // so that we don't lock up the UI
@@ -82,7 +87,7 @@ namespace EnergonSoftware.Launcher
 
             // TODO: logout?
 
-            _sessions.DisconnectAll();
+            Sessions.DisconnectAll();
 
             Logger.Info("Goodbye!");
         }
@@ -93,19 +98,19 @@ namespace EnergonSoftware.Launcher
             ClientState.Instance.LoggingIn = false;
         }
 
-        private void OnAuthSuccessCallback()
+        private async void OnAuthSuccessCallback()
         {
             _overmindSession = new OvermindSession();
             _overmindSession.OnDisconnect += OnDisconnectCallback;
             _overmindSession.OnError += OnErrorCallback;
-            _overmindSession.BeginConnect(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"]));
-            _sessions.Add(_overmindSession);
+            await _overmindSession.BeginConnectAsync(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"])).ConfigureAwait(false);
+            Sessions.Add(_overmindSession);
 
             _chatSession = new ChatSession();
             _chatSession.OnDisconnect += OnDisconnectCallback;
             _chatSession.OnError += OnErrorCallback;
-            _chatSession.BeginConnect(ConfigurationManager.AppSettings["chatHost"], Convert.ToInt32(ConfigurationManager.AppSettings["chatPort"]));
-            _sessions.Add(_chatSession);
+            await _chatSession.BeginConnectAsync(ConfigurationManager.AppSettings["chatHost"], Convert.ToInt32(ConfigurationManager.AppSettings["chatPort"])).ConfigureAwait(false);
+            Sessions.Add(_chatSession);
         }
 
         private void OnDisconnectCallback(object sender, DisconnectEventArgs e)
@@ -114,14 +119,14 @@ namespace EnergonSoftware.Launcher
             //OnError(reason, "Disconnected!");
         }
 
-        private void OnErrorCallback(object sender, ErrorEventArgs e)
+        private async void OnErrorCallback(object sender, ErrorEventArgs e)
         {
             OnError(e.Error, "Error!");
-            Logout();
+            await LogoutAsync().ConfigureAwait(false);
         }
 #endregion
 
-        public void Login(string password)
+        public async Task LoginAsync(string password)
         {
             Logger.Info("Logging in...");
 
@@ -133,19 +138,19 @@ namespace EnergonSoftware.Launcher
             session.OnAuthSuccess += OnAuthSuccessCallback;
             session.OnDisconnect += OnDisconnectCallback;
             session.OnError += OnErrorCallback;
-            session.BeginConnect(ConfigurationManager.AppSettings["authHost"], Convert.ToInt32(ConfigurationManager.AppSettings["authPort"]));
-            _sessions.Add(session);
+            await session.BeginConnectAsync(ConfigurationManager.AppSettings["authHost"], Convert.ToInt32(ConfigurationManager.AppSettings["authPort"])).ConfigureAwait(false);
+            Sessions.Add(session);
         }
 
-        public void Logout()
+        public async Task LogoutAsync()
         {
             if(null != _overmindSession) {
                 Logger.Info("Logging out...");
 
-                _chatSession.Logout();
+                await _chatSession.LogoutAsync().ConfigureAwait(false);
                 _chatSession = null;
 
-                _overmindSession.Logout();
+                await _overmindSession.LogoutAsync().ConfigureAwait(false);
                 _overmindSession = null;
             }
 
