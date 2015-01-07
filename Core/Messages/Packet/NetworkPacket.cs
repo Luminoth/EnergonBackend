@@ -34,10 +34,10 @@ namespace EnergonSoftware.Core.Messages.Packet
                     await formatter.WriteIntAsync(0, stream).ConfigureAwait(false);
                 } else {
                     await formatter.WriteStringAsync(Content.Type, stream).ConfigureAwait(false);
-                    using(MemoryStream mstream = new MemoryStream()) {
-                        await Content.SerializeAsync(mstream, formatter).ConfigureAwait(false);
+                    using(MemoryStream cstream = new MemoryStream()) {
+                        await Content.SerializeAsync(cstream, formatter).ConfigureAwait(false);
 
-                        byte[] bytes = mstream.ToArray();
+                        byte[] bytes = cstream.ToArray();
                         if(bytes.Length > MaxContentLength) {
                             throw new MessageException("Packet content is too large!");
                         }

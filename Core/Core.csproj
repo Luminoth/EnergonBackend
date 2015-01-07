@@ -52,6 +52,7 @@
     <Compile Include="Auth.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="Configuration\ListenAddressConfiguration.cs" />
+    <Compile Include="ErrorEventArgs.cs" />
     <Compile Include="MessageHandlers\MessageProcessor.cs" />
     <Compile Include="Messages\AuthenticatedMessage.cs" />
     <Compile Include="Messages\Auth\AuthMessage.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Messages\PingMessage.cs" />
     <Compile Include="Net\AuthenticatedSession.cs" />
     <Compile Include="Net\BufferedSocketReader.cs" />
+    <Compile Include="Net\DisconnectEventArgs.cs" />
     <Compile Include="Net\HttpServer.cs" />
     <Compile Include="Net\UdpListener.cs" />
     <Compile Include="Net\NetUtil.cs" />

@@ -23,7 +23,7 @@ namespace EnergonSoftware.Core.MessageHandlers
         private readonly AutoResetEvent _messageQueueEvent = new AutoResetEvent(false);
         private /*readonly*/ ConcurrentQueue<IMessage> _messageQueue = new ConcurrentQueue<IMessage>();
 
-        private volatile bool _running;
+        private CancellationTokenSource _cancellationToken;
         private Task _task;
 
         private MessageProcessor()
@@ -46,6 +46,7 @@ namespace EnergonSoftware.Core.MessageHandlers
         {
             if(disposing) {
                 _messageQueueEvent.Dispose();
+                _cancellationToken.Dispose();
             }
         }
 #endregion
@@ -73,62 +74,48 @@ namespace EnergonSoftware.Core.MessageHandlers
 
         public void Start()
         {
+            if(null != _task) {
+                throw new InvalidOperationException("Message processor already running!");
+            }
+
             Logger.Debug("Starting message processor for session " + _session.Id + "...");
 
-            _running = true;
-            _task = Task.Run(() => Run());
+            _cancellationToken = new CancellationTokenSource();
+            _task = Task.Run(async () =>
+                {
+                    // TODO: capture exceptions
+                    while(!_cancellationToken.IsCancellationRequested) {
+                        _messageQueueEvent.WaitOne();
+                        await RunAsync().ConfigureAwait(false);
+                    }
+                }, _cancellationToken.Token);
         }
 
         public void Stop()
         {
-            if(!_running) {
+            if(null == _task || _cancellationToken.IsCancellationRequested) {
                 return;
             }
 
             Logger.Debug("Stopping message processor for session " + _session.Id + "...");
 
-            _running = false;
+            _cancellationToken.Cancel();
             _messageQueueEvent.Set();
-
             _task.Wait();
+
             _task = null;
+            _cancellationToken = null;
 
             _messageQueue = new ConcurrentQueue<IMessage>();
-        }
 
-        private void Run()
-        {
-            RunAsync().Wait();
+            Logger.Debug("Message processor for session " + _session.Id + " finished!");
         }
 
         private async Task RunAsync()
         {
-            while(_running) {
-                _messageQueueEvent.WaitOne();
-
-                IMessage message;
-                while(_running && _messageQueue.TryDequeue(out message)) {
-                    await HandleMessageAsync(message).ConfigureAwait(false);
-                }
-            }
-        }
-
-        private async Task HandleMessageAsync(IMessage message)
-        {
-            Logger.Debug("Processing message with type=" + message.Type + " for session " + _session.Id + "...");
-
-            try {
-                MessageHandler messageHandler = _session.HandlerFactory.Create(message.Type);
-                if(null == messageHandler) {
-                    _session.InternalError("Session " + _session.Id + " could not create handler for message type: " + message.Type);
-                    return;
-                }
-                await messageHandler.HandleMessageAsync(message, _session).ConfigureAwait(false);
-                Logger.Debug("Handler for message with type=" + message.Type + " for session " + _session.Id + " took " + messageHandler.RuntimeMs + "ms to complete");
-            } catch(MessageHandlerException e) {
-                _session.InternalError("Error handling message for session " + _session.Id, e);
-            } catch(Exception e) {
-                _session.InternalError("Unhandled message processing exception for session + " + _session.Id + "!", e);
+            IMessage message;
+            while(!_cancellationToken.IsCancellationRequested && _messageQueue.TryDequeue(out message)) {
+                await _session.HandleMessageAsync(message).ConfigureAwait(false);
             }
         }
     }

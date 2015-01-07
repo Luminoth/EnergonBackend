@@ -42,28 +42,26 @@ namespace EnergonSoftware.Launcher.Net
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
-        public override IMessageHandlerFactory HandlerFactory { get { return new MessageHandlerFactory(); } }
+        protected override IMessageHandlerFactory HandlerFactory { get { return new MessageHandlerFactory(); } }
 
         public AuthSession() : base()
         {
             AuthStage = AuthenticationStage.NotAuthenticated;
         }
 
-        private async void OnConnectFailedCallback(object sender, ConnectEventArgs e)
-        {
-            await AuthFailedAsync("Failed to connect to the authentication server: " + e.Error).ConfigureAwait(false);
-        }
-
-        private async void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
-        {
-            await BeginAuthAsync().ConfigureAwait(false);
-        }
-
         public async Task BeginConnectAsync(string host, int port)
         {
-            OnConnectSuccess += OnConnectSuccessCallback;
-            OnConnectFailed += OnConnectFailedCallback;
-            await ConnectAsync(host, port).ConfigureAwait(false);
+            try {
+                await ConnectAsync(host, port, SocketType.Stream, ProtocolType.Tcp).ConfigureAwait(false);
+                if(!Connected) {
+                    await ErrorAsync("Failed to connect to the chat server").ConfigureAwait(false);
+                    return;
+                }
+
+                await BeginAuthAsync().ConfigureAwait(false);
+            } catch(SocketException e) {
+                AuthFailedAsync("Failed to connect to the authentication server: " + e.Message).Wait();
+            }
         }
 
         private async Task BeginAuthAsync()
@@ -111,7 +109,7 @@ namespace EnergonSoftware.Launcher.Net
                 OnAuthSuccess();
             }
 
-            Disconnect();
+            await DisconnectAsync().ConfigureAwait(false);
             await Task.Delay(0).ConfigureAwait(false);
         }
 
@@ -126,7 +124,7 @@ namespace EnergonSoftware.Launcher.Net
                 OnAuthFailed(reason);
             }
 
-            Disconnect();
+            await DisconnectAsync().ConfigureAwait(false);
             await Task.Delay(0).ConfigureAwait(false);
         }
     }

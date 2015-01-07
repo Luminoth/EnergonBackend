@@ -53,8 +53,6 @@ namespace EnergonSoftware.Database
             }
         }
 
-        private readonly Mutex _lock = new Mutex();
-
         public ConnectionStringSettings ConnectionSettings { get; private set; }
         public DbConnection Connection { get; private set; }
 
@@ -62,17 +60,12 @@ namespace EnergonSoftware.Database
         {
             get
             {
-                _lock.WaitOne();
-                try {
-                    switch(ConnectionSettings.ProviderName)
-                    {
-                    case "System.Data.SQLite":
-                        return ((SQLiteConnection)Connection).LastInsertRowId;
-                    }
-                    return -1;
-                } finally {
-                    _lock.ReleaseMutex();
+                switch(ConnectionSettings.ProviderName)
+                {
+                case "System.Data.SQLite":
+                    return ((SQLiteConnection)Connection).LastInsertRowId;
                 }
+                return -1;
             }
         }
 
@@ -101,31 +94,20 @@ namespace EnergonSoftware.Database
         {
             if(disposing) {
                 Connection.Dispose();
-                _lock.Dispose();
             }
         }
 #endregion
 
         public async Task OpenAsync()
         {
-            _lock.WaitOne();
-            try {
-                Logger.Debug("Opening " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
-                await Connection.OpenAsync().ConfigureAwait(false);
-            } finally {
-                _lock.ReleaseMutex();
-            }
+            Logger.Debug("Opening " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
+            await Connection.OpenAsync().ConfigureAwait(false);
         }
 
         public void Close()
         {
-            _lock.WaitOne();
-            try {
-                Logger.Debug("Closing " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
-                Connection.Close();
-            } finally {
-                _lock.ReleaseMutex();
-            }
+            Logger.Debug("Closing " + ConnectionSettings.ProviderName + " database connection to " + ConnectionSettings.ConnectionString + "...");
+            Connection.Close();
         }
 
         public DbCommand BuildCommand(string commandText)

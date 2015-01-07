@@ -42,7 +42,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
-        public override IMessageHandlerFactory HandlerFactory { get { return new AuthMessageHandlerFactory(); } }
+        protected override IMessageHandlerFactory HandlerFactory { get { return new AuthMessageHandlerFactory(); } }
 
         public AuthSession(Socket socket) : base(socket)
         {
@@ -96,7 +96,7 @@ namespace EnergonSoftware.Authenticator.Net
                 }
             ).ConfigureAwait(false);
 
-            Disconnect();
+            await DisconnectAsync().ConfigureAwait(false);
         }
 
         public async Task FailureAsync(string reason)
@@ -115,7 +115,7 @@ namespace EnergonSoftware.Authenticator.Net
                 }
             ).ConfigureAwait(false);
 
-            Disconnect();
+            await DisconnectAsync().ConfigureAwait(false);
         }
     }
 }

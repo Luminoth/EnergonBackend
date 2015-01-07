@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Util;
@@ -28,6 +29,8 @@ namespace EnergonSoftware.Core.Net
                 _reader = null == _socket ? null : new BufferedSocketReader(_socket);
             }
         }
+
+        public bool IsValid { get { return null != _socket && null != _reader; } }
 
         public bool Connecting { get; set; }
         public bool Connected { get { return null != _socket && _socket.Connected; } }
@@ -67,6 +70,10 @@ namespace EnergonSoftware.Core.Net
 
         public async Task<int> PollAndReadAsync()
         {
+            if(!IsValid) {
+                return -1;
+            }
+
             int count = await _reader.PollAndReadAsync().ConfigureAwait(false);
             if(count > 0) {
                 LastMessageTime = Time.CurrentTimeMs;
@@ -76,21 +83,28 @@ namespace EnergonSoftware.Core.Net
 
         public async Task<int> SendAsync(byte[] buffer)
         {
+            if(!IsValid) {
+                return -1;
+            }
+
             Logger.Debug("Socket state " + Id + " sending " + buffer.Length + " bytes");
             return await Task.Run(() => _socket.Send(buffer)).ConfigureAwait(false);
         }
 
-        public void ShutdownAndClose(bool reuseSocket)
+        public async Task ShutdownAndCloseAsync(bool reuseSocket)
         {
-            if(null == _socket) {
+            if(!IsValid) {
                 return;
             }
 
             _socket.Shutdown(SocketShutdown.Both);
             if(_socket.Connected) {
-                _socket.Disconnect(reuseSocket);
+                await Task.Run(() => _socket.Disconnect(reuseSocket)).ConfigureAwait(false);
             }
             _socket.Close();
+
+            _reader = null;
+            _socket = null;
         }
     }
 }

@@ -16,6 +16,8 @@ namespace EnergonSoftware.Core.Net
     public sealed class SessionManager
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SessionManager));
+
+        private readonly object _lock = new object();
  
         private readonly List<Session> _sessions = new List<Session>();
 
@@ -23,65 +25,66 @@ namespace EnergonSoftware.Core.Net
 
         public void Add(Session session)
         {
-            _sessions.Add(session);
-            Logger.Info("Added new session: " + session.Id);
+            lock(_lock) {
+                Logger.Info("Managing new session: " + session.Id);
+                _sessions.Add(session);
+            }
         }
 
         public bool Contains(EndPoint remoteEndpoint)
         {
-            return _sessions.Exists(session => session.Connected && remoteEndpoint.Equals(session.RemoteEndPoint));
+            lock(_lock) {
+                return _sessions.Exists(session => session.Connected && remoteEndpoint.Equals(session.RemoteEndPoint));
+            }
         }
 
         public Session Get(EndPoint remoteEndpoint)
         {
-            return _sessions.Find(session => session.Connected && remoteEndpoint.Equals(session.RemoteEndPoint));
+            lock(_lock) {
+                return _sessions.Find(session => session.Connected && remoteEndpoint.Equals(session.RemoteEndPoint));
+            }
         }
 
-        public void DisconnectAll()
+        public async Task DisconnectAllAsync()
         {
-            Logger.Info("Disconnecting all sessions...");
-            _sessions.ForEach(session => session.Disconnect());
-            _sessions.Clear();
+            List<Task> tasks = new List<Task>();
+            lock(_lock) {
+                Logger.Info("Disconnecting all sessions...");
+                _sessions.ForEach(session => tasks.Add(session.DisconnectAsync()));
+            }
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            lock(_lock) {
+                _sessions.Clear();
+            }
         }
 
         public void Cleanup()
         {
-            int count = _sessions.RemoveAll(session => !session.Connecting && !session.Connected);
-            if(count > 0) {
-                Logger.Info("Removed " + count + " disconnected sessions");
-            }
-        }
-
-        private async Task PollAndRunAsync(Session session)
-        {
-            int count = await session.PollAndReadAsync().ConfigureAwait(false);
-            if(count < 0) {
-                session.Disconnect("Socket closed!");
-                return;
-            }
-
-            if(session.TimedOut) {
-                Logger.Info("Session " + session.Id + " timed out!");
-                session.Disconnect("Timed Out!");
-                return;
-            }
-
-            if(session.Connected) {
-                await session.RunAsync().ConfigureAwait(false);
+            lock(_lock) {
+                int count = _sessions.RemoveAll(session => !session.Connecting && !session.Connected);
+                if(count > 0) {
+                    Logger.Info("Removed " + count + " disconnected sessions");
+                }
             }
         }
 
         public async Task PollAndRunAsync()
         {
             List<Task> tasks = new List<Task>();
-            _sessions.ForEach(session => tasks.Add(PollAndRunAsync(session)));
+            lock(_lock) {
+                _sessions.ForEach(session => tasks.Add(session.PollAndRunAsync()));
+            }
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         public async Task BroadcastMessageAsync(IMessage message)
         {
             List<Task> tasks = new List<Task>();
-            _sessions.ForEach(session => tasks.Add(session.SendMessageAsync(message)));
+            lock(_lock) {
+                _sessions.ForEach(session => tasks.Add(session.SendMessageAsync(message)));
+            }
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }

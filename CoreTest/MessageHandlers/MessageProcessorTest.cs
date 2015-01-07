@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Net;
@@ -27,7 +28,6 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
             if(disposing) {
                 if(null != _session) {
                     _session.Dispose();
-                    _session = null;
                 }
             }
         }
@@ -42,9 +42,9 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
         }
 
         [TestCleanup]
-        public void Cleanup()
+        public async Task Cleanup()
         {
-            _manager.DisconnectAll();
+            await _manager.DisconnectAllAsync().ConfigureAwait(false);
         }
 
         [TestMethod]

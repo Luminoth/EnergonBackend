@@ -60,7 +60,7 @@ namespace EnergonSoftware.DbInit
                 Active = true,
                 Username = "shane",
             };
-            shaneAccount.SetPassword(authRealm, "password");
+            await shaneAccount.SetPassword(authRealm, "password").ConfigureAwait(false);
             await shaneAccount.InsertAsync(connection).ConfigureAwait(false);
             Logger.Info("Inserted new account: " + shaneAccount);
 
@@ -69,7 +69,7 @@ namespace EnergonSoftware.DbInit
                 Active = true,
                 Username = "test1",
             };
-            testAccount1.SetPassword(authRealm, "password");
+            await testAccount1.SetPassword(authRealm, "password").ConfigureAwait(false);
             await testAccount1.InsertAsync(connection).ConfigureAwait(false);
             Logger.Info("Inserted new account: " + testAccount1);
 
@@ -78,7 +78,7 @@ namespace EnergonSoftware.DbInit
                 Active = true,
                 Username = "test2",
             };
-            testAccount2.SetPassword(authRealm, "password");
+            await testAccount2.SetPassword(authRealm, "password").ConfigureAwait(false);
             await testAccount2.InsertAsync(connection).ConfigureAwait(false);
             Logger.Info("Inserted new account: " + testAccount2);
 

@@ -98,7 +98,7 @@ namespace EnergonSoftware.Chat
             _listener.CloseSockets();
 
             Logger.Debug("Disconnecting sessions...");
-            _sessions.DisconnectAll();
+            _sessions.DisconnectAllAsync().Wait();
 
             Logger.Debug("Stopping instance notifier...");
             InstanceNotifier.Instance.Stop();

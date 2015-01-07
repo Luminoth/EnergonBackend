@@ -80,14 +80,14 @@ namespace EnergonSoftware.Launcher
             await Task.Run(() => OnIdle());
         }
 
-        private void Application_Exit(object sender, ExitEventArgs e)
+        private async void Application_Exit(object sender, ExitEventArgs e)
         {
             Logger.Info("Exiting...");
             _quit = true;
 
             // TODO: logout?
 
-            Sessions.DisconnectAll();
+            await Sessions.DisconnectAllAsync();
 
             Logger.Info("Goodbye!");
         }
@@ -103,13 +103,13 @@ namespace EnergonSoftware.Launcher
             _overmindSession = new OvermindSession();
             _overmindSession.OnDisconnect += OnDisconnectCallback;
             _overmindSession.OnError += OnErrorCallback;
-            await _overmindSession.BeginConnectAsync(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"])).ConfigureAwait(false);
+            await _overmindSession.ConnectAsync(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"])).ConfigureAwait(false);
             Sessions.Add(_overmindSession);
 
             _chatSession = new ChatSession();
             _chatSession.OnDisconnect += OnDisconnectCallback;
             _chatSession.OnError += OnErrorCallback;
-            await _chatSession.BeginConnectAsync(ConfigurationManager.AppSettings["chatHost"], Convert.ToInt32(ConfigurationManager.AppSettings["chatPort"])).ConfigureAwait(false);
+            await _chatSession.ConnectAsync(ConfigurationManager.AppSettings["chatHost"], Convert.ToInt32(ConfigurationManager.AppSettings["chatPort"])).ConfigureAwait(false);
             Sessions.Add(_chatSession);
         }
 

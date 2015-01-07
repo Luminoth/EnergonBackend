@@ -99,10 +99,10 @@ namespace EnergonSoftware.Database.Models
             Id = -1;
         }
 
-        public void SetPassword(string realm, string password)
+        public async Task SetPassword(string realm, string password)
         {
-            PasswordMD5 = new MD5().DigestPasswordAsync(Username, realm, password).Result;
-            PasswordSHA512 = new SHA512().DigestPasswordAsync(Username, realm, password).Result;
+            PasswordMD5 = await new MD5().DigestPasswordAsync(Username, realm, password).ConfigureAwait(false);
+            PasswordSHA512 = await new SHA512().DigestPasswordAsync(Username, realm, password).ConfigureAwait(false);
 
             Dirty = true;
         }

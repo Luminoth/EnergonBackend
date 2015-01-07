@@ -25,7 +25,7 @@ namespace EnergonSoftware.Launcher.Net
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
-        public override IMessageHandlerFactory HandlerFactory { get { return new MessageHandlerFactory(); } }
+        protected override IMessageHandlerFactory HandlerFactory { get { return new MessageHandlerFactory(); } }
 
         public ChatSession() : base()
         {
@@ -36,23 +36,20 @@ namespace EnergonSoftware.Launcher.Net
             await PingAsync().ConfigureAwait(false);
         }
 
-        private void OnConnectFailedCallback(object sender, ConnectEventArgs e)
+        public async Task ConnectAsync(string host, int port)
         {
-            Error("Failed to connect to the overmind server: " + e.Error);
-        }
+            try {
+                await ConnectAsync(host, port, SocketType.Stream, ProtocolType.Tcp).ConfigureAwait(false);
+                if(!Connected) {
+                    await ErrorAsync("Failed to connect to the chat server").ConfigureAwait(false);
+                    return;
+                }
 
-        private async void OnConnectSuccessCallback(object sender, ConnectEventArgs e)
-        {
-            await LoginAsync().ConfigureAwait(false);
-
-            await SetVisibilityAsync(Visibility.Online).ConfigureAwait(false);
-        }
-
-        public async Task BeginConnectAsync(string host, int port)
-        {
-            OnConnectSuccess += OnConnectSuccessCallback;
-            OnConnectFailed += OnConnectFailedCallback;
-            await ConnectAsync(host, port).ConfigureAwait(false);
+                await LoginAsync().ConfigureAwait(false);
+                await SetVisibilityAsync(Visibility.Online).ConfigureAwait(false);
+            } catch(SocketException e) {
+                ErrorAsync("Failed to connect to the chat server: " + e.Message).Wait();
+            }
         }
 
         private async Task LoginAsync()
@@ -74,7 +71,7 @@ namespace EnergonSoftware.Launcher.Net
                 }
             ).ConfigureAwait(false);
 
-            Disconnect();
+            await DisconnectAsync().ConfigureAwait(false);
         }
 
         public async Task PingAsync()

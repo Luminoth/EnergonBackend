@@ -61,7 +61,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColumnDescription.cs" />
     <Compile Include="DatabaseConnection.cs" />
+    <Compile Include="DatabaseType.cs" />
     <Compile Include="Models\AccountFriend.cs" />
     <Compile Include="Models\AccountInfo.cs" />
     <Compile Include="Models\DatabaseObject.cs" />

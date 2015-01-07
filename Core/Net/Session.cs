@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
@@ -31,12 +32,6 @@ namespace EnergonSoftware.Core.Net
 #endregion
 
 #region Events
-        public delegate void OnConnectSuccessHandler(object sender, ConnectEventArgs e);
-        public event OnConnectSuccessHandler OnConnectSuccess;
-        
-        public delegate void OnConnectFailedHandler(object sender, ConnectEventArgs e);
-        public event OnConnectFailedHandler OnConnectFailed;
-
         public delegate void OnDisconnectHandler(object sender, DisconnectEventArgs e);
         public event OnDisconnectHandler OnDisconnect;
 
@@ -49,7 +44,7 @@ namespace EnergonSoftware.Core.Net
 #region Message Properties
         public abstract IMessagePacketParser Parser { get; }
         public abstract IMessageFormatter Formatter { get; }
-        public abstract IMessageHandlerFactory HandlerFactory { get; }
+        protected abstract IMessageHandlerFactory HandlerFactory { get; }
 
         protected readonly MessageProcessor Processor;
 #endregion
@@ -94,49 +89,11 @@ namespace EnergonSoftware.Core.Net
         protected virtual void Dispose(bool disposing)
         {
             if(disposing) {
-                Processor.Stop();
                 Processor.Dispose();
-
                 _socketState.Dispose();
             }
         }
 #endregion
-
-        private void OnConnectAsyncFailedCallback(object sender, ConnectEventArgs e)
-        {
-            Logger.Error("Session " + Id + " connect failed: " + e.Error);
-
-            Disconnect(e.Error.ToString());
-
-            if(null != OnConnectFailed) {
-                OnConnectFailed(sender, e);
-            }
-        }
-
-        private void OnConnectAsyncSuccessCallback(object sender, ConnectEventArgs e)
-        {
-            Logger.Info("Connected session " + Id + " to " + e.Socket.RemoteEndPoint);
-            _socketState.Socket = e.Socket;
-            _socketState.Connecting = false;
-
-            if(null != OnConnectSuccess) {
-                OnConnectSuccess(sender, e);
-            }
-        }
-
-        public async Task ConnectAsync(string host, int port)
-        {
-            Logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
-            _socketState.Connecting = true;
-
-            AsyncConnectEventArgs args = new AsyncConnectEventArgs()
-            {
-                Sender = this,
-            };
-            args.OnConnectFailed += OnConnectAsyncFailedCallback;
-            args.OnConnectSuccess += OnConnectAsyncSuccessCallback;
-            await NetUtil.ConnectAsync(host, port, args).ConfigureAwait(false);
-        }
 
         public async Task ConnectAsync(string host, int port, SocketType socketType, ProtocolType protocolType)
         {
@@ -150,39 +107,23 @@ namespace EnergonSoftware.Core.Net
             _socketState.Socket = await NetUtil.ConnectMulticastAsync(group, port, ttl).ConfigureAwait(false);
         }
 
-        public void Disconnect(string reason=null)
+        public async Task DisconnectAsync(string reason=null)
         {
-            if(!Connected) {
-                return;
-            }
-
             try {
+                if(!Connected) {
+                    return;
+                }
+
                 Logger.Info("Session " + Id + " disconnecting: " + reason);
-                _socketState.ShutdownAndClose(false);
+                await _socketState.ShutdownAndCloseAsync(false).ConfigureAwait(false);
 
                 if(null != OnDisconnect) {
                     OnDisconnect(this, new DisconnectEventArgs() { Reason = reason });
                 }
+
+                Processor.Stop();
             } catch(SocketException e) {
                 Logger.Error("Error disconnecting socket!", e);
-            }
-        }
-
-        public async Task<int> PollAndReadAsync()
-        {
-            if(!Connected) {
-                return -1;
-            }
-
-            try {
-                int count = await _socketState.PollAndReadAsync().ConfigureAwait(false);
-                if(count > 0) {
-                    Logger.Debug("Session " + Id + " read " + count + " bytes");
-                }
-                return count;
-            } catch(SocketException e) {
-                Error(e);
-                return -1;
             }
         }
 
@@ -191,13 +132,50 @@ namespace EnergonSoftware.Core.Net
             await _socketState.Buffer.WriteAsync(data, offset, count).ConfigureAwait(false);
         }
 
+        public async Task<int> PollAndReadAsync()
+        {
+            try {
+                if(!Connected) {
+                    return -1;
+                }
+
+                int count = await _socketState.PollAndReadAsync().ConfigureAwait(false);
+                if(count > 0) {
+                    Logger.Debug("Session " + Id + " read " + count + " bytes");
+                }
+                return count;
+            } catch(SocketException e) {
+                InternalErrorAsync(e).Wait();
+                return -1;
+            }
+        }
+
+        public async Task PollAndRunAsync()
+        {
+            int count = await PollAndReadAsync().ConfigureAwait(false);
+            if(count < 0) {
+                await DisconnectAsync("Socket closed!").ConfigureAwait(false);
+                return;
+            }
+
+            if(TimedOut) {
+                Logger.Info("Session " + Id + " timed out!");
+                await DisconnectAsync("Timed Out!").ConfigureAwait(false);
+                return;
+            }
+
+            if(Connected) {
+                await RunAsync().ConfigureAwait(false);
+            }
+        }
+
         public async Task RunAsync()
         {
             try {
                 await Processor.ParseMessagesAsync(_socketState.Buffer).ConfigureAwait(false);
                 await OnRunAsync().ConfigureAwait(false);
             } catch(MessageException e) {
-                Error("Exception while parsing messages!", e);
+                InternalErrorAsync("Exception while parsing messages!", e).Wait();
             }
         }
 
@@ -208,51 +186,70 @@ namespace EnergonSoftware.Core.Net
 
         public async Task SendMessageAsync(IMessage message)
         {
-            if(!Connected) {
-                return;
-            }
-
             try {
+                if(!Connected) {
+                    return;
+                }
+
                 MessagePacket packet = Parser.Create();
                 packet.Content = message;
-
                 Logger.Debug("Sending packet: " + packet);
 
                 byte[] bytes = await packet.SerializeAsync(Formatter).ConfigureAwait(false);
                 Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
                 await _socketState.SendAsync(bytes).ConfigureAwait(false);
             } catch(SocketException e) {
-                Error("Error sending message!", e);
+                InternalErrorAsync("Error sending message!", e).Wait();
             } catch(MessageException e) {
-                Error("Error sending message!", e);
+                InternalErrorAsync("Error sending message!", e).Wait(); 
+            }
+        }
+
+        public async Task HandleMessageAsync(IMessage message)
+        {
+            try {
+                Logger.Debug("Handling message with type=" + message.Type + " for session " + Id + "...");
+
+                MessageHandler messageHandler = HandlerFactory.Create(message.Type);
+                if(null == messageHandler) {
+                    await InternalErrorAsync("Session " + Id + " could not create handler for message type: " + message.Type).ConfigureAwait(false);
+                    return;
+                }
+
+                await messageHandler.HandleMessageAsync(message, this).ConfigureAwait(false);
+                Logger.Debug("Handler for message with type=" + message.Type + " for session " + Id + " took " + messageHandler.RuntimeMs + "ms to complete");
+            } catch(MessageHandlerException e) {
+                InternalErrorAsync("Error handling message for session " + Id, e).Wait();
+            } catch(Exception e) {
+                InternalErrorAsync("Unhandled message processing exception for session + " + Id + "!", e).Wait();
             }
         }
 
 #region Internal Errors
-        public void InternalError(string error)
+        public async Task InternalErrorAsync(string error)
         {
             Logger.Error("Session " + Id + " encountered an internal error: " + error);
-            Disconnect("Internal Error");
+            await DisconnectAsync("Internal Error").ConfigureAwait(false);
 
             if(null != OnError) {
                 OnError(this, new ErrorEventArgs() { Error = error });
             }
         }
 
-        public void InternalError(string error, Exception ex)
+        public async Task InternalErrorAsync(string error, Exception ex)
         {
             Logger.Error("Session " + Id + " encountered an internal error: " + error, ex);
-            Disconnect("Internal Error");
+            await DisconnectAsync("Internal Error").ConfigureAwait(false);
 
             if(null != OnError) {
                 OnError(this, new ErrorEventArgs() { Error = error, Exception = ex });
             }
         }
 
-        public void InternalError(Exception ex)
+        public async Task InternalErrorAsync(Exception ex)
         {
             Logger.Error("Session " + Id + " encountered an internal error", ex);
-            Disconnect("Internal Error");
+            await DisconnectAsync("Internal Error").ConfigureAwait(false);
 
             if(null != OnError) {
                 OnError(this, new ErrorEventArgs() { Exception = ex });
@@ -261,30 +258,30 @@ namespace EnergonSoftware.Core.Net
 #endregion
 
 #region Errors
-        public void Error(string error)
+        public async Task ErrorAsync(string error)
         {
             Logger.Error("Session " + Id + " encountered an error: " + error);
-            Disconnect(error);
+            await DisconnectAsync(error).ConfigureAwait(false);
 
             if(null != OnError) {
                 OnError(this, new ErrorEventArgs() { Error = error });
             }
         }
 
-        public void Error(string error, Exception ex)
+        public async Task ErrorAsync(string error, Exception ex)
         {
             Logger.Error("Session " + Id + " encountered an error: " + error, ex);
-            Disconnect(error);
+            await DisconnectAsync(error).ConfigureAwait(false);
 
             if(null != OnError) {
                 OnError(this, new ErrorEventArgs() { Error = error, Exception = ex });
             }
         }
 
-        public void Error(Exception ex)
+        public async Task ErrorAsync(Exception ex)
         {
             Logger.Error("Session " + Id + " encountered an error", ex);
-            Disconnect(ex.Message);
+            await DisconnectAsync(ex.Message).ConfigureAwait(false);
 
             if(null != OnError) {
                 OnError(this, new ErrorEventArgs() { Exception = ex });

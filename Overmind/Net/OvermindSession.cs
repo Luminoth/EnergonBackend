@@ -34,7 +34,7 @@ namespace EnergonSoftware.Overmind.Net
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
-        public override IMessageHandlerFactory HandlerFactory { get { return new OvermindMessageHandlerFactory(); } }
+        protected override IMessageHandlerFactory HandlerFactory { get { return new OvermindMessageHandlerFactory(); } }
 
         public OvermindSession(Socket socket) : base(socket)
         {

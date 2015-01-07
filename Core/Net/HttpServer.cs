@@ -16,7 +16,7 @@ namespace EnergonSoftware.Core.Net
 
         private readonly HttpListener _listener = new HttpListener();
 
-        private volatile bool _running = false;
+        private CancellationTokenSource _cancellationToken;
         private Task _task;
 
         public string DefaultIndex { get; set; }
@@ -37,54 +37,65 @@ namespace EnergonSoftware.Core.Net
         {
             if(disposing) {
                 _listener.Close();
+                _cancellationToken.Dispose();
             }
         }
 #endregion
 
         public void Start(List<string> prefixes)
         {
+            if(null != _task) {
+                throw new InvalidOperationException("HTTP server already running!");
+            }
+
             Logger.Debug("Starting HttpServer...");
 
             prefixes.ForEach(prefix => _listener.Prefixes.Add(prefix));
 
             _listener.Start();
-            _task = Task.Run(() => Run());
+
+            _cancellationToken = new CancellationTokenSource();
+            _task = Task.Run(async () =>
+                {
+                    // TODO: capture exceptions
+                    while(!_cancellationToken.IsCancellationRequested) {
+                        await RunAsync().ConfigureAwait(false);
+                    }
+                }, _cancellationToken.Token);
         }
 
         public void Stop()
         {
-            if(!_running) {
+            if(null == _task || _cancellationToken.IsCancellationRequested) {
                 return;
             }
 
             Logger.Debug("Stopping HttpServer...");
 
+            _cancellationToken.Cancel();
             _listener.Stop();
             _task.Wait();
-            _task = null;
-        }
 
-        private void Run()
-        {
-            RunAsync().Wait();
+            _task = null;
+            _cancellationToken = null;
+
+            Logger.Debug("HTTP server finished!");
         }
 
         private async Task RunAsync()
         {
+            if(!_listener.IsListening) {
+                return;
+            }
+
             try {
-                _running = true;
-                while(_listener.IsListening) {
-                    HttpListenerContext context = await _listener.GetContextAsync().ConfigureAwait(false);
-                    await HandleRequestAsync(context.Request, context.Response).ConfigureAwait(false);
-                }
+                HttpListenerContext context = await _listener.GetContextAsync().ConfigureAwait(false);
+                await HandleRequestAsync(context.Request, context.Response).ConfigureAwait(false);
             } catch(HttpListenerException e) {
+                // ignore the normal exit error code
                 if(995 != e.ErrorCode) {
-                    Logger.Error("Unhandled Exception!", e);
+                    throw;
                 }
-            } catch(Exception e) {
-                Logger.Fatal("Unhandled Exception!", e);
-            } finally {
-                _running = false;
             }
         }
 
@@ -118,6 +129,7 @@ namespace EnergonSoftware.Core.Net
 
             Logger.Debug("Reading content for url=" + url);
             if(DefaultIndex == url) {
+                // TODO: read from disk or whatever
 string data = "<html><head><title>HttpServer Test</title></head><body>Hello World!</body></html>";
 await Task.Delay(1).ConfigureAwait(false);
                 return encoding.GetBytes(data);

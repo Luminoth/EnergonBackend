@@ -14,8 +14,6 @@ namespace EnergonSoftware.Core.Util
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MemoryBuffer));
 
-        private readonly Mutex _lock = new Mutex();
-
         public readonly Stream Buffer;
         public int Capacity { get { return ((MemoryStream)Buffer).Capacity; } }
         public int Length { get { return (int)Buffer.Length; } }
@@ -54,97 +52,56 @@ namespace EnergonSoftware.Core.Util
         {
             if(disposing) {
                 Buffer.Dispose();
-                _lock.Dispose();
             }
         }
 #endregion
 
         public async Task WriteAsync(byte[] value, int offset, int count)
         {
-            _lock.WaitOne();
-            try {
-                await Buffer.WriteAsync(value, offset, count).ConfigureAwait(false);
-            } finally {
-                _lock.ReleaseMutex();
-            }
+            await Buffer.WriteAsync(value, offset, count).ConfigureAwait(false);
         }
 
         public async Task<int> PeekAsync(byte[] value, int offset, int count)
         {
-            _lock.WaitOne();
-            try {
-                int read = await Buffer.ReadAsync(value, offset, count).ConfigureAwait(false);
-                Buffer.Seek(-read, SeekOrigin.Current);
-                return read;
-            } finally {
-                _lock.ReleaseMutex();
-            }
+            int read = await Buffer.ReadAsync(value, offset, count).ConfigureAwait(false);
+            Buffer.Seek(-read, SeekOrigin.Current);
+            return read;
         }
 
         public async Task<int> ReadAsync(byte[] value, int offset, int count)
         {
-            _lock.WaitOne();
-            try {
-                return await Buffer.ReadAsync(value, offset, count).ConfigureAwait(false);
-            } finally {
-                _lock.ReleaseMutex();
-            }
+            return await Buffer.ReadAsync(value, offset, count).ConfigureAwait(false);
         }
 
         public void Clear()
         {
-            _lock.WaitOne();
-            try {
-                Buffer.Position = 0;
-                Buffer.SetLength(0);
-            } finally {
-                _lock.ReleaseMutex();
-            }
+            Buffer.Position = 0;
+            Buffer.SetLength(0);
         }
 
         public async Task CompactAsync()
         {
-            _lock.WaitOne();
-            try {
-                byte[] buffer = ToArray();
-                int position = (int)Position;
+            byte[] buffer = ToArray();
+            int position = (int)Position;
 
-                Clear();
-                await WriteAsync(buffer, position, buffer.Length - position).ConfigureAwait(false);
-            } finally {
-                _lock.ReleaseMutex();
-            }
+            Clear();
+            await WriteAsync(buffer, position, buffer.Length - position).ConfigureAwait(false);
         }
 
         public void Flip()
         {
-            _lock.WaitOne();
-            try {
-                Buffer.SetLength(Position);
-                Buffer.Position = 0;
-            } finally {
-                _lock.ReleaseMutex();
-            }
+            Buffer.SetLength(Position);
+            Buffer.Position = 0;
         }
 
         public void Reset()
         {
-            _lock.WaitOne();
-            try {
-                Buffer.Position = Length;
-            } finally {
-                _lock.ReleaseMutex();
-            }
+            Buffer.Position = Length;
         }
 
         public byte[] ToArray()
         {
-            _lock.WaitOne();
-            try {
-                return ((MemoryStream)Buffer).ToArray();
-            } finally {
-                _lock.ReleaseMutex();
-            }
+            return ((MemoryStream)Buffer).ToArray();
         }
     }
 }

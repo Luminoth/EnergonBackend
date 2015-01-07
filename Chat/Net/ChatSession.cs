@@ -34,7 +34,7 @@ namespace EnergonSoftware.Chat.Net
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
-        public override IMessageHandlerFactory HandlerFactory { get { return new ChatMessageHandlerFactory(); } }
+        protected override IMessageHandlerFactory HandlerFactory { get { return new ChatMessageHandlerFactory(); } }
 
         public ChatSession(Socket socket) : base(socket)
         {

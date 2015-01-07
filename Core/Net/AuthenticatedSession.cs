@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Accounts;
@@ -38,11 +39,16 @@ namespace EnergonSoftware.Core.Net
 
         public async Task LoginAsync(string username, string sessionid)
         {
+            if(null != Account) {
+                await ErrorAsync("Session already authenticated!").ConfigureAwait(false);
+                return;
+            }
+
             Logger.Info("Login request from username=" + username + ", with sessionid=" + sessionid);
 
             Account lookupAccount = await LookupAccountAsync(username).ConfigureAwait(false);
             if(null == lookupAccount) {
-                Error("Invalid login: " + username);
+                await ErrorAsync("Invalid login: " + username).ConfigureAwait(false);
                 return;
             }
             Account = lookupAccount;
@@ -56,7 +62,7 @@ namespace EnergonSoftware.Core.Net
 
             Logger.Debug("Authenticating login account: " + loginAccount);
             if(!Authenticate(loginAccount)) {
-                Error("Invalid login account: " + loginAccount + ", expected: " + Account);
+                await ErrorAsync("Invalid login account: " + loginAccount + ", expected: " + Account).ConfigureAwait(false);
                 return;
             }
 
@@ -67,8 +73,7 @@ namespace EnergonSoftware.Core.Net
         public async Task LogoutAsync()
         {
             await SendMessageAsync(new LogoutMessage()).ConfigureAwait(false);
-
-            Disconnect();
+            await DisconnectAsync().ConfigureAwait(false);
 
             Account = null;
         }

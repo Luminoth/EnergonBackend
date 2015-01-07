@@ -13,6 +13,8 @@ namespace EnergonSoftware.Core.Net
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SocketListener));
 
+        private readonly object _lock = new object();
+
         private readonly List<Socket> _listenSockets = new List<Socket>();
         private readonly ISessionFactory _factory;
 
@@ -32,34 +34,38 @@ namespace EnergonSoftware.Core.Net
 
         public void CreateSockets(ListenAddressConfigurationElementCollection listenAddresses)
         {
-            foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
-                Logger.Info("Listening on address " + listenAddress + "...");
+            lock(_lock) {
+                foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
+                    Logger.Info("Listening on address " + listenAddress + "...");
 
-                try {
-                    IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
-                    Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                    socket.Bind(endpoint);
-                    socket.Listen(SocketBacklog);
-                    _listenSockets.Add(socket);
-                } catch(SocketException e) {
-                    Logger.Error("Exception creating socket!", e);
+                    try {
+                        IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
+                        Socket socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                        socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                        socket.Bind(endpoint);
+                        socket.Listen(SocketBacklog);
+                        _listenSockets.Add(socket);
+                    } catch(SocketException e) {
+                        Logger.Error("Exception creating socket!", e);
+                    }
                 }
             }
         }
 
         public void CloseSockets()
         {
-            Logger.Info("Closing listen sockets...");
-            _listenSockets.ForEach(socket => socket.Close());
-            _listenSockets.Clear();
+            lock(_lock) {
+                Logger.Info("Closing listen sockets...");
+                _listenSockets.ForEach(socket => socket.Close());
+                _listenSockets.Clear();
+            }
         }
 
-        private void Poll(Socket socket, SessionManager manager)
+        private async Task PollAsync(Socket socket, SessionManager manager)
         {
             try {
                 if(socket.Poll(100, SelectMode.SelectRead)) {
-                    Socket remote = socket.Accept();
+                    Socket remote = await Task.Run(() => socket.Accept()).ConfigureAwait(false);
                     Logger.Info("New connection from " + remote.RemoteEndPoint);
 
                     if(MaxConnections >= 0 && manager.Count >= MaxConnections) {
@@ -79,7 +85,9 @@ namespace EnergonSoftware.Core.Net
         public async Task PollAsync(SessionManager manager)
         {
             List<Task> tasks = new List<Task>();
-            _listenSockets.ForEach(socket => tasks.Add(Task.Run(() => Poll(socket, manager))));
+            lock(_lock) {
+                _listenSockets.ForEach(socket => tasks.Add(PollAsync(socket, manager)));
+            }
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }

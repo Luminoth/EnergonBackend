@@ -39,7 +39,7 @@ namespace EnergonSoftware.Manager.Net
         public void Stop()
         {
             Logger.Debug("Disconnecting instance notifier sessions...");
-            _sessions.DisconnectAll();
+            _sessions.DisconnectAllAsync().Wait();
         }
 
         public async Task RunAsync()

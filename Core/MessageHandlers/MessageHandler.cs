@@ -16,6 +16,9 @@ namespace EnergonSoftware.Core.MessageHandlers
 
     public class MessageHandler
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageHandler));
+
+        private bool _running = false;
         public bool Finished { get; private set; }
 
         private long _startTime, _finishTime;
@@ -32,6 +35,11 @@ namespace EnergonSoftware.Core.MessageHandlers
 
         public async Task HandleMessageAsync(IMessage message, Session session)
         {
+            if(_running) {
+                throw new MessageHandlerException("Handler is already running!");
+            }
+            _running = true;
+
             Authenticate(message as IAuthenticatedMessage, session as AuthenticatedSession);
 
             Finished = false;
