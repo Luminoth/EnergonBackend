@@ -37,11 +37,11 @@ namespace EnergonSoftware.Core.Net
 
         protected abstract Task<Account> LookupAccountAsync(string username);
 
-        public async Task LoginAsync(string username, string sessionid)
+        public async Task<bool> LoginAsync(string username, string sessionid)
         {
             if(null != Account) {
                 await ErrorAsync("Session already authenticated!").ConfigureAwait(false);
-                return;
+                return false;
             }
 
             Logger.Info("Login request from username=" + username + ", with sessionid=" + sessionid);
@@ -49,7 +49,7 @@ namespace EnergonSoftware.Core.Net
             Account lookupAccount = await LookupAccountAsync(username).ConfigureAwait(false);
             if(null == lookupAccount) {
                 await ErrorAsync("Invalid login: " + username).ConfigureAwait(false);
-                return;
+                return false;
             }
             Account = lookupAccount;
 
@@ -63,11 +63,13 @@ namespace EnergonSoftware.Core.Net
             Logger.Debug("Authenticating login account: " + loginAccount);
             if(!Authenticate(loginAccount)) {
                 await ErrorAsync("Invalid login account: " + loginAccount + ", expected: " + Account).ConfigureAwait(false);
-                return;
+                return false;
             }
 
             Logger.Info("Login for username=" + username + " successful!");
             await SendMessageAsync(new LoginMessage()).ConfigureAwait(false);
+
+            return true;
         }
 
         public async Task LogoutAsync()

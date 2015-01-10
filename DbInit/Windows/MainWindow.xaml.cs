@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Windows;
 
-namespace EnergonSoftware.DbInit
+namespace EnergonSoftware.DbInit.Windows
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static MainWindow Instance { get { return (MainWindow)Application.Current.MainWindow; } }
+
         public static void AppendOutputText(string text)
         {
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
                 if(null != Application.Current.MainWindow) {
-                    ((MainWindow)Application.Current.MainWindow).OutputText.AppendText(text);
+                    MainWindow.Instance.OutputText.AppendText(text);
                 }
             }));
         }
@@ -23,7 +25,7 @@ namespace EnergonSoftware.DbInit
             Application.Current.Dispatcher.Invoke(new Action(() =>
             {
                 if(null != Application.Current.MainWindow) {
-                    ((MainWindow)Application.Current.MainWindow).StatusBarText.Text = text;
+                    MainWindow.Instance.StatusBarText.Text = text;
                 }
             }));
         }
@@ -54,9 +56,9 @@ namespace EnergonSoftware.DbInit
             OutputText.Clear();
             SetStatusBarText("Running...");
 
-            ((App)Application.Current).Running = true;
+            App.Instance.Running = true;
             await DatabaseManager.InitializeDatabaseAsync().ConfigureAwait(false);
-            ((App)Application.Current).Running = false;
+            App.Instance.Running = false;
 
             SetStatusBarText("Success!");
         }

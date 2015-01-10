@@ -46,6 +46,8 @@ namespace EnergonSoftware.Core.Messages
                 return new SuccessMessage();
 
             /* chat */
+            case FriendListMessage.MessageType:
+                return new FriendListMessage();
             case VisibilityMessage.MessageType:
                 return new VisibilityMessage();
             }

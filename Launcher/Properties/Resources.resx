@@ -123,6 +123,9 @@
   <data name="CloseLabel" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="DebugWindowTitle" xml:space="preserve">
+    <value>Debug</value>
+  </data>
   <data name="LoginButtonLabel" xml:space="preserve">
     <value>Login</value>
   </data>
@@ -137,6 +140,9 @@
   </data>
   <data name="PasswordLabel" xml:space="preserve">
     <value>Password:</value>
+  </data>
+  <data name="ProgressLabel" xml:space="preserve">
+    <value>Logging in, please wait...</value>
   </data>
   <data name="UpdatesLabel" xml:space="preserve">
     <value>Checking for updates...</value>

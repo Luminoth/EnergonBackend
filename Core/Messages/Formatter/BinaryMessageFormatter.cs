@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -8,6 +9,12 @@ namespace EnergonSoftware.Core.Messages.Formatter
 {
     public sealed class BinaryMessageFormatter : IMessageFormatter
     {
+        public async Task WriteListAsync<T>(List<T> value, Stream stream) where T : IMessageSerializable
+        {
+            await WriteIntAsync(value.Count, stream).ConfigureAwait(false);
+            value.ForEach(async (v) => await v.SerializeAsync(stream, this).ConfigureAwait(false));
+        }
+
         public async Task WriteStringAsync(string value, Stream stream)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(value);
@@ -58,6 +65,19 @@ namespace EnergonSoftware.Core.Messages.Formatter
         public async Task WriteAsync(byte[] value, int offset, int count, Stream stream)
         {
             await stream.WriteAsync(value, offset, count).ConfigureAwait(false);
+        }
+
+        public async Task<List<T>> ReadListAsync<T>(Stream stream) where T : IMessageSerializable, new()
+        {
+            List<T> values = new List<T>();
+
+            int count = await ReadIntAsync(stream).ConfigureAwait(false);
+            for(int i=0; i<count; ++i) {
+                T value = new T();
+                await value.DeSerializeAsync(stream, this).ConfigureAwait(false);
+                values.Add(value);
+            }
+            return values;
         }
 
         public async Task<string> ReadStringAsync(Stream stream)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using EnergonSoftware.Chat.MessageHandlers;
 using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
@@ -55,6 +57,20 @@ namespace EnergonSoftware.Chat.Net
         public async Task PingAsync()
         {
             await SendMessageAsync(new PingMessage()).ConfigureAwait(false);
+        }
+
+        public async Task SyncFriends()
+        {
+            List<Account> friends = new List<Account>();
+            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
+                friends = await AccountInfo.ReadFriendsAsync(connection, Account.Id).ConfigureAwait(false);
+            }
+
+            await SendMessageAsync(new FriendListMessage()
+                {
+                    Friends = friends,
+                }
+            ).ConfigureAwait(false);
         }
     }
 }

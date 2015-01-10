@@ -11,6 +11,7 @@ using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Launcher.MessageHandlers;
 using EnergonSoftware.Launcher.Net;
+using EnergonSoftware.Launcher.Windows;
 
 using log4net;
 using log4net.Config;
@@ -24,12 +25,24 @@ namespace EnergonSoftware.Launcher
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(App));
 
+        public static App Instance { get { return (App)Application.Current; } }
+
+#region Window Properties
+        public readonly DebugWindow DebugWindow = new DebugWindow();
+#endregion
+
+#region Network Properties
         private static readonly SessionManager Sessions = new SessionManager();
         private static OvermindSession _overmindSession;
         private static ChatSession _chatSession;
+#endregion
 
-        private static volatile bool _quit;
+#region Idle Properties
+        private static Task _idleTask;
+        private static CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+#endregion
 
+#region Idle Handlers
         private static void OnIdle()
         {
             OnIdleAsync().Wait();
@@ -37,19 +50,35 @@ namespace EnergonSoftware.Launcher
 
         private static async Task OnIdleAsync()
         {
-            Logger.Info("**Idle mark**");
-            while(!_quit) {
+            Logger.Debug("**Idle mark**");
+            while(!_cancellationToken.IsCancellationRequested) {
                 try {
                     await Sessions.PollAndRunAsync().ConfigureAwait(false);
                     Sessions.Cleanup();
                 } catch(Exception e) {
                     Logger.Info("Unhandled Exception!", e);
-                    ((App)Application.Current).OnError(e.Message, "Unhandled Exception!");
+                    App.Instance.OnError(e.Message, "Unhandled Exception!");
                 }
 
                 Thread.Sleep(0);
             }
         }
+#endregion
+
+#region Dispose
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if(disposing) {
+                _cancellationToken.Dispose();
+            }
+        }
+#endregion
 
         private void ConfigureLogging()
         {
@@ -77,17 +106,19 @@ namespace EnergonSoftware.Launcher
             // have to run this in a separate thread
             // so that we don't lock up the UI
             Logger.Info("Starting idle thread...");
-            await Task.Run(() => OnIdle());
+            _idleTask = Task.Run(() =>  OnIdle(), _cancellationToken.Token);
         }
 
         private async void Application_Exit(object sender, ExitEventArgs e)
         {
             Logger.Info("Exiting...");
-            _quit = true;
+            _cancellationToken.Cancel();
 
             // TODO: logout?
 
             await Sessions.DisconnectAllAsync();
+
+            DebugWindow.Close();
 
             Logger.Info("Goodbye!");
         }

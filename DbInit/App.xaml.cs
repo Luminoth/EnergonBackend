@@ -16,6 +16,8 @@ namespace EnergonSoftware.DbInit
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(App));
 
+        public static App Instance { get { return (App)Application.Current; } }
+
         private bool _running = false;
         public bool Running { get { return _running; } set { _running = value; NotifyPropertyChanged(); NotifyPropertyChanged("NotRunning"); } }
         public bool NotRunning { get { return !Running; } }

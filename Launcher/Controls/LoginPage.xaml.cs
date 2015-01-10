@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -14,7 +15,9 @@ namespace EnergonSoftware.Launcher.Controls
             InitializeComponent();
             DataContext = ClientState.Instance;
 
-            IsVisibleChanged += OnVisibleChanged;
+            if(!DesignerProperties.GetIsInDesignMode(this)) {
+                IsVisibleChanged += OnVisibleChanged;
+            }
         }
 
 #region UI Helpers
@@ -30,7 +33,7 @@ namespace EnergonSoftware.Launcher.Controls
 #region Event Handlers
         private async void ButtonLogin_Click(object sender, RoutedEventArgs evt)
         {
-            await ((App)Application.Current).LoginAsync(Password.Password);
+            await App.Instance.LoginAsync(Password.Password);
             ClearPassword();
         }
 

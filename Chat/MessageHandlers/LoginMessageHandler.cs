@@ -17,7 +17,12 @@ namespace EnergonSoftware.Chat.MessageHandlers
         {
             LoginMessage loginMessage = (LoginMessage)message;
             ChatSession chatSession = (ChatSession)session;
-            await chatSession.LoginAsync(loginMessage.Username, loginMessage.SessionId).ConfigureAwait(false);
+
+            if(!await chatSession.LoginAsync(loginMessage.Username, loginMessage.SessionId).ConfigureAwait(false)) {
+                return;
+            }
+
+            await chatSession.SyncFriends().ConfigureAwait(false);
         }
     }
 }

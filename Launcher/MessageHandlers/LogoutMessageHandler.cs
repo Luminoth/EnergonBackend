@@ -15,7 +15,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers
 
         protected async override Task OnHandleMessageAsync(IMessage message, Session session)
         {
-            await ((App)Application.Current).LogoutAsync().ConfigureAwait(false);
+            await App.Instance.LogoutAsync().ConfigureAwait(false);
         }
     }
 }

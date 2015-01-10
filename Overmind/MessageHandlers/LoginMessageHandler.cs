@@ -17,7 +17,10 @@ namespace EnergonSoftware.Overmind.MessageHandlers
         {
             LoginMessage loginMessage = (LoginMessage)message;
             OvermindSession overmindSession = (OvermindSession)session;
-            await overmindSession.LoginAsync(loginMessage.Username, loginMessage.SessionId).ConfigureAwait(false);
+
+            if(!await overmindSession.LoginAsync(loginMessage.Username, loginMessage.SessionId).ConfigureAwait(false)) {
+                return;
+            }
         }
     }
 }

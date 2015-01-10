@@ -79,6 +79,15 @@ namespace EnergonSoftware.Launcher.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Debug.
+        /// </summary>
+        public static string DebugWindowTitle {
+            get {
+                return ResourceManager.GetString("DebugWindowTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Login.
         /// </summary>
         public static string LoginButtonLabel {
@@ -120,6 +129,15 @@ namespace EnergonSoftware.Launcher.Properties {
         public static string PasswordLabel {
             get {
                 return ResourceManager.GetString("PasswordLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Logging in, please wait....
+        /// </summary>
+        public static string ProgressLabel {
+            get {
+                return ResourceManager.GetString("ProgressLabel", resourceCulture);
             }
         }
         
