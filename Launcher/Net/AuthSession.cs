@@ -110,7 +110,6 @@ namespace EnergonSoftware.Launcher.Net
             }
 
             await DisconnectAsync().ConfigureAwait(false);
-            await Task.Delay(0).ConfigureAwait(false);
         }
 
         public async Task AuthFailedAsync(string reason)
@@ -125,7 +124,6 @@ namespace EnergonSoftware.Launcher.Net
             }
 
             await DisconnectAsync().ConfigureAwait(false);
-            await Task.Delay(0).ConfigureAwait(false);
         }
     }
 }

@@ -57,10 +57,10 @@ namespace EnergonSoftware.Launcher
                     Sessions.Cleanup();
                 } catch(Exception e) {
                     Logger.Info("Unhandled Exception!", e);
-                    App.Instance.OnError(e.Message, "Unhandled Exception!");
+                    App.Instance.OnErrorAsync(e.Message, "Unhandled Exception!").Wait();
                 }
 
-                Thread.Sleep(0);
+                await Task.Delay(0).ConfigureAwait(false);
             }
         }
 #endregion
@@ -86,12 +86,14 @@ namespace EnergonSoftware.Launcher
         }
 
 #region UI Helpers
-        public void OnError(string message, string title)
+        public async Task OnErrorAsync(string message, string title)
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                MessageBox.Show(Application.Current.MainWindow, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
-            }));
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    MessageBox.Show(Application.Current.MainWindow, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            );
+            await LogoutAsync().ConfigureAwait(false);
         }
 #endregion
 
@@ -106,7 +108,7 @@ namespace EnergonSoftware.Launcher
             // have to run this in a separate thread
             // so that we don't lock up the UI
             Logger.Info("Starting idle thread...");
-            _idleTask = Task.Run(() =>  OnIdle(), _cancellationToken.Token);
+            _idleTask = Task.Run(() => OnIdle(), _cancellationToken.Token);
         }
 
         private async void Application_Exit(object sender, ExitEventArgs e)
@@ -123,9 +125,9 @@ namespace EnergonSoftware.Launcher
             Logger.Info("Goodbye!");
         }
 
-        private void OnAuthFailedCallback(string reason)
+        private async void OnAuthFailedCallback(string reason)
         {
-            OnError("Authentication failed: " + reason, "Authentication Failed");
+            await OnErrorAsync("Authentication failed: " + reason, "Authentication Failed").ConfigureAwait(false);
             ClientState.Instance.LoggingIn = false;
         }
 
@@ -144,15 +146,15 @@ namespace EnergonSoftware.Launcher
             Sessions.Add(_chatSession);
         }
 
-        private void OnDisconnectCallback(object sender, DisconnectEventArgs e)
+        private /*async*/ void OnDisconnectCallback(object sender, DisconnectEventArgs e)
         {
             Logger.Debug("Disconnected: " + e.Reason);
-            //OnError(reason, "Disconnected!");
+            //await OnErrorAsync(reason, "Disconnected!").ConfigureAwait(false);
         }
 
         private async void OnErrorCallback(object sender, ErrorEventArgs e)
         {
-            OnError(e.Error, "Error!");
+            await OnErrorAsync(e.Error, "Error!").ConfigureAwait(false);
             await LogoutAsync().ConfigureAwait(false);
         }
 #endregion

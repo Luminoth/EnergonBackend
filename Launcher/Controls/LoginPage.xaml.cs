@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,17 +17,18 @@ namespace EnergonSoftware.Launcher.Controls
             DataContext = ClientState.Instance;
 
             if(!DesignerProperties.GetIsInDesignMode(this)) {
-                IsVisibleChanged += OnVisibleChanged;
+                IsVisibleChanged += Visible_Changed;
             }
         }
 
 #region UI Helpers
-        private void ClearPassword()
+        private async Task ClearPasswordAsync()
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                Password.Password = string.Empty;
-            }));
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    Password.Password = string.Empty;
+                }
+            );
         }
 #endregion
 
@@ -34,10 +36,10 @@ namespace EnergonSoftware.Launcher.Controls
         private async void ButtonLogin_Click(object sender, RoutedEventArgs evt)
         {
             await App.Instance.LoginAsync(Password.Password);
-            ClearPassword();
+            await ClearPasswordAsync();
         }
 
-        private async void OnVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private async void Visible_Changed(object sender, DependencyPropertyChangedEventArgs e)
         {
             if(IsVisible) {
                 await NewsChecker.Instance.UpdateNewsAsync();

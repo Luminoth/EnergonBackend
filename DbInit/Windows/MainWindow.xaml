@@ -4,7 +4,8 @@
         xmlns:dbinitprops="clr-namespace:EnergonSoftware.DbInit.Properties"
         Title="{x:Static dbinitprops:Resources.MainWindowTitle}"
         Height="650" Width="825"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Initialized="Window_Initialized">
     <DockPanel>
         <Menu DockPanel.Dock="Top" IsMainMenu="True">
             <MenuItem Header="_File">

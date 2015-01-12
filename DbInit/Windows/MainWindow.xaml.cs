@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace EnergonSoftware.DbInit.Windows
@@ -10,35 +11,40 @@ namespace EnergonSoftware.DbInit.Windows
     {
         public static MainWindow Instance { get { return (MainWindow)Application.Current.MainWindow; } }
 
-        public static void AppendOutputText(string text)
+        public static async Task AppendOutputTextAsync(string text)
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                if(null != Application.Current.MainWindow) {
-                    MainWindow.Instance.OutputText.AppendText(text);
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    if(null != Application.Current.MainWindow) {
+                        MainWindow.Instance.OutputText.AppendText(text);
+                    }
                 }
-            }));
+            );
         }
 
-        public static void SetStatusBarText(string text)
+        public static async Task SetStatusBarTextAsync(string text)
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                if(null != Application.Current.MainWindow) {
-                    MainWindow.Instance.StatusBarText.Text = text;
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    if(null != Application.Current.MainWindow) {
+                        MainWindow.Instance.StatusBarText.Text = text;
+                    }
                 }
-            }));
+            );
         }
 
         public MainWindow()
         {
             InitializeComponent();
             DataContext = Application.Current;
-
-            SetStatusBarText("Waiting...");
         }
 
 #region Event Handlers
+        private async void Window_Initialized(object sender, EventArgs e)
+        {
+            await SetStatusBarTextAsync("Waiting...");
+        }
+
         public void MenuFileExit_Click(object sender, RoutedEventArgs e)
         {
             Close();
@@ -53,20 +59,20 @@ namespace EnergonSoftware.DbInit.Windows
 
         public async void ButtonInitialize_Click(object sender, RoutedEventArgs e)
         {
-            OutputText.Clear();
-            SetStatusBarText("Running...");
+            //OutputText.Clear();
+            await SetStatusBarTextAsync("Running...");
 
             App.Instance.Running = true;
             await DatabaseManager.InitializeDatabaseAsync().ConfigureAwait(false);
             App.Instance.Running = false;
 
-            SetStatusBarText("Success!");
+            await SetStatusBarTextAsync("Success!");
         }
 
-        public void ButtonClear_Click(object sender, RoutedEventArgs e)
+        public async void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
             OutputText.Clear();
-            SetStatusBarText("Waiting...");
+            await SetStatusBarTextAsync("Waiting...");
         }
 #endregion
     }

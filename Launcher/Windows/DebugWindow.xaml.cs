@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace EnergonSoftware.Launcher.Windows
@@ -10,12 +11,13 @@ namespace EnergonSoftware.Launcher.Windows
     {
         public static DebugWindow Instance { get { return App.Instance.DebugWindow; } }
 
-        public static void AppendOutputText(string text)
+        public static async Task AppendOutputTextAsync(string text)
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                DebugWindow.Instance.OutputText.AppendText(text);
-            }));
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    DebugWindow.Instance.OutputText.AppendText(text);
+                }
+            );
         }
 
         public DebugWindow()
