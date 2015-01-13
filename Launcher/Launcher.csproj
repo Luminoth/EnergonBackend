@@ -183,6 +183,10 @@
       <Project>{b8cf252f-2fbc-4d35-90a9-c0adf2b0b9e0}</Project>
       <Name>Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WindowsUtil\WindowsUtil.csproj">
+      <Project>{90bdf00a-9c80-4716-a4f9-888718e550b6}</Project>
+      <Name>WindowsUtil</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

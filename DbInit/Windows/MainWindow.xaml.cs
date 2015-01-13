@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+
+using EnergonSoftware.WindowsUtil;
 
 namespace EnergonSoftware.DbInit.Windows
 {
@@ -11,12 +15,13 @@ namespace EnergonSoftware.DbInit.Windows
     {
         public static MainWindow Instance { get { return (MainWindow)Application.Current.MainWindow; } }
 
-        public static async Task AppendOutputTextAsync(string text)
+        public static async Task AppendOutputTextAsync(string logEntry)
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     if(null != Application.Current.MainWindow) {
-                        MainWindow.Instance.OutputText.AppendText(text);
+                        MainWindow.Instance.OutputText.AppendText(logEntry, LoggerColor.ParseColor(logEntry));
+                        MainWindow.Instance.OutputText.ScrollToEnd();
                     }
                 }
             );
@@ -71,7 +76,7 @@ namespace EnergonSoftware.DbInit.Windows
 
         public async void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
-            OutputText.Clear();
+            //OutputText.Clear();
             await SetStatusBarTextAsync("Waiting...");
         }
 #endregion

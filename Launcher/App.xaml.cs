@@ -56,7 +56,7 @@ namespace EnergonSoftware.Launcher
                     await Sessions.PollAndRunAsync().ConfigureAwait(false);
                     Sessions.Cleanup();
                 } catch(Exception e) {
-                    Logger.Info("Unhandled Exception!", e);
+                    Logger.Fatal("Unhandled Exception!", e);
                     App.Instance.OnErrorAsync(e.Message, "Unhandled Exception!").Wait();
                 }
 

@@ -155,6 +155,10 @@
       <Project>{9821a7a5-8136-4863-ab09-bd5c7e1a6606}</Project>
       <Name>Database</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WindowsUtil\WindowsUtil.csproj">
+      <Project>{90bdf00a-9c80-4716-a4f9-888718e550b6}</Project>
+      <Name>WindowsUtil</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

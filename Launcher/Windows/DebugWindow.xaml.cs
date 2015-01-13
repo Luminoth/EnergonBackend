@@ -1,6 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+
+using EnergonSoftware.WindowsUtil;
 
 namespace EnergonSoftware.Launcher.Windows
 {
@@ -11,11 +14,12 @@ namespace EnergonSoftware.Launcher.Windows
     {
         public static DebugWindow Instance { get { return App.Instance.DebugWindow; } }
 
-        public static async Task AppendOutputTextAsync(string text)
+        public static async Task AppendOutputTextAsync(string logEntry)
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    DebugWindow.Instance.OutputText.AppendText(text);
+                    DebugWindow.Instance.OutputText.AppendText(logEntry, LoggerColor.ParseColor(logEntry));
+                    DebugWindow.Instance.OutputText.ScrollToEnd();
                 }
             );
         }
