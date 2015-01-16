@@ -21,6 +21,11 @@ namespace EnergonSoftware.Launcher.Windows
         {
             DebugWindow.Instance.Show();
         }
+
+        private void MenuItemHelpSettings_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow.Instance.Show();
+        }
 #endregion
     }
 }

@@ -142,6 +142,15 @@ namespace EnergonSoftware.Launcher.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string SettingsWindowTitle {
+            get {
+                return ResourceManager.GetString("SettingsWindowTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Checking for updates....
         /// </summary>
         public static string UpdatesLabel {

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -32,7 +33,7 @@ namespace EnergonSoftware.Launcher.Windows
 #region Event Handlers
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            Hide();
+            Close();
         }
 
         private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -40,6 +41,12 @@ namespace EnergonSoftware.Launcher.Windows
             if(IsVisible) {
                 OutputText.ScrollToEnd();
             }
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            e.Cancel = true;
+            Hide();
         }
 #endregion
     }

@@ -13,6 +13,7 @@
         <Menu DockPanel.Dock="Top" IsMainMenu="True">
             <MenuItem Header="_Help">
                 <MenuItem Header="Debug Window..." Click="MenuHelpDebugWindow_Click" />
+                <MenuItem Header="Settings..." Click="MenuItemHelpSettings_Click" />
             </MenuItem>
         </Menu>
         <Grid Margin="5" HorizontalAlignment="Center" VerticalAlignment="Top">

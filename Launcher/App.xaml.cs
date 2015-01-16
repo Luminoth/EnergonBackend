@@ -29,6 +29,7 @@ namespace EnergonSoftware.Launcher
 
 #region Window Properties
         public readonly DebugWindow DebugWindow = new DebugWindow();
+        public readonly SettingsWindow SettingsWindow = new SettingsWindow();
 #endregion
 
 #region Network Properties

@@ -1,0 +1,11 @@
+﻿<Window x:Class="EnergonSoftware.Launcher.Windows.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:launcherprops="clr-namespace:EnergonSoftware.Launcher.Properties"
+        Title="{x:Static launcherprops:Resources.SettingsWindowTitle}"
+        Height="300" Width="300"
+        Closing="Window_Closing">
+    <Grid>
+        
+    </Grid>
+</Window>
