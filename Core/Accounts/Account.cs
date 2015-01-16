@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -10,6 +9,8 @@ namespace EnergonSoftware.Core.Accounts
     [Serializable]
     public sealed class Account : IMessageSerializable
     {
+        public string Type { get { return "Account"; } }
+
         public long Id { get; set; }
         public string Username { get; set; }
         public string SessionId { get; set; }
@@ -24,20 +25,20 @@ namespace EnergonSoftware.Core.Accounts
             Visibility = Visibility.Offline;
         }
 
-        public async Task SerializeAsync(Stream stream, IMessageFormatter formatter)
+        public async Task SerializeAsync(IMessageFormatter formatter)
         {
             // Id not serialized
-            await formatter.WriteStringAsync(Username, stream).ConfigureAwait(false);
-            await formatter.WriteIntAsync((int)Visibility, stream).ConfigureAwait(false);
-            await formatter.WriteStringAsync(Status, stream).ConfigureAwait(false);
+            await formatter.WriteAsync("username", Username).ConfigureAwait(false);
+            await formatter.WriteAsync("visibility", (int)Visibility).ConfigureAwait(false);
+            await formatter.WriteAsync("status", Status).ConfigureAwait(false);
         }
 
-        public async Task DeSerializeAsync(Stream stream, IMessageFormatter formatter)
+        public async Task DeSerializeAsync(IMessageFormatter formatter)
         {
             // Id not serialized
-            Username = await formatter.ReadStringAsync(stream).ConfigureAwait(false);
-            Visibility = (Visibility)await formatter.ReadIntAsync(stream).ConfigureAwait(false);
-            Status = await formatter.ReadStringAsync(stream).ConfigureAwait(false);
+            Username = await formatter.ReadStringAsync("username").ConfigureAwait(false);
+            Visibility = (Visibility)await formatter.ReadIntAsync("visibility").ConfigureAwait(false);
+            Status = await formatter.ReadStringAsync("status").ConfigureAwait(false);
         }
 
         public override bool Equals(object obj)

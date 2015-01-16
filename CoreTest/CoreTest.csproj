@@ -61,6 +61,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Accounts\AccountTest.cs" />
     <Compile Include="MessageHandlers\ExceptionMessageHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandlerFactory.cs" />
     <Compile Include="MessageHandlers\MessageProcessorTest.cs" />

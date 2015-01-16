@@ -64,11 +64,11 @@ namespace EnergonSoftware.Core.MessageHandlers
 
         public async Task ParseMessagesAsync(MemoryBuffer buffer)
         {
-            MessagePacket packet = await _session.Parser.ParseAsync(buffer, _session.Formatter).ConfigureAwait(false);
+            MessagePacket packet = await _session.Parser.ParseAsync(buffer, _session.FormatterType).ConfigureAwait(false);
             while(null != packet) {
                 Logger.Debug("Session " + _session.Id + " parsed message type: " + packet.Content.Type);
                 QueueMessage(packet.Content);
-                packet = await _session.Parser.ParseAsync(buffer, _session.Formatter).ConfigureAwait(false);
+                packet = await _session.Parser.ParseAsync(buffer, _session.FormatterType).ConfigureAwait(false);
             }
         }
 

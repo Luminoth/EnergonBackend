@@ -35,7 +35,7 @@ namespace EnergonSoftware.Chat.Net
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ChatSession));
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
-        public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
         protected override IMessageHandlerFactory HandlerFactory { get { return new ChatMessageHandlerFactory(); } }
 
         public ChatSession(Socket socket) : base(socket)

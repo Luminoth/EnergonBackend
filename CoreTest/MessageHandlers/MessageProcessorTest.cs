@@ -34,7 +34,7 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
 #endregion
 
         [TestInitialize]
-        public void Initialize()
+        public void SetUp()
         {
             _manager = new SessionManager();
             _session = new TestSession();
@@ -42,9 +42,9 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
         }
 
         [TestCleanup]
-        public async Task Cleanup()
+        public void TearDown()
         {
-            await _manager.DisconnectAllAsync().ConfigureAwait(false);
+            _manager.DisconnectAllAsync().Wait();
         }
 
         [TestMethod]

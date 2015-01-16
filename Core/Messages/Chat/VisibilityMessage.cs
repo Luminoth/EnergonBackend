@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Accounts;
@@ -26,18 +25,18 @@ namespace EnergonSoftware.Core.Messages.Chat
             Visibility = Accounts.Visibility.Online;
         }
 
-        public async Task SerializeAsync(Stream stream, IMessageFormatter formatter)
+        public async Task SerializeAsync(IMessageFormatter formatter)
         {
-            await formatter.WriteStringAsync(Username, stream).ConfigureAwait(false);
-            await formatter.WriteStringAsync(SessionId, stream).ConfigureAwait(false);
-            await formatter.WriteIntAsync((int)Visibility, stream).ConfigureAwait(false);
+            await formatter.WriteAsync("username", Username).ConfigureAwait(false);
+            await formatter.WriteAsync("ticket", SessionId).ConfigureAwait(false);
+            await formatter.WriteAsync("visibility", (int)Visibility).ConfigureAwait(false);
         }
 
-        public async Task DeSerializeAsync(Stream stream, IMessageFormatter formatter)
+        public async Task DeSerializeAsync(IMessageFormatter formatter)
         {
-            Username = await formatter.ReadStringAsync(stream).ConfigureAwait(false);
-            SessionId = await formatter.ReadStringAsync(stream).ConfigureAwait(false);
-            Visibility = (Visibility)await formatter.ReadIntAsync(stream).ConfigureAwait(false);
+            Username = await formatter.ReadStringAsync("username").ConfigureAwait(false);
+            SessionId = await formatter.ReadStringAsync("ticket").ConfigureAwait(false);
+            Visibility = (Visibility)await formatter.ReadIntAsync("visibility").ConfigureAwait(false);
         }
 
         public override string ToString()

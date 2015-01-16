@@ -41,7 +41,7 @@ namespace EnergonSoftware.Launcher.Net
         public string RspAuth { get; private set; }
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
-        public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
         protected override IMessageHandlerFactory HandlerFactory { get { return new MessageHandlerFactory(); } }
 
         public AuthSession() : base()

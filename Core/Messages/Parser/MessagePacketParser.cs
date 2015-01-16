@@ -9,6 +9,6 @@ namespace EnergonSoftware.Core.Messages.Parser
     public interface IMessagePacketParser
     {
         MessagePacket Create();
-        Task<MessagePacket> ParseAsync(MemoryBuffer buffer, IMessageFormatter formatter);
+        Task<MessagePacket> ParseAsync(MemoryBuffer buffer, string formatterType);
     }
 }

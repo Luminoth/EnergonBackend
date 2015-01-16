@@ -17,7 +17,7 @@ namespace EnergonSoftware.Core.Messages.Parser
             return new NetworkPacket();
         }
 
-        public async Task<MessagePacket> ParseAsync(MemoryBuffer buffer, IMessageFormatter formatter)
+        public async Task<MessagePacket> ParseAsync(MemoryBuffer buffer, string formatterType)
         {
             buffer.Flip();
             if(!buffer.HasRemaining) {
@@ -25,8 +25,13 @@ namespace EnergonSoftware.Core.Messages.Parser
                 return null;
             }
 
+            IMessageFormatter formatter = MessageFormatterFactory.Create(formatterType);
+            formatter.Attach(buffer.Buffer);
+
             NetworkPacket packet = new NetworkPacket();
-            if(!await packet.DeSerializeAsync(buffer, formatter).ConfigureAwait(false)) {
+            try {
+                await packet.DeSerializeAsync(formatter).ConfigureAwait(false);
+            } catch(MessageException) {
                 buffer.Reset();
                 return null;
             }

@@ -21,13 +21,14 @@ namespace EnergonSoftware.Core.Messages.Packet
         public IMessage Content { get; set; }
         public bool HasContent { get { return null != Content; } }
 
-        public MessagePacket()
+        protected MessagePacket()
         {
             Id = NextId;
         }
 
-        public abstract Task<byte[]> SerializeAsync(IMessageFormatter formatter);
-        public abstract Task<bool> DeSerializeAsync(MemoryBuffer buffer, IMessageFormatter formatter);
+        // NOTE: these can throw MessageException
+        public abstract Task SerializeAsync(IMessageFormatter formatter);
+        public abstract Task DeSerializeAsync(IMessageFormatter formatter);
 
         public int CompareTo(object obj)
         {

@@ -34,6 +34,13 @@ namespace EnergonSoftware.Launcher.Windows
         {
             Hide();
         }
+
+        private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if(IsVisible) {
+                OutputText.ScrollToEnd();
+            }
+        }
 #endregion
     }
 }

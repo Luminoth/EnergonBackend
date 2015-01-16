@@ -33,7 +33,7 @@ namespace EnergonSoftware.Overmind.Net
         private static readonly ILog Logger = LogManager.GetLogger(typeof(OvermindSession));
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
-        public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
         protected override IMessageHandlerFactory HandlerFactory { get { return new OvermindMessageHandlerFactory(); } }
 
         public OvermindSession(Socket socket) : base(socket)

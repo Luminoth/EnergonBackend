@@ -7,7 +7,6 @@ namespace EnergonSoftware.Core.Messages
 {
     public interface IMessage : IMessageSerializable
     {
-        string Type { get; }
     }
 
     public static class MessageFactory

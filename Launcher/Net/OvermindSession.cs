@@ -24,7 +24,7 @@ namespace EnergonSoftware.Launcher.Net
         private bool ShouldPing { get { return 0 == LastMessageTime ? false : Time.CurrentTimeMs > (LastMessageTime + Convert.ToInt64(ConfigurationManager.AppSettings["overmindPingRate"])); } }
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
-        public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
         protected override IMessageHandlerFactory HandlerFactory { get { return new MessageHandlerFactory(); } }
 
         public OvermindSession() : base()

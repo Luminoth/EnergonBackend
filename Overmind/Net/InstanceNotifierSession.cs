@@ -18,7 +18,7 @@ namespace EnergonSoftware.Overmind.Net
         private readonly SocketState _listener;
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
-        public override IMessageFormatter Formatter { get { return new BinaryMessageFormatter(); } }
+        public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
         protected override IMessageHandlerFactory HandlerFactory { get { return new InstanceNotifierMessageHandlerFactory(); } }
 
         private InstanceNotifierSession(Socket socket) : base(socket)

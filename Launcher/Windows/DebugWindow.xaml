@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:launcherprops="clr-namespace:EnergonSoftware.Launcher.Properties"
         Title="{x:Static launcherprops:Resources.DebugWindowTitle}"
-        Height="600" Width="700">
+        Height="600" Width="700"
+        IsVisibleChanged="Window_IsVisibleChanged">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -43,7 +44,7 @@ namespace EnergonSoftware.Core.Net
 
 #region Message Properties
         public abstract IMessagePacketParser Parser { get; }
-        public abstract IMessageFormatter Formatter { get; }
+        public abstract string FormatterType { get; }
         protected abstract IMessageHandlerFactory HandlerFactory { get; }
 
         protected readonly MessageProcessor Processor;
@@ -184,6 +185,12 @@ namespace EnergonSoftware.Core.Net
             await Task.Delay(0).ConfigureAwait(false);
         }
 
+        private async Task<int> SendAsync(byte[] bytes)
+        {
+            Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
+            return await _socketState.SendAsync(bytes).ConfigureAwait(false);
+        }
+
         public async Task SendMessageAsync(IMessage message)
         {
             try {
@@ -195,9 +202,17 @@ namespace EnergonSoftware.Core.Net
                 packet.Content = message;
                 Logger.Debug("Sending packet: " + packet);
 
-                byte[] bytes = await packet.SerializeAsync(Formatter).ConfigureAwait(false);
-                Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
-                await _socketState.SendAsync(bytes).ConfigureAwait(false);
+                using(MemoryStream ms = new MemoryStream()) {
+                    IMessageFormatter formatter = MessageFormatterFactory.Create(FormatterType);
+                    formatter.Attach(ms);
+
+                    await formatter.StartDocumentAsync().ConfigureAwait(false);
+                    await packet.SerializeAsync(formatter).ConfigureAwait(false);
+                    await formatter.EndDocumentAsync().ConfigureAwait(false);
+                    await formatter.FlushAsync().ConfigureAwait(false);
+
+                    await SendAsync(ms.ToArray()).ConfigureAwait(false);
+                }
             } catch(SocketException e) {
                 InternalErrorAsync("Error sending message!", e).Wait();
             } catch(MessageException e) {

@@ -18,12 +18,12 @@ namespace EnergonSoftware.Core.Test.Messages
         {
         }
 
-        public async Task SerializeAsync(Stream stream, IMessageFormatter formatter)
+        public async Task SerializeAsync(IMessageFormatter formatter)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }
 
-        public async Task DeSerializeAsync(Stream stream, IMessageFormatter formatter)
+        public async Task DeSerializeAsync(IMessageFormatter formatter)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }

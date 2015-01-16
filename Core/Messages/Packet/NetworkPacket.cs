@@ -9,7 +9,7 @@ using EnergonSoftware.Core.Util;
 namespace EnergonSoftware.Core.Messages.Packet
 {
     /*
-     * Packet Format:
+     * Binary Packet Format:
      *      MARKER | ID | TYPE | CONTENT LENGTH | CONTENT | TERMINATOR
      */
     [Serializable]
@@ -23,73 +23,47 @@ namespace EnergonSoftware.Core.Messages.Packet
         public const string PacketType = "network";
         public override string Type { get { return PacketType; } }
 
-        public async override Task<byte[]> SerializeAsync(IMessageFormatter formatter)
+        public async override Task SerializeAsync(IMessageFormatter formatter)
         {
-            using(MemoryStream stream = new MemoryStream()) {
-                await formatter.WriteAsync(Marker, 0, Marker.Length, stream).ConfigureAwait(false);
-                await formatter.WriteIntAsync(Id, stream).ConfigureAwait(false);
+            await formatter.WriteAsync(Marker, 0, Marker.Length).ConfigureAwait(false);
+            await formatter.WriteAsync("id", Id).ConfigureAwait(false);
 
-                if(!HasContent) {
-                    await formatter.WriteStringAsync("null", stream).ConfigureAwait(false);
-                    await formatter.WriteIntAsync(0, stream).ConfigureAwait(false);
-                } else {
-                    await formatter.WriteStringAsync(Content.Type, stream).ConfigureAwait(false);
-                    using(MemoryStream cstream = new MemoryStream()) {
-                        await Content.SerializeAsync(cstream, formatter).ConfigureAwait(false);
-
-                        byte[] bytes = cstream.ToArray();
-                        if(bytes.Length > MaxContentLength) {
-                            throw new MessageException("Packet content is too large!");
-                        }
-
-                        await formatter.WriteIntAsync(bytes.Length, stream).ConfigureAwait(false);
-                        await formatter.WriteAsync(bytes, 0, bytes.Length, stream).ConfigureAwait(false);
-                    }
-                }
-
-                await formatter.WriteAsync(Terminator, 0, Terminator.Length, stream).ConfigureAwait(false);
-                return stream.ToArray();
+            if(!HasContent) {
+                await formatter.WriteAsync("contentType", "null").ConfigureAwait(false);
+            } else {
+                await formatter.WriteAsync("contentType", Content.Type).ConfigureAwait(false);
+                await Content.SerializeAsync(formatter).ConfigureAwait(false);
             }
+
+            await formatter.WriteAsync(Terminator, 0, Terminator.Length).ConfigureAwait(false);
         }
 
-        public async override Task<bool> DeSerializeAsync(MemoryBuffer buffer, IMessageFormatter formatter)
+        public async override Task DeSerializeAsync(IMessageFormatter formatter)
         {
             byte[] marker = new byte[Marker.Length];
-            await buffer.ReadAsync(marker, 0, marker.Length).ConfigureAwait(false);
+            await formatter.ReadAsync(marker, 0, marker.Length).ConfigureAwait(false);
             if(!marker.SequenceEqual(Marker)) {
                 throw new MessageException("Invalid marker!");
             }
 
-            Id = await formatter.ReadIntAsync(buffer.Buffer).ConfigureAwait(false);
+            Id = await formatter.ReadIntAsync("id").ConfigureAwait(false);
 
-            string type = await formatter.ReadStringAsync(buffer.Buffer).ConfigureAwait(false);
+            string type = await formatter.ReadStringAsync("contentType").ConfigureAwait(false);
             Content = MessageFactory.Create(type);
-
-            int contentLength = await formatter.ReadIntAsync(buffer.Buffer).ConfigureAwait(false);
-            if(contentLength > MaxContentLength) {
-                throw new MessageException("Invalid packet content length: " + contentLength);
-            }
-
-            int expectedLength = contentLength + Terminator.Length;
-            if(expectedLength > buffer.Remaining) {
-                return false;
-            }
 
             if(null != Content) {
                 try {
-                    await Content.DeSerializeAsync(buffer.Buffer, formatter).ConfigureAwait(false);
+                    await Content.DeSerializeAsync(formatter).ConfigureAwait(false);
                 } catch(Exception e) {
                     throw new MessageException("Exception while deserializing content", e);
                 }
             }
 
             byte[] terminator = new byte[Terminator.Length];
-            await buffer.ReadAsync(terminator, 0, terminator.Length).ConfigureAwait(false);
+            await formatter.ReadAsync(terminator, 0, terminator.Length).ConfigureAwait(false);
             if(!terminator.SequenceEqual(Terminator)) {
                 throw new MessageException("Invalid message terminator!");
             }
-
-            return true;
         }
 
         public override string ToString()
