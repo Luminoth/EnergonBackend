@@ -26,61 +26,105 @@ namespace System.Net.Sockets
 
         public static async Task<Socket> AcceptFromAsync(this Socket socket)
         {
-            return await Task.Run(() => socket.AcceptFrom()).ConfigureAwait(false);
+            try {
+                return await Task.Run(() => socket.AcceptFrom()).ConfigureAwait(false);
+            } catch(AggregateException e) {
+                throw e.InnerException;
+            }
         }
 #endregion
 
 #region Async Helpers
         public static async Task<Socket> AcceptAsync(this Socket socket)
         {
-            return await Task.Run(() => socket.Accept()).ConfigureAwait(false);
+            try {
+                return await Task.Run(() => socket.Accept()).ConfigureAwait(false);
+            } catch(AggregateException e) {
+                throw e.InnerException;
+            }
         }
 
         public static async Task ConnectAsync(this Socket socket, EndPoint endPoint)
         {
-            await Task.Run(() => socket.Connect(endPoint)).ConfigureAwait(false);
+            try {
+                await Task.Run(() => socket.Connect(endPoint)).ConfigureAwait(false);
+            } catch(AggregateException e) {
+                throw e.InnerException;
+            }
         }
 
         public static async Task ConnectAsync(this Socket socket, IPAddress address, int port)
         {
-            await Task.Run(() => socket.Connect(address, port)).ConfigureAwait(false);
+            try {
+                await Task.Run(() => socket.Connect(address, port)).ConfigureAwait(false);
+            } catch(AggregateException e) {
+                throw e.InnerException;
+            }
         }
 
         public static async Task ConnectAsync(this Socket socket, IPAddress[] addresses, int port)
         {
-            await Task.Run(() => socket.Connect(addresses, port)).ConfigureAwait(false);
+            try {
+                await Task.Run(() => socket.Connect(addresses, port)).ConfigureAwait(false);
+            } catch(AggregateException e) {
+                throw e.InnerException;
+            }
         }
 
         public static async Task ConnectAsync(this Socket socket, string host, int port)
         {
-            await Task.Run(() => socket.Connect(host, port)).ConfigureAwait(false);
+            try {
+                await Task.Run(() => socket.Connect(host, port)).ConfigureAwait(false);
+            } catch(AggregateException e) {
+                throw e.InnerException;
+            }
         }
 
         public static async Task DisconnectAsync(this Socket socket, bool reuseSocket)
         {
-            await Task.Run(() => socket.Disconnect(reuseSocket)).ConfigureAwait(false);
+            try {
+                await Task.Run(() => socket.Disconnect(reuseSocket)).ConfigureAwait(false);
+            } catch(AggregateException e) {
+                throw e.InnerException;
+            }
         }
 
         public static async Task<int> ReceiveAsync(this Socket socket, byte[] buffer)
         {
-            return await Task.Run(() => socket.Receive(buffer)).ConfigureAwait(false);
+            try {
+                return await Task.Run(() => socket.Receive(buffer)).ConfigureAwait(false);
+            } catch(AggregateException e) {
+                throw e.InnerException;
+            }
         }
 
         /*public static async Task<int> ReceiveFromAsync(this Socket socket, byte[] buffer, ref EndPoint endPoint)
         {
-            return await Task.Run(() => socket.ReceiveFrom(buffer, ref endPoint)).ConfigureAwait(false);
+            try {
+                return await Task.Run(() => socket.ReceiveFrom(buffer, ref endPoint)).ConfigureAwait(false);
+            } catch(AggregateException e) {
+                throw e.InnerException;
+            }
         }*/
 
 // TODO: add more receive methods
 
         public static async Task<int> SendAsync(this Socket socket, byte[] buffer)
         {
-            return await Task.Run(() => socket.Send(buffer)).ConfigureAwait(false);
+            try {
+                return await Task.Run(() => socket.Send(buffer)).ConfigureAwait(false);
+            } catch(AggregateException e) {
+                throw e.InnerException;
+            }
         }
 
         public static async Task<int> SendToAsync(this Socket socket, byte[] buffer, EndPoint endPoint)
         {
-            return await Task.Run(() => socket.SendTo(buffer, endPoint)).ConfigureAwait(false);
+            try {
+                return await Task.Run(() => socket.SendTo(buffer, endPoint)).ConfigureAwait(false);
+            } catch(AggregateException e) {
+                throw e.InnerException;
+            }
         }
 
 // TODO: add more send methods

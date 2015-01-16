@@ -136,8 +136,12 @@ namespace EnergonSoftware.DbInit
             if(File.Exists(dataSource)) {
                 string backupfilename = dataSource + ".bak";
                 Logger.Info("Backing up old database to " + backupfilename + "...");
-                await Task.Run(() => File.Delete(backupfilename)).ConfigureAwait(false);
-                await Task.Run(() => File.Move(dataSource, backupfilename)).ConfigureAwait(false);
+                try {
+                    await Task.Run(() => File.Delete(backupfilename)).ConfigureAwait(false);
+                    await Task.Run(() => File.Move(dataSource, backupfilename)).ConfigureAwait(false);
+                } catch(AggregateException e) {
+                    throw e.InnerException;
+                }
             }
             return await DatabaseConnection.CreateDatabaseAsync(connectionSettings).ConfigureAwait(false);
         }

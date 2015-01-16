@@ -30,11 +30,15 @@ namespace EnergonSoftware.Database
             string dataSource = ParseDataSource(connectionSettings);
 
             Logger.Info("Creating " + connectionSettings.ProviderName + " database at " + dataSource + "...");
-            switch(connectionSettings.ProviderName)
-            {
-            case "System.Data.SQLite":
-                await Task.Run(() => SQLiteConnection.CreateFile(dataSource)).ConfigureAwait(false);
-                return true;
+            try {
+                switch(connectionSettings.ProviderName)
+                {
+                case "System.Data.SQLite":
+                    await Task.Run(() => SQLiteConnection.CreateFile(dataSource)).ConfigureAwait(false);
+                    return true;
+                }
+            } catch(AggregateException e) {
+                throw e.InnerException;
             }
 
             return false;

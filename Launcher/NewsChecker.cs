@@ -9,6 +9,8 @@ using System.Runtime.Serialization.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core.Util;
+
 using log4net;
 
 namespace EnergonSoftware.Launcher
@@ -39,8 +41,17 @@ namespace EnergonSoftware.Launcher
 
         public static readonly NewsChecker Instance = new NewsChecker();
 
+        private const int MinCheckTimeSeconds = 1000 * 60;
+
+        private long _lastCheckTime = 0;
+
         public async Task UpdateNewsAsync()
         {
+            if(Time.CurrentTimeMs < (_lastCheckTime + MinCheckTimeSeconds)) {
+                return;
+            }
+            _lastCheckTime = Time.CurrentTimeMs;
+
             // TODO: use string resources here
             Logger.Info("Updating news...");
 

@@ -1,13 +1,15 @@
-﻿<UserControl x:Class="EnergonSoftware.Launcher.Controls.MainPage"
+﻿<UserControl x:Class="EnergonSoftware.Launcher.Controls.FriendsListPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:launcherprops="clr-namespace:EnergonSoftware.Launcher.Properties"
-             xmlns:launchercontrols="clr-namespace:EnergonSoftware.Launcher.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </UserControl.Resources>
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Bottom">
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition />
@@ -16,7 +18,9 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <launchercontrols:FriendsListPage Grid.Row="0" Grid.Column="1" />
-        <Button Grid.Row="1" Grid.Column="0" Margin="5" Width="50" Click="ButtonLogout_Click" IsEnabled="{Binding LoggedIn}" IsDefault="True"><TextBlock Text="{x:Static launcherprops:Resources.LogoutButtonLabel}" /></Button>
+        <ScrollViewer Grid.Row="0" Grid.Column="0" Margin="5" HorizontalScrollBarVisibility="Auto" Visibility="{Binding ShowFriendsList, Converter={StaticResource BoolToVis}}">
+        </ScrollViewer>
+
+        <Button Grid.Row="1" Grid.Column="0" Margin="5" Width="90" Click="ButtonFriends_Click"><TextBlock Text="{Binding FriendButtonText, FallbackValue='Friends: (9999)'}" /></Button>
     </Grid>
 </UserControl>

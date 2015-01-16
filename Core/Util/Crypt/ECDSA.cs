@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,11 @@ namespace EnergonSoftware.Core.Util.Crypt
         {
             using(ECDsaCng dsa = new ECDsaCng(privKey)) {
                 dsa.HashAlgorithm = algorithm;
-                return await Task.Run(() => dsa.SignData(Encoding.UTF8.GetBytes(data))).ConfigureAwait(false);
+                try {
+                    return await Task.Run(() => dsa.SignData(Encoding.UTF8.GetBytes(data))).ConfigureAwait(false);
+                } catch(AggregateException e) {
+                    throw e.InnerException;
+                }
             }
         }
 
@@ -19,7 +24,11 @@ namespace EnergonSoftware.Core.Util.Crypt
         {
             using(ECDsaCng dsa = new ECDsaCng()) {
                 dsa.HashAlgorithm = algorithm;
-                return await Task.Run(() => dsa.VerifyData(data, signature)).ConfigureAwait(false);
+                try {
+                    return await Task.Run(() => dsa.VerifyData(data, signature)).ConfigureAwait(false);
+                } catch(AggregateException e) {
+                    throw e.InnerException;
+                }
             }
         }
     }

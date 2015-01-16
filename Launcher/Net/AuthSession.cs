@@ -52,6 +52,7 @@ namespace EnergonSoftware.Launcher.Net
         public async Task BeginConnectAsync(string host, int port)
         {
             try {
+                Logger.Info("Connecting to authentication server...");
                 await ConnectAsync(host, port, SocketType.Stream, ProtocolType.Tcp).ConfigureAwait(false);
                 if(!Connected) {
                     await ErrorAsync("Failed to connect to the chat server").ConfigureAwait(false);

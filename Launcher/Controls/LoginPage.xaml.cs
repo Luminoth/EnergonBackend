@@ -17,7 +17,7 @@ namespace EnergonSoftware.Launcher.Controls
             DataContext = ClientState.Instance;
 
             if(!DesignerProperties.GetIsInDesignMode(this)) {
-                IsVisibleChanged += Visible_Changed;
+                IsVisibleChanged += IsVisible_Changed;
             }
         }
 
@@ -39,7 +39,7 @@ namespace EnergonSoftware.Launcher.Controls
             await ClearPasswordAsync();
         }
 
-        private async void Visible_Changed(object sender, DependencyPropertyChangedEventArgs e)
+        private async void IsVisible_Changed(object sender, DependencyPropertyChangedEventArgs e)
         {
             if(IsVisible) {
                 await NewsChecker.Instance.UpdateNewsAsync();

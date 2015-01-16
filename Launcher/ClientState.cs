@@ -32,6 +32,11 @@ namespace EnergonSoftware.Launcher
         public bool ShowLoginPage { get { return Page.Login == CurrentPage; } }
         public bool ShowMainPage { get { return Page.Main == CurrentPage; } }
 
+        private bool _showFriendsList = false;
+        public bool ShowFriendsList { get { return _showFriendsList; } set { _showFriendsList = value; NotifyPropertyChanged(); } }
+
+        public string FriendButtonText { get { return "Friends (...)"; } }
+
         // *** move these
         private string _news = "Checking for news updates...";
         public string News { get { return _news; } set { _news = value; NotifyPropertyChanged(); } }
@@ -70,7 +75,7 @@ namespace EnergonSoftware.Launcher
 
 #region Property Notifier
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] string property=null)
+        public void NotifyPropertyChanged([CallerMemberName] string property=null)
         {
             if(null != PropertyChanged) {
                 PropertyChanged(this, new PropertyChangedEventArgs(property));

@@ -39,6 +39,7 @@ namespace EnergonSoftware.Launcher.Net
         public async Task ConnectAsync(string host, int port)
         {
             try {
+                Logger.Info("Connecting to overmind server...");
                 await ConnectAsync(host, port, SocketType.Stream, ProtocolType.Tcp).ConfigureAwait(false);
                 if(!Connected) {
                     await ErrorAsync("Failed to connect to the overmind server").ConfigureAwait(false);
@@ -53,6 +54,8 @@ namespace EnergonSoftware.Launcher.Net
 
         private async Task LoginAsync()
         {
+            Logger.Info("Logging in to overmind server...");
+
             await SendMessageAsync(new LoginMessage()
                 {
                     Username = ClientState.Instance.Username,
@@ -63,6 +66,8 @@ namespace EnergonSoftware.Launcher.Net
 
         public async Task LogoutAsync()
         {
+            Logger.Info("Logging out of overmind server...");
+
             await SendMessageAsync(new LogoutMessage()
                 {
                     Username = ClientState.Instance.Username,

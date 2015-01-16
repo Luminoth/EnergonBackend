@@ -1,7 +1,9 @@
 ﻿using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
+using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Launcher.MessageHandlers.Auth;
+using EnergonSoftware.Launcher.MessageHandlers.Chat;
 
 namespace EnergonSoftware.Launcher.MessageHandlers
 {
@@ -11,18 +13,25 @@ namespace EnergonSoftware.Launcher.MessageHandlers
         {
             switch(type)
             {
+            /* misc */
             case PingMessage.MessageType:
                 return new PingMessageHandler();
             case LoginMessage.MessageType:
                 return new LoginMessageHandler();
             case LogoutMessage.MessageType:
                 return new LogoutMessageHandler();
+
+            /* auth */
             case ChallengeMessage.MessageType:
                 return new ChallengeMessageHandler();
             case FailureMessage.MessageType:
                 return new FailureMessageHandler();
             case SuccessMessage.MessageType:
                 return new SuccessMessageHandler();
+
+            /* chat */
+            case FriendListMessage.MessageType:
+                return new FriendListMessageHandler();
             }
             throw new MessageHandlerException("Unsupported message type: " + type);
         }

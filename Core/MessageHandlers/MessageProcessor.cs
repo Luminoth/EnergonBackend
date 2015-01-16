@@ -81,7 +81,7 @@ namespace EnergonSoftware.Core.MessageHandlers
             _cancellationToken = new CancellationTokenSource();
             _task = Task.Run(async () =>
                 {
-                    // TODO: capture exceptions
+                    // TODO: trap exceptions
                     while(!_cancellationToken.IsCancellationRequested) {
                         _messageQueueEvent.WaitOne();
                         await RunAsync().ConfigureAwait(false);

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Launcher.Windows;
 
@@ -11,8 +12,12 @@ namespace EnergonSoftware.Launcher
     {
         protected override void Append(LoggingEvent loggingEvent)
         {
-            // don't need to wait for this to finish
-            Task.Run(() => DebugWindow.AppendOutputTextAsync(RenderLoggingEvent(loggingEvent)));
+            try {
+                // don't need to wait for this to finish
+                Task.Run(() => DebugWindow.AppendOutputTextAsync(RenderLoggingEvent(loggingEvent)));
+            } catch(AggregateException e) {
+                throw e.InnerException;
+            }
         }
     }
 }

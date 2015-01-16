@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -39,6 +40,7 @@ namespace EnergonSoftware.Launcher.Net
         public async Task ConnectAsync(string host, int port)
         {
             try {
+                Logger.Info("Connecting to chat server...");
                 await ConnectAsync(host, port, SocketType.Stream, ProtocolType.Tcp).ConfigureAwait(false);
                 if(!Connected) {
                     await ErrorAsync("Failed to connect to the chat server").ConfigureAwait(false);
@@ -54,6 +56,8 @@ namespace EnergonSoftware.Launcher.Net
 
         private async Task LoginAsync()
         {
+            Logger.Info("Logging in to chat server...");
+
             await SendMessageAsync(new LoginMessage()
                 {
                     Username = ClientState.Instance.Username,
@@ -64,6 +68,8 @@ namespace EnergonSoftware.Launcher.Net
 
         public async Task LogoutAsync()
         {
+            Logger.Info("Logging out of chat server...");
+
             await SendMessageAsync(new LogoutMessage()
                 {
                     Username = ClientState.Instance.Username,
@@ -85,6 +91,8 @@ namespace EnergonSoftware.Launcher.Net
 
         public async Task SetVisibilityAsync(Visibility visibility)
         {
+            Logger.Info("Setting chat visibility=" + visibility);
+
             await SendMessageAsync(new VisibilityMessage()
                 {
                     Username = ClientState.Instance.Username,
@@ -92,6 +100,13 @@ namespace EnergonSoftware.Launcher.Net
                     Visibility = visibility,
                 }
             ).ConfigureAwait(false);
+        }
+
+        public void SetFriendList(IReadOnlyCollection<Account> friendList)
+        {
+            Logger.Info("Received " + friendList.Count + " friends!");
+
+            ClientState.Instance.NotifyPropertyChanged("FriendButtonText");
         }
     }
 }
