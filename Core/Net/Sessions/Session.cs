@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
@@ -11,12 +9,11 @@ using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
-using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 
 using log4net;
 
-namespace EnergonSoftware.Core.Net
+namespace EnergonSoftware.Core.Net.Sessions
 {
     public interface ISessionFactory
     {
@@ -116,7 +113,7 @@ namespace EnergonSoftware.Core.Net
                 }
 
                 Logger.Info("Session " + Id + " disconnecting: " + reason);
-                await _socketState.ShutdownAndCloseAsync(false).ConfigureAwait(false);
+                await _socketState.ShutdownDisconnectCloseAsync(false).ConfigureAwait(false);
 
                 if(null != OnDisconnect) {
                     OnDisconnect(this, new DisconnectEventArgs() { Reason = reason });
@@ -128,19 +125,14 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        public async Task BufferWriteAsync(byte[] data, int offset, int count)
-        {
-            await _socketState.Buffer.WriteAsync(data, offset, count).ConfigureAwait(false);
-        }
-
-        public async Task<int> PollAndReadAsync()
+        public async Task<int> PollAndReceiveAllAsync()
         {
             try {
                 if(!Connected) {
                     return -1;
                 }
 
-                int count = await _socketState.PollAndReadAsync().ConfigureAwait(false);
+                int count = await _socketState.PollAndReceiveAllAsync().ConfigureAwait(false);
                 if(count > 0) {
                     Logger.Debug("Session " + Id + " read " + count + " bytes");
                 }
@@ -153,7 +145,7 @@ namespace EnergonSoftware.Core.Net
 
         public async Task PollAndRunAsync()
         {
-            int count = await PollAndReadAsync().ConfigureAwait(false);
+            int count = await PollAndReceiveAllAsync().ConfigureAwait(false);
             if(count < 0) {
                 await DisconnectAsync("Socket closed!").ConfigureAwait(false);
                 return;

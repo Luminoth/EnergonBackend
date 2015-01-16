@@ -6,7 +6,7 @@ using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
-using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Launcher.MessageHandlers;
 
 using log4net;

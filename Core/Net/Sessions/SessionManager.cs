@@ -1,17 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Net;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Formatter;
-using EnergonSoftware.Core.Messages.Parser;
 
 using log4net;
 
-namespace EnergonSoftware.Core.Net
+namespace EnergonSoftware.Core.Net.Sessions
 {
     public sealed class SessionManager
     {

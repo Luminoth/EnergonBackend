@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Overmind.Net;
 

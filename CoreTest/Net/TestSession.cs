@@ -1,9 +1,10 @@
 ﻿using System.Net.Sockets;
 
 using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
-using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Test.MessageHandlers;
 
 namespace EnergonSoftware.Core.Test.Net
@@ -28,6 +29,11 @@ namespace EnergonSoftware.Core.Test.Net
 
         public TestSession(Socket socket) : base(socket)
         {
+        }
+
+        public void QueueMessage(IMessage message)
+        {
+            Processor.QueueMessage(message);
         }
     }
 }

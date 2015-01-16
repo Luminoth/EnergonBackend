@@ -8,6 +8,7 @@ using System.Windows.Interop;
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Launcher.MessageHandlers;
 using EnergonSoftware.Launcher.Net;

@@ -21,23 +21,12 @@ namespace EnergonSoftware.Core.Net
 
         public readonly int Id;
 
-        private Socket _socket;
-        public Socket Socket
-        {
-            set {
-                _socket = value;
-                _reader = null == _socket ? null : new BufferedSocketReader(_socket);
-            }
-        }
-
-        public bool IsValid { get { return null != _socket && null != _reader; } }
-
+        public Socket Socket { private get; set; }
         public bool Connecting { get; set; }
-        public bool Connected { get { return null != _socket && _socket.Connected; } }
-        public EndPoint RemoteEndPoint { get { return null != _socket ? _socket.RemoteEndPoint : null; } }
+        public bool Connected { get { return null != Socket && Socket.Connected; } }
+        public EndPoint RemoteEndPoint { get { return null != Socket ? Socket.RemoteEndPoint : null; } }
 
-        private BufferedSocketReader _reader;
-        public MemoryBuffer Buffer { get { return null != _reader ? _reader.Buffer : null; } }
+        public readonly MemoryBuffer Buffer = new MemoryBuffer();
 
         public long LastMessageTime { get; private set; }
 
@@ -61,20 +50,21 @@ namespace EnergonSoftware.Core.Net
         private void Dispose(bool disposing)
         {
             if(disposing) {
-                if(null != _socket) {
-                    _socket.Dispose();
+                if(null != Socket) {
+                    Socket.Dispose();
                 }
+                Buffer.Dispose();
             }
         }
 #endregion
 
-        public async Task<int> PollAndReadAsync()
+        public async Task<int> PollAndReceiveAllAsync()
         {
-            if(!IsValid) {
+            if(null == Socket) {
                 return -1;
             }
 
-            int count = await _reader.PollAndReadAsync().ConfigureAwait(false);
+            int count = await Socket.PollAndReceiveAllAsync(Buffer).ConfigureAwait(false);
             if(count > 0) {
                 LastMessageTime = Time.CurrentTimeMs;
             }
@@ -83,28 +73,22 @@ namespace EnergonSoftware.Core.Net
 
         public async Task<int> SendAsync(byte[] buffer)
         {
-            if(!IsValid) {
+            if(null == Socket) {
                 return -1;
             }
 
             Logger.Debug("Socket state " + Id + " sending " + buffer.Length + " bytes");
-            return await Task.Run(() => _socket.Send(buffer)).ConfigureAwait(false);
+            return await Socket.SendAsync(buffer).ConfigureAwait(false);
         }
 
-        public async Task ShutdownAndCloseAsync(bool reuseSocket)
+        public async Task ShutdownDisconnectCloseAsync(bool reuseSocket)
         {
-            if(!IsValid) {
+            if(null == Socket) {
                 return;
             }
 
-            _socket.Shutdown(SocketShutdown.Both);
-            if(_socket.Connected) {
-                await Task.Run(() => _socket.Disconnect(reuseSocket)).ConfigureAwait(false);
-            }
-            _socket.Close();
-
-            _reader = null;
-            _socket = null;
+            await Socket.ShutdownDisconnectCloseAsync(SocketShutdown.Both, reuseSocket);
+            Socket = null;
         }
     }
 }

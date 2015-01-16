@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Configuration;
+using EnergonSoftware.Core.Net.Sessions;
 
 using log4net;
 
@@ -58,42 +59,26 @@ namespace EnergonSoftware.Core.Net
             }
         }
 
-        private Socket Accept(Socket socket, out byte[] data)
-        {
-            IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
-            EndPoint remoteEndpoint = (EndPoint)sender;
-
-            data = new byte[socket.Available];
-            int len = socket.ReceiveFrom(data, ref remoteEndpoint);
-            if(len <= 0) {
-                return null;
-            }
-
-            Socket remote = new Socket(socket.AddressFamily, socket.SocketType, socket.ProtocolType);
-            remote.Connect(remoteEndpoint);
-            Logger.Info("New connection from " + remote.RemoteEndPoint);
-            return remote;
-        }
-
         private async Task PollAsync(Socket socket, SessionManager manager)
         {
+            // TODO: this probably doesn't work correctly
             try {
                 if(socket.Poll(100, SelectMode.SelectRead)) {
-                    byte[] data;
-                    Socket remote = Accept(socket, out data);
+                    Socket remote = await socket.AcceptFromAsync().ConfigureAwait(false);
                     if(manager.Contains(remote.RemoteEndPoint)) {
                         Session session = manager.Get(remote.RemoteEndPoint);
-                        await session.BufferWriteAsync(data, 0, data.Length).ConfigureAwait(false);
+                        await session.PollAndReceiveAllAsync().ConfigureAwait(false);
                         return;
                     }
-
                     Logger.Info("New connection from " + remote.RemoteEndPoint);
+
                     if(MaxConnections >= 0 && manager.Count >= MaxConnections) {
                         Logger.Info("Max connections exceeded, denying new connection!");
                         remote.Close();
                     } else {
+                        Logger.Debug("Allowing new connection...");
                         Session session = _factory.Create(remote);
-                        await session.BufferWriteAsync(data, 0, data.Length).ConfigureAwait(false);
+                        await session.PollAndReceiveAllAsync().ConfigureAwait(false);
                         manager.Add(session);
                     }
                 }

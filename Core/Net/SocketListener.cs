@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Configuration;
+using EnergonSoftware.Core.Net.Sessions;
 
 using log4net;
 
@@ -65,7 +66,7 @@ namespace EnergonSoftware.Core.Net
         {
             try {
                 if(socket.Poll(100, SelectMode.SelectRead)) {
-                    Socket remote = await Task.Run(() => socket.Accept()).ConfigureAwait(false);
+                    Socket remote = await socket.AcceptAsync().ConfigureAwait(false);
                     Logger.Info("New connection from " + remote.RemoteEndPoint);
 
                     if(MaxConnections >= 0 && manager.Count >= MaxConnections) {

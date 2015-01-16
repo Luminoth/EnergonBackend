@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
-using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Test.Messages;
 using EnergonSoftware.Core.Test.Net;
 
@@ -36,8 +36,9 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
         [TestInitialize]
         public void SetUp()
         {
-            _manager = new SessionManager();
             _session = new TestSession();
+
+            _manager = new SessionManager();
             _manager.Add(_session);
         }
 
@@ -48,10 +49,10 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
         }
 
         [TestMethod]
-        public void TestQueue()
+        public async Task TestQueueAsync()
         {
-// TODO: so what are we looking for here?
-            //_session.QueueMessage(_session, new ExceptionMessage());
+            _session.QueueMessage(new ExceptionMessage());
+            await _session.RunAsync();
         }
     }
 }

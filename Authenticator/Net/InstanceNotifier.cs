@@ -10,6 +10,7 @@ using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Notification;
 using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Net.Sessions;
 
 using log4net;
 

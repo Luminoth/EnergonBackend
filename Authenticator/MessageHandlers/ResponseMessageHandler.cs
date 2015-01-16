@@ -8,7 +8,7 @@ using EnergonSoftware.Authenticator.Net;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
-using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Core.Util.Crypt;
 using EnergonSoftware.Database;

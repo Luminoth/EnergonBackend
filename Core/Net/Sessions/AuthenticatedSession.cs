@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Accounts;
@@ -7,7 +6,7 @@ using EnergonSoftware.Core.Messages;
 
 using log4net;
 
-namespace EnergonSoftware.Core.Net
+namespace EnergonSoftware.Core.Net.Sessions
 {
     public abstract class AuthenticatedSession : Session
     {

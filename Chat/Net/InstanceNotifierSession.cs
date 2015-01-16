@@ -6,6 +6,7 @@ using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Net.Sessions;
 
 using log4net;
 
@@ -32,7 +33,7 @@ namespace EnergonSoftware.Chat.Net
 
         protected async override Task OnRunAsync()
         {
-            int count = await _listener.PollAndReadAsync().ConfigureAwait(false);
+            int count = await _listener.PollAndReceiveAllAsync().ConfigureAwait(false);
             if(count > 0) {
                 Logger.Debug("Instance notifier session " + Id + " read " + count + " bytes");
             }

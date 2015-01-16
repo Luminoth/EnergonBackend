@@ -3,7 +3,7 @@ using System.Windows;
 
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Net;
+using EnergonSoftware.Core.Net.Sessions;
 
 namespace EnergonSoftware.Launcher.MessageHandlers
 {

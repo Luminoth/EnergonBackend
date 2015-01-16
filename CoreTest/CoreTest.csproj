@@ -67,7 +67,6 @@
     <Compile Include="MessageHandlers\MessageProcessorTest.cs" />
     <Compile Include="Messages\ExceptionMessage.cs" />
     <Compile Include="Net\TestSession.cs" />
-    <Compile Include="Net\BufferedSocketReaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\MemoryBufferTest.cs" />
   </ItemGroup>
