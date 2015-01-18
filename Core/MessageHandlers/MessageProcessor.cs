@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Net.Sessions;
+using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Util;
 
 using log4net;
@@ -73,7 +74,7 @@ namespace EnergonSoftware.Core.MessageHandlers
         public void Start()
         {
             if(null != _task) {
-                throw new InvalidOperationException("Message processor already running!");
+                throw new InvalidOperationException(Resources.ErrorMessageProcessorAlreadyRunning);
             }
 
             Logger.Debug("Starting message processor for session " + _session.Id + "...");

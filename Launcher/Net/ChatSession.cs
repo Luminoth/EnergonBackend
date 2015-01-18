@@ -106,6 +106,9 @@ namespace EnergonSoftware.Launcher.Net
         {
             Logger.Info("Received " + friendList.Count + " friends!");
 
+            FriendListManager.Instance.Clear();
+            FriendListManager.Instance.AddAll(friendList);
+
             ClientState.Instance.NotifyPropertyChanged("FriendButtonText");
         }
     }

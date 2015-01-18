@@ -41,6 +41,7 @@ namespace EnergonSoftware.Core.Util
 
         public SessionId(string password, string sessionId, int expiry = -1) : this()
         {
+            throw new NotImplementedException();
 /*
  *     // unencode the value
     size_t len = 0;

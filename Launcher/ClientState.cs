@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
+using EnergonSoftware.Launcher.Properties;
+
 using log4net;
 
 namespace EnergonSoftware.Launcher
@@ -35,7 +37,7 @@ namespace EnergonSoftware.Launcher
         private bool _showFriendsList = false;
         public bool ShowFriendsList { get { return _showFriendsList; } set { _showFriendsList = value; NotifyPropertyChanged(); } }
 
-        public string FriendButtonText { get { return "Friends (...)"; } }
+        public string FriendButtonText { get { return string.Format(Resources.FriendsLabel, FriendListManager.Instance.OnlineCount, FriendListManager.Instance.Total); } }
 
         // *** move these
         private string _news = "Checking for news updates...";

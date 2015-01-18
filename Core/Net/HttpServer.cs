@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core.Properties;
+
 using log4net;
 
 namespace EnergonSoftware.Core.Net
@@ -45,7 +47,7 @@ namespace EnergonSoftware.Core.Net
         public void Start(List<string> prefixes)
         {
             if(null != _task) {
-                throw new InvalidOperationException("HTTP server already running!");
+                throw new InvalidOperationException(Resources.ErrorHttpServerAlreadyRunning);
             }
 
             Logger.Debug("Starting HttpServer...");

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Util;
 
 namespace EnergonSoftware.Core.Messages.Packet
@@ -28,7 +29,7 @@ namespace EnergonSoftware.Core.Messages.Packet
             await formatter.WriteAsync(Marker, 0, Marker.Length).ConfigureAwait(false);
             await formatter.WriteAsync("id", Id).ConfigureAwait(false);
 
-            if(!HasContent) {
+            if(null == Content) {
                 await formatter.WriteAsync("contentType", "null").ConfigureAwait(false);
             } else {
                 await formatter.WriteAsync("contentType", Content.Type).ConfigureAwait(false);
@@ -43,7 +44,7 @@ namespace EnergonSoftware.Core.Messages.Packet
             byte[] marker = new byte[Marker.Length];
             await formatter.ReadAsync(marker, 0, marker.Length).ConfigureAwait(false);
             if(!marker.SequenceEqual(Marker)) {
-                throw new MessageException("Invalid marker!");
+                throw new MessageException(Resources.ErrorInvalidNetworkPacketMarker);
             }
 
             Id = await formatter.ReadIntAsync("id").ConfigureAwait(false);
@@ -55,14 +56,14 @@ namespace EnergonSoftware.Core.Messages.Packet
                 try {
                     await Content.DeSerializeAsync(formatter).ConfigureAwait(false);
                 } catch(Exception e) {
-                    throw new MessageException("Exception while deserializing content", e);
+                    throw new MessageException(Resources.ErrorDeserializingNetworkPacketContent, e);
                 }
             }
 
             byte[] terminator = new byte[Terminator.Length];
             await formatter.ReadAsync(terminator, 0, terminator.Length).ConfigureAwait(false);
             if(!terminator.SequenceEqual(Terminator)) {
-                throw new MessageException("Invalid message terminator!");
+                throw new MessageException(Resources.ErrorInvalidNetworkPacketTerminator);
             }
         }
 

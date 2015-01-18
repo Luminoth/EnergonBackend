@@ -117,43 +117,64 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CancelLabel" xml:space="preserve">
-    <value>Cancel</value>
+  <data name="DisconnectInternalError" xml:space="preserve">
+    <value>Disconnect due to internal error!</value>
   </data>
-  <data name="CloseLabel" xml:space="preserve">
-    <value>Close</value>
+  <data name="DisconnectSocketClosed" xml:space="preserve">
+    <value>Disconnect due to socket closed!</value>
   </data>
-  <data name="DebugWindowTitle" xml:space="preserve">
-    <value>Debug</value>
+  <data name="DisconnectTimeout" xml:space="preserve">
+    <value>Disconnect due to timeout!</value>
   </data>
-  <data name="FriendsLabel" xml:space="preserve">
-    <value>Friends: {0} ({1})</value>
+  <data name="ErrorCreatingMessageHandler" xml:space="preserve">
+    <value>Session {0} could not create handler for message type: {1}</value>
   </data>
-  <data name="LoginButtonLabel" xml:space="preserve">
-    <value>Login</value>
+  <data name="ErrorCreatingSocket" xml:space="preserve">
+    <value>Exception while creating socket!</value>
   </data>
-  <data name="LogoutButtonLabel" xml:space="preserve">
-    <value>Logout</value>
+  <data name="ErrorDeserializingNetworkPacketContent" xml:space="preserve">
+    <value>Exception encountered while deserializing content!</value>
   </data>
-  <data name="MainWindowTitle" xml:space="preserve">
-    <value>Launcher</value>
+  <data name="ErrorHandlingMessage" xml:space="preserve">
+    <value>Exception while handling message for session {0}!</value>
   </data>
-  <data name="OkLabel" xml:space="preserve">
-    <value>OK</value>
+  <data name="ErrorHttpServerAlreadyRunning" xml:space="preserve">
+    <value>HTTP server is already running!</value>
   </data>
-  <data name="PasswordLabel" xml:space="preserve">
-    <value>Password:</value>
+  <data name="ErrorInvalidLogin" xml:space="preserve">
+    <value>Invalid login: {0}</value>
   </data>
-  <data name="ProgressLabel" xml:space="preserve">
-    <value>Logging in, please wait...</value>
+  <data name="ErrorInvalidLoginAccount" xml:space="preserve">
+    <value>Invalid login account: {0}, expected: {1}</value>
   </data>
-  <data name="SettingsWindowTitle" xml:space="preserve">
-    <value>Settings</value>
+  <data name="ErrorInvalidNetworkPacketMarker" xml:space="preserve">
+    <value>Invalid network packet marker found!</value>
   </data>
-  <data name="UpdatesLabel" xml:space="preserve">
-    <value>Checking for updates...</value>
+  <data name="ErrorInvalidNetworkPacketTerminator" xml:space="preserve">
+    <value>Invalid network packet terminator found!</value>
   </data>
-  <data name="UsernameLabel" xml:space="preserve">
-    <value>Username:</value>
+  <data name="ErrorMessageHandlerAlreadyRunning" xml:space="preserve">
+    <value>Message handler is already running!</value>
+  </data>
+  <data name="ErrorMessageProcessorAlreadyRunning" xml:space="preserve">
+    <value>Message processor already running!</value>
+  </data>
+  <data name="ErrorParsingMessages" xml:space="preserve">
+    <value>Exception while parsing messages!</value>
+  </data>
+  <data name="ErrorSendingMessage" xml:space="preserve">
+    <value>Exception while sending message!</value>
+  </data>
+  <data name="ErrorSessionAlreadyAuthenticated" xml:space="preserve">
+    <value>Session is already authenticated!</value>
+  </data>
+  <data name="ErrorSessionNotAuthenticated" xml:space="preserve">
+    <value>Session is not authenticated!</value>
+  </data>
+  <data name="ErrorUnsupportedMessage" xml:space="preserve">
+    <value>Unsupported message type for construction: {0}</value>
+  </data>
+  <data name="ErrorUnsupportedMessageFormatter" xml:space="preserve">
+    <value>Unsupported message formatter type for construction: {0}</value>
   </data>
 </root>

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Properties;
 
 using log4net;
 
@@ -39,7 +40,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         public async Task<bool> LoginAsync(string username, string sessionid)
         {
             if(null != Account) {
-                await ErrorAsync("Session already authenticated!").ConfigureAwait(false);
+                await ErrorAsync(Resources.ErrorSessionAlreadyAuthenticated).ConfigureAwait(false);
                 return false;
             }
 
@@ -47,7 +48,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
             Account lookupAccount = await LookupAccountAsync(username).ConfigureAwait(false);
             if(null == lookupAccount) {
-                await ErrorAsync("Invalid login: " + username).ConfigureAwait(false);
+                await ErrorAsync(string.Format(Resources.ErrorInvalidLogin, username)).ConfigureAwait(false);
                 return false;
             }
             Account = lookupAccount;
@@ -61,7 +62,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
             Logger.Debug("Authenticating login account: " + loginAccount);
             if(!Authenticate(loginAccount)) {
-                await ErrorAsync("Invalid login account: " + loginAccount + ", expected: " + Account).ConfigureAwait(false);
+                await ErrorAsync(string.Format(Resources.ErrorInvalidLoginAccount, loginAccount, Account)).ConfigureAwait(false);
                 return false;
             }
 

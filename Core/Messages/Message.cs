@@ -2,6 +2,7 @@
 using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Notification;
+using EnergonSoftware.Core.Properties;
 
 namespace EnergonSoftware.Core.Messages
 {
@@ -51,7 +52,7 @@ namespace EnergonSoftware.Core.Messages
                 return new VisibilityMessage();
             }
 
-            throw new MessageException("Unsupported message type for construction: " + type);
+            throw new MessageException(string.Format(Resources.ErrorUnsupportedMessage, type));
         }
     }
 }

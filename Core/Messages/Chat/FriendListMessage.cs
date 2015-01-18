@@ -30,14 +30,14 @@ namespace EnergonSoftware.Core.Messages.Chat
         {
             await formatter.WriteAsync("username", Username).ConfigureAwait(false);
             await formatter.WriteAsync("ticket", SessionId).ConfigureAwait(false);
-            await formatter.WriteAsync<Account>("friends", Friends).ConfigureAwait(false);
+            await formatter.WriteAsync<Account>("friendList", Friends).ConfigureAwait(false);
         }
 
         public async Task DeSerializeAsync(IMessageFormatter formatter)
         {
             Username = await formatter.ReadStringAsync("username").ConfigureAwait(false);
             SessionId = await formatter.ReadStringAsync("sessionid").ConfigureAwait(false);
-            Friends = await formatter.ReadListAsync<Account>("friends").ConfigureAwait(false);
+            Friends = await formatter.ReadListAsync<Account>("friendList").ConfigureAwait(false);
         }
 
         public override string ToString()

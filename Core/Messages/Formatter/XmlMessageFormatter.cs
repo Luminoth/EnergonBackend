@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -121,72 +122,53 @@ namespace EnergonSoftware.Core.Messages.Formatter
 #endregion
 
 #region Reading
-        public async Task<List<T>> ReadListAsync<T>(string name) where T : IMessageSerializable, new()
+        public Task<List<T>> ReadListAsync<T>(string name) where T : IMessageSerializable, new()
         {
-            // TODO
-            await Task.Delay(0).ConfigureAwait(false);
-            return new List<T>();
+            throw new NotImplementedException();
         }
 
-        public async Task<T> ReadAsync<T>(string name) where T : IMessageSerializable, new()
+        public Task<T> ReadAsync<T>(string name) where T : IMessageSerializable, new()
         {
-            // TODO
-            await Task.Delay(0).ConfigureAwait(false);
-            return new T();
+            throw new NotImplementedException();
         }
 
-        public async Task<string> ReadStringAsync(string name)
+        public Task<string> ReadStringAsync(string name)
         {
-            // TODO
-            await Task.Delay(0).ConfigureAwait(false);
-            return string.Empty;
+            throw new NotImplementedException();
         }
 
-        public async Task<byte> ReadByteAsync(string name)
+        public Task<byte> ReadByteAsync(string name)
         {
-            // TODO
-            await Task.Delay(0).ConfigureAwait(false);
-            return 0;
+            throw new NotImplementedException();
         }
 
-        public async Task<bool> ReadBoolAsync(string name)
+        public Task<bool> ReadBoolAsync(string name)
         {
-            // TODO
-            await Task.Delay(0).ConfigureAwait(false);
-            return false;
+            throw new NotImplementedException();
         }
 
-        public async Task<int> ReadIntAsync(string name)
+        public Task<int> ReadIntAsync(string name)
         {
-            // TODO
-            await Task.Delay(0).ConfigureAwait(false);
-            return 0;
+            throw new NotImplementedException();
         }
 
-        public async Task<long> ReadLongAsync(string name)
+        public Task<long> ReadLongAsync(string name)
         {
-            // TODO
-            await Task.Delay(0).ConfigureAwait(false);
-            return 0;
+            throw new NotImplementedException();
         }
 
-        public async Task<float> ReadFloatAsync(string name)
+        public Task<float> ReadFloatAsync(string name)
         {
-            // TODO
-            await Task.Delay(0).ConfigureAwait(false);
-            return 0.0f;
+            throw new NotImplementedException();
         }
 
-        public async Task<double> ReadDoubleAsync(string name)
+        public Task<double> ReadDoubleAsync(string name)
         {
-            // TODO
-            await Task.Delay(0).ConfigureAwait(false);
-            return 0.0;
+            throw new NotImplementedException();
         }
 
         public async Task ReadAsync(byte[] value, int offset, int count)
         {
-            // TODO
             await Task.Delay(0).ConfigureAwait(false);
         }
 #endregion

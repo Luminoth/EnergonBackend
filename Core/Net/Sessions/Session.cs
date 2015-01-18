@@ -9,6 +9,7 @@ using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
+using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Util;
 
 using log4net;
@@ -147,13 +148,13 @@ namespace EnergonSoftware.Core.Net.Sessions
         {
             int count = await PollAndReceiveAllAsync().ConfigureAwait(false);
             if(count < 0) {
-                await DisconnectAsync("Socket closed!").ConfigureAwait(false);
+                await DisconnectAsync(Resources.DisconnectSocketClosed).ConfigureAwait(false);
                 return;
             }
 
             if(TimedOut) {
                 Logger.Info("Session " + Id + " timed out!");
-                await DisconnectAsync("Timed Out!").ConfigureAwait(false);
+                await DisconnectAsync(Resources.DisconnectTimeout).ConfigureAwait(false);
                 return;
             }
 
@@ -168,7 +169,7 @@ namespace EnergonSoftware.Core.Net.Sessions
                 await Processor.ParseMessagesAsync(_socketState.Buffer).ConfigureAwait(false);
                 await OnRunAsync().ConfigureAwait(false);
             } catch(MessageException e) {
-                InternalErrorAsync("Exception while parsing messages!", e).Wait();
+                InternalErrorAsync(Resources.ErrorParsingMessages, e).Wait();
             }
         }
 
@@ -206,9 +207,9 @@ namespace EnergonSoftware.Core.Net.Sessions
                     await SendAsync(ms.ToArray()).ConfigureAwait(false);
                 }
             } catch(SocketException e) {
-                InternalErrorAsync("Error sending message!", e).Wait();
+                InternalErrorAsync(Resources.ErrorSendingMessage, e).Wait();
             } catch(MessageException e) {
-                InternalErrorAsync("Error sending message!", e).Wait(); 
+                InternalErrorAsync(Resources.ErrorSendingMessage, e).Wait(); 
             }
         }
 
@@ -219,16 +220,16 @@ namespace EnergonSoftware.Core.Net.Sessions
 
                 MessageHandler messageHandler = HandlerFactory.Create(message.Type);
                 if(null == messageHandler) {
-                    await InternalErrorAsync("Session " + Id + " could not create handler for message type: " + message.Type).ConfigureAwait(false);
+                    await InternalErrorAsync(string.Format(Resources.ErrorCreatingMessageHandler, Id, message.Type)).ConfigureAwait(false);
                     return;
                 }
 
                 await messageHandler.HandleMessageAsync(message, this).ConfigureAwait(false);
                 Logger.Debug("Handler for message with type=" + message.Type + " for session " + Id + " took " + messageHandler.RuntimeMs + "ms to complete");
             } catch(MessageHandlerException e) {
-                InternalErrorAsync("Error handling message for session " + Id, e).Wait();
+                InternalErrorAsync(string.Format(Resources.ErrorHandlingMessage, Id), e).Wait();
             } catch(Exception e) {
-                InternalErrorAsync("Unhandled message processing exception for session + " + Id + "!", e).Wait();
+                InternalErrorAsync(string.Format(Resources.ErrorHandlingMessage, Id), e).Wait();
             }
         }
 
@@ -236,7 +237,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         public async Task InternalErrorAsync(string error)
         {
             Logger.Error("Session " + Id + " encountered an internal error: " + error);
-            await DisconnectAsync("Internal Error").ConfigureAwait(false);
+            await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
             if(null != OnError) {
                 OnError(this, new ErrorEventArgs() { Error = error });
@@ -246,7 +247,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         public async Task InternalErrorAsync(string error, Exception ex)
         {
             Logger.Error("Session " + Id + " encountered an internal error: " + error, ex);
-            await DisconnectAsync("Internal Error").ConfigureAwait(false);
+            await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
             if(null != OnError) {
                 OnError(this, new ErrorEventArgs() { Error = error, Exception = ex });
@@ -256,7 +257,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         public async Task InternalErrorAsync(Exception ex)
         {
             Logger.Error("Session " + Id + " encountered an internal error", ex);
-            await DisconnectAsync("Internal Error").ConfigureAwait(false);
+            await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
             if(null != OnError) {
                 OnError(this, new ErrorEventArgs() { Exception = ex });

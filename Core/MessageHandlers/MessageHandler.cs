@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 
+using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
@@ -27,7 +28,7 @@ namespace EnergonSoftware.Core.MessageHandlers
         {
             if(null != message && null != session) {
                 if(!session.Authenticate(message.Username, message.SessionId)) {
-                    throw new MessageHandlerException("Session is not authenticated!");
+                    throw new MessageHandlerException(Resources.ErrorSessionNotAuthenticated);
                 }
             }
         }
@@ -35,7 +36,7 @@ namespace EnergonSoftware.Core.MessageHandlers
         public async Task HandleMessageAsync(IMessage message, Session session)
         {
             if(_running) {
-                throw new MessageHandlerException("Handler is already running!");
+                throw new MessageHandlerException(Resources.ErrorMessageHandlerAlreadyRunning);
             }
             _running = true;
 

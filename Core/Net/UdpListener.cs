@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net.Sessions;
+using EnergonSoftware.Core.Properties;
 
 using log4net;
 
@@ -44,7 +45,7 @@ namespace EnergonSoftware.Core.Net
                         socket.Bind(endpoint);
                         _listenSockets.Add(socket);
                     } catch(SocketException e) {
-                        Logger.Error("Exception creating socket!", e);
+                        Logger.Error(Resources.ErrorCreatingSocket, e);
                     }
                 }
             }

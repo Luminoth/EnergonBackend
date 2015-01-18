@@ -19,4 +19,12 @@ namespace EnergonSoftware.Core.Accounts
         [Description("Busy")]
         Busy,
     }
+
+    public static class VisibilityExtensions
+    {
+        public static bool IsOnline(this Visibility visibility)
+        {
+            return Visibility.Offline != visibility && Visibility.Invisible != visibility;
+        }
+    }
 }

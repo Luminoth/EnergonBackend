@@ -19,7 +19,7 @@ namespace EnergonSoftware.Database.Models
             {
                 { new ColumnDescription("id", DatabaseType.Integer).SetPrimaryKey() },
                 { new ColumnDescription("active", DatabaseType.Boolean).SetNotNull() },
-                { new ColumnDescription("username", DatabaseType.Text).SetNotNull() },
+                { new ColumnDescription("username", DatabaseType.Text).SetNotNull().SetUnique() },
                 { new ColumnDescription("passwordMD5", DatabaseType.Text).SetNotNull() },
                 { new ColumnDescription("passwordSHA512", DatabaseType.Text).SetNotNull() },
                 { new ColumnDescription("endPoint", DatabaseType.Text) },

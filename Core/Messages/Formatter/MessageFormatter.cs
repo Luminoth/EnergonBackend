@@ -2,6 +2,8 @@
 using System.IO;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core.Properties;
+
 namespace EnergonSoftware.Core.Messages.Formatter
 {
     public interface IMessageFormatter
@@ -61,7 +63,7 @@ namespace EnergonSoftware.Core.Messages.Formatter
             case XmlMessageFormatter.FormatterType:
                 return new XmlMessageFormatter();
             }
-            throw new MessageFormatterException("Unsupported message formatter type for construction: " + type);
+            throw new MessageFormatterException(string.Format(Resources.ErrorUnsupportedMessageFormatter, type));
         }
     }
 }

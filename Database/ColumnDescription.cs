@@ -9,9 +9,12 @@ namespace EnergonSoftware.Database
     {
         public int Id { get; set; }
         public TableDescription Table { get; set; }
+
         public readonly string Name;
         public readonly DatabaseType Type;
+
         public bool PrimaryKey { get; private set; }
+        public bool Unique { get; private set; }
         public bool Nullable { get; private set; }
 
         private Tuple<string, string> _references;
@@ -27,12 +30,19 @@ namespace EnergonSoftware.Database
             Name = name;
             Type = type;
             PrimaryKey = false;
+            Unique = false;
             Nullable = true;
         }
 
         public ColumnDescription SetPrimaryKey()
         {
             PrimaryKey = true;
+            return this;
+        }
+
+        public ColumnDescription SetUnique()
+        {
+            Unique = true;
             return this;
         }
 
@@ -61,6 +71,10 @@ namespace EnergonSoftware.Database
 
             if(PrimaryKey || HasForeignKey || !Nullable) {
                 builder.Append(" NOT NULL");
+            }
+
+            if(Unique) {
+                builder.Append(" UNIQUE");
             }
 
             if(HasForeignKey) {

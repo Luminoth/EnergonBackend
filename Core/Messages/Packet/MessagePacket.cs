@@ -19,7 +19,6 @@ namespace EnergonSoftware.Core.Messages.Packet
         public int Id { get; protected set; }
 
         public IMessage Content { get; set; }
-        public bool HasContent { get { return null != Content; } }
 
         protected MessagePacket()
         {

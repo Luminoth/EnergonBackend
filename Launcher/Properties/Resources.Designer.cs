@@ -88,6 +88,15 @@ namespace EnergonSoftware.Launcher.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Friends: {0} ({1}).
+        /// </summary>
+        public static string FriendsLabel {
+            get {
+                return ResourceManager.GetString("FriendsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Login.
         /// </summary>
         public static string LoginButtonLabel {
