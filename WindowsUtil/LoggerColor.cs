@@ -9,7 +9,7 @@ namespace EnergonSoftware.WindowsUtil
         public static Color LogEntryColor(Level level)
         {
             if(Level.Debug == level) {
-                return Colors.Blue;
+                return Colors.DarkCyan;
             } else if(Level.Warn == level) {
                 return Colors.Green;
             } else if(Level.Error == level) {

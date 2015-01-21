@@ -9,7 +9,7 @@ namespace EnergonSoftware.Core.Accounts
     [Serializable]
     public sealed class Account : IMessageSerializable
     {
-        public string Type { get { return "Account"; } }
+        public string Type { get { return "account"; } }
 
         public long Id { get; set; }
         public string Username { get; set; }

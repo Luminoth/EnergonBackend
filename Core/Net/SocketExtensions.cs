@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Util;
 
@@ -141,8 +142,8 @@ namespace System.Net.Sockets
         }
 #endregion
 
-#region MemoryBuffer Helpers
-        public static async Task<int> ReceiveAsync(this Socket socket, MemoryBuffer buffer)
+#region Stream Helpers
+        public static async Task<int> ReceiveAsync(this Socket socket, Stream stream)
         {
             byte[] data = new byte[socket.Available];
             int len = await socket.ReceiveAsync(data).ConfigureAwait(false);
@@ -150,15 +151,15 @@ namespace System.Net.Sockets
                 return len;
             }
 
-            await buffer.WriteAsync(data, 0, len).ConfigureAwait(false);
+            await stream.WriteAsync(data, 0, len).ConfigureAwait(false);
             return len;
         }
 
-        public static async Task<int> PollAndReceiveAllAsync(this Socket socket, MemoryBuffer buffer)
+        public static async Task<int> PollAndReceiveAllAsync(this Socket socket, Stream stream)
         {
             int count = 0;
             while(socket.Poll(100, SelectMode.SelectRead)) {
-                int len = await socket.ReceiveAsync(buffer).ConfigureAwait(false);
+                int len = await socket.ReceiveAsync(stream).ConfigureAwait(false);
                 if(len <= 0) {
                     return count > 0 ? count : -1;
                 }

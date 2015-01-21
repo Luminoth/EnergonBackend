@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -26,7 +27,7 @@ namespace EnergonSoftware.Core.Net
         public bool Connected { get { return null != Socket && Socket.Connected; } }
         public EndPoint RemoteEndPoint { get { return null != Socket ? Socket.RemoteEndPoint : null; } }
 
-        public readonly MemoryBuffer Buffer = new MemoryBuffer();
+        public readonly MemoryStream Buffer = new MemoryStream();
 
         public long LastMessageTime { get; private set; }
 

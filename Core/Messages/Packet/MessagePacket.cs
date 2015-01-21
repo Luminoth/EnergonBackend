@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Util;
 
 namespace EnergonSoftware.Core.Messages.Packet
@@ -26,8 +28,29 @@ namespace EnergonSoftware.Core.Messages.Packet
         }
 
         // NOTE: these can throw MessageException
-        public abstract Task SerializeAsync(IMessageFormatter formatter);
-        public abstract Task DeSerializeAsync(IMessageFormatter formatter);
+        public abstract Task SerializeAsync(Stream stream, string formatterType);
+        public abstract Task DeSerializeAsync(Stream stream);
+
+        protected async Task SerializeContentAsync(Stream stream, IMessageFormatter formatter)
+        {
+            if(null == Content) {
+                return;
+            }
+
+            await formatter.StartDocumentAsync().ConfigureAwait(false);
+            await Content.SerializeAsync(formatter).ConfigureAwait(false);
+            await formatter.EndDocumentAsync().ConfigureAwait(false);
+            await formatter.FlushAsync().ConfigureAwait(false);
+        }
+
+        protected async Task DeSerializeContentAsync(IMessageFormatter formatter)
+        {
+            if(null == Content) {
+                return;
+            }
+
+            await Content.DeSerializeAsync(formatter).ConfigureAwait(false);
+        }
 
         public int CompareTo(object obj)
         {

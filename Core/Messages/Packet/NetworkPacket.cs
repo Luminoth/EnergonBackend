@@ -24,44 +24,41 @@ namespace EnergonSoftware.Core.Messages.Packet
         public const string PacketType = "network";
         public override string Type { get { return PacketType; } }
 
-        public async override Task SerializeAsync(IMessageFormatter formatter)
+        public async override Task SerializeAsync(Stream stream, string formatterType)
         {
-            await formatter.WriteAsync(Marker, 0, Marker.Length).ConfigureAwait(false);
-            await formatter.WriteAsync("id", Id).ConfigureAwait(false);
+            await stream.WriteAsync(Marker, 0, Marker.Length).ConfigureAwait(false);
+            await stream.WriteNetworkAsync(Id).ConfigureAwait(false);
 
-            if(null == Content) {
-                await formatter.WriteAsync("contentType", "null").ConfigureAwait(false);
-            } else {
-                await formatter.WriteAsync("contentType", Content.Type).ConfigureAwait(false);
-                await Content.SerializeAsync(formatter).ConfigureAwait(false);
-            }
+            await stream.WriteNetworkAsync(formatterType).ConfigureAwait(false);
+            IMessageFormatter formatter = MessageFormatterFactory.Create(formatterType);
+            formatter.Attach(stream);
 
-            await formatter.WriteAsync(Terminator, 0, Terminator.Length).ConfigureAwait(false);
+            await stream.WriteNetworkAsync(null == Content ? "null" : Content.Type).ConfigureAwait(false);
+            await SerializeContentAsync(stream, formatter).ConfigureAwait(false);
+
+            await stream.WriteAsync(Terminator, 0, Terminator.Length).ConfigureAwait(false);
         }
 
-        public async override Task DeSerializeAsync(IMessageFormatter formatter)
+        public async override Task DeSerializeAsync(Stream stream)
         {
             byte[] marker = new byte[Marker.Length];
-            await formatter.ReadAsync(marker, 0, marker.Length).ConfigureAwait(false);
+            await stream.ReadAsync(marker, 0, marker.Length).ConfigureAwait(false);
             if(!marker.SequenceEqual(Marker)) {
                 throw new MessageException(Resources.ErrorInvalidNetworkPacketMarker);
             }
 
-            Id = await formatter.ReadIntAsync("id").ConfigureAwait(false);
+            Id = await stream.ReadNetworkIntAsync().ConfigureAwait(false);
 
-            string type = await formatter.ReadStringAsync("contentType").ConfigureAwait(false);
-            Content = MessageFactory.Create(type);
+            string formatterType = await stream.ReadNetworkStringAsync().ConfigureAwait(false);
+            IMessageFormatter formatter = MessageFormatterFactory.Create(formatterType);
+            formatter.Attach(stream);
 
-            if(null != Content) {
-                try {
-                    await Content.DeSerializeAsync(formatter).ConfigureAwait(false);
-                } catch(Exception e) {
-                    throw new MessageException(Resources.ErrorDeserializingNetworkPacketContent, e);
-                }
-            }
+            string messageType = await stream.ReadNetworkStringAsync().ConfigureAwait(false);
+            Content = MessageFactory.Create(messageType);
+            await DeSerializeContentAsync(formatter).ConfigureAwait(false);
 
             byte[] terminator = new byte[Terminator.Length];
-            await formatter.ReadAsync(terminator, 0, terminator.Length).ConfigureAwait(false);
+            await stream.ReadAsync(terminator, 0, terminator.Length).ConfigureAwait(false);
             if(!terminator.SequenceEqual(Terminator)) {
                 throw new MessageException(Resources.ErrorInvalidNetworkPacketTerminator);
             }

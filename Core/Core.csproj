@@ -80,6 +80,7 @@
     <Compile Include="Messages\Parser\MessagePacketParser.cs" />
     <Compile Include="Messages\Parser\NetworkPacketParser.cs" />
     <Compile Include="Messages\PingMessage.cs" />
+    <Compile Include="Net\NetworkStreamExtensions.cs" />
     <Compile Include="Net\Sessions\AuthenticatedSession.cs" />
     <Compile Include="Net\DisconnectEventArgs.cs" />
     <Compile Include="Net\HttpServer.cs" />
@@ -104,7 +105,7 @@
     <Compile Include="Util\Crypt\MD5.cs" />
     <Compile Include="Util\Crypt\SHA512.cs" />
     <Compile Include="Util\EnumDescription.cs" />
-    <Compile Include="Util\MemoryBuffer.cs" />
+    <Compile Include="Util\StreamExtensions.cs" />
     <Compile Include="Util\Nonce.cs" />
     <Compile Include="Util\ServiceWrapper.cs">
       <SubType>Component</SubType>
@@ -120,6 +121,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

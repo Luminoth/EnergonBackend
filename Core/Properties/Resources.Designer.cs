@@ -88,7 +88,7 @@ namespace EnergonSoftware.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Session {0} could not create handler for message type: {1}.
+        ///   Looks up a localized string similar to Could not create handler for message type: {0}.
         /// </summary>
         internal static string ErrorCreatingMessageHandler {
             get {
@@ -115,7 +115,7 @@ namespace EnergonSoftware.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exception while handling message for session {0}!.
+        ///   Looks up a localized string similar to Exception while handling message!.
         /// </summary>
         internal static string ErrorHandlingMessage {
             get {
@@ -192,6 +192,15 @@ namespace EnergonSoftware.Core.Properties {
         internal static string ErrorParsingMessages {
             get {
                 return ResourceManager.GetString("ErrorParsingMessages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exception while parsing network packet!.
+        /// </summary>
+        internal static string ErrorParsingNetworkPacket {
+            get {
+                return ResourceManager.GetString("ErrorParsingNetworkPacket", resourceCulture);
             }
         }
         

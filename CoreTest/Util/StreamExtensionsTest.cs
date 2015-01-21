@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,39 +10,39 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EnergonSoftware.Core.Test.Util
 {
     [TestClass]
-    public class MemoryBufferTest
+    public class StreamExtensionsTest
     {
         private static readonly byte[] TestData = Encoding.UTF8.GetBytes("Test Data");
 
-        private static async Task TestWriteAsync(MemoryBuffer buffer, byte[] data)
+        private static async Task TestWriteAsync(Stream stream, byte[] data)
         {
-            int length = buffer.Length;
+            long length = stream.Length;
 
-            await buffer.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
-            Assert.AreEqual(length + data.Length, buffer.Position);
-            Assert.AreEqual(length + data.Length, buffer.Length);
+            await stream.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
+            Assert.AreEqual(length + data.Length, stream.Position);
+            Assert.AreEqual(length + data.Length, stream.Length);
         }
 
-        private static async Task TestReadAsync(MemoryBuffer buffer, byte[] expected)
+        private static async Task TestReadAsync(Stream stream, byte[] expected)
         {
-            byte[] data = new byte[buffer.Length];
-            await buffer.ReadAsync(data, 0, data.Length).ConfigureAwait(false);
+            byte[] data = new byte[stream.Length];
+            await stream.ReadAsync(data, 0, data.Length).ConfigureAwait(false);
             CollectionAssert.AreEqual(expected, data);
         }
 
-        private static void TestFlip(MemoryBuffer buffer)
+        private static void TestFlip(Stream stream)
         {
-            int position = buffer.Position;
+            long position = stream.Position;
 
-            buffer.Flip();
-            Assert.AreEqual(position, buffer.Length);
-            Assert.AreEqual(0, buffer.Position);
+            stream.Flip();
+            Assert.AreEqual(position, stream.Length);
+            Assert.AreEqual(0, stream.Position);
         }
 
         [TestMethod]
         public async Task TestReadAsync()
         {
-            using(MemoryBuffer buffer = new MemoryBuffer()) {
+            using(MemoryStream buffer = new MemoryStream()) {
                 await TestWriteAsync(buffer, TestData).ConfigureAwait(false);
                 TestFlip(buffer);
                 await TestReadAsync(buffer, TestData).ConfigureAwait(false);
@@ -51,7 +52,7 @@ namespace EnergonSoftware.Core.Test.Util
         [TestMethod]
         public async Task TestCompactAsync()
         {
-            using(MemoryBuffer buffer = new MemoryBuffer()) {
+            using(MemoryStream buffer = new MemoryStream()) {
                 await TestWriteAsync(buffer, TestData).ConfigureAwait(false);
                 await TestWriteAsync(buffer, TestData).ConfigureAwait(false);
                 TestFlip(buffer);
@@ -64,7 +65,7 @@ namespace EnergonSoftware.Core.Test.Util
         [TestMethod]
         public async Task TestWriteClearAsync()
         {
-            using(MemoryBuffer buffer = new MemoryBuffer()) {
+            using(MemoryStream buffer = new MemoryStream()) {
                 await TestWriteAsync(buffer, TestData).ConfigureAwait(false);
 
                 buffer.Clear();
@@ -76,10 +77,10 @@ namespace EnergonSoftware.Core.Test.Util
         [TestMethod]
         public async Task TestResetAsync()
         {
-            using(MemoryBuffer buffer = new MemoryBuffer()) {
+            using(MemoryStream buffer = new MemoryStream()) {
                 await TestWriteAsync(buffer, TestData).ConfigureAwait(false);
 
-                int length = buffer.Length;
+                long length = buffer.Length;
 
                 buffer.Reset();
                 Assert.AreEqual(length, buffer.Position);

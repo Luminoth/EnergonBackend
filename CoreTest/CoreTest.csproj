@@ -68,7 +68,7 @@
     <Compile Include="Messages\ExceptionMessage.cs" />
     <Compile Include="Net\TestSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util\MemoryBufferTest.cs" />
+    <Compile Include="Util\StreamExtensionsTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

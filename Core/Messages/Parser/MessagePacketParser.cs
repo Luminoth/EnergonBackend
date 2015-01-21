@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Packet;
@@ -9,6 +10,6 @@ namespace EnergonSoftware.Core.Messages.Parser
     public interface IMessagePacketParser
     {
         MessagePacket Create();
-        Task<MessagePacket> ParseAsync(MemoryBuffer buffer, string formatterType);
+        Task<MessagePacket> ParseAsync(MemoryStream stream);
     }
 }

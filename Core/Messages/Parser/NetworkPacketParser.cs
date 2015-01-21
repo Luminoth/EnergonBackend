@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Packet;
+using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Util;
 
 using log4net;
@@ -17,26 +19,24 @@ namespace EnergonSoftware.Core.Messages.Parser
             return new NetworkPacket();
         }
 
-        public async Task<MessagePacket> ParseAsync(MemoryBuffer buffer, string formatterType)
+        public async Task<MessagePacket> ParseAsync(MemoryStream stream)
         {
-            buffer.Flip();
-            if(!buffer.HasRemaining) {
-                buffer.Reset();
+            stream.Flip();
+            if(!stream.HasRemaining()) {
+                stream.Reset();
                 return null;
             }
-
-            IMessageFormatter formatter = MessageFormatterFactory.Create(formatterType);
-            formatter.Attach(buffer.Buffer);
 
             NetworkPacket packet = new NetworkPacket();
             try {
-                await packet.DeSerializeAsync(formatter).ConfigureAwait(false);
-            } catch(MessageException) {
-                buffer.Reset();
+                await packet.DeSerializeAsync(stream).ConfigureAwait(false);
+            } catch(MessageException e) {
+                Logger.Warn(Resources.ErrorParsingNetworkPacket, e);
+                stream.Reset();
                 return null;
             }
 
-            await buffer.CompactAsync().ConfigureAwait(false);
+            await stream.CompactAsync().ConfigureAwait(false);
             return packet;
         }
     }

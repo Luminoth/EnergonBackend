@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Util;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -35,12 +36,12 @@ namespace EnergonSoftware.Core.Test.Accounts
             };
 
             Account deserializedAccount = new Account();
-            using(MemoryStream ms = new MemoryStream()) {
-                _formatter.Attach(ms);
+            using(MemoryStream buffer = new MemoryStream()) {
+                _formatter.Attach(buffer);
                 await account.SerializeAsync(_formatter).ConfigureAwait(false);
                 await _formatter.FlushAsync().ConfigureAwait(false);
 
-                ms.Position = 0;
+                buffer.Flip();
 
                 await deserializedAccount.DeSerializeAsync(_formatter).ConfigureAwait(false);
             }

@@ -127,7 +127,7 @@
     <value>Disconnect due to timeout!</value>
   </data>
   <data name="ErrorCreatingMessageHandler" xml:space="preserve">
-    <value>Session {0} could not create handler for message type: {1}</value>
+    <value>Could not create handler for message type: {0}</value>
   </data>
   <data name="ErrorCreatingSocket" xml:space="preserve">
     <value>Exception while creating socket!</value>
@@ -136,7 +136,7 @@
     <value>Exception encountered while deserializing content!</value>
   </data>
   <data name="ErrorHandlingMessage" xml:space="preserve">
-    <value>Exception while handling message for session {0}!</value>
+    <value>Exception while handling message!</value>
   </data>
   <data name="ErrorHttpServerAlreadyRunning" xml:space="preserve">
     <value>HTTP server is already running!</value>
@@ -161,6 +161,9 @@
   </data>
   <data name="ErrorParsingMessages" xml:space="preserve">
     <value>Exception while parsing messages!</value>
+  </data>
+  <data name="ErrorParsingNetworkPacket" xml:space="preserve">
+    <value>Exception while parsing network packet!</value>
   </data>
   <data name="ErrorSendingMessage" xml:space="preserve">
     <value>Exception while sending message!</value>

@@ -195,16 +195,9 @@ namespace EnergonSoftware.Core.Net.Sessions
                 packet.Content = message;
                 Logger.Debug("Sending packet: " + packet);
 
-                using(MemoryStream ms = new MemoryStream()) {
-                    IMessageFormatter formatter = MessageFormatterFactory.Create(FormatterType);
-                    formatter.Attach(ms);
-
-                    await formatter.StartDocumentAsync().ConfigureAwait(false);
-                    await packet.SerializeAsync(formatter).ConfigureAwait(false);
-                    await formatter.EndDocumentAsync().ConfigureAwait(false);
-                    await formatter.FlushAsync().ConfigureAwait(false);
-
-                    await SendAsync(ms.ToArray()).ConfigureAwait(false);
+                using(MemoryStream buffer = new MemoryStream()) {
+                    await packet.SerializeAsync(buffer, FormatterType).ConfigureAwait(false);
+                    await SendAsync(buffer.ToArray()).ConfigureAwait(false);
                 }
             } catch(SocketException e) {
                 InternalErrorAsync(Resources.ErrorSendingMessage, e).Wait();
@@ -220,16 +213,16 @@ namespace EnergonSoftware.Core.Net.Sessions
 
                 MessageHandler messageHandler = HandlerFactory.Create(message.Type);
                 if(null == messageHandler) {
-                    await InternalErrorAsync(string.Format(Resources.ErrorCreatingMessageHandler, Id, message.Type)).ConfigureAwait(false);
+                    await InternalErrorAsync(string.Format(Resources.ErrorCreatingMessageHandler, message.Type)).ConfigureAwait(false);
                     return;
                 }
 
                 await messageHandler.HandleMessageAsync(message, this).ConfigureAwait(false);
                 Logger.Debug("Handler for message with type=" + message.Type + " for session " + Id + " took " + messageHandler.RuntimeMs + "ms to complete");
             } catch(MessageHandlerException e) {
-                InternalErrorAsync(string.Format(Resources.ErrorHandlingMessage, Id), e).Wait();
+                InternalErrorAsync(string.Format(Resources.ErrorHandlingMessage), e).Wait();
             } catch(Exception e) {
-                InternalErrorAsync(string.Format(Resources.ErrorHandlingMessage, Id), e).Wait();
+                InternalErrorAsync(string.Format(Resources.ErrorHandlingMessage), e).Wait();
             }
         }
 

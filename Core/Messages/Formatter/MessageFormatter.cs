@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Properties;
+using EnergonSoftware.Core.Util;
 
 namespace EnergonSoftware.Core.Messages.Formatter
 {

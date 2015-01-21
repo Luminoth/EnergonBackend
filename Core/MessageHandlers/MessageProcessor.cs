@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,13 +62,13 @@ namespace EnergonSoftware.Core.MessageHandlers
             _messageQueueEvent.Set();
         }
 
-        public async Task ParseMessagesAsync(MemoryBuffer buffer)
+        public async Task ParseMessagesAsync(MemoryStream buffer)
         {
-            MessagePacket packet = await _session.Parser.ParseAsync(buffer, _session.FormatterType).ConfigureAwait(false);
+            MessagePacket packet = await _session.Parser.ParseAsync(buffer).ConfigureAwait(false);
             while(null != packet) {
                 Logger.Debug("Session " + _session.Id + " parsed message type: " + packet.Content.Type);
                 QueueMessage(packet.Content);
-                packet = await _session.Parser.ParseAsync(buffer, _session.FormatterType).ConfigureAwait(false);
+                packet = await _session.Parser.ParseAsync(buffer).ConfigureAwait(false);
             }
         }
 
