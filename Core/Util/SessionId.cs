@@ -32,13 +32,14 @@ namespace EnergonSoftware.Core.Util
             long salt2 = random.Next(10000);
 
             string value = salt1.ToString() + ":" + CreationTime + ":" + salt2.ToString();
-            byte[] secretHash = Encoding.UTF8.GetBytes(new EnergonSoftware.Core.Util.Crypt.SHA512().HashHexAsync(Secret).Result);
+            string secretHash = new EnergonSoftware.Core.Util.Crypt.SHA512().HashHexAsync(Secret).Result;
 
             byte[] encrypted = null;
             using(Aes aes = Aes.Create()) {
-                aes.GenerateIV();
+                /*aes.GenerateIV();
                 Array.Copy(IV, aes.IV, Math.Min(IV.Length, aes.IV.Length));
-                encrypted = AES.EncryptAsync(value, secretHash, IV).Result;
+                encrypted = AES.EncryptAsync(value, secretHash, IV).Result;*/
+                encrypted = AES.EncryptAsync(secretHash, aes.Key, aes.IV).Result;
             }
 
             byte[] combined = new byte[IV.Length + encrypted.Length];

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Configuration;
 using System.Runtime.CompilerServices;
 
 using EnergonSoftware.Launcher.Properties;
@@ -17,6 +19,8 @@ namespace EnergonSoftware.Launcher
         }
 
         public static readonly ClientState Instance = new ClientState();
+
+        public bool UseDummyNetwork { get { return Convert.ToBoolean(ConfigurationManager.AppSettings["dummyNetwork"]); } }
 
         private Page _currentPage = Page.Update;
         public Page CurrentPage

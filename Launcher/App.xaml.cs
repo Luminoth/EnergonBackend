@@ -120,6 +120,15 @@ namespace EnergonSoftware.Launcher
 
         private async void OnAuthSuccessCallback()
         {
+            if(ClientState.Instance.UseDummyNetwork) {
+                // TODO: this is duplicated from the LoginMessageHandler
+                // and should be better encapsulated somewhere else
+                ClientState.Instance.LoggingIn = false;
+                ClientState.Instance.LoggedIn = true;
+                ClientState.Instance.CurrentPage = ClientState.Page.Main;
+                return;
+            }
+
             _overmindSession = new OvermindSession();
             _overmindSession.OnDisconnect += OnDisconnectCallback;
             _overmindSession.OnError += OnErrorCallback;
@@ -152,6 +161,12 @@ namespace EnergonSoftware.Launcher
 
             ClientState.Instance.Password = password;
             ClientState.Instance.LoggingIn = true;
+
+            if(ClientState.Instance.UseDummyNetwork) {
+                Logger.Debug("Faking network for testing...");
+                OnAuthSuccessCallback();
+                return;
+            }
 
             AuthSession session = new AuthSession();
             session.OnAuthFailed += OnAuthFailedCallback;
