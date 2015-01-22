@@ -19,7 +19,7 @@ namespace EnergonSoftware.Database.Models.Events
         public long Id { get; protected set; }
         public long Timestamp { get; protected set; }
 
-        public Event()
+        protected Event()
         {
             Timestamp = Time.CurrentTimeMs;
         }

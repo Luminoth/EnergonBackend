@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -34,17 +35,25 @@ namespace EnergonSoftware.Core.Net
 
         public void CreateSockets(ListenAddressConfigurationElementCollection listenAddresses)
         {
+            if(null == listenAddresses) {
+                throw new ArgumentNullException("listenAddresses");
+            }
+
             lock(_lock) {
                 foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
                     Logger.Info("Listening on address " + listenAddress + "...");
 
+                    Socket socket = null;
                     try {
                         IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
-                        Socket socket = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+                        socket = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
                         socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                         socket.Bind(endpoint);
                         _listenSockets.Add(socket);
-                    } catch(SocketException e) {
+                    } catch(Exception e) {
+                        if(null != socket) {
+                            socket.Dispose();
+                        }
                         Logger.Error(Resources.ErrorCreatingSocket, e);
                     }
                 }

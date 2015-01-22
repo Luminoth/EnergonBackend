@@ -37,11 +37,11 @@ namespace EnergonSoftware.Launcher
             }
         }
 
+        private const int MinCheckTimeSeconds = 1000 * 60;
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(NewsChecker));
 
         public static readonly NewsChecker Instance = new NewsChecker();
-
-        private const int MinCheckTimeSeconds = 1000 * 60;
 
         private long _lastCheckTime = 0;
 

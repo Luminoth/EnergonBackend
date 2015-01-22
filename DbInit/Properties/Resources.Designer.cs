@@ -61,6 +61,15 @@ namespace EnergonSoftware.DbInit.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to About {0}.
+        /// </summary>
+        public static string AboutMessage {
+            get {
+                return ResourceManager.GetString("AboutMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clear.
         /// </summary>
         public static string ButtonClear {

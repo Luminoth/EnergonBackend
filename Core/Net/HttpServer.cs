@@ -44,15 +44,21 @@ namespace EnergonSoftware.Core.Net
         }
 #endregion
 
-        public void Start(List<string> prefixes)
+        public void Start(IReadOnlyCollection<string> prefixes)
         {
+            if(null == prefixes) {
+                throw new ArgumentNullException("prefixes");
+            }
+
             if(null != _task) {
                 throw new InvalidOperationException(Resources.ErrorHttpServerAlreadyRunning);
             }
 
             Logger.Debug("Starting HttpServer...");
 
-            prefixes.ForEach(prefix => _listener.Prefixes.Add(prefix));
+            foreach(string prefix in prefixes) {
+                _listener.Prefixes.Add(prefix);
+            }
 
             _listener.Start();
 

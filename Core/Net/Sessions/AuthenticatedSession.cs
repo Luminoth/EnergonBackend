@@ -15,7 +15,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
         public Account Account { get; protected set; }
 
-        public AuthenticatedSession(Socket socket) : base(socket)
+        protected AuthenticatedSession(Socket socket) : base(socket)
         {
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using System;
+using System.Windows.Media;
 
 using log4net.Core;
 
@@ -22,6 +23,10 @@ namespace EnergonSoftware.WindowsUtil
 
         public static Color ParseColor(string logEntry)
         {
+            if(null == logEntry) {
+                throw new ArgumentNullException("logEntry");
+            }
+
             if(logEntry.Contains("INFO")) {
                 return LogEntryColor(Level.Info);
             } else if(logEntry.Contains("DEBUG")) {

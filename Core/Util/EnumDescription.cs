@@ -10,6 +10,10 @@ namespace EnergonSoftware.Core.Util
     {
         public static string GetDescriptionFromEnumValue(Enum value)
         {
+            if(null == value) {
+                throw new ArgumentNullException("value");
+            }
+
             DescriptionAttribute attribute = value.GetType()
                 .GetField(value.ToString())
                 .GetCustomAttributes(typeof(DescriptionAttribute), false)
@@ -21,7 +25,7 @@ namespace EnergonSoftware.Core.Util
         {
             var type = typeof(T);
             if(!type.IsEnum) {
-                throw new ArgumentException();
+                throw new ArgumentException("Type is not an enum!");
             }
 
             FieldInfo[] fields = type.GetFields();

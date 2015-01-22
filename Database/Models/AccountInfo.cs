@@ -133,6 +133,10 @@ namespace EnergonSoftware.Database.Models
 
         public void Load(DbDataReader reader)
         {
+            if(null == reader) {
+                throw new ArgumentNullException("reader");
+            }
+
             Id = reader.GetInt32(AccountsTable["id"].Id);
             _active = reader.GetBoolean(AccountsTable["active"].Id);
             _username = reader.GetString(AccountsTable["username"].Id);

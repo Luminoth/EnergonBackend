@@ -20,9 +20,17 @@ namespace System.Net.Sockets
                 return null;
             }
 
-            Socket remote = new Socket(socket.AddressFamily, socket.SocketType, socket.ProtocolType);
-            remote.Connect(remoteEndpoint);
-            return remote;
+            Socket remote = null;
+            try {
+                remote = new Socket(socket.AddressFamily, socket.SocketType, socket.ProtocolType);
+                remote.Connect(remoteEndpoint);
+                return remote;
+            } catch(Exception) {
+                if(null != remote) {
+                    remote.Dispose();
+                }
+                throw;
+            }
         }
 
         public static async Task<Socket> AcceptFromAsync(this Socket socket)

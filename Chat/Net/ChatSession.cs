@@ -23,10 +23,17 @@ namespace EnergonSoftware.Chat.Net
     {
         public Session Create(Socket socket)
         {
-            return new ChatSession(socket)
-            {
-                Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
-            };
+            ChatSession session = null;
+            try {
+                session = new ChatSession(socket);
+                session.Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
+                return session;
+            } catch(Exception) {
+                if(null != session) {
+                    session.Dispose();
+                }
+                throw;
+            }
         }
     }
 

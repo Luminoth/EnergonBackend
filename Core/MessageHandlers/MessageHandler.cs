@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net.Sessions;
+using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Util;
 
 using log4net;
@@ -16,15 +16,7 @@ namespace EnergonSoftware.Core.MessageHandlers
 
     public class MessageHandler
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageHandler));
-
-        private bool _running = false;
-        public bool Finished { get; private set; }
-
-        private long _startTime, _finishTime;
-        public long RuntimeMs { get { return Finished ? _finishTime - _startTime : Time.CurrentTimeMs - _startTime; } }
-
-        private void Authenticate(IAuthenticatedMessage message, AuthenticatedSession session)
+        private static void Authenticate(IAuthenticatedMessage message, AuthenticatedSession session)
         {
             if(null != message && null != session) {
                 if(!session.Authenticate(message.Username, message.SessionId)) {
@@ -32,6 +24,12 @@ namespace EnergonSoftware.Core.MessageHandlers
                 }
             }
         }
+
+        private bool _running = false;
+        public bool Finished { get; private set; }
+
+        private long _startTime, _finishTime;
+        public long RuntimeMs { get { return Finished ? _finishTime - _startTime : Time.CurrentTimeMs - _startTime; } }
 
         public async Task HandleMessageAsync(IMessage message, Session session)
         {

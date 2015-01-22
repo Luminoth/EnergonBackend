@@ -58,7 +58,7 @@ namespace EnergonSoftware.DbInit.Windows
         public void MenuHelpAbout_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(this, EnergonSoftware.DbInit.Properties.Resources.MainWindowTitle,
-                "About " + EnergonSoftware.DbInit.Properties.Resources.MainWindowTitle,
+                string.Format(EnergonSoftware.DbInit.Properties.Resources.AboutMessage, EnergonSoftware.DbInit.Properties.Resources.MainWindowTitle),
                 MessageBoxButton.OK, MessageBoxImage.Information);
         }
 

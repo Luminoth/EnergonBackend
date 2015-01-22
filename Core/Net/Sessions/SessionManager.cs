@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -20,6 +21,10 @@ namespace EnergonSoftware.Core.Net.Sessions
 
         public void Add(Session session)
         {
+            if(null == session) {
+                throw new ArgumentNullException("session");
+            }
+
             lock(_lock) {
                 Logger.Info("Managing new session: " + session.Id);
                 _sessions.Add(session);

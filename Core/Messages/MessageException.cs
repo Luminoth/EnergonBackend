@@ -18,7 +18,7 @@ namespace EnergonSoftware.Core.Messages
         {
         }
 
-        public MessageException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected MessageException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Windows.Documents;
+﻿using System;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace System.Windows.Controls

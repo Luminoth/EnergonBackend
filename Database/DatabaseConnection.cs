@@ -18,6 +18,10 @@ namespace EnergonSoftware.Database
 
         public static string ParseDataSource(ConnectionStringSettings connectionSettings)
         {
+            if(null == connectionSettings) {
+                throw new ArgumentNullException("connectionSettings");
+            }
+
             DbProviderFactory providerFactory = DbProviderFactories.GetFactory(connectionSettings.ProviderName);
 
             DbConnectionStringBuilder builder = providerFactory.CreateConnectionStringBuilder();
@@ -79,6 +83,10 @@ namespace EnergonSoftware.Database
 
         public DatabaseConnection(ConnectionStringSettings connectionSettings)
         {
+            if(null == connectionSettings) {
+                throw new ArgumentNullException("connectionSettings");
+            }
+
             ConnectionSettings = connectionSettings;
 
             DbProviderFactory providerFactory = DbProviderFactories.GetFactory(connectionSettings.ProviderName);
@@ -125,6 +133,14 @@ namespace EnergonSoftware.Database
 
         public DbCommand BuildCommand(string commandText, Dictionary<string, object> parameters)
         {
+            if(null == commandText) {
+                throw new ArgumentNullException("commandText");
+            }
+
+            if(null == parameters) {
+                throw new ArgumentNullException("parameters");
+            }
+
             DbCommand command = BuildCommand(commandText);
             foreach(var param in parameters) {
                 AddParameter(command, param.Key, param.Value);

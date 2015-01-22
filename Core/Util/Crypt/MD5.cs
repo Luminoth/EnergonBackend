@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace EnergonSoftware.Core.Util.Crypt
 {
-    [Obsolete]
+    [Obsolete("Use SHA512 instead")]
     public class MD5 : Digest
     {
         public async override Task<byte[]> HashAsync(string value)

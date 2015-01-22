@@ -18,7 +18,7 @@ namespace EnergonSoftware.Core.Messages.Formatter
         {
         }
 
-        public MessageFormatterException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected MessageFormatterException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

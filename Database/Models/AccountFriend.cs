@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
 
@@ -62,6 +63,10 @@ namespace EnergonSoftware.Database.Models
 
         public void Load(DbDataReader reader)
         {
+            if(null == reader) {
+                throw new ArgumentNullException("reader");
+            }
+
             _account = reader.GetInt32(AccountFriendsTable["account"].Id);
             _friend = reader.GetInt32(AccountFriendsTable["friend"].Id);
         }

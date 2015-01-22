@@ -17,8 +17,6 @@ namespace EnergonSoftware.Core.Messages.Packet
     public sealed class NetworkPacket : MessagePacket
     {
         public static readonly byte[] Marker = new byte[] { (byte)'E', (byte)'S', (byte)'N', (byte)'M', 0 };
-
-        private const int MaxContentLength = ushort.MaxValue;
         private static readonly byte[] Terminator = new byte[] { (byte)'\r', (byte)'\n', 0 };
 
         public const string PacketType = "network";

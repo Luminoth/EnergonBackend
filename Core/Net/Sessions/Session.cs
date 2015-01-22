@@ -31,11 +31,8 @@ namespace EnergonSoftware.Core.Net.Sessions
 #endregion
 
 #region Events
-        public delegate void OnDisconnectHandler(object sender, DisconnectEventArgs e);
-        public event OnDisconnectHandler OnDisconnect;
-
-        public delegate void OnErrorHandler(object sender, ErrorEventArgs e);
-        public event OnErrorHandler OnError;
+        public event EventHandler<DisconnectEventArgs> OnDisconnect;
+        public event EventHandler<ErrorEventArgs> OnError;
 #endregion
 
         public readonly int Id;
@@ -73,7 +70,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             Processor.Start();
         }
 
-        public Session(Socket socket) : this()
+        protected Session(Socket socket) : this()
         {
             _socketState = new SocketState(socket);
         }
@@ -106,7 +103,12 @@ namespace EnergonSoftware.Core.Net.Sessions
             _socketState.Socket = await NetUtil.ConnectMulticastAsync(group, port, ttl).ConfigureAwait(false);
         }
 
-        public async Task DisconnectAsync(string reason=null)
+        public async Task DisconnectAsync()
+        {
+            await DisconnectAsync(string.Empty);
+        }
+
+        public async Task DisconnectAsync(string reason)
         {
             try {
                 if(!Connected) {

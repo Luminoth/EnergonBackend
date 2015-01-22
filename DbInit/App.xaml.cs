@@ -14,18 +14,16 @@ namespace EnergonSoftware.DbInit
     /// </summary>
     public partial class App : Application, INotifyPropertyChanged
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(App));
-
         public static App Instance { get { return (App)Application.Current; } }
+
+        private static void ConfigureLogging()
+        {
+            XmlConfigurator.Configure();
+        }
 
         private bool _running = false;
         public bool Running { get { return _running; } set { _running = value; NotifyPropertyChanged(); NotifyPropertyChanged("NotRunning"); } }
         public bool NotRunning { get { return !Running; } }
-
-        private void ConfigureLogging()
-        {
-            XmlConfigurator.Configure();
-        }
 
 #region Event Handlers
         private /*async*/ void Application_Startup(object sender, StartupEventArgs e)

@@ -34,7 +34,7 @@ namespace EnergonSoftware.Core.Util
             NonceValue = nonce;
             NonceHash = new SHA512().HashHexAsync(NonceValue).Result;
 
-            int idx = NonceValue.IndexOf(":");
+            int idx = NonceValue.IndexOf(":", StringComparison.InvariantCultureIgnoreCase);
             CreationTime = int.Parse(NonceValue.Substring(0, idx));
         }
     }

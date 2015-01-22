@@ -12,7 +12,7 @@ namespace EnergonSoftware.Core
         [Description("NONE")]
         None,
 
-        [Obsolete]
+        [Obsolete("Use DIGEST-SHA512 instead")]
         [Description("DIGEST-MD5")]
         DigestMD5,
 
@@ -24,10 +24,14 @@ namespace EnergonSoftware.Core
     {
         public static Dictionary<string, string> ParseDigestValues(string message)
         {
+            if(null == message) {
+                throw new ArgumentNullException("message");
+            }
+
             string[] pairs = message.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             Dictionary<string, string> values = new Dictionary<string, string>();
             foreach(string pair in pairs) {
-                int idx = pair.IndexOf("=");
+                int idx = pair.IndexOf("=", StringComparison.InvariantCultureIgnoreCase);
                 if(idx < 0) {
                     return null;
                 }

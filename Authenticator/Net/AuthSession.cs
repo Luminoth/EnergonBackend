@@ -23,10 +23,17 @@ namespace EnergonSoftware.Authenticator.Net
     {
         public Session Create(Socket socket)
         {
-            return new AuthSession(socket)
-            {
-                Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
-            };
+            AuthSession session = null;
+            try {
+                session = new AuthSession(socket);
+                session.Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
+                return session;
+            } catch(Exception) {
+                if(null != session) {
+                    session.Dispose();
+                }
+                throw;
+            }
         }
     }
 

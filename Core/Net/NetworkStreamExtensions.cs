@@ -31,7 +31,6 @@ namespace System.IO
             await stream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
         }
 
-
         public static async Task WriteNetworkAsync(this Stream stream, float value)
         {
             byte[] bytes = BitConverter.GetBytes(value);

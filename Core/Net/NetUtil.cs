@@ -35,15 +35,23 @@ namespace EnergonSoftware.Core.Net
         {
             EndPoint endpoint = new IPEndPoint(iface, port);
 
-            Socket listener = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-            listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            listener.Bind(endpoint);
+            Socket listener = null;
+            try {
+                listener = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+                listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                listener.Bind(endpoint);
 
-// TODO: support ipv6 here
-            listener.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(group, iface));
-            listener.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, ttl);
+    // TODO: support ipv6 here
+                listener.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(group, iface));
+                listener.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, ttl);
 
-            return listener;
+                return listener;
+            } catch(Exception) {
+                if(null != listener) {
+                    listener.Dispose();
+                }
+                throw;
+            }
         }
 
         public static async Task<Socket> ConnectMulticastAsync(IPAddress group, int port, int ttl)
@@ -61,6 +69,14 @@ namespace EnergonSoftware.Core.Net
 
         public static bool CompareEndPoints(string a, EndPoint b)
         {
+            if(null == a) {
+                throw new ArgumentNullException("a");
+            }
+
+            if(null == b) {
+                throw new ArgumentNullException("b");
+            }
+
             string[] aparts = a.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
             if(aparts.Length < 1) {
                 return false;

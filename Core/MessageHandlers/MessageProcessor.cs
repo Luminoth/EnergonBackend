@@ -23,6 +23,8 @@ namespace EnergonSoftware.Core.MessageHandlers
         private readonly AutoResetEvent _messageQueueEvent = new AutoResetEvent(false);
         private /*readonly*/ ConcurrentQueue<IMessage> _messageQueue = new ConcurrentQueue<IMessage>();
 
+        public int QueueSize { get { return _messageQueue.Count; } }
+
         private CancellationTokenSource _cancellationToken;
         private Task _task;
 
@@ -50,11 +52,6 @@ namespace EnergonSoftware.Core.MessageHandlers
             }
         }
 #endregion
-
-        public int GetQueueSize()
-        {
-            return _messageQueue.Count;
-        }
 
         public void QueueMessage(IMessage message)
         {

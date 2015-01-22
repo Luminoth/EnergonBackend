@@ -40,7 +40,7 @@ namespace EnergonSoftware.Launcher
 #endregion
 
 #region Idle Properties
-        private static Task _idleTask;
+        private Task _idleTask;
         private static CancellationTokenSource _cancellationToken = new CancellationTokenSource();
 #endregion
 
@@ -67,22 +67,7 @@ namespace EnergonSoftware.Launcher
         }
 #endregion
 
-#region Dispose
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if(disposing) {
-                _cancellationToken.Dispose();
-            }
-        }
-#endregion
-
-        private void ConfigureLogging()
+        private static void ConfigureLogging()
         {
             XmlConfigurator.Configure();
         }

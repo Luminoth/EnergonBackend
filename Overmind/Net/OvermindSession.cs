@@ -21,10 +21,17 @@ namespace EnergonSoftware.Overmind.Net
     {
         public Session Create(Socket socket)
         {
-            return new OvermindSession(socket)
-            {
-                Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
-            };
+            OvermindSession session = null;
+            try {
+                session = new OvermindSession(socket);
+                session.Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
+                return session;
+            } catch(Exception) {
+                if(null != session) {
+                    session.Dispose();
+                }
+                throw;
+            }
         }
     }
 
