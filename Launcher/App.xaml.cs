@@ -3,14 +3,10 @@ using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
 
 using EnergonSoftware.Core;
-using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
-using EnergonSoftware.Core.Util;
-using EnergonSoftware.Launcher.MessageHandlers;
 using EnergonSoftware.Launcher.Net;
 using EnergonSoftware.Launcher.Windows;
 
@@ -90,7 +86,7 @@ namespace EnergonSoftware.Launcher
             ConfigureLogging();
             Common.InitFilesystem();
 
-            await UpdateChecker.Instance.CheckForUpdatesAsync();
+            await UpdateManager.Instance.CheckForUpdatesAsync();
 
             // have to run this in a separate thread
             // so that we don't lock up the UI
@@ -107,8 +103,6 @@ namespace EnergonSoftware.Launcher
 
             await Sessions.DisconnectAllAsync();
 
-            DebugWindow.Close();
-
             Logger.Info("Goodbye!");
         }
 
@@ -121,11 +115,7 @@ namespace EnergonSoftware.Launcher
         private async void OnAuthSuccessCallback()
         {
             if(ClientState.Instance.UseDummyNetwork) {
-                // TODO: this is duplicated from the LoginMessageHandler
-                // and should be better encapsulated somewhere else
-                ClientState.Instance.LoggingIn = false;
-                ClientState.Instance.LoggedIn = true;
-                ClientState.Instance.CurrentPage = ClientState.Page.Main;
+                await ClientState.Instance.OnLoggedInAsync(true).ConfigureAwait(false);
                 return;
             }
 
@@ -189,10 +179,7 @@ namespace EnergonSoftware.Launcher
                 _overmindSession = null;
             }
 
-            ClientState.Instance.LoggingIn = false;
-            ClientState.Instance.LoggedIn = false;
-
-            ClientState.Instance.CurrentPage = ClientState.Page.Login;
+            await ClientState.Instance.OnLoggedInAsync(false).ConfigureAwait(false);
         }
     }
 }

@@ -8,14 +8,13 @@ using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 using log4net;
 
 namespace EnergonSoftware.Launcher
 {
-    internal class UpdateChecker : INotifyPropertyChanged
+    internal class UpdateManager : INotifyPropertyChanged
     {
         [DataContract]
         private class Update
@@ -38,9 +37,9 @@ namespace EnergonSoftware.Launcher
             }
         }
 
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(UpdateChecker));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(UpdateManager));
 
-        public static readonly UpdateChecker Instance = new UpdateChecker();
+        public static readonly UpdateManager Instance = new UpdateManager();
 
         private string _updateStatus = Properties.Resources.UpdatesLabel;
         public string UpdateStatus { get { return _updateStatus; } private set { _updateStatus = value; NotifyPropertyChanged(); } }
@@ -56,33 +55,43 @@ namespace EnergonSoftware.Launcher
             // TODO: use string resources here
             Logger.Info("Checking for updates...");
 
-            using(HttpClient client = new HttpClient()) {
-                client.BaseAddress = new Uri(ConfigurationManager.AppSettings["updateHost"]);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            try {
+                using(HttpClient client = new HttpClient()) {
+                    client.BaseAddress = new Uri(ConfigurationManager.AppSettings["updateHost"]);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                HttpResponseMessage response = await client.GetAsync("updates/launcher").ConfigureAwait(false);
-                if(response.IsSuccessStatusCode) {
-                    List<Update> updates = new List<Update>();
-                    using(Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false)) {
-                        DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Update>));
-                        updates = (List<Update>)serializer.ReadObject(stream);
-                    }
-                    Logger.Debug("Read updates: " + string.Join(",", (object[])updates.ToArray()));
-
-                    // TODO: check the updates and then update!
-
-                    UpdateStatus = "Up to date!";
-                    UpdateFailed = false;
-                    Updated = true;
-
+                    HttpResponseMessage response = await client.GetAsync("updates/launcher").ConfigureAwait(false);
 await Task.Delay(2000).ConfigureAwait(false);
-                    ClientState.Instance.CurrentPage = ClientState.Page.Login;
-                } else {
-                    UpdateStatus = "Error contacting update server: " + response.ReasonPhrase;
-                    UpdateFailed = true;
-                    Updated = false;
+                    if(response.IsSuccessStatusCode) {
+                        List<Update> updates = new List<Update>();
+                        using(Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false)) {
+                            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Update>));
+                            updates = (List<Update>)serializer.ReadObject(stream);
+                        }
+                        Logger.Debug("Read updates: " + string.Join(",", (object[])updates.ToArray()));
+
+                        // TODO: check the updates and then update!
+
+                        await DoUpdateAsync("Up to date!", true).ConfigureAwait(false);
+                    } else {
+                        await DoUpdateAsync("Error contacting update server: " + response.ReasonPhrase, false).ConfigureAwait(false);
+                    }
                 }
+            } catch(Exception e) {
+                DoUpdateAsync("Error contacting update server: " + e.Message, false).Wait();
+            }
+        }
+
+        private async Task DoUpdateAsync(string status, bool success)
+        {
+            UpdateStatus = status;
+            UpdateFailed = !success;
+            Updated = success;
+
+            if(success) {
+                await Task.Delay(1000).ConfigureAwait(false);
+                await ClientState.Instance.OnUpdatedAsync().ConfigureAwait(false);
             }
         }
 
@@ -96,7 +105,7 @@ await Task.Delay(2000).ConfigureAwait(false);
         }
 #endregion
 
-        private UpdateChecker()
+        private UpdateManager()
         {
         }
     }

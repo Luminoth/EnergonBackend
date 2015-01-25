@@ -1,19 +1,19 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace EnergonSoftware.Launcher.Controls
+namespace EnergonSoftware.Launcher.Pages
 {
     /// <summary>
     /// Interaction logic for LoginPage.xaml
     /// </summary>
-    public partial class LoginPage : UserControl
+    public partial class LoginPage : Page
     {
         public LoginPage()
         {
             InitializeComponent();
+
             DataContext = ClientState.Instance;
 
             if(!DesignerProperties.GetIsInDesignMode(this)) {
@@ -42,7 +42,7 @@ namespace EnergonSoftware.Launcher.Controls
         private async void IsVisible_Changed(object sender, DependencyPropertyChangedEventArgs e)
         {
             if(IsVisible) {
-                await NewsChecker.Instance.UpdateNewsAsync();
+                await NewsManager.Instance.UpdateNewsAsync();
             }
         }
 #endregion

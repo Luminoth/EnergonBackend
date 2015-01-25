@@ -1,17 +1,17 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace EnergonSoftware.Launcher.Controls
+namespace EnergonSoftware.Launcher.Pages
 {
     /// <summary>
     /// Interaction logic for UpdatePage.xaml
     /// </summary>
-    public partial class UpdatePage : UserControl
+    public partial class UpdatePage : Page
     {
         public UpdatePage()
         {
             InitializeComponent();
-            DataContext = UpdateChecker.Instance;
+            DataContext = UpdateManager.Instance;
         }
 
 #region Event Handlers

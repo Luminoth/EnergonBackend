@@ -79,27 +79,36 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Controls\FriendsListPage.xaml.cs">
-      <DependentUpon>FriendsListPage.xaml</DependentUpon>
+    <Compile Include="Controls\FriendsListPanel.xaml.cs">
+      <DependentUpon>FriendsListPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="FriendListManager.cs" />
     <Compile Include="MessageHandlers\Chat\FriendListMessageHandler.cs" />
+    <Compile Include="Pages\LoginPage.xaml.cs">
+      <DependentUpon>LoginPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\UpdatePage.xaml.cs">
+      <DependentUpon>UpdatePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="Controls\FriendsListPage.xaml">
+    <Page Include="Controls\FriendsListPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\LoginPage.xaml">
+    <Page Include="Pages\LoginPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\MainPage.xaml">
+    <Page Include="Pages\MainPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\UpdatePage.xaml">
+    <Page Include="Pages\UpdatePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -116,15 +125,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ClientState.cs" />
-    <Compile Include="Controls\LoginPage.xaml.cs">
-      <DependentUpon>LoginPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\MainPage.xaml.cs">
-      <DependentUpon>MainPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\UpdatePage.xaml.cs">
-      <DependentUpon>UpdatePage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="MessageHandlers\Auth\ChallengeMessageHandler.cs" />
     <Compile Include="MessageHandlers\Auth\FailureMessageHandler.cs" />
     <Compile Include="MessageHandlers\Auth\SuccessMessageHandler.cs" />
@@ -135,9 +135,9 @@
     <Compile Include="Net\AuthSession.cs" />
     <Compile Include="Net\ChatSession.cs" />
     <Compile Include="Net\OvermindSession.cs" />
-    <Compile Include="NewsChecker.cs" />
+    <Compile Include="NewsManager.cs" />
     <Compile Include="OutputAppender.cs" />
-    <Compile Include="UpdateChecker.cs" />
+    <Compile Include="UpdateManager.cs" />
     <Compile Include="Windows\DebugWindow.xaml.cs">
       <DependentUpon>DebugWindow.xaml</DependentUpon>
     </Compile>
@@ -205,6 +205,7 @@
       <Name>WindowsUtil</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

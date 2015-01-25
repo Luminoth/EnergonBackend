@@ -20,11 +20,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers
                 return;
             }
 
-            ClientState.Instance.LoggingIn = false;
-            ClientState.Instance.LoggedIn = true;
-
-            ClientState.Instance.CurrentPage = ClientState.Page.Main;
-            await Task.Delay(0).ConfigureAwait(false);
+            await ClientState.Instance.OnLoggedInAsync(true).ConfigureAwait(false);
         }
     }
 }

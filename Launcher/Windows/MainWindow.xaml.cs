@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
+
+using EnergonSoftware.Launcher.Pages;
 
 namespace EnergonSoftware.Launcher.Windows
 {
@@ -9,6 +12,35 @@ namespace EnergonSoftware.Launcher.Windows
     public partial class MainWindow : Window
     {
         public static MainWindow Instance { get { return (MainWindow)Application.Current.MainWindow; } }
+
+#region UI Helpers
+        public static async Task ShowLoginPageAsync()
+        {
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    MainWindow.Instance.MainFrame.Navigate(new LoginPage());
+                }
+            );
+        }
+
+        public static async Task ShowMainPageAsync()
+        {
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    MainWindow.Instance.MainFrame.Navigate(new MainPage());
+                }
+            );
+        }
+
+        public static async Task NavigateBackAsync()
+        {
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    MainWindow.Instance.MainFrame.GoBack();
+                }
+            );
+        }
+#endregion
 
         public MainWindow()
         {

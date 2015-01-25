@@ -2,44 +2,18 @@
 using System.ComponentModel;
 using System.Configuration;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Launcher.Properties;
-
-using log4net;
+using EnergonSoftware.Launcher.Windows;
 
 namespace EnergonSoftware.Launcher
 {
     internal sealed class ClientState : INotifyPropertyChanged
     {
-        public enum Page
-        {
-            Update,
-            Login,
-            Main,
-        }
-
         public static readonly ClientState Instance = new ClientState();
 
         public bool UseDummyNetwork { get { return Convert.ToBoolean(ConfigurationManager.AppSettings["dummyNetwork"]); } }
-
-        private Page _currentPage = Page.Update;
-        public Page CurrentPage
-        {
-            get { return _currentPage; }
-            set {
-                _currentPage = value;
-                NotifyPropertyChanged();
-                NotifyPropertyChanged("ShowUpdatePage");
-                NotifyPropertyChanged("ShowLoginPage");
-                NotifyPropertyChanged("ShowMainPage");
-            }
-        }
-        public bool ShowUpdatePage { get { return Page.Update == CurrentPage; } }
-        public bool ShowLoginPage { get { return Page.Login == CurrentPage; } }
-        public bool ShowMainPage { get { return Page.Main == CurrentPage; } }
-
-        private bool _showFriendsList = false;
-        public bool ShowFriendsList { get { return _showFriendsList; } set { _showFriendsList = value; NotifyPropertyChanged(); } }
 
         public string FriendButtonText { get { return string.Format(Resources.FriendsLabel, FriendListManager.Instance.OnlineCount, FriendListManager.Instance.Total); } }
 
@@ -59,10 +33,12 @@ namespace EnergonSoftware.Launcher
         public bool LoggedIn
         {
             get { return _loggedIn; }
-            set {
+            private set {
                 _loggedIn = value;
                 NotifyPropertyChanged();
                 NotifyPropertyChanged("NotLoggedIn");
+
+                LoggingIn = false;
             }
         }
         public bool NotLoggedIn { get { return !LoggedIn; } }
@@ -78,6 +54,22 @@ namespace EnergonSoftware.Launcher
             }
         }
         public bool NotLoggingIn { get { return !LoggingIn; } }
+
+        public async Task OnLoggedInAsync(bool loggedIn)
+        {
+            LoggedIn = loggedIn;
+
+            if(LoggedIn) {
+                await MainWindow.ShowMainPageAsync().ConfigureAwait(false);
+            } else {
+                await MainWindow.ShowLoginPageAsync().ConfigureAwait(false);
+            }
+        }
+
+        public async Task OnUpdatedAsync()
+        {
+            await MainWindow.ShowLoginPageAsync().ConfigureAwait(false);
+        }
 
 #region Property Notifier
         public event PropertyChangedEventHandler PropertyChanged;

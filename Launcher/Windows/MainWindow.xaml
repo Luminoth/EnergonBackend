@@ -2,13 +2,10 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:launcherprops="clr-namespace:EnergonSoftware.Launcher.Properties"
-        xmlns:launchercontrols="clr-namespace:EnergonSoftware.Launcher.Controls"
         Title="{x:Static launcherprops:Resources.MainWindowTitle}"
         Height="350" Width="525" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
-    <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
-    </Window.Resources>
+
     <DockPanel>
         <Menu DockPanel.Dock="Top" IsMainMenu="True">
             <MenuItem Header="_Help">
@@ -16,19 +13,7 @@
                 <MenuItem Header="Settings..." Click="MenuItemHelpSettings_Click" />
             </MenuItem>
         </Menu>
-        <Grid Margin="5" HorizontalAlignment="Center" VerticalAlignment="Top">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
 
-            <launchercontrols:UpdatePage Grid.Row="0" Grid.Column="0" Margin="5" Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ShowUpdatePage, Converter={StaticResource BoolToVis}}" />
-            <launchercontrols:LoginPage Grid.Row="1" Grid.Column="0" Margin="5" Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ShowLoginPage, Converter={StaticResource BoolToVis}}" />
-            <launchercontrols:MainPage Grid.Row="2" Grid.Column="0" Margin="5" Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ShowMainPage, Converter={StaticResource BoolToVis}}" />
-        </Grid>
+        <Frame Name="MainFrame" Source="..\Pages\UpdatePage.xaml" JournalOwnership="OwnsJournal" NavigationUIVisibility="Hidden" />
     </DockPanel>
 </Window>
