@@ -4,6 +4,7 @@ using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Launcher.Net;
+using EnergonSoftware.Launcher.Windows;
 
 namespace EnergonSoftware.Launcher.MessageHandlers
 {
@@ -20,7 +21,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers
                 return;
             }
 
-            await ClientState.Instance.OnLoggedInAsync(true).ConfigureAwait(false);
+            await MainWindow.ShowMainPageAsync().ConfigureAwait(false);
         }
     }
 }

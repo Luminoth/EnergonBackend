@@ -49,7 +49,17 @@ namespace EnergonSoftware.Launcher.Windows
         }
 
 #region Event Handlers
-        private void MenuHelpDebugWindow_Click(object sender, RoutedEventArgs evt)
+        private async void MenuFileLogout_Click(object sender, RoutedEventArgs e)
+        {
+            await App.Instance.LogoutAsync().ConfigureAwait(false);
+        }
+
+        private void MenuFileExit_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void MenuHelpDebugWindow_Click(object sender, RoutedEventArgs e)
         {
             DebugWindow.Instance.Show();
         }

@@ -12,30 +12,10 @@ using EnergonSoftware.Core.Util;
 
 using log4net;
 
-namespace EnergonSoftware.Launcher
+namespace EnergonSoftware.Launcher.News
 {
-    internal class NewsManager
+    internal sealed class NewsManager
     {
-        [DataContract]
-        private class News
-        {
-            [DataMember(Name="category")]
-            public string Category { get; set; }
-
-            [DataMember(Name="date")]
-            public string Date { get; set; }
-
-            [DataMember(Name="news")]
-            public /*DateTime*/string NewsValue { get; set; }
-
-            public string NewsUpdate { get { return Date + "\r\n\r\n" + NewsValue; } }
-
-            public override string ToString()
-            {
-                return "News(category=" + Category + ", date=" + Date + ", news=" + NewsValue + ")";
-            }
-        }
-
         private const int MinCheckTimeSeconds = 1000 * 60;
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(NewsManager));
@@ -63,10 +43,10 @@ namespace EnergonSoftware.Launcher
                     HttpResponseMessage response = await client.GetAsync("news/launcher").ConfigureAwait(false);
 await Task.Delay(2000).ConfigureAwait(false);
                     if(response.IsSuccessStatusCode) {
-                        List<News> news = new List<News>();
+                        List<NewsContract> news = new List<NewsContract>();
                         using(Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false)) {
-                            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<News>));
-                            news = (List<News>)serializer.ReadObject(stream);
+                            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<NewsContract>));
+                            news = (List<NewsContract>)serializer.ReadObject(stream);
                         }
                         Logger.Debug("Read news: " + string.Join(",", (object[])news.ToArray()));
 

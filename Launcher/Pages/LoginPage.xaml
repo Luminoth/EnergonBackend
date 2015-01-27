@@ -39,16 +39,16 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static launcherprops:Resources.UsernameLabel}" />
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Width="Auto" Name="Username" IsEnabled="{Binding NotLoggingIn}" Text="{Binding Username}" />
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Width="Auto" Name="Username" Text="{Binding Username}" />
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"  Text="{x:Static launcherprops:Resources.PasswordLabel}" />
-                <PasswordBox Grid.Row="1" Grid.Column="1" Margin="5" Width="Auto" Name="Password" IsEnabled="{Binding NotLoggingIn}" />
+                <PasswordBox Grid.Row="1" Grid.Column="1" Margin="5" Width="Auto" Name="Password" />
             </Grid>
         </Border>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding LoggingIn, Converter={StaticResource BoolToVis}}" Text="{x:Static launcherprops:Resources.ProgressLabel}" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center" Name="LoginProgress" Text="{x:Static launcherprops:Resources.ProgressLabel}" />
 
-        <Button Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5" Click="ButtonLogin_Click" IsEnabled="{Binding NotLoggingIn}" IsDefault="True">
+        <Button Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5" Name="LoginButton" Click="ButtonLogin_Click" IsDefault="True">
             <TextBlock Margin="5" Text="{x:Static launcherprops:Resources.LoginButtonLabel}" />
         </Button>
     </Grid>

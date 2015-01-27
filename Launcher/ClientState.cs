@@ -29,48 +29,6 @@ namespace EnergonSoftware.Launcher
 
         public string Ticket { get; set; }
 
-        private bool _loggedIn = false;
-        public bool LoggedIn
-        {
-            get { return _loggedIn; }
-            private set {
-                _loggedIn = value;
-                NotifyPropertyChanged();
-                NotifyPropertyChanged("NotLoggedIn");
-
-                LoggingIn = false;
-            }
-        }
-        public bool NotLoggedIn { get { return !LoggedIn; } }
-
-        private bool _loggingIn = false;
-        public bool LoggingIn
-        {
-            get { return _loggingIn; }
-            set {
-                _loggingIn = value;
-                NotifyPropertyChanged();
-                NotifyPropertyChanged("NotLoggingIn");
-            }
-        }
-        public bool NotLoggingIn { get { return !LoggingIn; } }
-
-        public async Task OnLoggedInAsync(bool loggedIn)
-        {
-            LoggedIn = loggedIn;
-
-            if(LoggedIn) {
-                await MainWindow.ShowMainPageAsync().ConfigureAwait(false);
-            } else {
-                await MainWindow.ShowLoginPageAsync().ConfigureAwait(false);
-            }
-        }
-
-        public async Task OnUpdatedAsync()
-        {
-            await MainWindow.ShowLoginPageAsync().ConfigureAwait(false);
-        }
-
 #region Property Notifier
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged([CallerMemberName] string property=null)

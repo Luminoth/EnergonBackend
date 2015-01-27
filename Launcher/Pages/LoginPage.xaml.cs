@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
+using EnergonSoftware.Launcher.News;
+
 namespace EnergonSoftware.Launcher.Pages
 {
     /// <summary>
@@ -33,10 +35,20 @@ namespace EnergonSoftware.Launcher.Pages
 #endregion
 
 #region Event Handlers
-        private async void ButtonLogin_Click(object sender, RoutedEventArgs evt)
+        private async void ButtonLogin_Click(object sender, RoutedEventArgs e)
         {
+            Username.IsEnabled = false;
+            Password.IsEnabled = false;
+            LoginProgress.Visibility = Visibility.Visible;
+            LoginButton.IsEnabled = false;
+
+
             await App.Instance.LoginAsync(Password.Password);
             await ClearPasswordAsync();
+
+            Username.IsEnabled = true;
+            Password.IsEnabled = true;
+            LoginButton.IsEnabled = true;
         }
 
         private async void IsVisible_Changed(object sender, DependencyPropertyChangedEventArgs e)

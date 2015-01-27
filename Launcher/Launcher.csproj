@@ -84,6 +84,7 @@
     </Compile>
     <Compile Include="FriendListManager.cs" />
     <Compile Include="MessageHandlers\Chat\FriendListMessageHandler.cs" />
+    <Compile Include="News\NewsContract.cs" />
     <Compile Include="Pages\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
     </Compile>
@@ -93,6 +94,8 @@
     <Compile Include="Pages\UpdatePage.xaml.cs">
       <DependentUpon>UpdatePage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Updater\UpdateContract.cs" />
+    <Compile Include="Updater\UpdateFinishedEventArgs.cs" />
     <Compile Include="Windows\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
@@ -135,9 +138,9 @@
     <Compile Include="Net\AuthSession.cs" />
     <Compile Include="Net\ChatSession.cs" />
     <Compile Include="Net\OvermindSession.cs" />
-    <Compile Include="NewsManager.cs" />
+    <Compile Include="News\NewsManager.cs" />
     <Compile Include="OutputAppender.cs" />
-    <Compile Include="UpdateManager.cs" />
+    <Compile Include="Updater\UpdateManager.cs" />
     <Compile Include="Windows\DebugWindow.xaml.cs">
       <DependentUpon>DebugWindow.xaml</DependentUpon>
     </Compile>

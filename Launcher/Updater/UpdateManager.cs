@@ -6,49 +6,25 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
 
 using log4net;
 
-namespace EnergonSoftware.Launcher
+namespace EnergonSoftware.Launcher.Updater
 {
-    internal class UpdateManager : INotifyPropertyChanged
+    internal sealed class UpdateManager : INotifyPropertyChanged
     {
-        [DataContract]
-        private class Update
-        {
-            [DataMember(Name="category")]
-            public string Category { get; set; }
-
-            [DataMember(Name="version")]
-            public string Version { get; set; }
-
-            [DataMember(Name="release_date")]
-            public /*DateTime*/string ReleaseDate { get; set; }
-
-            [DataMember(Name="url")]
-            public string Url { get; set; }
-
-            public override string ToString()
-            {
-                return "Update(category=" + Category + ", version=" + Version + ", release date=" + ReleaseDate + ", url=" + Url + ")";
-            }
-        }
-
         private static readonly ILog Logger = LogManager.GetLogger(typeof(UpdateManager));
 
         public static readonly UpdateManager Instance = new UpdateManager();
 
+#region Events
+        public event EventHandler<UpdateFinishedEventArgs> OnUpdateFinished;
+#endregion
+
         private string _updateStatus = Properties.Resources.UpdatesLabel;
         public string UpdateStatus { get { return _updateStatus; } private set { _updateStatus = value; NotifyPropertyChanged(); } }
-
-        private bool _updateFailed;
-        public bool UpdateFailed { get { return _updateFailed; } private set { _updateFailed = value; NotifyPropertyChanged(); } }
-
-        private bool _updated;
-        public bool Updated { get { return _updated; } private set { _updated = value; NotifyPropertyChanged(); } }
 
         public async Task CheckForUpdatesAsync()
         {
@@ -64,34 +40,43 @@ namespace EnergonSoftware.Launcher
                     HttpResponseMessage response = await client.GetAsync("updates/launcher").ConfigureAwait(false);
 await Task.Delay(2000).ConfigureAwait(false);
                     if(response.IsSuccessStatusCode) {
-                        List<Update> updates = new List<Update>();
+                        List<UpdateContract> updates = new List<UpdateContract>();
                         using(Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false)) {
-                            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<Update>));
-                            updates = (List<Update>)serializer.ReadObject(stream);
+                            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<UpdateContract>));
+                            updates = (List<UpdateContract>)serializer.ReadObject(stream);
                         }
                         Logger.Debug("Read updates: " + string.Join(",", (object[])updates.ToArray()));
 
                         // TODO: check the updates and then update!
 
-                        await DoUpdateAsync("Up to date!", true).ConfigureAwait(false);
+                        UpdateStatus = "Up to date!";
+                        if(null != OnUpdateFinished) {
+                            OnUpdateFinished(this, new UpdateFinishedEventArgs()
+                                {
+                                    Success = true,
+                                }
+                            );
+                        }
                     } else {
-                        await DoUpdateAsync("Error contacting update server: " + response.ReasonPhrase, false).ConfigureAwait(false);
+                        UpdateStatus = "Error contacting update server: " + response.ReasonPhrase;
+                        if(null != OnUpdateFinished) {
+                            OnUpdateFinished(this, new UpdateFinishedEventArgs()
+                                {
+                                    Success = false,
+                                }
+                            );
+                        }
                     }
                 }
             } catch(Exception e) {
-                DoUpdateAsync("Error contacting update server: " + e.Message, false).Wait();
-            }
-        }
-
-        private async Task DoUpdateAsync(string status, bool success)
-        {
-            UpdateStatus = status;
-            UpdateFailed = !success;
-            Updated = success;
-
-            if(success) {
-                await Task.Delay(1000).ConfigureAwait(false);
-                await ClientState.Instance.OnUpdatedAsync().ConfigureAwait(false);
+                UpdateStatus = "Error contacting update server: " + e.Message;
+                if(null != OnUpdateFinished) {
+                    OnUpdateFinished(this, new UpdateFinishedEventArgs()
+                        {
+                            Success = false,
+                        }
+                    );
+                }
             }
         }
 

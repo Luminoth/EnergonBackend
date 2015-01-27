@@ -8,6 +8,11 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top" IsMainMenu="True">
+            <MenuItem Header="_File">
+                <MenuItem Header="Log_out" IsEnabled="False" Click="MenuFileLogout_Click" />
+                <Separator />
+                <MenuItem Header="E_xit" Click="MenuFileExit_Click" />
+            </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="Debug Window..." Click="MenuHelpDebugWindow_Click" />
                 <MenuItem Header="Settings..." Click="MenuItemHelpSettings_Click" />

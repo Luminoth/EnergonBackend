@@ -8,6 +8,7 @@ using EnergonSoftware.Core;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Launcher.Net;
+using EnergonSoftware.Launcher.Updater;
 using EnergonSoftware.Launcher.Windows;
 
 using log4net;
@@ -86,12 +87,12 @@ namespace EnergonSoftware.Launcher
             ConfigureLogging();
             Common.InitFilesystem();
 
-            await UpdateManager.Instance.CheckForUpdatesAsync();
-
             // have to run this in a separate thread
             // so that we don't lock up the UI
             Logger.Info("Starting idle thread...");
             _idleTask = Task.Run(() => OnIdle(), _cancellationToken.Token);
+
+            await UpdateManager.Instance.CheckForUpdatesAsync();
         }
 
         private async void Application_Exit(object sender, ExitEventArgs e)
@@ -109,13 +110,12 @@ namespace EnergonSoftware.Launcher
         private async void OnAuthFailedCallback(string reason)
         {
             await OnErrorAsync("Authentication failed: " + reason, "Authentication Failed").ConfigureAwait(false);
-            ClientState.Instance.LoggingIn = false;
         }
 
         private async void OnAuthSuccessCallback()
         {
             if(ClientState.Instance.UseDummyNetwork) {
-                await ClientState.Instance.OnLoggedInAsync(true).ConfigureAwait(false);
+                await EnergonSoftware.Launcher.Windows.MainWindow.ShowMainPageAsync().ConfigureAwait(false);
                 return;
             }
 
@@ -150,7 +150,6 @@ namespace EnergonSoftware.Launcher
             Logger.Info("Logging in...");
 
             ClientState.Instance.Password = password;
-            ClientState.Instance.LoggingIn = true;
 
             if(ClientState.Instance.UseDummyNetwork) {
                 Logger.Debug("Faking network for testing...");
@@ -179,7 +178,7 @@ namespace EnergonSoftware.Launcher
                 _overmindSession = null;
             }
 
-            await ClientState.Instance.OnLoggedInAsync(false).ConfigureAwait(false);
+            await EnergonSoftware.Launcher.Windows.MainWindow.ShowLoginPageAsync().ConfigureAwait(false);
         }
     }
 }
