@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 
 using log4net;
 
@@ -19,13 +20,13 @@ namespace EnergonSoftware.Core
         public static string DataDir { get { return Path.Combine(HomeDir, "share"); } }
         public static string LogDir { get { return Path.Combine(HomeDir, "var"); } }
 
-        public static void InitFilesystem()
+        public static async Task InitFilesystemAsync()
         {
             Logger.Info("Initializing filesystem...");
-            Directory.CreateDirectory(BinDir);
-            Directory.CreateDirectory(ConfDir);
-            Directory.CreateDirectory(DataDir);
-            Directory.CreateDirectory(LogDir);
+            await DirectoryExtensions.CreateDirectoryAsync(BinDir).ConfigureAwait(false);
+            await DirectoryExtensions.CreateDirectoryAsync(ConfDir).ConfigureAwait(false);
+            await DirectoryExtensions.CreateDirectoryAsync(DataDir).ConfigureAwait(false);
+            await DirectoryExtensions.CreateDirectoryAsync(LogDir).ConfigureAwait(false);
         }
     }
 }

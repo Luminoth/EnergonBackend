@@ -65,8 +65,9 @@
     <Compile Include="ColumnDescription.cs" />
     <Compile Include="DatabaseConnection.cs" />
     <Compile Include="DatabaseType.cs" />
-    <Compile Include="Models\AccountFriend.cs" />
-    <Compile Include="Models\AccountInfo.cs" />
+    <Compile Include="Models\Accounts\AccountFriend.cs" />
+    <Compile Include="Models\Accounts\AccountInfo.cs" />
+    <Compile Include="Models\Accounts\FriendGroup.cs" />
     <Compile Include="Models\DatabaseObject.cs" />
     <Compile Include="Models\Events\Event.cs" />
     <Compile Include="Models\Events\AuthEvent.cs" />

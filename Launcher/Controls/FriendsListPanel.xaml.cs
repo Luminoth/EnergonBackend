@@ -11,10 +11,10 @@ namespace EnergonSoftware.Launcher.Controls
         public FriendsListPanel()
         {
             InitializeComponent();
-            DataContext = ClientState.Instance;
+            DataContext = FriendListManager.Instance;
         }
 
-#region Event Handlers
+#region UI Event Handlers
         private void ButtonFriends_Click(object sender, RoutedEventArgs e)
         {
             FriendList.Visibility = FriendList.IsVisible ? Visibility.Hidden : Visibility.Visible;

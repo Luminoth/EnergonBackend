@@ -13,7 +13,7 @@ using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Database;
-using EnergonSoftware.Database.Models;
+using EnergonSoftware.Database.Models.Accounts;
 
 using log4net;
 
@@ -40,6 +40,8 @@ namespace EnergonSoftware.Chat.Net
     internal sealed class ChatSession : AuthenticatedSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ChatSession));
+
+        public override string Name { get { return "chat"; } }
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
@@ -72,6 +74,7 @@ namespace EnergonSoftware.Chat.Net
             using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
                 friends = await AccountInfo.ReadFriendsAsync(connection, Account.Id).ConfigureAwait(false);
             }
+            Logger.Debug("Read " + friends.Count + " friends...");
 
             await SendMessageAsync(new FriendListMessage()
                 {

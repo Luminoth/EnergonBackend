@@ -19,19 +19,25 @@ namespace EnergonSoftware.Launcher.Pages
             UpdateManager.Instance.OnUpdateFinished += OnUpdateFinished;
         }
 
+#region UI Event Handlers
+        private void ButtonClose_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+#endregion
+
 #region Event Handlers
         private async void OnUpdateFinished(object sender, UpdateFinishedEventArgs e)
         {
             if(e.Success) {
                 await MainWindow.ShowLoginPageAsync().ConfigureAwait(false);
             } else {
-                CloseButton.IsEnabled = true;
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        CloseButton.IsEnabled = true;
+                    }
+                );
             }
-        }
-
-        private void ButtonClose_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.MainWindow.Close();
         }
 #endregion
     }

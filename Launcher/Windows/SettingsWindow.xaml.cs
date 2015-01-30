@@ -15,7 +15,7 @@ namespace EnergonSoftware.Launcher.Windows
             InitializeComponent();
         }
 
-#region Event Handlers
+#region UI Event Handlers
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             e.Cancel = true;

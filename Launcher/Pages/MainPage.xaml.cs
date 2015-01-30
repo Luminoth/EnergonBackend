@@ -14,7 +14,7 @@ namespace EnergonSoftware.Launcher.Pages
             DataContext = ClientState.Instance;
         }
 
-#region Event Handlers
+#region UI Event Handlers
         private async void ButtonLogout_Click(object sender, RoutedEventArgs e)
         {
             await App.Instance.LogoutAsync();

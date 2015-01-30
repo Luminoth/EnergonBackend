@@ -46,7 +46,7 @@
             </Grid>
         </Border>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center" Name="LoginProgress" Text="{x:Static launcherprops:Resources.ProgressLabel}" />
+        <TextBlock Grid.Row="2" Grid.Column="0" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center" Name="LoginProgress" Visibility="Hidden" Text="{x:Static launcherprops:Resources.ProgressLabel}" />
 
         <Button Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5" Name="LoginButton" Click="ButtonLogin_Click" IsDefault="True">
             <TextBlock Margin="5" Text="{x:Static launcherprops:Resources.LoginButtonLabel}" />

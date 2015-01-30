@@ -13,7 +13,7 @@ using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Database;
-using EnergonSoftware.Database.Models;
+using EnergonSoftware.Database.Models.Accounts;
 
 using log4net;
 
@@ -46,6 +46,8 @@ namespace EnergonSoftware.Authenticator.Net
         public bool Authenticated { get; private set; }
 
         public AccountInfo AccountInfo { get; private set; }
+
+        public override string Name { get { return "auth"; } }
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }

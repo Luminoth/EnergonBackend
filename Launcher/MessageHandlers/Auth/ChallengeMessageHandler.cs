@@ -104,7 +104,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(challengeMessage.Challenge));
             Logger.Debug("Decoded challenge: " + decoded);
 
-            switch(authSession.AuthStage)
+            switch(ClientState.Instance.AuthStage)
             {
             case AuthenticationStage.Begin:
                 await HandleChallengeStateAsync(authSession, decoded).ConfigureAwait(false);
@@ -113,7 +113,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 await HandleResponseStateAsync(authSession, decoded).ConfigureAwait(false);
                 break;
             default:
-                await authSession.ErrorAsync("Unexpected auth stage: " + authSession.AuthStage).ConfigureAwait(false);
+                await authSession.ErrorAsync("Unexpected auth stage: " + ClientState.Instance.AuthStage).ConfigureAwait(false);
                 return;
             }
         }

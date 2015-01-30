@@ -19,6 +19,8 @@ namespace EnergonSoftware.Core.Test.Net
 
     internal sealed class TestSession : Session
     {
+        public override string Name { get { return "test"; } }
+
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
         protected override IMessageHandlerFactory HandlerFactory { get { return new MessageHandlerFactory(); } }

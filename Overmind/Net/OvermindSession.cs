@@ -10,7 +10,7 @@ using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Database;
-using EnergonSoftware.Database.Models;
+using EnergonSoftware.Database.Models.Accounts;
 using EnergonSoftware.Overmind.MessageHandlers;
 
 using log4net;
@@ -38,6 +38,8 @@ namespace EnergonSoftware.Overmind.Net
     internal sealed class OvermindSession : AuthenticatedSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(OvermindSession));
+
+        public override string Name { get { return "overmind"; } }
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }

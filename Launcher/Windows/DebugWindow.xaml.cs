@@ -31,7 +31,7 @@ namespace EnergonSoftware.Launcher.Windows
             InitializeComponent();
         }
 
-#region Event Handlers
+#region UI Event Handlers
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
             Close();

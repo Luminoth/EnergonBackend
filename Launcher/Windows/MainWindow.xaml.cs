@@ -48,7 +48,7 @@ namespace EnergonSoftware.Launcher.Windows
             DataContext = ClientState.Instance;
         }
 
-#region Event Handlers
+#region UI Event Handlers
         private async void MenuFileLogout_Click(object sender, RoutedEventArgs e)
         {
             await App.Instance.LogoutAsync().ConfigureAwait(false);

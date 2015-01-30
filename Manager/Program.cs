@@ -32,6 +32,7 @@ namespace EnergonSoftware.Manager
             ConfigureLogging();
 
             Manager manager = new Manager();
+            Console.Title = manager.ServiceName;
             Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
                 {
                     Logger.Info("Caught CancelKeyPress, stopping...");

@@ -2,20 +2,27 @@
 using System.ComponentModel;
 using System.Configuration;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-
-using EnergonSoftware.Launcher.Properties;
-using EnergonSoftware.Launcher.Windows;
 
 namespace EnergonSoftware.Launcher
 {
+    internal enum AuthenticationStage
+    {
+        NotAuthenticated,
+        Begin,
+        Challenge,
+        Finalize,
+        Authenticated,
+    }
+
     internal sealed class ClientState : INotifyPropertyChanged
     {
         public static readonly ClientState Instance = new ClientState();
 
         public bool UseDummyNetwork { get { return Convert.ToBoolean(ConfigurationManager.AppSettings["dummyNetwork"]); } }
 
-        public string FriendButtonText { get { return string.Format(Resources.FriendsLabel, FriendListManager.Instance.OnlineCount, FriendListManager.Instance.Total); } }
+        public AuthenticationStage AuthStage { get; set; }
+        public bool Authenticating { get { return AuthStage > AuthenticationStage.NotAuthenticated && AuthStage < AuthenticationStage.Authenticated; } }
+        public bool Authenticated { get { return AuthenticationStage.Authenticated == AuthStage; } }
 
         // *** move these
         private string _news = "Checking for news updates...";
@@ -41,6 +48,7 @@ namespace EnergonSoftware.Launcher
 
         private ClientState()
         {
+            AuthStage = AuthenticationStage.NotAuthenticated;
         }
     }
 }

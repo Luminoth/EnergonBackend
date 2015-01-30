@@ -37,6 +37,8 @@ namespace EnergonSoftware.Core.Net.Sessions
 
         public readonly int Id;
 
+        public abstract string Name { get; }
+
 #region Message Properties
         public abstract IMessagePacketParser Parser { get; }
         public abstract string FormatterType { get; }
@@ -52,10 +54,10 @@ namespace EnergonSoftware.Core.Net.Sessions
         public bool Connecting { get { return _socketState.Connecting; } }
         public bool Connected { get { return _socketState.Connected; } }
 
-        public long LastMessageTime { get { return _socketState.LastMessageTime; } }
+        public long LastMessageTimeMS { get { return _socketState.LastMessageTimeMS; } }
 
         public long Timeout { get; set; }
-        public bool TimedOut { get { return Timeout < 0 ? false : Time.CurrentTimeMs >= (_socketState.LastMessageTime + Timeout); } }
+        public bool TimedOut { get { return Timeout < 0 ? false : Time.CurrentTimeMs >= (_socketState.LastMessageTimeMS + Timeout); } }
 #endregion
 
         protected Session()

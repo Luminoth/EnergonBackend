@@ -105,7 +105,9 @@
     <Compile Include="Util\Crypt\Hasher.cs" />
     <Compile Include="Util\Crypt\MD5.cs" />
     <Compile Include="Util\Crypt\SHA512.cs" />
+    <Compile Include="Util\DirectoryExtensions.cs" />
     <Compile Include="Util\EnumDescription.cs" />
+    <Compile Include="Util\FileExtensions.cs" />
     <Compile Include="Util\StreamExtensions.cs" />
     <Compile Include="Util\Nonce.cs" />
     <Compile Include="Util\ServiceWrapper.cs">

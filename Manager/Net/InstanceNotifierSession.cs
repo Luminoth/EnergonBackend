@@ -18,6 +18,8 @@ namespace EnergonSoftware.Manager.Net
 
         private readonly SocketState _listener;
 
+        public override string Name { get { return "instanceNotifier"; } }
+
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
         protected override IMessageHandlerFactory HandlerFactory { get { return new InstanceNotifierMessageHandlerFactory(); } }

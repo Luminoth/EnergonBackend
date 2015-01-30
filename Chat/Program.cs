@@ -37,6 +37,7 @@ namespace EnergonSoftware.Chat
             }
 
             Chat chat = new Chat();
+            Console.Title = chat.ServiceName;
             Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
                 {
                     Logger.Info("Caught CancelKeyPress, stopping...");

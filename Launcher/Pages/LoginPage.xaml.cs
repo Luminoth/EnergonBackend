@@ -34,14 +34,13 @@ namespace EnergonSoftware.Launcher.Pages
         }
 #endregion
 
-#region Event Handlers
+#region UI Event Handlers
         private async void ButtonLogin_Click(object sender, RoutedEventArgs e)
         {
             Username.IsEnabled = false;
             Password.IsEnabled = false;
             LoginProgress.Visibility = Visibility.Visible;
             LoginButton.IsEnabled = false;
-
 
             await App.Instance.LoginAsync(Password.Password);
             await ClearPasswordAsync();

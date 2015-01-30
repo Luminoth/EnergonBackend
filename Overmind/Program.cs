@@ -37,6 +37,7 @@ namespace EnergonSoftware.Overmind
             }
 
             Overmind overmind = new Overmind();
+            Console.Title = overmind.ServiceName;
             Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
                 {
                     Logger.Info("Caught CancelKeyPress, stopping...");

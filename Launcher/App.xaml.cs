@@ -81,11 +81,11 @@ namespace EnergonSoftware.Launcher
         }
 #endregion
 
-#region Event Handlers
+#region UI Event Handlers
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
             ConfigureLogging();
-            Common.InitFilesystem();
+            await Common.InitFilesystemAsync();
 
             // have to run this in a separate thread
             // so that we don't lock up the UI
@@ -106,7 +106,9 @@ namespace EnergonSoftware.Launcher
 
             Logger.Info("Goodbye!");
         }
+#endregion
 
+#region Event Handlers
         private async void OnAuthFailedCallback(string reason)
         {
             await OnErrorAsync("Authentication failed: " + reason, "Authentication Failed").ConfigureAwait(false);
@@ -132,10 +134,17 @@ namespace EnergonSoftware.Launcher
             Sessions.Add(_chatSession);
         }
 
-        private /*async*/ void OnDisconnectCallback(object sender, DisconnectEventArgs e)
+        private async void OnDisconnectCallback(object sender, DisconnectEventArgs e)
         {
-            Logger.Debug("Disconnected: " + e.Reason);
-            //await OnErrorAsync(reason, "Disconnected!").ConfigureAwait(false);
+            AuthSession authSession = sender as AuthSession;
+            if(null != authSession && ClientState.Instance.Authenticated) {
+                Logger.Debug("Ignoring expected auth session disconnect");
+                return;
+            }
+
+            Session session = (Session)sender;
+            Logger.Debug("Session " + session.Name + " disconnected: " + e.Reason);
+            await OnErrorAsync(e.Reason, "Disconnected!").ConfigureAwait(false);
         }
 
         private async void OnErrorCallback(object sender, ErrorEventArgs e)
@@ -149,19 +158,23 @@ namespace EnergonSoftware.Launcher
         {
             Logger.Info("Logging in...");
 
-            ClientState.Instance.Password = password;
-
-            if(ClientState.Instance.UseDummyNetwork) {
-                Logger.Debug("Faking network for testing...");
-                OnAuthSuccessCallback();
-                return;
-            }
-
             AuthSession session = new AuthSession();
             session.OnAuthFailed += OnAuthFailedCallback;
             session.OnAuthSuccess += OnAuthSuccessCallback;
             session.OnDisconnect += OnDisconnectCallback;
             session.OnError += OnErrorCallback;
+
+            ClientState.Instance.AuthStage = AuthenticationStage.NotAuthenticated;
+            ClientState.Instance.Password = password;
+
+            if(ClientState.Instance.UseDummyNetwork) {
+                Logger.Debug("Faking network for testing...");
+                await Task.Delay(1000).ConfigureAwait(false);
+                await session.AuthSuccessAsync("").ConfigureAwait(false);
+
+                return;
+            }
+
             await session.BeginConnectAsync(ConfigurationManager.AppSettings["authHost"], Convert.ToInt32(ConfigurationManager.AppSettings["authPort"])).ConfigureAwait(false);
             Sessions.Add(session);
         }

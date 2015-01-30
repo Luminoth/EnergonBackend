@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core;
-
-namespace EnergonSoftware.Database.Models
+namespace EnergonSoftware.Database.Models.Accounts
 {
     public sealed class AccountFriend : IDatabaseObject
     {
@@ -15,6 +13,7 @@ namespace EnergonSoftware.Database.Models
             {
                 { new ColumnDescription("account", DatabaseType.Integer).SetPrimaryKey().SetReferences("accounts", "id") },
                 { new ColumnDescription("friend", DatabaseType.Integer).SetPrimaryKey().SetReferences("accounts", "id") },
+                { new ColumnDescription("friend_group", DatabaseType.Integer).SetReferences("friend_groups", "id") },
             }
         );
 
@@ -43,16 +42,17 @@ namespace EnergonSoftware.Database.Models
         }
 #endregion
 
-        private long _account;
+        private long _account = -1;
         public long Account { get { return _account; } set { _account = value; Dirty = true; } }
 
-        private long _friend;
+        private long _friend = -1;
         public long Friend { get { return _friend; } set { _friend = value; Dirty = true; } }
+
+        private long _group = -1;
+        public long Group { get { return _group; } set { _group = value; Dirty = true; } }
 
         public AccountFriend()
         {
-            _account = -1;
-            _friend = -1;
         }
 
         public async Task<bool> ReadAsync(DatabaseConnection connection)
@@ -69,23 +69,36 @@ namespace EnergonSoftware.Database.Models
 
             _account = reader.GetInt32(AccountFriendsTable["account"].Id);
             _friend = reader.GetInt32(AccountFriendsTable["friend"].Id);
+            _group = reader.GetInt32(AccountFriendsTable["friend_group"].Id);
         }
 
         public async Task InsertAsync(DatabaseConnection connection)
         {
             // account -> friend
-            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountFriendsTable.Name + "(account, friend) VALUES(@account, @friend)")) {
+            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountFriendsTable.Name
+                + "(account, friend, friend_group) VALUES(@account, @friend, @friend_group)"))
+            {
                 connection.AddParameter(command, "account", Account);
                 connection.AddParameter(command, "friend", Friend);
+                connection.AddParameter(command, "friend_group", Group);
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
 
             // friend -> account
-            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountFriendsTable.Name + "(account, friend) VALUES(@account, @friend)")) {
+            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountFriendsTable.Name
+                + "(account, friend, friend_group) VALUES(@account, @friend, @friend_group)"))
+            {
                 connection.AddParameter(command, "account", Friend);
                 connection.AddParameter(command, "friend", Account);
+                connection.AddParameter(command, "friend_group", Group);
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
+        }
+
+        public async Task UpdateAsync(DatabaseConnection connection)
+        {
+            await Task.Delay(0).ConfigureAwait(false);
+            Clean();
         }
 
         public async Task DeleteAsync(DatabaseConnection connection)
@@ -105,15 +118,9 @@ namespace EnergonSoftware.Database.Models
             }
         }
 
-        public async Task UpdateAsync(DatabaseConnection connection)
-        {
-            await Task.Delay(0).ConfigureAwait(false);
-            Clean();
-        }
-
         public override string ToString()
         {
-            return "AccountFriend(account: " + Account + ", friend: " + Friend + ")";
+            return "AccountFriend(account: " + Account + ", friend: " + Friend + ", group: " + Group + ")";
         }
     }
 }

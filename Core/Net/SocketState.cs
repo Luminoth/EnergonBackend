@@ -29,7 +29,7 @@ namespace EnergonSoftware.Core.Net
 
         public readonly MemoryStream Buffer = new MemoryStream();
 
-        public long LastMessageTime { get; private set; }
+        public long LastMessageTimeMS { get; private set; }
 
         public SocketState()
         {
@@ -67,7 +67,7 @@ namespace EnergonSoftware.Core.Net
 
             int count = await Socket.PollAndReceiveAllAsync(Buffer).ConfigureAwait(false);
             if(count > 0) {
-                LastMessageTime = Time.CurrentTimeMs;
+                LastMessageTimeMS = Time.CurrentTimeMs;
             }
             return count;
         }

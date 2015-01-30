@@ -21,7 +21,20 @@ namespace EnergonSoftware.Launcher.Net
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(OvermindSession));
 
-        private bool ShouldPing { get { return 0 == LastMessageTime ? false : Time.CurrentTimeMs > (LastMessageTime + Convert.ToInt64(ConfigurationManager.AppSettings["overmindPingRate"])); } }
+        private long LastPingTimeMS { get; set; }
+        private bool ShouldPing
+        {
+            get
+            {
+                // TODO: this check sucks, find a better way to do it
+                if(0 == LastMessageTimeMS) {
+                    return false;
+                }
+                return Time.CurrentTimeMs > LastPingTimeMS + Convert.ToInt64(ConfigurationManager.AppSettings["overmindPingRate"]);
+            }
+        }
+
+        public override string Name { get { return "overmind"; } }
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
@@ -85,6 +98,7 @@ namespace EnergonSoftware.Launcher.Net
             }
 
             await SendMessageAsync(new PingMessage()).ConfigureAwait(false);
+            LastPingTimeMS = Time.CurrentTimeMs;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace EnergonSoftware.Core.Accounts
             // Id not serialized
             await formatter.WriteAsync("username", Username).ConfigureAwait(false);
             await formatter.WriteAsync("visibility", (int)Visibility).ConfigureAwait(false);
-            await formatter.WriteAsync("status", Status).ConfigureAwait(false);
+            await formatter.WriteAsync("status", Status??string.Empty).ConfigureAwait(false);
         }
 
         public async Task DeSerializeAsync(IMessageFormatter formatter)

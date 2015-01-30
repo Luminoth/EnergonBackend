@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Database;
-using EnergonSoftware.Database.Models;
+using EnergonSoftware.Database.Models.Accounts;
 using EnergonSoftware.Database.Models.Events;
 
 using log4net;
@@ -46,6 +46,7 @@ namespace EnergonSoftware.DbInit
             Logger.Info("Creating account tables...");
             await AccountInfo.CreateTableAsync(connection).ConfigureAwait(false);
             await AccountFriend.CreateTableAsync(connection).ConfigureAwait(false);
+            await FriendGroup.CreateTableAsync(connection).ConfigureAwait(false);
         }
 
         private static async Task InsertAccountsDataAsync(DatabaseConnection connection)
@@ -84,8 +85,8 @@ namespace EnergonSoftware.DbInit
 
             AccountFriend friend = new AccountFriend()
             {
-                Account = testAccount1.Id,
-                Friend = testAccount2.Id,
+                Account = shaneAccount.Id,
+                Friend = testAccount1.Id,
             };
             await friend.InsertAsync(connection).ConfigureAwait(false);
             Logger.Info("Inserted new account friend: " + friend);
@@ -137,8 +138,8 @@ namespace EnergonSoftware.DbInit
                 string backupfilename = dataSource + ".bak";
                 Logger.Info("Backing up old database to " + backupfilename + "...");
                 try {
-                    await Task.Run(() => File.Delete(backupfilename)).ConfigureAwait(false);
-                    await Task.Run(() => File.Move(dataSource, backupfilename)).ConfigureAwait(false);
+                    await FileExtensions.DeleteAsync(backupfilename).ConfigureAwait(false);
+                    await FileExtensions.MoveAsync(dataSource, backupfilename).ConfigureAwait(false);
                 } catch(AggregateException e) {
                     throw e.InnerException;
                 }

@@ -12,7 +12,7 @@ using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Core.Util.Crypt;
 using EnergonSoftware.Database;
-using EnergonSoftware.Database.Models;
+using EnergonSoftware.Database.Models.Accounts;
 
 using log4net;
 

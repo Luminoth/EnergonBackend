@@ -13,15 +13,6 @@ using log4net;
 
 namespace EnergonSoftware.Launcher.Net
 {
-    internal enum AuthenticationStage
-    {
-        NotAuthenticated,
-        Begin,
-        Challenge,
-        Finalize,
-        Authenticated,
-    }
-
     internal sealed class AuthSession : Session
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthSession));
@@ -34,11 +25,9 @@ namespace EnergonSoftware.Launcher.Net
         public event OnAuthFailedHandler OnAuthFailed;
 #endregion
 
-        public AuthenticationStage AuthStage { get; private set; }
-        public bool Authenticating { get { return AuthStage > AuthenticationStage.NotAuthenticated && AuthStage < AuthenticationStage.Authenticated; } }
-        public bool Authenticated { get { return AuthenticationStage.Authenticated == AuthStage; } }
-
         public string RspAuth { get; private set; }
+
+        public override string Name { get { return "auth"; } }
 
         public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
         public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
@@ -46,7 +35,6 @@ namespace EnergonSoftware.Launcher.Net
 
         public AuthSession() : base()
         {
-            AuthStage = AuthenticationStage.NotAuthenticated;
         }
 
         public async Task BeginConnectAsync(string host, int port)
@@ -55,7 +43,7 @@ namespace EnergonSoftware.Launcher.Net
                 Logger.Info("Connecting to authentication server...");
                 await ConnectAsync(host, port, SocketType.Stream, ProtocolType.Tcp).ConfigureAwait(false);
                 if(!Connected) {
-                    await ErrorAsync("Failed to connect to the chat server").ConfigureAwait(false);
+                    await ErrorAsync("Failed to connect to the authentication server").ConfigureAwait(false);
                     return;
                 }
 
@@ -75,7 +63,7 @@ namespace EnergonSoftware.Launcher.Net
                 }
             ).ConfigureAwait(false);
 
-            AuthStage = AuthenticationStage.Begin;
+            ClientState.Instance.AuthStage = AuthenticationStage.Begin;
         }
 
         public async Task AuthResponseAsync(string response, string rspAuth)
@@ -88,13 +76,13 @@ namespace EnergonSoftware.Launcher.Net
                 }
             ).ConfigureAwait(false);
 
-            AuthStage = AuthenticationStage.Challenge;
+            ClientState.Instance.AuthStage = AuthenticationStage.Challenge;
         }
 
         public async Task AuthFinalizeAsync()
         {
             await SendMessageAsync(new ResponseMessage()).ConfigureAwait(false);
-            AuthStage = AuthenticationStage.Finalize;
+            ClientState.Instance.AuthStage = AuthenticationStage.Finalize;
         }
 
         public async Task AuthSuccessAsync(string ticket)
@@ -102,7 +90,7 @@ namespace EnergonSoftware.Launcher.Net
             Logger.Info("Authentication successful!");
             Logger.Debug("Ticket=" + ticket);
 
-            AuthStage = AuthenticationStage.Authenticated;
+            ClientState.Instance.AuthStage = AuthenticationStage.Authenticated;
             ClientState.Instance.Ticket = ticket;
             ClientState.Instance.Password = null;
 
@@ -117,7 +105,7 @@ namespace EnergonSoftware.Launcher.Net
         {
             Logger.Warn("Authentication failed: " + reason);
 
-            AuthStage = AuthenticationStage.NotAuthenticated;
+            ClientState.Instance.AuthStage = AuthenticationStage.NotAuthenticated;
             ClientState.Instance.Password = null;
 
             if(null != OnAuthFailed) {

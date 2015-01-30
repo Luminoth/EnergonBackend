@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core;
 using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.Util.Crypt;
 
-namespace EnergonSoftware.Database.Models
+namespace EnergonSoftware.Database.Models.Accounts
 {
     public sealed class AccountInfo : IDatabaseObject
     {
@@ -40,19 +38,15 @@ namespace EnergonSoftware.Database.Models
         {
             List<Account> friends = new List<Account>();
 
-            using(DbCommand command = connection.BuildCommand("SELECT id, username, visibility, status FROM " + AccountsTable.Name + " WHERE id IN"
+            using(DbCommand command = connection.BuildCommand("SELECT * FROM " + AccountsTable.Name + " WHERE id IN"
                 + " (SELECT friend FROM " + AccountFriend.TableName + " where account=@account) AND active=1"))
             {
                 connection.AddParameter(command, "account", accountId);
                 using(DbDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false)) {
                     while(await reader.ReadAsync().ConfigureAwait(false)) {
-                        friends.Add(new Account()
-                            {
-                                Username = reader.GetString(1),
-                                Visibility = (Visibility)reader.GetInt32(2),
-                                Status = reader.GetString(3),
-                            }
-                        );
+                        AccountInfo account = new AccountInfo();
+                        account.Load(reader);
+                        friends.Add(account.ToAccount());
                     }
                 }
             }
@@ -76,7 +70,7 @@ namespace EnergonSoftware.Database.Models
         public bool Active { get { return _active; } set { _active = value; Dirty = true; } }
 
         // NOTE: changing the username invalidates the password digest!
-        private string _username;
+        private string _username = string.Empty;
         public string Username { get { return _username; } set { _username = value; Dirty = true; } }
 
         public string PasswordMD5 { get; private set; }
@@ -97,6 +91,8 @@ namespace EnergonSoftware.Database.Models
         public AccountInfo()
         {
             Id = -1;
+            PasswordMD5 = string.Empty;
+            PasswordSHA512 = string.Empty;
         }
 
         public async Task SetPassword(string realm, string password)
@@ -201,17 +197,21 @@ namespace EnergonSoftware.Database.Models
 
         public Account ToAccount()
         {
-            string[] endPoint = EndPoint.Split(':');
-            if(2 != endPoint.Length) {
-                throw new FormatException("Invalid EndPoint!");
-            }
+            EndPoint endPoint = null;
+            if(null != EndPoint) {
+                string[] endPointStr = EndPoint.Split(':');
+                if(2 != endPointStr.Length) {
+                    throw new FormatException("Invalid EndPoint!");
+                }
+                endPoint = new IPEndPoint(IPAddress.Parse(endPointStr[0]), Convert.ToInt32(endPointStr[1]));
+            } 
 
             return new Account()
             {
                 Id = Id,
                 Username = Username,
                 SessionId = SessionId,
-                EndPoint = new IPEndPoint(IPAddress.Parse(endPoint[0]), Convert.ToInt32(endPoint[1])),
+                EndPoint = endPoint,
                 Visibility = Visibility,
             };
         }

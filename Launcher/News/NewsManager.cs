@@ -16,20 +16,20 @@ namespace EnergonSoftware.Launcher.News
 {
     internal sealed class NewsManager
     {
-        private const int MinCheckTimeSeconds = 1000 * 60;
+        private const int MinCheckTimeMS = 1000 * 60;
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(NewsManager));
 
         public static readonly NewsManager Instance = new NewsManager();
 
-        private long _lastCheckTime = 0;
+        private long _lastCheckTimeMS = 0;
 
         public async Task UpdateNewsAsync()
         {
-            if(Time.CurrentTimeMs < (_lastCheckTime + MinCheckTimeSeconds)) {
+            if(Time.CurrentTimeMs < (_lastCheckTimeMS + MinCheckTimeMS)) {
                 return;
             }
-            _lastCheckTime = Time.CurrentTimeMs;
+            _lastCheckTimeMS = Time.CurrentTimeMs;
 
             // TODO: use string resources here
             Logger.Info("Updating news...");

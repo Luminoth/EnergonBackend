@@ -37,6 +37,7 @@ namespace EnergonSoftware.Authenticator
             }
 
             Authenticator authenticator = new Authenticator();
+            Console.Title = authenticator.ServiceName;
             Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
                 {
                     Logger.Info("Caught CancelKeyPress, stopping...");

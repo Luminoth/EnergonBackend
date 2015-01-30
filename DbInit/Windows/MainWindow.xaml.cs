@@ -64,7 +64,7 @@ namespace EnergonSoftware.DbInit.Windows
 
         public async void ButtonInitialize_Click(object sender, RoutedEventArgs e)
         {
-            //OutputText.Clear();
+            //OutputText.Document.Blocks.Clear();
             await SetStatusBarTextAsync("Running...");
 
             App.Instance.Running = true;
@@ -76,7 +76,7 @@ namespace EnergonSoftware.DbInit.Windows
 
         public async void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
-            //OutputText.Clear();
+            OutputText.Document.Blocks.Clear();
             await SetStatusBarTextAsync("Waiting...");
         }
 #endregion
