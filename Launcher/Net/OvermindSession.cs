@@ -71,8 +71,8 @@ namespace EnergonSoftware.Launcher.Net
 
             await SendMessageAsync(new LoginMessage()
                 {
-                    Username = ClientState.Instance.Username,
-                    SessionId = ClientState.Instance.Ticket,
+                    Username = App.Instance.UserAccount.Username,
+                    SessionId = App.Instance.UserAccount.SessionId,
                 }
             ).ConfigureAwait(false);
         }
@@ -83,8 +83,8 @@ namespace EnergonSoftware.Launcher.Net
 
             await SendMessageAsync(new LogoutMessage()
                 {
-                    Username = ClientState.Instance.Username,
-                    SessionId = ClientState.Instance.Ticket,
+                    Username = App.Instance.UserAccount.Username,
+                    SessionId = App.Instance.UserAccount.SessionId,
                 }
             ).ConfigureAwait(false);
 

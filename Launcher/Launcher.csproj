@@ -79,10 +79,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Controls\FriendsListPanel.xaml.cs">
-      <DependentUpon>FriendsListPanel.xaml</DependentUpon>
+    <Compile Include="AuthenticationStage.cs" />
+    <Compile Include="Controls\FriendsListControl.xaml.cs">
+      <DependentUpon>FriendsListControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FriendListManager.cs" />
+    <Compile Include="Controls\NewsControl.xaml.cs">
+      <DependentUpon>NewsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Friends\FriendListManager.cs" />
     <Compile Include="MessageHandlers\Chat\FriendListMessageHandler.cs" />
     <Compile Include="News\NewsContract.cs" />
     <Compile Include="Pages\LoginPage.xaml.cs">
@@ -99,7 +103,11 @@
     <Compile Include="Windows\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="Controls\FriendsListPanel.xaml">
+    <Page Include="Controls\FriendsListControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\NewsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -127,7 +135,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ClientState.cs" />
     <Compile Include="MessageHandlers\Auth\ChallengeMessageHandler.cs" />
     <Compile Include="MessageHandlers\Auth\FailureMessageHandler.cs" />
     <Compile Include="MessageHandlers\Auth\SuccessMessageHandler.cs" />

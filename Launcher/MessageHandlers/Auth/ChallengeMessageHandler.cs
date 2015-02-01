@@ -44,11 +44,11 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 string nc = "00000001";
                 string digestURI = realm + "/" + ConfigurationManager.AppSettings["authHost"];
 
-                Logger.Debug("Authenticating " + ClientState.Instance.Username + ":" + realm + ":***");
+                Logger.Debug("Authenticating " + App.Instance.UserAccount.Username + ":" + realm + ":***");
                 string passwordHash = await new SHA512().DigestPasswordAsync(
-                    ClientState.Instance.Username,
+                    App.Instance.UserAccount.Username,
                     realm,
-                    ClientState.Instance.Password
+                    App.Instance.UserAccount.Password
                 ).ConfigureAwait(false);
                 Logger.Debug("passwordHash=" + passwordHash);
 
@@ -56,7 +56,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 string qop = values["qop"].Trim(new char[] { '"' });
                 string rsp = await EnergonSoftware.Core.Auth.DigestClientResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI).ConfigureAwait(false);
             
-                string msg = "username=\"" + ClientState.Instance.Username + "\","
+                string msg = "username=\"" + App.Instance.UserAccount.Username + "\","
                     + "realm=" + realm + ","
                         + "nonce=" + nonce + ","
                         + "cnonce=\"" + cnonce.NonceHash + "\","
@@ -104,7 +104,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(challengeMessage.Challenge));
             Logger.Debug("Decoded challenge: " + decoded);
 
-            switch(ClientState.Instance.AuthStage)
+            switch(App.Instance.AuthStage)
             {
             case AuthenticationStage.Begin:
                 await HandleChallengeStateAsync(authSession, decoded).ConfigureAwait(false);
@@ -113,7 +113,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 await HandleResponseStateAsync(authSession, decoded).ConfigureAwait(false);
                 break;
             default:
-                await authSession.ErrorAsync("Unexpected auth stage: " + ClientState.Instance.AuthStage).ConfigureAwait(false);
+                await authSession.ErrorAsync("Unexpected auth stage: " + App.Instance.AuthStage).ConfigureAwait(false);
                 return;
             }
         }

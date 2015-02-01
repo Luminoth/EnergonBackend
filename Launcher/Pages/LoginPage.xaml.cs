@@ -16,7 +16,7 @@ namespace EnergonSoftware.Launcher.Pages
         {
             InitializeComponent();
 
-            DataContext = ClientState.Instance;
+            DataContext = App.Instance.UserAccount;
 
             if(!DesignerProperties.GetIsInDesignMode(this)) {
                 IsVisibleChanged += IsVisible_Changed;
@@ -44,10 +44,6 @@ namespace EnergonSoftware.Launcher.Pages
 
             await App.Instance.LoginAsync(Password.Password);
             await ClearPasswordAsync();
-
-            Username.IsEnabled = true;
-            Password.IsEnabled = true;
-            LoginButton.IsEnabled = true;
         }
 
         private async void IsVisible_Changed(object sender, DependencyPropertyChangedEventArgs e)

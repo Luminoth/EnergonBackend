@@ -4,12 +4,10 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:launcherprops="clr-namespace:EnergonSoftware.Launcher.Properties"
+      xmlns:launchercontrols="clr-namespace:EnergonSoftware.Launcher.Controls"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="300">
 
-    <Page.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
-    </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -22,9 +20,7 @@
         </Grid.ColumnDefinitions>
 
         <Border Grid.Row="0" Grid.Column="0" Margin="5" BorderThickness="1" BorderBrush="Black">
-            <ScrollViewer Margin="5">
-                <TextBlock ScrollViewer.VerticalScrollBarVisibility="Auto" Name="News" Text="{Binding News, FallbackValue='News!'}" TextWrapping="Wrap" />
-            </ScrollViewer>
+            <launchercontrols:NewsControl Margin="5" />
         </Border>
 
         <Border Grid.Row="1" Grid.Column="0" Margin="5" BorderThickness="1" BorderBrush="Black">

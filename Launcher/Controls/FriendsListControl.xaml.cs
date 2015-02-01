@@ -1,14 +1,16 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
+using EnergonSoftware.Launcher.Friends;
+
 namespace EnergonSoftware.Launcher.Controls
 {
     /// <summary>
-    /// Interaction logic for FriendsListPanel.xaml
+    /// Interaction logic for FriendsListControl.xaml
     /// </summary>
-    public partial class FriendsListPanel : UserControl
+    public partial class FriendsListControl : UserControl
     {
-        public FriendsListPanel()
+        public FriendsListControl()
         {
             InitializeComponent();
             DataContext = FriendListManager.Instance;

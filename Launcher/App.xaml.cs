@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 
 using EnergonSoftware.Core;
+using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Launcher.Net;
@@ -34,6 +35,29 @@ namespace EnergonSoftware.Launcher
         private static readonly SessionManager Sessions = new SessionManager();
         private static OvermindSession _overmindSession;
         private static ChatSession _chatSession;
+#endregion
+
+        public Account UserAccount { get; private set; }
+
+#region Auth Properties
+        // TODO: move these into a model object
+        public AuthenticationStage AuthStage { get; set; }
+        public bool Authenticating { get { return AuthStage > AuthenticationStage.NotAuthenticated && AuthStage < AuthenticationStage.Authenticated; } }
+        public bool Authenticated { get { return AuthenticationStage.Authenticated == AuthStage; } }
+#endregion
+
+#region Debug Properties
+        public bool UseDummyNetwork
+        {
+            get
+            {
+#if DEBUG
+                return Convert.ToBoolean(ConfigurationManager.AppSettings["dummyNetwork"]);
+#else
+                return false;
+#endif
+            }
+        }
 #endregion
 
 #region Idle Properties
@@ -67,6 +91,14 @@ namespace EnergonSoftware.Launcher
         private static void ConfigureLogging()
         {
             XmlConfigurator.Configure();
+        }
+
+        public App()
+        {
+            InitializeComponent();
+
+            UserAccount = new Account();
+            AuthStage = AuthenticationStage.NotAuthenticated;
         }
 
 #region UI Helpers
@@ -116,7 +148,7 @@ namespace EnergonSoftware.Launcher
 
         private async void OnAuthSuccessCallback()
         {
-            if(ClientState.Instance.UseDummyNetwork) {
+            if(UseDummyNetwork) {
                 await EnergonSoftware.Launcher.Windows.MainWindow.ShowMainPageAsync().ConfigureAwait(false);
                 return;
             }
@@ -137,7 +169,7 @@ namespace EnergonSoftware.Launcher
         private async void OnDisconnectCallback(object sender, DisconnectEventArgs e)
         {
             AuthSession authSession = sender as AuthSession;
-            if(null != authSession && ClientState.Instance.Authenticated) {
+            if(null != authSession && Authenticated) {
                 Logger.Debug("Ignoring expected auth session disconnect");
                 return;
             }
@@ -164,13 +196,13 @@ namespace EnergonSoftware.Launcher
             session.OnDisconnect += OnDisconnectCallback;
             session.OnError += OnErrorCallback;
 
-            ClientState.Instance.AuthStage = AuthenticationStage.NotAuthenticated;
-            ClientState.Instance.Password = password;
+            AuthStage = AuthenticationStage.NotAuthenticated;
+            UserAccount.Password = password;
 
-            if(ClientState.Instance.UseDummyNetwork) {
+            if(UseDummyNetwork) {
                 Logger.Debug("Faking network for testing...");
                 await Task.Delay(1000).ConfigureAwait(false);
-                await session.AuthSuccessAsync("").ConfigureAwait(false);
+                await session.AuthSuccessAsync(string.Empty).ConfigureAwait(false);
 
                 return;
             }

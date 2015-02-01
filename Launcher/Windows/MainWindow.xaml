@@ -7,9 +7,9 @@
         WindowStartupLocation="CenterScreen">
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top" IsMainMenu="True">
+        <Menu DockPanel.Dock="Top" Name="MainMenu" IsMainMenu="True">
             <MenuItem Header="_File">
-                <MenuItem Header="Log_out" IsEnabled="False" Click="MenuFileLogout_Click" />
+                <MenuItem Header="Log_out" Name="MenuFileLogout" IsEnabled="False" Click="MenuFileLogout_Click" />
                 <Separator />
                 <MenuItem Header="E_xit" Click="MenuFileExit_Click" />
             </MenuItem>

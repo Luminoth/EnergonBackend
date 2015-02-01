@@ -18,6 +18,6 @@
 
         <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="Content Be Goin Here..." />
 
-        <launchercontrols:FriendsListPanel Grid.Row="0" Grid.Column="1" />
+        <launchercontrols:FriendsListControl Grid.Row="0" Grid.Column="1" />
     </Grid>
 </Page>

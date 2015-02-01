@@ -2,7 +2,7 @@
 
 namespace System.IO
 {
-    public static class MemoryStreamExtensions
+    public static class StreamExtensions
     {
         public static long GetRemaining(this Stream stream)
         {
@@ -47,15 +47,6 @@ namespace System.IO
         {
             stream.Position = 0;
             stream.SetLength(0);
-        }
-
-        public static async Task CompactAsync(this MemoryStream stream)
-        {
-            byte[] buffer = stream.ToArray();
-            long position = stream.Position;
-
-            stream.Clear();
-            await stream.WriteAsync(buffer, (int)position, (int)(buffer.Length - position)).ConfigureAwait(false);
         }
 
         public static void Flip(this Stream stream)

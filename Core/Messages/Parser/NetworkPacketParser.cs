@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core.IO;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Properties;
@@ -19,25 +20,31 @@ namespace EnergonSoftware.Core.Messages.Parser
             return new NetworkPacket();
         }
 
-        public async Task<MessagePacket> ParseAsync(MemoryStream stream)
+        public async Task<MessagePacket> ParseAsync(LockingMemoryStream stream)
         {
-            stream.Flip();
-            if(!stream.HasRemaining()) {
-                stream.Reset();
-                return null;
-            }
+            await stream.LockAsync().ConfigureAwait(false);
 
-            NetworkPacket packet = new NetworkPacket();
             try {
-                await packet.DeSerializeAsync(stream).ConfigureAwait(false);
-            } catch(MessageException e) {
-                Logger.Warn(Resources.ErrorParsingNetworkPacket, e);
-                stream.Reset();
-                return null;
-            }
+                stream.Flip();
+                if(!stream.HasRemaining()) {
+                    stream.Reset();
+                    return null;
+                }
 
-            await stream.CompactAsync().ConfigureAwait(false);
-            return packet;
+                NetworkPacket packet = new NetworkPacket();
+                try {
+                    await packet.DeSerializeAsync(stream).ConfigureAwait(false);
+                } catch(MessageException e) {
+                    Logger.Warn(Resources.ErrorParsingNetworkPacket, e);
+                    stream.Reset();
+                    return null;
+                }
+
+                await stream.CompactAsync().ConfigureAwait(false);
+                return packet;
+            } finally {
+                stream.Release();
+            }
         }
     }
 }

@@ -10,7 +10,7 @@ using EnergonSoftware.Core.Properties;
 
 using log4net;
 
-namespace EnergonSoftware.Core.Net
+namespace EnergonSoftware.Core.Net.Sockets
 {
     public sealed class UdpListener
     {

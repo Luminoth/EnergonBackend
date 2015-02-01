@@ -11,8 +11,8 @@ namespace EnergonSoftware.Core.Util
     {
         private const int IVLength = 16;
 
-        private readonly byte[] IV = new byte[IVLength];
-        private readonly string Secret;
+        private readonly byte[] _iv = new byte[IVLength];
+        private readonly string _secret;
 
         public readonly int ExpiryMS = -1;
         public readonly string SessionID;
@@ -25,14 +25,14 @@ namespace EnergonSoftware.Core.Util
 
         public SessionId(string secret) : this()
         {
-            Secret = secret;
+            _secret = secret;
 
             Random random = new Random();
             long salt1 = random.Next(10000);
             long salt2 = random.Next(10000);
 
             string value = salt1.ToString() + ":" + CreationTime + ":" + salt2.ToString();
-            string secretHash = new EnergonSoftware.Core.Util.Crypt.SHA512().HashHexAsync(Secret).Result;
+            string secretHash = new EnergonSoftware.Core.Util.Crypt.SHA512().HashHexAsync(_secret).Result;
 
             byte[] encrypted = null;
             using(Aes aes = Aes.Create()) {
@@ -42,9 +42,9 @@ namespace EnergonSoftware.Core.Util
                 encrypted = AES.EncryptAsync(secretHash, aes.Key, aes.IV).Result;
             }
 
-            byte[] combined = new byte[IV.Length + encrypted.Length];
-            Array.Copy(IV, combined, IV.Length);
-            Array.Copy(encrypted, 0, combined, IV.Length, encrypted.Length);
+            byte[] combined = new byte[_iv.Length + encrypted.Length];
+            Array.Copy(_iv, combined, _iv.Length);
+            Array.Copy(encrypted, 0, combined, _iv.Length, encrypted.Length);
             SessionID = Convert.ToBase64String(combined);
         }
 

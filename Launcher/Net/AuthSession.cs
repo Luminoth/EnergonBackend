@@ -55,7 +55,7 @@ namespace EnergonSoftware.Launcher.Net
 
         private async Task BeginAuthAsync()
         {
-            Logger.Info("Authenticating as user '" + ClientState.Instance.Username + "'...");
+            Logger.Info("Authenticating as user '" + App.Instance.UserAccount.Username + "'...");
 
             await SendMessageAsync(new AuthMessage()
                 {
@@ -63,7 +63,7 @@ namespace EnergonSoftware.Launcher.Net
                 }
             ).ConfigureAwait(false);
 
-            ClientState.Instance.AuthStage = AuthenticationStage.Begin;
+            App.Instance.AuthStage = AuthenticationStage.Begin;
         }
 
         public async Task AuthResponseAsync(string response, string rspAuth)
@@ -76,13 +76,13 @@ namespace EnergonSoftware.Launcher.Net
                 }
             ).ConfigureAwait(false);
 
-            ClientState.Instance.AuthStage = AuthenticationStage.Challenge;
+            App.Instance.AuthStage = AuthenticationStage.Challenge;
         }
 
         public async Task AuthFinalizeAsync()
         {
             await SendMessageAsync(new ResponseMessage()).ConfigureAwait(false);
-            ClientState.Instance.AuthStage = AuthenticationStage.Finalize;
+            App.Instance.AuthStage = AuthenticationStage.Finalize;
         }
 
         public async Task AuthSuccessAsync(string ticket)
@@ -90,9 +90,9 @@ namespace EnergonSoftware.Launcher.Net
             Logger.Info("Authentication successful!");
             Logger.Debug("Ticket=" + ticket);
 
-            ClientState.Instance.AuthStage = AuthenticationStage.Authenticated;
-            ClientState.Instance.Ticket = ticket;
-            ClientState.Instance.Password = null;
+            App.Instance.AuthStage = AuthenticationStage.Authenticated;
+            App.Instance.UserAccount.SessionId = ticket;
+            App.Instance.UserAccount.Password = null;
 
             if(null != OnAuthSuccess) {
                 OnAuthSuccess();
@@ -105,8 +105,8 @@ namespace EnergonSoftware.Launcher.Net
         {
             Logger.Warn("Authentication failed: " + reason);
 
-            ClientState.Instance.AuthStage = AuthenticationStage.NotAuthenticated;
-            ClientState.Instance.Password = null;
+            App.Instance.AuthStage = AuthenticationStage.NotAuthenticated;
+            App.Instance.UserAccount.Password = null;
 
             if(null != OnAuthFailed) {
                 OnAuthFailed(reason);

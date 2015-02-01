@@ -150,6 +150,10 @@ namespace EnergonSoftware.Database
 
         public void AddParameter(DbCommand command, string name, object value)
         {
+            if(null == command) {
+                throw new ArgumentNullException("command");
+            }
+
             Logger.Debug("Adding parameter " + name + "=" + value);
 
             DbParameter param = command.CreateParameter();

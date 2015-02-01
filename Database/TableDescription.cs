@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,10 @@ namespace EnergonSoftware.Database
 
         public TableDescription(string name, List<ColumnDescription> columns)
         {
+            if(null == columns) {
+                throw new ArgumentNullException("columns");
+            }
+
             Name = name;
             for(int i=0; i<columns.Count; ++i) {
                 ColumnDescription column = columns[i];

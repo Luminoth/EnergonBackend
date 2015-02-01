@@ -8,6 +8,7 @@ using EnergonSoftware.Chat.Net;
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
+using EnergonSoftware.Core.Net.Sockets;
 using EnergonSoftware.Core.Util;
 
 using log4net;

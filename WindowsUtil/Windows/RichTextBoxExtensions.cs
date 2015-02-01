@@ -8,6 +8,10 @@ namespace System.Windows.Controls
     {
         public static void AppendText(this RichTextBox box, string text, Color color)
         {
+            if(null == box) {
+                throw new ArgumentNullException("box");
+            }
+
             TextRange range = new TextRange(box.Document.ContentEnd, box.Document.ContentEnd);
             range.Text = text;
             range.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(color));

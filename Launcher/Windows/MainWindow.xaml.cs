@@ -18,6 +18,7 @@ namespace EnergonSoftware.Launcher.Windows
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
+                    MainWindow.Instance.MenuFileLogout.IsEnabled = false;
                     MainWindow.Instance.MainFrame.Navigate(new LoginPage());
                 }
             );
@@ -27,6 +28,7 @@ namespace EnergonSoftware.Launcher.Windows
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
+                    MainWindow.Instance.MenuFileLogout.IsEnabled = true;
                     MainWindow.Instance.MainFrame.Navigate(new MainPage());
                 }
             );
@@ -45,13 +47,12 @@ namespace EnergonSoftware.Launcher.Windows
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = ClientState.Instance;
         }
 
 #region UI Event Handlers
         private async void MenuFileLogout_Click(object sender, RoutedEventArgs e)
         {
-            await App.Instance.LogoutAsync().ConfigureAwait(false);
+            await App.Instance.LogoutAsync();
         }
 
         private void MenuFileExit_Click(object sender, RoutedEventArgs e)

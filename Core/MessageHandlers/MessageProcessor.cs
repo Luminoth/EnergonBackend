@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core.IO;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Net.Sessions;
@@ -59,7 +60,7 @@ namespace EnergonSoftware.Core.MessageHandlers
             _messageQueueEvent.Set();
         }
 
-        public async Task ParseMessagesAsync(MemoryStream buffer)
+        public async Task ParseMessagesAsync(LockingMemoryStream buffer)
         {
             MessagePacket packet = await _session.Parser.ParseAsync(buffer).ConfigureAwait(false);
             while(null != packet) {

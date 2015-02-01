@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Messages.Formatter;
@@ -7,12 +9,16 @@ using EnergonSoftware.Core.Messages.Formatter;
 namespace EnergonSoftware.Core.Accounts
 {
     [Serializable]
-    public sealed class Account : IMessageSerializable
+    public sealed class Account : IMessageSerializable, INotifyPropertyChanged
     {
         public string Type { get { return "account"; } }
 
         public long Id { get; set; }
-        public string Username { get; set; }
+
+        private string _username = string.Empty;
+        public string Username { get { return _username; } set { _username = value; NotifyPropertyChanged(); } }
+
+        public string Password { get; set; }
         public string SessionId { get; set; }
         public EndPoint EndPoint { get; set; }
 
@@ -52,12 +58,22 @@ namespace EnergonSoftware.Core.Accounts
                 return false;
             }
 
+            if(null == Username && null != account.Username || null != Username && !Username.Equals(account.Username, StringComparison.InvariantCultureIgnoreCase)) {
+                return false;
+            }
+
+            if(null == SessionId && null != account.SessionId || null != SessionId && !SessionId.Equals(account.SessionId, StringComparison.InvariantCultureIgnoreCase)) {
+                return false;
+            }
+
             IPEndPoint thisEndPoint = (IPEndPoint)EndPoint;
             IPEndPoint otherEndPoint = (IPEndPoint)account.EndPoint;
 
-            return Username.Equals(account.Username, StringComparison.InvariantCultureIgnoreCase)
-                && SessionId.Equals(account.SessionId, StringComparison.InvariantCultureIgnoreCase)
-                && thisEndPoint.Address.Equals(otherEndPoint.Address);
+            if(null == EndPoint && null != account.EndPoint || null != EndPoint && !thisEndPoint.Address.Equals(otherEndPoint.Address)) {
+                return false;
+            }
+
+            return true;
         }
 
         public override int GetHashCode()
@@ -69,5 +85,15 @@ namespace EnergonSoftware.Core.Accounts
         {
             return "Account(Id=" + Id + ", Username=" + Username + ", SessionId=" + SessionId + ", EndPoint=" + EndPoint + ", Visibility=" + Visibility + ", Status=" + Status + ")";
         }
+
+#region Property Notifier
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged([CallerMemberName] string property=null)
+        {
+            if(null != PropertyChanged) {
+                PropertyChanged(this, new PropertyChangedEventArgs(property));
+            }
+        }
+#endregion
     }
 }

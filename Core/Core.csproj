@@ -52,7 +52,9 @@
     <Compile Include="Accounts\Visibility.cs" />
     <Compile Include="Auth.cs" />
     <Compile Include="Common.cs" />
-    <Compile Include="Configuration\ListenAddressConfiguration.cs" />
+    <Compile Include="Configuration\ListenAddressesConfigurationSection.cs" />
+    <Compile Include="Configuration\ListenAddressConfigurationElement.cs" />
+    <Compile Include="Configuration\ListenAddressConfigurationElementCollection.cs" />
     <Compile Include="ErrorEventArgs.cs" />
     <Compile Include="MessageHandlers\MessageProcessor.cs" />
     <Compile Include="Messages\AuthenticatedMessage.cs" />
@@ -81,18 +83,18 @@
     <Compile Include="Messages\Parser\MessagePacketParser.cs" />
     <Compile Include="Messages\Parser\NetworkPacketParser.cs" />
     <Compile Include="Messages\PingMessage.cs" />
-    <Compile Include="Net\NetworkStreamExtensions.cs" />
+    <Compile Include="IO\NetworkStreamExtensions.cs" />
     <Compile Include="Net\Sessions\AuthenticatedSession.cs" />
     <Compile Include="Net\DisconnectEventArgs.cs" />
     <Compile Include="Net\HttpServer.cs" />
-    <Compile Include="Net\SocketExtensions.cs" />
-    <Compile Include="Net\UdpListener.cs" />
+    <Compile Include="Net\Sockets\SocketExtensions.cs" />
+    <Compile Include="Net\Sockets\UdpListener.cs" />
     <Compile Include="Net\NetUtil.cs" />
     <Compile Include="Messages\Packet\NetworkPacket.cs" />
     <Compile Include="Net\Sessions\Session.cs" />
     <Compile Include="Net\Sessions\SessionManager.cs" />
-    <Compile Include="Net\SocketListener.cs" />
-    <Compile Include="Net\SocketState.cs" />
+    <Compile Include="Net\Sockets\SocketListener.cs" />
+    <Compile Include="Net\Sockets\SocketState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -105,10 +107,12 @@
     <Compile Include="Util\Crypt\Hasher.cs" />
     <Compile Include="Util\Crypt\MD5.cs" />
     <Compile Include="Util\Crypt\SHA512.cs" />
-    <Compile Include="Util\DirectoryExtensions.cs" />
+    <Compile Include="IO\DirectoryExtensions.cs" />
     <Compile Include="Util\EnumDescription.cs" />
-    <Compile Include="Util\FileExtensions.cs" />
-    <Compile Include="Util\StreamExtensions.cs" />
+    <Compile Include="IO\FileExtensions.cs" />
+    <Compile Include="IO\LockingMemoryStream.cs" />
+    <Compile Include="IO\MemoryStreamExtensions.cs" />
+    <Compile Include="IO\StreamExtensions.cs" />
     <Compile Include="Util\Nonce.cs" />
     <Compile Include="Util\ServiceWrapper.cs">
       <SubType>Component</SubType>

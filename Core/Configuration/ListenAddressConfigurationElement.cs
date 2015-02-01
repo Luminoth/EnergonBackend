@@ -1,5 +1,4 @@
-﻿using System;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Net;
 using System.Text;
 
@@ -32,36 +31,6 @@ namespace EnergonSoftware.Core.Configuration
             }
             builder.Append(")");
             return builder.ToString();
-        }
-    }
-
-    [ConfigurationCollection(typeof(ListenAddressConfigurationElement))]
-    public class ListenAddressConfigurationElementCollection : ConfigurationElementCollection
-    {
-        protected override string ElementName { get { return "listenAddress"; } }
-
-        public override ConfigurationElementCollectionType CollectionType
-        { get { return ConfigurationElementCollectionType.BasicMapAlternate; } }
-
-        protected override ConfigurationElement CreateNewElement()
-        { return new ListenAddressConfigurationElement(); }
-
-        protected override object GetElementKey(ConfigurationElement element)
-        { return ((ListenAddressConfigurationElement)element).Name; }
-    }
-
-    public class ListenAddressesConfigurationSection : ConfigurationSection
-    {
-        [ConfigurationProperty("maxConnections", DefaultValue = -1)]
-        public int MaxConnections { get { return (int)this["maxConnections"]; } }
-
-        [ConfigurationProperty("backlog", DefaultValue=10)]
-        public int Backlog { get { return (int)this["backlog"]; } }
-
-        [ConfigurationProperty("", IsDefaultCollection=true)]
-        public ListenAddressConfigurationElementCollection ListenAddresses
-        {
-            get { return (ListenAddressConfigurationElementCollection)base[string.Empty]; }
         }
     }
 }

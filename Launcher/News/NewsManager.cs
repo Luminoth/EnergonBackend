@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.Serialization;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ using log4net;
 
 namespace EnergonSoftware.Launcher.News
 {
-    internal sealed class NewsManager
+    internal sealed class NewsManager : INotifyPropertyChanged
     {
         private const int MinCheckTimeMS = 1000 * 60;
 
@@ -23,6 +24,9 @@ namespace EnergonSoftware.Launcher.News
         public static readonly NewsManager Instance = new NewsManager();
 
         private long _lastCheckTimeMS = 0;
+
+        private string _news = "Checking for news updates...";
+        public string News { get { return _news; } set { _news = value; NotifyPropertyChanged(); } }
 
         public async Task UpdateNewsAsync()
         {
@@ -51,18 +55,28 @@ await Task.Delay(2000).ConfigureAwait(false);
                         Logger.Debug("Read news: " + string.Join(",", (object[])news.ToArray()));
 
                         if(news.Count < 1) {
-                            ClientState.Instance.News = "No news updates!";
+                            News = "No news updates!";
                         } else {
-                            ClientState.Instance.News = news[0].NewsUpdate;
+                            News = news[0].NewsUpdate;
                         }
                     } else {
-                        ClientState.Instance.News = "Error contacting news server: " + response.ReasonPhrase;
+                        News = "Error contacting news server: " + response.ReasonPhrase;
                     }
                 }
             } catch(Exception e) {
-                ClientState.Instance.News = "Error contacting news server: " + e.Message;
+                News = "Error contacting news server: " + e.Message;
             }
         }
+
+#region Property Notifier
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] string property=null)
+        {
+            if(null != PropertyChanged) {
+                PropertyChanged(this, new PropertyChangedEventArgs(property));
+            }
+        }
+#endregion
 
         private NewsManager()
         {

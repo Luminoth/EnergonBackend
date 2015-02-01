@@ -12,6 +12,7 @@ using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
+using EnergonSoftware.Launcher.Friends;
 using EnergonSoftware.Launcher.MessageHandlers;
 
 using log4net;
@@ -73,8 +74,8 @@ namespace EnergonSoftware.Launcher.Net
 
             await SendMessageAsync(new LoginMessage()
                 {
-                    Username = ClientState.Instance.Username,
-                    SessionId = ClientState.Instance.Ticket,
+                    Username = App.Instance.UserAccount.Username,
+                    SessionId = App.Instance.UserAccount.SessionId,
                 }
             ).ConfigureAwait(false);
         }
@@ -85,8 +86,8 @@ namespace EnergonSoftware.Launcher.Net
 
             await SendMessageAsync(new LogoutMessage()
                 {
-                    Username = ClientState.Instance.Username,
-                    SessionId = ClientState.Instance.Ticket,
+                    Username = App.Instance.UserAccount.Username,
+                    SessionId = App.Instance.UserAccount.SessionId,
                 }
             ).ConfigureAwait(false);
 
@@ -109,8 +110,8 @@ namespace EnergonSoftware.Launcher.Net
 
             await SendMessageAsync(new VisibilityMessage()
                 {
-                    Username = ClientState.Instance.Username,
-                    SessionId = ClientState.Instance.Ticket,
+                    Username = App.Instance.UserAccount.Username,
+                    SessionId = App.Instance.UserAccount.SessionId,
                     Visibility = visibility,
                 }
             ).ConfigureAwait(false);
@@ -122,8 +123,6 @@ namespace EnergonSoftware.Launcher.Net
 
             FriendListManager.Instance.Clear();
             FriendListManager.Instance.AddAll(friendList);
-
-            ClientState.Instance.NotifyPropertyChanged("FriendButtonText");
         }
     }
 }
