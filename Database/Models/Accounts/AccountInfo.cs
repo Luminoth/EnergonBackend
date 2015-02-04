@@ -38,15 +38,29 @@ namespace EnergonSoftware.Database.Models.Accounts
         {
             List<Account> friends = new List<Account>();
 
-            using(DbCommand command = connection.BuildCommand("SELECT * FROM " + AccountsTable.Name + " WHERE id IN"
-                + " (SELECT friend FROM " + AccountFriend.TableName + " where account=@account) AND active=1"))
+            using(DbCommand command = connection.BuildCommand("SELECT a.username, a.visibility, a.status, fg.name as group_name"
+                + " FROM " + TableName + " a, " + AccountFriend.TableName + " af"
+                    + " LEFT JOIN " + FriendGroup.TableName + " fg ON af.group_id = fg.id"
+                + " WHERE a.id = af.friend_account_id AND af.account_id=@account_id AND a.active=1"))
             {
-                connection.AddParameter(command, "account", accountId);
+                connection.AddParameter(command, "account_id", accountId);
                 using(DbDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false)) {
                     while(await reader.ReadAsync().ConfigureAwait(false)) {
-                        AccountInfo account = new AccountInfo();
-                        account.Load(reader);
-                        friends.Add(account.ToAccount());
+                        Account account = new Account()
+                        {
+                            Username = reader.GetString(0),
+                            Visibility = (Visibility)reader.GetInt32(1),
+                        };
+
+                        if(!await reader.IsDBNullAsync(2).ConfigureAwait(false)) {
+                            account.Status = reader.GetString(2);
+                        }
+
+                        if(!await reader.IsDBNullAsync(3).ConfigureAwait(false)) {
+                            account.Group = reader.GetString(3);
+                        }
+
+                        friends.Add(account);
                     }
                 }
             }
@@ -107,10 +121,10 @@ namespace EnergonSoftware.Database.Models.Accounts
         {
             DbCommand command = null;
             if(Id > 0) {
-                command = connection.BuildCommand("SELECT * FROM " + AccountsTable.Name + " WHERE id=@id");
+                command = connection.BuildCommand("SELECT * FROM " + TableName + " WHERE id=@id");
                 connection.AddParameter(command, "id", Id);
             } else {
-                command = connection.BuildCommand("SELECT * FROM " + AccountsTable.Name + " WHERE username=@username");
+                command = connection.BuildCommand("SELECT * FROM " + TableName + " WHERE username=@username");
                 connection.AddParameter(command, "username", Username);
             }
 
@@ -119,7 +133,7 @@ namespace EnergonSoftware.Database.Models.Accounts
                     if(!await reader.ReadAsync().ConfigureAwait(false)) {
                         return false;
                     }
-                    Load(reader);
+                    await LoadAsync(reader).ConfigureAwait(false);
                 }
             }
 
@@ -127,7 +141,7 @@ namespace EnergonSoftware.Database.Models.Accounts
             return true;
         }
 
-        public void Load(DbDataReader reader)
+        public async Task LoadAsync(DbDataReader reader)
         {
             if(null == reader) {
                 throw new ArgumentNullException("reader");
@@ -139,24 +153,24 @@ namespace EnergonSoftware.Database.Models.Accounts
             PasswordMD5 = reader.GetString(AccountsTable["passwordMD5"].Id);
             PasswordSHA512 = reader.GetString(AccountsTable["passwordSHA512"].Id);
 
-            if(!reader.IsDBNull(AccountsTable["endPoint"].Id)) {
+            if(!await reader.IsDBNullAsync(AccountsTable["endPoint"].Id).ConfigureAwait(false)) {
                 _endPoint = reader.GetString(AccountsTable["endPoint"].Id);
             }
 
-            if(!reader.IsDBNull(AccountsTable["sessionid"].Id)) {
+            if(!await reader.IsDBNullAsync(AccountsTable["sessionid"].Id).ConfigureAwait(false)) {
                 _sessionid = reader.GetString(AccountsTable["sessionid"].Id);
             }
 
             _visibility = (Visibility)reader.GetInt32(AccountsTable["visibility"].Id);
 
-            if(!reader.IsDBNull(AccountsTable["status"].Id)) {
+            if(!await reader.IsDBNullAsync(AccountsTable["status"].Id).ConfigureAwait(false)) {
                 _status = reader.GetString(AccountsTable["status"].Id);
             }
         }
 
         public async Task InsertAsync(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AccountsTable.Name
+            using(DbCommand command = connection.BuildCommand("INSERT INTO " + TableName
                 + "(active, username, passwordMD5, passwordSHA512, visibility, status)"
                 + " VALUES(@active, @username, @passwordMD5, @passwordSHA512, @visibility, @status)"))
             {
@@ -173,7 +187,7 @@ namespace EnergonSoftware.Database.Models.Accounts
 
         public async Task UpdateAsync(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("UPDATE " + AccountsTable.Name
+            using(DbCommand command = connection.BuildCommand("UPDATE " + TableName
                 + " SET active=@active, endPoint=@endPoint, sessionid=@sessionid, visibility=@visibility, status=@status WHERE id=@id"))
             {
                 connection.AddParameter(command, "active", Active);
@@ -189,7 +203,7 @@ namespace EnergonSoftware.Database.Models.Accounts
 
         public async Task DeleteAsync(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("DELETE FROM " + AccountsTable.Name + " WHERE id=@id")) {
+            using(DbCommand command = connection.BuildCommand("DELETE FROM " + TableName + " WHERE id=@id")) {
                 connection.AddParameter(command, "id", Id);
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }

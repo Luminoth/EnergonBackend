@@ -16,6 +16,7 @@ namespace EnergonSoftware.Database
         public bool PrimaryKey { get; private set; }
         public bool Unique { get; private set; }
         public bool Nullable { get; private set; }
+        public string DefaultValue { get; private set; }
 
         private Tuple<string, string> _references;
         public Tuple<string, string> References { get { return _references; } }
@@ -52,6 +53,12 @@ namespace EnergonSoftware.Database
             return this;
         }
 
+        public ColumnDescription SetDefaultValue(string defaultValue)
+        {
+            DefaultValue = defaultValue;
+            return this;
+        }
+
         public ColumnDescription SetReferences(string table, string column)
         {
             _references = new Tuple<string, string>(table, column);
@@ -75,6 +82,10 @@ namespace EnergonSoftware.Database
 
             if(Unique) {
                 builder.Append(" UNIQUE");
+            }
+
+            if(!string.IsNullOrEmpty(DefaultValue)) {
+                builder.Append(" DEFAULT " + DefaultValue);
             }
 
             if(HasForeignKey) {

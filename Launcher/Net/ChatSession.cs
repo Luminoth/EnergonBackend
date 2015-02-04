@@ -123,6 +123,8 @@ namespace EnergonSoftware.Launcher.Net
 
             FriendListManager.Instance.Clear();
             FriendListManager.Instance.AddAll(friendList);
+
+            Logger.Debug("Friends: " + FriendListManager.Instance.ToString());
         }
     }
 }

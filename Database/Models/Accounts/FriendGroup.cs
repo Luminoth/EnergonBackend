@@ -12,8 +12,8 @@ namespace EnergonSoftware.Database.Models.Accounts
             new List<ColumnDescription>
             {
                 { new ColumnDescription("id", DatabaseType.Integer).SetPrimaryKey() },
-                { new ColumnDescription("account", DatabaseType.Integer).SetReferences("accounts", "id") },
-                { new ColumnDescription("parent", DatabaseType.Integer).SetReferences("friend_groups", "id") },
+                { new ColumnDescription("account_id", DatabaseType.Integer).SetReferences("accounts", "id") },
+                { new ColumnDescription("parent_group_id", DatabaseType.Integer).SetDefaultValue("-1").SetReferences("friend_groups", "id") },
                 { new ColumnDescription("name", DatabaseType.Text).SetNotNull() },
             }
         );
@@ -25,28 +25,10 @@ namespace EnergonSoftware.Database.Models.Accounts
             await FriendGroupsTable.CreateAsync(connection).ConfigureAwait(false);
         }
 
-        public static async Task<List<FriendGroup>> ReadAllAsync(DatabaseConnection connection, long accountId)
-        {
-            List<FriendGroup> groups = new List<FriendGroup>();
-
-            using(DbCommand command = connection.BuildCommand("SELECT * FROM " + FriendGroupsTable.Name + " WHERE account=@account")) {
-                connection.AddParameter(command, "account", accountId);
-                using(DbDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false)) {
-                    while(await reader.ReadAsync().ConfigureAwait(false)) {
-                        FriendGroup group = new FriendGroup();
-                        group.Load(reader);
-                        groups.Add(group);
-                    }
-                }
-            }
-
-            return groups;
-        }
-
         public static async Task DeleteAllAsync(DatabaseConnection connection, long accountId)
         {
-            using(DbCommand command = connection.BuildCommand("DELETE FROM " + FriendGroupsTable.Name + " WHERE account=@account")) {
-                connection.AddParameter(command, "account", accountId);
+            using(DbCommand command = connection.BuildCommand("DELETE FROM " + TableName + " WHERE account_id=@account_id")) {
+                connection.AddParameter(command, "account_id", accountId);
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
         }
@@ -62,11 +44,8 @@ namespace EnergonSoftware.Database.Models.Accounts
 
         public long Id { get; private set; }
 
-        private long _account = -1;
-        public long Account { get { return _account; } set { _account = value; Dirty = true; } }
-
-        private long _parent = -1;
-        public long Parent { get { return _parent; } set { _parent = value; Dirty = true; } }
+        private long _account_id = -1;
+        public long AccountId { get { return _account_id; } set { _account_id = value; Dirty = true; } }
 
         private string _name = string.Empty;
         public string Name { get { return _name; } set { _name = value; Dirty = true; } }
@@ -82,13 +61,13 @@ namespace EnergonSoftware.Database.Models.Accounts
                 return false;
             }
 
-            using(DbCommand command = connection.BuildCommand("SELECT * FROM " + FriendGroupsTable.Name + " WHERE id=@id")) {
+            using(DbCommand command = connection.BuildCommand("SELECT * FROM " + TableName + " WHERE id=@id")) {
                 connection.AddParameter(command, "id", Id);
                 using(DbDataReader reader = await command.ExecuteReaderAsync().ConfigureAwait(false)) {
                     if(!await reader.ReadAsync().ConfigureAwait(false)) {
                         return false;
                     }
-                    Load(reader);
+                    await LoadAsync(reader).ConfigureAwait(false);
                 }
             }
 
@@ -96,25 +75,25 @@ namespace EnergonSoftware.Database.Models.Accounts
             return true;
         }
 
-        public void Load(DbDataReader reader)
+        public async Task LoadAsync(DbDataReader reader)
         {
             if(null == reader) {
                 throw new ArgumentNullException("reader");
             }
 
             Id = reader.GetInt32(FriendGroupsTable["id"].Id);
-            _account = reader.GetInt32(FriendGroupsTable["account"].Id);
-            _parent = reader.GetInt32(FriendGroupsTable["parent"].Id);
+            _account_id = reader.GetInt32(FriendGroupsTable["account_id"].Id);
             _name = reader.GetString(FriendGroupsTable["name"].Id);
+
+            await Task.Delay(0).ConfigureAwait(false);
         }
 
         public async Task InsertAsync(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("INSERT INTO " + FriendGroupsTable.Name
-                + "(account, parent, name) VALUES(@account, @parent, @name)"))
+            using(DbCommand command = connection.BuildCommand("INSERT INTO " + TableName
+                + "(account_id, name) VALUES(@account_id, @name)"))
             {
-                connection.AddParameter(command, "account", Account);
-                connection.AddParameter(command, "parent", Parent);
+                connection.AddParameter(command, "account_id", AccountId);
                 connection.AddParameter(command, "name", Name);
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                 Id = connection.LastInsertRowId;
@@ -123,11 +102,10 @@ namespace EnergonSoftware.Database.Models.Accounts
 
         public async Task UpdateAsync(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("UPDATE " + FriendGroupsTable.Name
-                + " SET account=@account, parent=@parent, name=@name WHERE id=@id"))
+            using(DbCommand command = connection.BuildCommand("UPDATE " + TableName
+                + " SET account_id=@account_id, name=@name WHERE id=@id"))
             {
-                connection.AddParameter(command, "account", Account);
-                connection.AddParameter(command, "parent", Parent);
+                connection.AddParameter(command, "account_id", AccountId);
                 connection.AddParameter(command, "name", Name);
                 connection.AddParameter(command, "id", Id);
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -137,7 +115,7 @@ namespace EnergonSoftware.Database.Models.Accounts
 
         public async Task DeleteAsync(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("DELETE FROM " + FriendGroupsTable.Name + " WHERE id=@id")) {
+            using(DbCommand command = connection.BuildCommand("DELETE FROM " + TableName + " WHERE id=@id")) {
                 connection.AddParameter(command, "id", Id);
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
@@ -145,7 +123,7 @@ namespace EnergonSoftware.Database.Models.Accounts
 
         public override string ToString()
         {
-            return "FriendGroup(id: " + Id + ", account: " + Account + ", parent: " + Parent +", name: " + Name + ")";
+            return "FriendGroup(id: " + Id + ", account_id: " + AccountId + ", name: " + Name + ")";
         }
     }
 }

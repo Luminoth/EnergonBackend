@@ -20,7 +20,7 @@ namespace EnergonSoftware.Launcher.Windows
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     DebugWindow.Instance.OutputText.AppendText(logEntry, LoggerColor.ParseColor(logEntry));
-                    DebugWindow.Instance.OutputText.ScrollToEnd();
+                    //DebugWindow.Instance.OutputText.ScrollToEnd();
                 }
             );
         }

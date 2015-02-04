@@ -25,6 +25,8 @@ namespace EnergonSoftware.Core.Accounts
         public Visibility Visibility { get; set; }
         public string Status { get; set; }
 
+        public string Group { get; set; }
+
         public Account()
         {
             Id = -1;
@@ -37,6 +39,7 @@ namespace EnergonSoftware.Core.Accounts
             await formatter.WriteAsync("username", Username).ConfigureAwait(false);
             await formatter.WriteAsync("visibility", (int)Visibility).ConfigureAwait(false);
             await formatter.WriteAsync("status", Status??string.Empty).ConfigureAwait(false);
+            await formatter.WriteAsync("group", Group??string.Empty).ConfigureAwait(false);
         }
 
         public async Task DeSerializeAsync(IMessageFormatter formatter)
@@ -45,6 +48,7 @@ namespace EnergonSoftware.Core.Accounts
             Username = await formatter.ReadStringAsync("username").ConfigureAwait(false);
             Visibility = (Visibility)await formatter.ReadIntAsync("visibility").ConfigureAwait(false);
             Status = await formatter.ReadStringAsync("status").ConfigureAwait(false);
+            Group = await formatter.ReadStringAsync("group").ConfigureAwait(false);
         }
 
         public override bool Equals(object obj)
@@ -83,7 +87,7 @@ namespace EnergonSoftware.Core.Accounts
 
         public override string ToString()
         {
-            return "Account(Id=" + Id + ", Username=" + Username + ", SessionId=" + SessionId + ", EndPoint=" + EndPoint + ", Visibility=" + Visibility + ", Status=" + Status + ")";
+            return "Account(Id=" + Id + ", Username=" + Username + ", SessionId=" + SessionId + ", EndPoint=" + EndPoint + ", Visibility=" + Visibility + ", Status=" + Status + ", Group=" + Group + ")";
         }
 
 #region Property Notifier

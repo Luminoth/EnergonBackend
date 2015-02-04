@@ -9,7 +9,7 @@ namespace EnergonSoftware.Database.Models
         void Clean();
 
         Task<bool> ReadAsync(DatabaseConnection connection);
-        void Load(DbDataReader reader);
+        Task LoadAsync(DbDataReader reader);
 
         Task InsertAsync(DatabaseConnection connection);
         Task UpdateAsync(DatabaseConnection connection);

@@ -28,6 +28,8 @@ namespace EnergonSoftware.Database.Models.Events
             }
         );
 
+        public static string TableName { get { return AuthEventsTable.Name; } }
+
         public static async Task CreateTableAsync(DatabaseConnection connection)
         {
             await AuthEventsTable.CreateAsync(connection).ConfigureAwait(false);
@@ -56,7 +58,7 @@ namespace EnergonSoftware.Database.Models.Events
 
         public override async Task InsertAsync(DatabaseConnection connection)
         {
-            using(DbCommand command = connection.BuildCommand("INSERT INTO " + AuthEventsTable.Name
+            using(DbCommand command = connection.BuildCommand("INSERT INTO " + TableName
                 + "(timestamp, type, origin, account, reason)"
                 + " VALUES(@timestamp, @type, @origin, @account, @reason)"))
             {

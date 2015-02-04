@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Database;
 using EnergonSoftware.Database.Models.Accounts;
 using EnergonSoftware.Database.Models.Events;
@@ -83,22 +85,42 @@ namespace EnergonSoftware.DbInit
             await testAccount2.InsertAsync(connection).ConfigureAwait(false);
             Logger.Info("Inserted new account: " + testAccount2);
 
-            AccountFriend friend = new AccountFriend()
+            AccountFriend shaneFriend1 = new AccountFriend()
             {
-                Account = shaneAccount.Id,
-                Friend = testAccount1.Id,
+                AccountId = shaneAccount.Id,
+                FriendAccountId = testAccount1.Id,
             };
-            await friend.InsertAsync(connection).ConfigureAwait(false);
-            Logger.Info("Inserted new account friend: " + friend);
+            await shaneFriend1.InsertAsync(connection).ConfigureAwait(false);
+            Logger.Info("Inserted new account friend: " + shaneFriend1);
+
+            FriendGroup shaneFriendGroup1 = new FriendGroup()
+            {
+                AccountId = shaneAccount.Id,
+                Name = "Test Group",
+            };
+            await shaneFriendGroup1.InsertAsync(connection).ConfigureAwait(false);
+            Logger.Info("Inserted new friend group: " + shaneFriendGroup1);
+
+            AccountFriend shaneFriend2 = new AccountFriend()
+            {
+                AccountId = shaneAccount.Id,
+                FriendAccountId = testAccount2.Id,
+                GroupId = shaneFriendGroup1.Id,
+            };
+            await shaneFriend2.InsertAsync(connection).ConfigureAwait(false);
+            Logger.Info("Inserted new account friend: " + shaneFriend2);
         }
 
         private static async Task VerifyAccountsDataAsync(DatabaseConnection connection)
         {
             Logger.Info("Verifying account data...");
 
-            AccountInfo account = new AccountInfo() { Username = "shane", };
+            AccountInfo account = new AccountInfo() { Username = "shane" };
             await account.ReadAsync(connection).ConfigureAwait(false);
             Logger.Info("Read account: " + account);
+
+            List<Account> friends = await AccountInfo.ReadFriendsAsync(connection, account.Id).ConfigureAwait(false);
+            Logger.Info("Read " + friends.Count + " friends: " + string.Join(", ", (object[])friends.ToArray()));
         }
 #endregion
 

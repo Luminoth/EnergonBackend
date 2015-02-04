@@ -80,6 +80,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AuthenticationStage.cs" />
+    <Compile Include="Controls\FriendEntry.cs" />
+    <Compile Include="Controls\FriendGroupEntry.cs" />
     <Compile Include="Controls\FriendsListControl.xaml.cs">
       <DependentUpon>FriendsListControl.xaml</DependentUpon>
     </Compile>

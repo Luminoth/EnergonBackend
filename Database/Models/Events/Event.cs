@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Util;
@@ -24,26 +25,26 @@ namespace EnergonSoftware.Database.Models.Events
             Timestamp = Time.CurrentTimeMs;
         }
 
-        public async Task<bool> ReadAsync(DatabaseConnection connection)
+        public Task<bool> ReadAsync(DatabaseConnection connection)
         {
-            await Task.Delay(0).ConfigureAwait(false);
-            return false;
+            throw new NotImplementedException("ReadAsync");
         }
 
-        public void Load(DbDataReader reader)
+        public Task LoadAsync(DbDataReader reader)
         {
+            throw new NotImplementedException("LoadAsync");
         }
 
         public abstract Task InsertAsync(DatabaseConnection connection);
 
-        public async Task UpdateAsync(DatabaseConnection connection)
+        public Task UpdateAsync(DatabaseConnection connection)
         {
-            await Task.Delay(0).ConfigureAwait(false);
+            throw new NotImplementedException("UpdateAsync");
         }
 
-        public async Task DeleteAsync(DatabaseConnection connection)
+        public Task DeleteAsync(DatabaseConnection connection)
         {
-            await Task.Delay(0).ConfigureAwait(false);
+            throw new NotImplementedException("DeleteAsync");
         }
     }
 }
