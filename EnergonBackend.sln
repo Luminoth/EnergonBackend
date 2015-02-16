@@ -33,6 +33,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat", "Chat\Chat.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsUtil", "WindowsUtil\WindowsUtil.csproj", "{90BDF00A-9C80-4716-A4F9-888718E550B6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{5DB7E72E-60F3-43C1-BA1C-953DB136BF90}"
+	ProjectSection(SolutionItems) = preProject
+		usr\doc\EnergonSoftware\accounts_database.vsdx = usr\doc\EnergonSoftware\accounts_database.vsdx
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
