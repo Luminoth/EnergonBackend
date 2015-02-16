@@ -76,6 +76,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             lock(_lock) {
                 _sessions.ForEach(session => tasks.Add(session.PollAndRunAsync()));
             }
+
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
@@ -85,6 +86,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             lock(_lock) {
                 _sessions.ForEach(session => tasks.Add(session.SendMessageAsync(message)));
             }
+
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }

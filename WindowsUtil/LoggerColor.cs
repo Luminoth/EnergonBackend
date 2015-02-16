@@ -18,6 +18,7 @@ namespace EnergonSoftware.WindowsUtil
             } else if(Level.Fatal == level) {
                 return Colors.Red;
             }
+
             return Colors.Black;
         }
 
@@ -38,6 +39,7 @@ namespace EnergonSoftware.WindowsUtil
             } else if(logEntry.Contains("FATAL")) {
                 return LogEntryColor(Level.Fatal);
             }
+
             return Colors.Black;
         }
     }

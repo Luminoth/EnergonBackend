@@ -46,14 +46,14 @@ namespace EnergonSoftware.Core.Messages.Formatter
 
         public async Task StartDocumentAsync()
         {
-            //await _writer.WriteStartDocumentAsync().ConfigureAwait(false);
+            ////await _writer.WriteStartDocumentAsync().ConfigureAwait(false);
             await StartElementAsync("message").ConfigureAwait(false);
         }
 
         public async Task EndDocumentAsync()
         {
             await EndElementAsync().ConfigureAwait(false);
-            //await _writer.WriteEndDocumentAsync().ConfigureAwait(false);
+            ////await _writer.WriteEndDocumentAsync().ConfigureAwait(false);
         }
 
         public async Task StartElementAsync(string name)
@@ -72,6 +72,7 @@ namespace EnergonSoftware.Core.Messages.Formatter
             foreach(T value in values) {
                 await WriteAsync(value).ConfigureAwait(false);
             }
+
             await EndElementAsync().ConfigureAwait(false);
         }
 

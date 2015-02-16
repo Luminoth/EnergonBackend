@@ -20,8 +20,7 @@ namespace EnergonSoftware.Authenticator
             await LogEventAsync(new AuthEvent(AuthEventType.Request)
                 {
                     Origin = origin.ToString(),
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
 
         public async Task BeginEventAsync(EndPoint origin, string username)
@@ -30,8 +29,7 @@ namespace EnergonSoftware.Authenticator
                 {
                     Origin = origin.ToString(),
                     Account = username,
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
 
         public async Task SuccessEventAsync(EndPoint origin, string username)
@@ -40,8 +38,7 @@ namespace EnergonSoftware.Authenticator
                 {
                     Origin = origin.ToString(),
                     Account = username,
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
 
         public async Task FailedEventAsync(EndPoint origin, string username, string reason)
@@ -51,8 +48,7 @@ namespace EnergonSoftware.Authenticator
                     Origin = origin.ToString(),
                     Account = username,
                     Reason = reason,
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
 
         // TODO: move this to a base class

@@ -64,6 +64,7 @@ namespace EnergonSoftware.Core.Messages.Formatter
             case XmlMessageFormatter.FormatterType:
                 return new XmlMessageFormatter();
             }
+
             throw new MessageFormatterException(string.Format(Resources.ErrorUnsupportedMessageFormatter, type));
         }
     }

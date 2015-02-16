@@ -73,6 +73,7 @@ namespace EnergonSoftware.Database
                 case "System.Data.SQLite":
                     return ((SQLiteConnection)Connection).LastInsertRowId;
                 }
+
                 return -1;
             }
         }
@@ -145,6 +146,7 @@ namespace EnergonSoftware.Database
             foreach(var param in parameters) {
                 AddParameter(command, param.Key, param.Value);
             }
+
             return command;
         }
 

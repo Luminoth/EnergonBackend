@@ -39,6 +39,7 @@ namespace EnergonSoftware.Manager
 
                 _diagnosticServer.Dispose();
             }
+
             base.Dispose(disposing);
         }
 #endregion
@@ -93,8 +94,7 @@ namespace EnergonSoftware.Manager
                     Task.WhenAll(new Task[]
                         {
                             InstanceNotifier.Instance.RunAsync(),
-                        }
-                    ).Wait();
+                        }).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();

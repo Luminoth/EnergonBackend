@@ -24,8 +24,7 @@ namespace EnergonSoftware.Database.Models.Accounts
                 { new ColumnDescription("sessionid", DatabaseType.Text) },
                 { new ColumnDescription("visibility", DatabaseType.Integer).SetNotNull() },
                 { new ColumnDescription("status", DatabaseType.Text) },
-            }
-        );
+            });
 
         public static string TableName { get { return AccountsTable.Name; } }
 
@@ -81,7 +80,15 @@ namespace EnergonSoftware.Database.Models.Accounts
         public bool Valid { get { return Id > 0; } }
 
         private bool _active;
-        public bool Active { get { return _active; } set { _active = value; Dirty = true; } }
+        public bool Active
+        {
+            get { return _active; }
+
+            set {
+                _active = value;
+                Dirty = true;
+            }
+        }
 
         // NOTE: changing the username invalidates the password digest!
         private string _username = string.Empty;
@@ -133,6 +140,7 @@ namespace EnergonSoftware.Database.Models.Accounts
                     if(!await reader.ReadAsync().ConfigureAwait(false)) {
                         return false;
                     }
+
                     await LoadAsync(reader).ConfigureAwait(false);
                 }
             }
@@ -198,6 +206,7 @@ namespace EnergonSoftware.Database.Models.Accounts
                 connection.AddParameter(command, "id", Id);
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
+
             Clean();
         }
 
@@ -217,6 +226,7 @@ namespace EnergonSoftware.Database.Models.Accounts
                 if(2 != endPointStr.Length) {
                     throw new FormatException("Invalid EndPoint!");
                 }
+
                 endPoint = new IPEndPoint(IPAddress.Parse(endPointStr[0]), Convert.ToInt32(endPointStr[1]));
             } 
 

@@ -18,6 +18,14 @@ namespace EnergonSoftware.Launcher.Friends
 
         public static readonly FriendListManager Instance = new FriendListManager();
 
+        private static readonly IReadOnlyCollection<Account> TestFriends = new List<Account>()
+        {
+            new Account() { Username = "Offline Group Friend", Group = "Test", Visibility = Visibility.Offline, Status = string.Empty, },
+            new Account() { Username = "Online Group Friend", Group = "Test", Visibility = Visibility.Online, Status = string.Empty, },
+            new Account() { Username = "Offline Friend", Group = string.Empty, Visibility = Visibility.Offline, Status = string.Empty, },
+            new Account() { Username = "Online Friend", Group = string.Empty, Visibility = Visibility.Online, Status = string.Empty, },
+        };
+
         private readonly Dictionary<string, Account> _friendList = new Dictionary<string, Account>();
         public IReadOnlyDictionary<string, Account> FriendList { get { return _friendList; } }
 
@@ -46,6 +54,7 @@ namespace EnergonSoftware.Launcher.Friends
             foreach(Account friend in friendList) {
                 AddFriendInternal(friend);
             }
+
             UpdateOnlineCount();
         }
 
@@ -53,6 +62,18 @@ namespace EnergonSoftware.Launcher.Friends
         {
             Logger.Debug("Adding friend: " + friend);
             _friendList[friend.Username] = friend;
+
+            FriendGroupEntry group = RootGroupEntry;
+            if(!string.IsNullOrEmpty(friend.Group)) {
+                try {
+                    group = RootGroupEntry.Groups[friend.Group];
+                } catch(KeyNotFoundException) {
+                    group = new FriendGroupEntry() { Text = friend.Group };
+                    RootGroupEntry.AddGroup(group);
+                }
+            }
+
+            group.AddFriend(new FriendEntry() { Text = friend.Username });
         }
 
         public void AddFriend(Account friend)
@@ -73,6 +94,11 @@ namespace EnergonSoftware.Launcher.Friends
             UpdateOnlineCount();
         }
 
+        public void PopulateTestFriends()
+        {
+            AddAll(TestFriends);
+        }
+
         public override string ToString()
         {
             return string.Join(", ", (object[])FriendList.Values.ToArray());
@@ -80,7 +106,7 @@ namespace EnergonSoftware.Launcher.Friends
 
 #region Property Notifier
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] string property=null)
+        private void NotifyPropertyChanged([CallerMemberName] string property = null)
         {
             if(null != PropertyChanged) {
                 PropertyChanged(this, new PropertyChangedEventArgs(property));

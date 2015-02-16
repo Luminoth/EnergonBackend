@@ -17,13 +17,21 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <ScrollViewer Grid.Row="0" Grid.Column="0" Margin="5" Width="150" Name="FriendList" HorizontalScrollBarVisibility="Auto" Visibility="Hidden">
+        <ScrollViewer Grid.Row="0" Grid.Column="0" Margin="5" Width="150" Name="FriendList" HorizontalScrollBarVisibility="Auto" Panel.ZIndex="1">
             <TreeView Name="FriendListView">
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type launchercontrols:FriendGroupEntry}" ItemsSource="{Binding Entries}">
                         <TextBlock Text="{Binding Text}" />
                     </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type launchercontrols:FriendEntry}">
+                        <TextBlock Text="{Binding Text}" />
+                    </DataTemplate>
                 </TreeView.Resources>
+            	<TreeView.ContextMenu>
+            		<ContextMenu StaysOpen="True">
+            			<MenuItem Header="Add..." />
+					</ContextMenu>
+            	</TreeView.ContextMenu>
             </TreeView>
         </ScrollViewer>
 

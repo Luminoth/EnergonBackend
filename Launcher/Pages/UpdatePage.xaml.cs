@@ -35,8 +35,7 @@ namespace EnergonSoftware.Launcher.Pages
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         CloseButton.IsEnabled = true;
-                    }
-                );
+                    });
             }
         }
 #endregion

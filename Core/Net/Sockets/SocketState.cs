@@ -28,6 +28,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         public Socket Socket
         {
             private get { return _socket; }
+
             set
             {
                 _socketLock.Wait();
@@ -70,6 +71,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                 if(null != Socket) {
                     Socket.Dispose();
                 }
+
                 _socketLock.Dispose();
                 Buffer.Dispose();
             }
@@ -90,6 +92,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                 if(count > 0) {
                     LastMessageTimeMS = Time.CurrentTimeMs;
                 }
+
                 return count;
             } finally {
                 Buffer.Release();

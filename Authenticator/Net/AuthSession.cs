@@ -32,6 +32,7 @@ namespace EnergonSoftware.Authenticator.Net
                 if(null != session) {
                     session.Dispose();
                 }
+
                 throw;
             }
         }
@@ -69,8 +70,7 @@ namespace EnergonSoftware.Authenticator.Net
             await SendMessageAsync(new ChallengeMessage()
                 {
                     Challenge = Convert.ToBase64String(Encoding.UTF8.GetBytes(challenge)),
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
 
         public async Task ChallengeAsync(string challenge, AccountInfo accountInfo)
@@ -83,8 +83,7 @@ namespace EnergonSoftware.Authenticator.Net
             await SendMessageAsync(new ChallengeMessage()
                 {
                     Challenge = Convert.ToBase64String(Encoding.UTF8.GetBytes(challenge)),
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
 
         public async Task SuccessAsync(string sessionid)
@@ -102,8 +101,7 @@ namespace EnergonSoftware.Authenticator.Net
             await SendMessageAsync(new SuccessMessage()
                 {
                     SessionId = sessionid,
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
 
             await DisconnectAsync().ConfigureAwait(false);
         }
@@ -112,17 +110,18 @@ namespace EnergonSoftware.Authenticator.Net
         {
             await EventLogger.Instance.FailedEventAsync(RemoteEndPoint, null == AccountInfo ? null : AccountInfo.Username, reason).ConfigureAwait(false);
 
-            // NOTE: we don't update the database here because this
-            // might be a malicious login attempt against an account
-            // that is already using a legitimate ticket
+            /*
+             * NOTE: we don't update the database here because this
+             * might be a malicious login attempt against an account
+             * that is already using a legitimate ticket
+             */
 
             AccountInfo = null;
 
             await SendMessageAsync(new FailureMessage()
                 {
                     Reason = reason,
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
 
             await DisconnectAsync().ConfigureAwait(false);
         }

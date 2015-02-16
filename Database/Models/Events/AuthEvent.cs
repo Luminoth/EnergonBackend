@@ -25,8 +25,7 @@ namespace EnergonSoftware.Database.Models.Events
                 { new ColumnDescription("origin", DatabaseType.Text).SetNotNull() },
                 { new ColumnDescription("account", DatabaseType.Text) },
                 { new ColumnDescription("reason", DatabaseType.Text) },
-            }
-        );
+            });
 
         public static string TableName { get { return AuthEventsTable.Name; } }
 

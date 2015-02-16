@@ -23,8 +23,7 @@ namespace EnergonSoftware.DbInit.Windows
                         MainWindow.Instance.OutputText.AppendText(logEntry, LoggerColor.ParseColor(logEntry));
                         MainWindow.Instance.OutputText.ScrollToEnd();
                     }
-                }
-            );
+                });
         }
 
         public static async Task SetStatusBarTextAsync(string text)
@@ -34,8 +33,7 @@ namespace EnergonSoftware.DbInit.Windows
                     if(null != Application.Current.MainWindow) {
                         MainWindow.Instance.StatusBarText.Text = text;
                     }
-                }
-            );
+                });
         }
 
         public MainWindow()
@@ -57,14 +55,17 @@ namespace EnergonSoftware.DbInit.Windows
 
         public void MenuHelpAbout_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(this, EnergonSoftware.DbInit.Properties.Resources.MainWindowTitle,
+            MessageBox.Show(
+                this,
+                EnergonSoftware.DbInit.Properties.Resources.MainWindowTitle,
                 string.Format(EnergonSoftware.DbInit.Properties.Resources.AboutMessage, EnergonSoftware.DbInit.Properties.Resources.MainWindowTitle),
-                MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
 
         public async void ButtonInitialize_Click(object sender, RoutedEventArgs e)
         {
-            //OutputText.Document.Blocks.Clear();
+            ////OutputText.Document.Blocks.Clear();
             await SetStatusBarTextAsync("Running...");
 
             App.Instance.Running = true;

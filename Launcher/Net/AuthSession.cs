@@ -60,8 +60,7 @@ namespace EnergonSoftware.Launcher.Net
             await SendMessageAsync(new AuthMessage()
                 {
                     MechanismType = AuthType.DigestSHA512,
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
 
             App.Instance.AuthStage = AuthenticationStage.Begin;
         }
@@ -73,8 +72,7 @@ namespace EnergonSoftware.Launcher.Net
             await SendMessageAsync(new ResponseMessage()
                 {
                     Response = response,
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
 
             App.Instance.AuthStage = AuthenticationStage.Challenge;
         }

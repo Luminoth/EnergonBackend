@@ -8,6 +8,7 @@ using EnergonSoftware.Core;
 using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
+using EnergonSoftware.Launcher.Friends;
 using EnergonSoftware.Launcher.Net;
 using EnergonSoftware.Launcher.Updater;
 using EnergonSoftware.Launcher.Windows;
@@ -107,8 +108,8 @@ namespace EnergonSoftware.Launcher
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     MessageBox.Show(Application.Current.MainWindow, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            );
+                });
+
             await LogoutAsync().ConfigureAwait(false);
         }
 #endregion
@@ -132,7 +133,7 @@ namespace EnergonSoftware.Launcher
             Logger.Info("Exiting...");
             _cancellationToken.Cancel();
 
-            // TODO: logout?
+            //// TODO: logout?
 
             await Sessions.DisconnectAllAsync();
 
@@ -150,6 +151,7 @@ namespace EnergonSoftware.Launcher
         {
             if(UseDummyNetwork) {
                 await EnergonSoftware.Launcher.Windows.MainWindow.ShowMainPageAsync().ConfigureAwait(false);
+                FriendListManager.Instance.PopulateTestFriends();
                 return;
             }
 

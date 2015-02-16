@@ -35,8 +35,10 @@ namespace EnergonSoftware.Core
                 if(idx < 0) {
                     return null;
                 }
-                values[pair.Substring(0, idx)] = pair.Substring(idx+1);
+
+                values[pair.Substring(0, idx)] = pair.Substring(idx + 1);
             }
+
             return values;
         }
 

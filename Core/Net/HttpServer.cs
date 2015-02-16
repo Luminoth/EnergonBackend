@@ -63,13 +63,15 @@ namespace EnergonSoftware.Core.Net
             _listener.Start();
 
             _cancellationToken = new CancellationTokenSource();
-            _task = Task.Run(async () =>
+            _task = Task.Run(
+                async () =>
                 {
                     // TODO: trap exceptions
                     while(!_cancellationToken.IsCancellationRequested) {
                         await RunAsync().ConfigureAwait(false);
                     }
-                }, _cancellationToken.Token);
+                },
+                _cancellationToken.Token);
         }
 
         public void Stop()
@@ -126,6 +128,7 @@ namespace EnergonSoftware.Core.Net
                 response.ContentLength64 = data.Length;
                 await response.OutputStream.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
             }
+
             response.OutputStream.Close();
         }
 
@@ -142,6 +145,7 @@ string data = "<html><head><title>HttpServer Test</title></head><body>Hello Worl
 await Task.Delay(1).ConfigureAwait(false);
                 return encoding.GetBytes(data);
             }
+
             return null;
         }
     }

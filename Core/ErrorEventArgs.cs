@@ -10,6 +10,7 @@ namespace EnergonSoftware.Core
             get { return null != Exception && string.IsNullOrEmpty(_error) ? Exception.Message : _error; }
             set { _error = value; }
         }
+
         public Exception Exception { get; set; }
     }
 }

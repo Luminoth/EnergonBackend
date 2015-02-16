@@ -25,6 +25,7 @@ namespace EnergonSoftware.Core.Net
                 } catch(SocketException) {
                     continue;
                 }
+
                 return socket;
             }
 
@@ -50,6 +51,7 @@ namespace EnergonSoftware.Core.Net
                 if(null != listener) {
                     listener.Dispose();
                 }
+
                 throw;
             }
         }

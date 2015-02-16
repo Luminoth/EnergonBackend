@@ -27,15 +27,12 @@ namespace EnergonSoftware.Core.Net.Sessions
         public bool Authenticate(string username, string sessionid)
         {
             return Authenticate(new Account()
-                {
-                    Username = username,
-                    SessionId = sessionid,
-                    EndPoint = RemoteEndPoint,
-                }
-            );
+            {
+                Username = username,
+                SessionId = sessionid,
+                EndPoint = RemoteEndPoint,
+            });
         }
-
-        protected abstract Task<Account> LookupAccountAsync(string username);
 
         public async Task<bool> LoginAsync(string username, string sessionid)
         {
@@ -51,6 +48,7 @@ namespace EnergonSoftware.Core.Net.Sessions
                 await ErrorAsync(string.Format(Resources.ErrorInvalidLogin, username)).ConfigureAwait(false);
                 return false;
             }
+
             Account = lookupAccount;
 
             EnergonSoftware.Core.Accounts.Account loginAccount = new Account()
@@ -79,5 +77,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
             Account = null;
         }
+
+        protected abstract Task<Account> LookupAccountAsync(string username);
     }
 }

@@ -26,7 +26,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
         {
         }
 
-// TODO: handle the case of a user authenticating a second time
+        //// TODO: handle the case of a user authenticating a second time
 
         private async Task CompleteAuthenticationAsync(AuthSession session)
         {
@@ -55,7 +55,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             {
             case EnergonSoftware.Core.AuthType.DigestMD5:
                 /*Logger.Debug("Handling MD5 response...");
-                //Logger.Debug("passwordHash=" + account.PasswordMD5);
+                ////Logger.Debug("passwordHash=" + account.PasswordMD5);
                 expected = await EnergonSoftware.Core.Auth.DigestClientResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
                 rspauth = await EnergonSoftware.Core.Auth.DigestServerResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
                 break;*/
@@ -63,7 +63,7 @@ await session.FailureAsync("MD5 auth type not supported!").ConfigureAwait(false)
 return;
             case EnergonSoftware.Core.AuthType.DigestSHA512:
                 Logger.Debug("Handling SHA512 response...");
-                //Logger.Debug("passwordHash=" + account.PasswordSHA512);
+                ////Logger.Debug("passwordHash=" + account.PasswordSHA512);
                 expected = await EnergonSoftware.Core.Auth.DigestClientResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
                 rspauth = await EnergonSoftware.Core.Auth.DigestServerResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
                 break;
@@ -141,7 +141,7 @@ return;
                 }
 
                 string digestURI = values["digest-uri"].Trim(new char[] { '"' });
-                // TODO: validate the digest-uri
+                //// TODO: validate the digest-uri
 
                 string cnonce = values["cnonce"].Trim(new char[] { '"' });
                 string nc = values["nc"].Trim(new char[] { '"' });

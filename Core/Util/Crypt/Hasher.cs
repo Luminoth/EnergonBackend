@@ -15,6 +15,7 @@ namespace EnergonSoftware.Core.Util.Crypt
             foreach(byte b in digest) {
                 builder.Append(b.ToString("x2"));
             }
+
             return builder.ToString();
         }
     }

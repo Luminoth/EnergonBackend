@@ -166,6 +166,7 @@ namespace EnergonSoftware.DbInit
                     throw e.InnerException;
                 }
             }
+
             return await DatabaseConnection.CreateDatabaseAsync(connectionSettings).ConfigureAwait(false);
         }
     }

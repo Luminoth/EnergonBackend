@@ -30,6 +30,7 @@ namespace EnergonSoftware.Overmind.Net
                 if(null != session) {
                     session.Dispose();
                 }
+
                 throw;
             }
         }
@@ -58,6 +59,7 @@ namespace EnergonSoftware.Overmind.Net
                     return null;
                 }
             }
+
             return account.ToAccount();
         }
 

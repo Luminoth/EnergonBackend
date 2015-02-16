@@ -7,10 +7,10 @@ namespace EnergonSoftware.Core.Configuration
         [ConfigurationProperty("maxConnections", DefaultValue = -1)]
         public int MaxConnections { get { return (int)this["maxConnections"]; } }
 
-        [ConfigurationProperty("backlog", DefaultValue=10)]
+        [ConfigurationProperty("backlog", DefaultValue = 10)]
         public int Backlog { get { return (int)this["backlog"]; } }
 
-        [ConfigurationProperty("", IsDefaultCollection=true)]
+        [ConfigurationProperty("", IsDefaultCollection = true)]
         public ListenAddressConfigurationElementCollection ListenAddresses
         {
             get { return (ListenAddressConfigurationElementCollection)base[string.Empty]; }

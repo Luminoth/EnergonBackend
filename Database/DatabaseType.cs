@@ -19,6 +19,7 @@
             case "System.Data.SQLite":
                 return GetSQLiteTypeString(type);
             }
+
             return string.Empty;
         }
 
@@ -39,6 +40,7 @@
             case DatabaseType.DateTime:
                 return "DATETIME";
             }
+
             return string.Empty;
         }
     }

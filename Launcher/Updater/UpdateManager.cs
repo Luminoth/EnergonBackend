@@ -45,44 +45,48 @@ await Task.Delay(2000).ConfigureAwait(false);
                             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<UpdateContract>));
                             updates = (List<UpdateContract>)serializer.ReadObject(stream);
                         }
+
                         Logger.Debug("Read updates: " + string.Join(",", (object[])updates.ToArray()));
 
-                        // TODO: check the updates and then update!
+                        //// TODO: check the updates and then update!
 
                         UpdateStatus = "Up to date!";
                         if(null != OnUpdateFinished) {
-                            OnUpdateFinished(this, new UpdateFinishedEventArgs()
+                            OnUpdateFinished(
+                                this,
+                                new UpdateFinishedEventArgs()
                                 {
                                     Success = true,
-                                }
-                            );
+                                });
                         }
                     } else {
                         UpdateStatus = "Error contacting update server: " + response.ReasonPhrase;
                         if(null != OnUpdateFinished) {
-                            OnUpdateFinished(this, new UpdateFinishedEventArgs()
+                            OnUpdateFinished(
+                                this,
+                                new UpdateFinishedEventArgs()
                                 {
                                     Success = false,
-                                }
-                            );
+                                });
                         }
                     }
                 }
             } catch(Exception e) {
                 UpdateStatus = "Error contacting update server: " + e.Message;
                 if(null != OnUpdateFinished) {
-                    OnUpdateFinished(this, new UpdateFinishedEventArgs()
+                    OnUpdateFinished(
+                        this,
+                        new UpdateFinishedEventArgs()
                         {
                             Success = false,
-                        }
-                    );
+                        });
                 }
             }
         }
 
 #region Property Notifier
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] string property=null)
+        private void NotifyPropertyChanged([CallerMemberName] string property = null)
         {
             if(null != PropertyChanged) {
                 PropertyChanged(this, new PropertyChangedEventArgs(property));

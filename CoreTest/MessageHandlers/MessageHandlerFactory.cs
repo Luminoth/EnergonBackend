@@ -13,6 +13,7 @@ namespace EnergonSoftware.Core.Test.MessageHandlers
             case ExceptionMessage.MessageType:
                 return new ExceptionMessageHandler();
             }
+
             throw new MessageHandlerException("Unsupported message type: " + type);
         }
     }

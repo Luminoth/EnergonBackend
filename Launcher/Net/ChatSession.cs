@@ -32,6 +32,7 @@ namespace EnergonSoftware.Launcher.Net
                 if(0 == LastMessageTimeMS) {
                     return false;
                 }
+
                 return Time.CurrentTimeMs > LastPingTimeMS + Convert.ToInt64(ConfigurationManager.AppSettings["chatPingRate"]);
             }
         }
@@ -76,8 +77,7 @@ namespace EnergonSoftware.Launcher.Net
                 {
                     Username = App.Instance.UserAccount.Username,
                     SessionId = App.Instance.UserAccount.SessionId,
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
 
         public async Task LogoutAsync()
@@ -88,8 +88,7 @@ namespace EnergonSoftware.Launcher.Net
                 {
                     Username = App.Instance.UserAccount.Username,
                     SessionId = App.Instance.UserAccount.SessionId,
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
 
             await DisconnectAsync().ConfigureAwait(false);
         }
@@ -113,8 +112,7 @@ namespace EnergonSoftware.Launcher.Net
                     Username = App.Instance.UserAccount.Username,
                     SessionId = App.Instance.UserAccount.SessionId,
                     Visibility = visibility,
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
 
         public void SetFriendList(IReadOnlyCollection<Account> friendList)

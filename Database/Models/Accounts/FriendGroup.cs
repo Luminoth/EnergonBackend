@@ -15,8 +15,7 @@ namespace EnergonSoftware.Database.Models.Accounts
                 { new ColumnDescription("account_id", DatabaseType.Integer).SetReferences("accounts", "id") },
                 { new ColumnDescription("parent_group_id", DatabaseType.Integer).SetDefaultValue("-1").SetReferences("friend_groups", "id") },
                 { new ColumnDescription("name", DatabaseType.Text).SetNotNull() },
-            }
-        );
+            });
 
         public static string TableName { get { return FriendGroupsTable.Name; } }
 
@@ -67,6 +66,7 @@ namespace EnergonSoftware.Database.Models.Accounts
                     if(!await reader.ReadAsync().ConfigureAwait(false)) {
                         return false;
                     }
+
                     await LoadAsync(reader).ConfigureAwait(false);
                 }
             }
@@ -110,6 +110,7 @@ namespace EnergonSoftware.Database.Models.Accounts
                 connection.AddParameter(command, "id", Id);
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
             }
+
             Clean();
         }
 

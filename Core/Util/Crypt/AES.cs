@@ -17,6 +17,7 @@ namespace EnergonSoftware.Core.Util.Crypt
                 using(StreamWriter writer = new StreamWriter(new CryptoStream(ms, encryptor, CryptoStreamMode.Write))) {
                     await writer.WriteAsync(data).ConfigureAwait(false);
                 }
+
                 return ms.ToArray();
             }
         }

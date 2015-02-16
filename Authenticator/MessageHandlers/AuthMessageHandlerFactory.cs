@@ -15,6 +15,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             case ResponseMessage.MessageType:
                 return new ResponseMessageHandler();
             }
+
             throw new MessageHandlerException("Unsupported message type: " + type);
         }
     }

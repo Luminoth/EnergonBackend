@@ -33,6 +33,7 @@ namespace EnergonSoftware.Launcher.News
             if(Time.CurrentTimeMs < (_lastCheckTimeMS + MinCheckTimeMS)) {
                 return;
             }
+
             _lastCheckTimeMS = Time.CurrentTimeMs;
 
             // TODO: use string resources here
@@ -52,6 +53,7 @@ await Task.Delay(2000).ConfigureAwait(false);
                             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<NewsContract>));
                             news = (List<NewsContract>)serializer.ReadObject(stream);
                         }
+
                         Logger.Debug("Read news: " + string.Join(",", (object[])news.ToArray()));
 
                         if(news.Count < 1) {
@@ -70,7 +72,7 @@ await Task.Delay(2000).ConfigureAwait(false);
 
 #region Property Notifier
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] string property=null)
+        private void NotifyPropertyChanged([CallerMemberName] string property = null)
         {
             if(null != PropertyChanged) {
                 PropertyChanged(this, new PropertyChangedEventArgs(property));

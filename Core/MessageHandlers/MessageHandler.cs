@@ -36,6 +36,7 @@ namespace EnergonSoftware.Core.MessageHandlers
             if(_running) {
                 throw new MessageHandlerException(Resources.ErrorMessageHandlerAlreadyRunning);
             }
+
             _running = true;
 
             Authenticate(message as IAuthenticatedMessage, session as AuthenticatedSession);

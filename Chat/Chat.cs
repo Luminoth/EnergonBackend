@@ -44,6 +44,7 @@ namespace EnergonSoftware.Chat
 
                 _diagnosticServer.Dispose();
             }
+
             base.Dispose(disposing);
         }
 #endregion
@@ -125,8 +126,7 @@ namespace EnergonSoftware.Chat
                         {
                             InstanceNotifier.Instance.RunAsync(),
                             PollAndRunAsync(),
-                        }
-                    ).Wait();
+                        }).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();

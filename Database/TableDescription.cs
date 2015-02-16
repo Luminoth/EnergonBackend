@@ -30,12 +30,13 @@ namespace EnergonSoftware.Database
             }
 
             Name = name;
-            for(int i=0; i<columns.Count; ++i) {
+            for(int i = 0; i < columns.Count; ++i) {
                 ColumnDescription column = columns[i];
                 column.Id = i;
                 column.Table = this;
                 _columns[column.Name] = column;
             }
+
             _primaryKeys.AddRange(from column in _columns.Values where column.PrimaryKey select column.Name);
         }
 
@@ -49,6 +50,7 @@ namespace EnergonSoftware.Database
             if(_primaryKeys.Count > 0) {
                 create.Append(", PRIMARY KEY(" + string.Join(", ", _primaryKeys) + ")");
             }
+
             create.Append(")");
 
             using(DbCommand command = connection.BuildCommand(create.ToString())) {

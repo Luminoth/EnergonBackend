@@ -32,6 +32,7 @@ namespace EnergonSoftware.Chat.Net
                 if(null != session) {
                     session.Dispose();
                 }
+
                 throw;
             }
         }
@@ -60,6 +61,7 @@ namespace EnergonSoftware.Chat.Net
                     return null;
                 }
             }
+
             return account.ToAccount();
         }
 
@@ -74,13 +76,13 @@ namespace EnergonSoftware.Chat.Net
             using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
                 friends = await AccountInfo.ReadFriendsAsync(connection, Account.Id).ConfigureAwait(false);
             }
+
             Logger.Debug("Read " + friends.Count + " friends...");
 
             await SendMessageAsync(new FriendListMessage()
                 {
                     Friends = friends,
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
     }
 }

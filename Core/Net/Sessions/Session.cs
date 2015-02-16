@@ -62,23 +62,6 @@ namespace EnergonSoftware.Core.Net.Sessions
         public bool TimedOut { get { return Timeout < 0 ? false : Time.CurrentTimeMs >= (_socketState.LastMessageTimeMS + Timeout); } }
 #endregion
 
-        protected Session()
-        {
-            Id = NextId;
-
-            _socketState = new SocketState();
-
-            Timeout = -1;
-
-            Processor = new MessageProcessor(this);
-            Processor.Start();
-        }
-
-        protected Session(Socket socket) : this()
-        {
-            _socketState = new SocketState(socket);
-        }
-
 #region Dispose
         public void Dispose()
         {
@@ -143,6 +126,7 @@ namespace EnergonSoftware.Core.Net.Sessions
                 if(count > 0) {
                     Logger.Debug("Session " + Id + " read " + count + " bytes");
                 }
+
                 return count;
             } catch(SocketException e) {
                 InternalErrorAsync(e).Wait();
@@ -177,17 +161,6 @@ namespace EnergonSoftware.Core.Net.Sessions
             } catch(MessageException e) {
                 InternalErrorAsync(Resources.ErrorParsingMessages, e).Wait();
             }
-        }
-
-        protected async virtual Task OnRunAsync()
-        {
-            await Task.Delay(0).ConfigureAwait(false);
-        }
-
-        private async Task<int> SendAsync(byte[] bytes)
-        {
-            Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
-            return await _socketState.SendAsync(bytes).ConfigureAwait(false);
         }
 
         public async Task SendMessageAsync(IMessage message)
@@ -294,6 +267,34 @@ namespace EnergonSoftware.Core.Net.Sessions
                 OnError(this, new ErrorEventArgs() { Exception = ex });
             }
         }
-    }
 #endregion
+
+        protected Session()
+        {
+            Id = NextId;
+
+            _socketState = new SocketState();
+
+            Timeout = -1;
+
+            Processor = new MessageProcessor(this);
+            Processor.Start();
+        }
+
+        protected Session(Socket socket) : this()
+        {
+            _socketState = new SocketState(socket);
+        }
+
+        protected async virtual Task OnRunAsync()
+        {
+            await Task.Delay(0).ConfigureAwait(false);
+        }
+
+        private async Task<int> SendAsync(byte[] bytes)
+        {
+            Logger.Debug("Session " + Id + " sending " + bytes.Length + " bytes");
+            return await _socketState.SendAsync(bytes).ConfigureAwait(false);
+        }
+    }
 }

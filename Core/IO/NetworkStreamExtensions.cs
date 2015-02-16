@@ -37,6 +37,7 @@ namespace System.IO
             if(BitConverter.IsLittleEndian) {
                 Array.Reverse(bytes);
             }
+
             await stream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
         }
 
@@ -46,6 +47,7 @@ namespace System.IO
             if(BitConverter.IsLittleEndian) {
                 Array.Reverse(bytes);
             }
+
             await stream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
         }
 #endregion
@@ -80,6 +82,7 @@ namespace System.IO
             if(BitConverter.IsLittleEndian) {
                 Array.Reverse(bytes);
             }
+
             return BitConverter.ToSingle(bytes, 0);
         }
 
@@ -90,6 +93,7 @@ namespace System.IO
             if(BitConverter.IsLittleEndian) {
                 Array.Reverse(bytes);
             }
+
             return BitConverter.ToDouble(bytes, 0);
         }
 #endregion

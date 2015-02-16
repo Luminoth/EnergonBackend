@@ -29,6 +29,7 @@ namespace System.Net.Sockets
                 if(null != remote) {
                     remote.Dispose();
                 }
+
                 throw;
             }
         }
@@ -116,7 +117,7 @@ namespace System.Net.Sockets
             }
         }*/
 
-// TODO: add more receive methods
+        //// TODO: add more receive methods
 
         public static async Task<int> SendAsync(this Socket socket, byte[] buffer)
         {
@@ -136,7 +137,7 @@ namespace System.Net.Sockets
             }
         }
 
-// TODO: add more send methods
+        //// TODO: add more send methods
 #endregion
 
 #region Misc Helpers
@@ -146,6 +147,7 @@ namespace System.Net.Sockets
             if(socket.Connected) {
                 await socket.DisconnectAsync(reuseSocket);
             }
+
             socket.Close();
         }
 #endregion
@@ -171,8 +173,10 @@ namespace System.Net.Sockets
                 if(len <= 0) {
                     return count > 0 ? count : -1;
                 }
+
                 count += len;
             }
+
             return count;
         }
 #endregion

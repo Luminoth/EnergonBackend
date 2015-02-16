@@ -57,6 +57,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                         if(null != socket) {
                             socket.Dispose();
                         }
+
                         Logger.Error(Resources.ErrorCreatingSocket, e);
                     }
                 }
@@ -99,6 +100,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             lock(_lock) {
                 _listenSockets.ForEach(socket => tasks.Add(PollAsync(socket, manager)));
             }
+
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }

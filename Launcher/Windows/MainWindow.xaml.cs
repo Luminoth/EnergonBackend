@@ -20,8 +20,7 @@ namespace EnergonSoftware.Launcher.Windows
                 {
                     MainWindow.Instance.MenuFileLogout.IsEnabled = false;
                     MainWindow.Instance.MainFrame.Navigate(new LoginPage());
-                }
-            );
+                });
         }
 
         public static async Task ShowMainPageAsync()
@@ -30,8 +29,7 @@ namespace EnergonSoftware.Launcher.Windows
                 {
                     MainWindow.Instance.MenuFileLogout.IsEnabled = true;
                     MainWindow.Instance.MainFrame.Navigate(new MainPage());
-                }
-            );
+                });
         }
 
         public static async Task NavigateBackAsync()
@@ -39,8 +37,7 @@ namespace EnergonSoftware.Launcher.Windows
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     MainWindow.Instance.MainFrame.GoBack();
-                }
-            );
+                });
         }
 #endregion
 

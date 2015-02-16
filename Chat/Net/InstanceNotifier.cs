@@ -29,8 +29,11 @@ namespace EnergonSoftware.Chat.Net
         {
             Logger.Debug("Opening instance notifier sockets...");
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
-                Socket listener = NetUtil.CreateMulticastListener(listenAddress.InterfaceAddress, listenAddress.Port,
-                    listenAddress.MulticastGroupIPAddress, listenAddress.MulticastTTL);
+                Socket listener = NetUtil.CreateMulticastListener(
+                    listenAddress.InterfaceAddress,
+                    listenAddress.Port,
+                    listenAddress.MulticastGroupIPAddress,
+                    listenAddress.MulticastTTL);
 
                 Session sender = new InstanceNotifierSession(new SocketState(listener));
                 await sender.ConnectMulticastAsync(listenAddress.MulticastGroupIPAddress, listenAddress.Port, listenAddress.MulticastTTL).ConfigureAwait(false);
@@ -56,8 +59,7 @@ namespace EnergonSoftware.Chat.Net
                 {
                     ServiceName = Chat.ServiceId,
                     ServiceId = Chat.UniqueId.ToString(),
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
 
         public async Task ShutdownAsync()
@@ -66,8 +68,7 @@ namespace EnergonSoftware.Chat.Net
                 {
                     ServiceName = Chat.ServiceId,
                     ServiceId = Chat.UniqueId.ToString(),
-                }
-            ).ConfigureAwait(false);
+                }).ConfigureAwait(false);
         }
 
         private InstanceNotifier()

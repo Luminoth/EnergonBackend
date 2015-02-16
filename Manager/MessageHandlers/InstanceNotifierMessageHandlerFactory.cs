@@ -15,6 +15,7 @@ namespace EnergonSoftware.Manager.MessageHandlers
             case ShutdownMessage.MessageType:
                 return new MessageHandler();
             }
+
             throw new MessageHandlerException("Unsupported message type: " + type);
         }
     }

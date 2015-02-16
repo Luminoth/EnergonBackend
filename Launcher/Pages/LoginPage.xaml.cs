@@ -29,8 +29,7 @@ namespace EnergonSoftware.Launcher.Pages
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     Password.Password = string.Empty;
-                }
-            );
+                });
         }
 #endregion
 

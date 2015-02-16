@@ -54,6 +54,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                         if(null != socket) {
                             socket.Dispose();
                         }
+
                         Logger.Error(Resources.ErrorCreatingSocket, e);
                     }
                 }
@@ -80,6 +81,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                         await session.PollAndReceiveAllAsync().ConfigureAwait(false);
                         return;
                     }
+
                     Logger.Info("New connection from " + remote.RemoteEndPoint);
 
                     if(MaxConnections >= 0 && manager.Count >= MaxConnections) {
@@ -103,6 +105,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             lock(_lock) {
                 _listenSockets.ForEach(socket => tasks.Add(PollAsync(socket, manager)));
             }
+
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }

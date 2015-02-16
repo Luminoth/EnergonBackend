@@ -79,14 +79,16 @@ namespace EnergonSoftware.Core.MessageHandlers
             Logger.Debug("Starting message processor for session " + _session.Id + "...");
 
             _cancellationToken = new CancellationTokenSource();
-            _task = Task.Run(async () =>
+            _task = Task.Run(
+                async () =>
                 {
                     // TODO: trap exceptions
                     while(!_cancellationToken.IsCancellationRequested) {
                         _messageQueueEvent.WaitOne();
                         await RunAsync().ConfigureAwait(false);
                     }
-                }, _cancellationToken.Token);
+                },
+                _cancellationToken.Token);
         }
 
         public void Stop()

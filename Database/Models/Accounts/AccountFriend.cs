@@ -14,8 +14,7 @@ namespace EnergonSoftware.Database.Models.Accounts
                 { new ColumnDescription("account_id", DatabaseType.Integer).SetPrimaryKey().SetReferences("accounts", "id") },
                 { new ColumnDescription("friend_account_id", DatabaseType.Integer).SetPrimaryKey().SetReferences("accounts", "id") },
                 { new ColumnDescription("group_id", DatabaseType.Integer).SetDefaultValue("-1").SetReferences("friend_groups", "id") },
-            }
-        );
+            });
 
         public static string TableName { get { return AccountFriendsTable.Name; } }
 
@@ -44,13 +43,37 @@ namespace EnergonSoftware.Database.Models.Accounts
 #endregion
 
         private long _account_id = -1;
-        public long AccountId { get { return _account_id; } set { _account_id = value; Dirty = true; } }
+        public long AccountId
+        {
+            get { return _account_id; }
+
+            set {
+                _account_id = value;
+                Dirty = true;
+            }
+        }
 
         private long _friend_account_id = -1;
-        public long FriendAccountId { get { return _friend_account_id; } set { _friend_account_id = value; Dirty = true; } }
+        public long FriendAccountId
+        {
+            get { return _friend_account_id; }
+
+            set {
+                _friend_account_id = value;
+                Dirty = true;
+            }
+        }
 
         private long _group_id = -1;
-        public long GroupId { get { return _group_id; } set { _group_id = value; Dirty = true; } }
+        public long GroupId
+        {
+            get { return _group_id; }
+
+            set {
+                _group_id = value;
+                Dirty = true;
+            }
+        }
 
         public AccountFriend()
         {

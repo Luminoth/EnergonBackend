@@ -33,6 +33,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers
             case FriendListMessage.MessageType:
                 return new FriendListMessageHandler();
             }
+
             throw new MessageHandlerException("Unsupported message type: " + type);
         }
     }

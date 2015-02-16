@@ -48,8 +48,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 string passwordHash = await new SHA512().DigestPasswordAsync(
                     App.Instance.UserAccount.Username,
                     realm,
-                    App.Instance.UserAccount.Password
-                ).ConfigureAwait(false);
+                    App.Instance.UserAccount.Password).ConfigureAwait(false);
                 Logger.Debug("passwordHash=" + passwordHash);
 
                 string nonce = values["nonce"].Trim(new char[] { '"' });

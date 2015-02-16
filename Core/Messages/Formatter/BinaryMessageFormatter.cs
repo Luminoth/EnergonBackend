@@ -114,9 +114,10 @@ namespace EnergonSoftware.Core.Messages.Formatter
             List<T> values = new List<T>();
 
             int count = await _stream.ReadNetworkIntAsync().ConfigureAwait(false);
-            for(int i=0; i<count; ++i) {
+            for(int i = 0; i < count; ++i) {
                 values.Add(await ReadAsync<T>(name).ConfigureAwait(false));
             }
+
             return values;
         }
 

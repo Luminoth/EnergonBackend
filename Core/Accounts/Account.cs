@@ -16,7 +16,16 @@ namespace EnergonSoftware.Core.Accounts
         public long Id { get; set; }
 
         private string _username = string.Empty;
-        public string Username { get { return _username; } set { _username = value; NotifyPropertyChanged(); } }
+        public string Username
+        {
+            get { return _username; }
+
+            set
+            {
+                _username = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public string Password { get; set; }
         public string SessionId { get; set; }
@@ -38,8 +47,8 @@ namespace EnergonSoftware.Core.Accounts
             // Id not serialized
             await formatter.WriteAsync("username", Username).ConfigureAwait(false);
             await formatter.WriteAsync("visibility", (int)Visibility).ConfigureAwait(false);
-            await formatter.WriteAsync("status", Status??string.Empty).ConfigureAwait(false);
-            await formatter.WriteAsync("group", Group??string.Empty).ConfigureAwait(false);
+            await formatter.WriteAsync("status", Status ?? string.Empty).ConfigureAwait(false);
+            await formatter.WriteAsync("group", Group ?? string.Empty).ConfigureAwait(false);
         }
 
         public async Task DeSerializeAsync(IMessageFormatter formatter)
@@ -62,18 +71,18 @@ namespace EnergonSoftware.Core.Accounts
                 return false;
             }
 
-            if(null == Username && null != account.Username || null != Username && !Username.Equals(account.Username, StringComparison.InvariantCultureIgnoreCase)) {
+            if((null == Username && null != account.Username) || (null != Username && !Username.Equals(account.Username, StringComparison.InvariantCultureIgnoreCase))) {
                 return false;
             }
 
-            if(null == SessionId && null != account.SessionId || null != SessionId && !SessionId.Equals(account.SessionId, StringComparison.InvariantCultureIgnoreCase)) {
+            if((null == SessionId && null != account.SessionId) || (null != SessionId && !SessionId.Equals(account.SessionId, StringComparison.InvariantCultureIgnoreCase))) {
                 return false;
             }
 
             IPEndPoint thisEndPoint = (IPEndPoint)EndPoint;
             IPEndPoint otherEndPoint = (IPEndPoint)account.EndPoint;
 
-            if(null == EndPoint && null != account.EndPoint || null != EndPoint && !thisEndPoint.Address.Equals(otherEndPoint.Address)) {
+            if((null == EndPoint && null != account.EndPoint) || (null != EndPoint && !thisEndPoint.Address.Equals(otherEndPoint.Address))) {
                 return false;
             }
 
@@ -92,7 +101,7 @@ namespace EnergonSoftware.Core.Accounts
 
 #region Property Notifier
         public event PropertyChangedEventHandler PropertyChanged;
-        public void NotifyPropertyChanged([CallerMemberName] string property=null)
+        public void NotifyPropertyChanged([CallerMemberName] string property = null)
         {
             if(null != PropertyChanged) {
                 PropertyChanged(this, new PropertyChangedEventArgs(property));

@@ -20,6 +20,7 @@ namespace EnergonSoftware.Chat.MessageHandlers
             case VisibilityMessage.MessageType:
                 return new VisibilityMessageHandler();
             }
+
             throw new MessageHandlerException("Unsupported message type: " + type);
         }
     }

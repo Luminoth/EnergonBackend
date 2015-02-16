@@ -17,6 +17,7 @@ namespace EnergonSoftware.Overmind.MessageHandlers
             case LogoutMessage.MessageType:
                 return new LogoutMessageHandler();
             }
+
             throw new MessageHandlerException("Unsupported message type: " + type);
         }
     }

@@ -22,35 +22,9 @@ namespace EnergonSoftware.Core.Messages.Packet
 
         public IMessage Content { get; set; }
 
-        protected MessagePacket()
-        {
-            Id = NextId;
-        }
-
         // NOTE: these can throw MessageException
         public abstract Task SerializeAsync(Stream stream, string formatterType);
         public abstract Task DeSerializeAsync(Stream stream);
-
-        protected async Task SerializeContentAsync(Stream stream, IMessageFormatter formatter)
-        {
-            if(null == Content) {
-                return;
-            }
-
-            await formatter.StartDocumentAsync().ConfigureAwait(false);
-            await Content.SerializeAsync(formatter).ConfigureAwait(false);
-            await formatter.EndDocumentAsync().ConfigureAwait(false);
-            await formatter.FlushAsync().ConfigureAwait(false);
-        }
-
-        protected async Task DeSerializeContentAsync(IMessageFormatter formatter)
-        {
-            if(null == Content) {
-                return;
-            }
-
-            await Content.DeSerializeAsync(formatter).ConfigureAwait(false);
-        }
 
         public int CompareTo(object obj)
         {
@@ -58,6 +32,7 @@ namespace EnergonSoftware.Core.Messages.Packet
             if(null == rhs) {
                 return 0;
             }
+
             return (int)(Id - rhs.Id);
         }
 
@@ -78,6 +53,32 @@ namespace EnergonSoftware.Core.Messages.Packet
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+
+        protected MessagePacket()
+        {
+            Id = NextId;
+        }
+
+        protected async Task SerializeContentAsync(Stream stream, IMessageFormatter formatter)
+        {
+            if(null == Content) {
+                return;
+            }
+
+            await formatter.StartDocumentAsync().ConfigureAwait(false);
+            await Content.SerializeAsync(formatter).ConfigureAwait(false);
+            await formatter.EndDocumentAsync().ConfigureAwait(false);
+            await formatter.FlushAsync().ConfigureAwait(false);
+        }
+
+        protected async Task DeSerializeContentAsync(IMessageFormatter formatter)
+        {
+            if(null == Content) {
+                return;
+            }
+
+            await Content.DeSerializeAsync(formatter).ConfigureAwait(false);
         }
     }
 }
