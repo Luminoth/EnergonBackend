@@ -55,7 +55,7 @@ namespace EnergonSoftware.Launcher.Net
 
         private async Task BeginAuthAsync()
         {
-            Logger.Info("Authenticating as user '" + App.Instance.UserAccount.Username + "'...");
+            Logger.Info("Authenticating as user '" + App.Instance.UserAccount.AccountName + "'...");
 
             await SendMessageAsync(new AuthMessage()
                 {

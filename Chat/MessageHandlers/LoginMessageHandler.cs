@@ -18,7 +18,7 @@ namespace EnergonSoftware.Chat.MessageHandlers
             LoginMessage loginMessage = (LoginMessage)message;
             ChatSession chatSession = (ChatSession)session;
 
-            if(!await chatSession.LoginAsync(loginMessage.Username, loginMessage.SessionId).ConfigureAwait(false)) {
+            if(!await chatSession.LoginAsync(loginMessage.AccountName, loginMessage.SessionId).ConfigureAwait(false)) {
                 return;
             }
 

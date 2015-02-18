@@ -19,7 +19,7 @@ namespace EnergonSoftware.Core.MessageHandlers
         private static void Authenticate(IAuthenticatedMessage message, AuthenticatedSession session)
         {
             if(null != message && null != session) {
-                if(!session.Authenticate(message.Username, message.SessionId)) {
+                if(!session.Authenticate(message.AccountName, message.SessionId)) {
                     throw new MessageHandlerException(Resources.ErrorSessionNotAuthenticated);
                 }
             }

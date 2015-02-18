@@ -23,7 +23,7 @@ namespace EnergonSoftware.Database.Models.Events
                 { new ColumnDescription("timestamp", DatabaseType.DateTime).SetNotNull() },
                 { new ColumnDescription("type", DatabaseType.Integer).SetNotNull() },
                 { new ColumnDescription("origin", DatabaseType.Text).SetNotNull() },
-                { new ColumnDescription("account", DatabaseType.Text) },
+                { new ColumnDescription("account_name", DatabaseType.Text) },
                 { new ColumnDescription("reason", DatabaseType.Text) },
             });
 
@@ -36,8 +36,8 @@ namespace EnergonSoftware.Database.Models.Events
 
         public readonly AuthEventType Type;
 
-        private string _account;
-        public string Account { get { return _account; } set { _account = value; Dirty = true; } }
+        private string _accountName;
+        public string AccountName { get { return _accountName; } set { _accountName = value; Dirty = true; } }
 
         private string _origin;
         public string Origin { get { return _origin; } set { _origin = value; Dirty = true; } }
@@ -58,13 +58,13 @@ namespace EnergonSoftware.Database.Models.Events
         public override async Task InsertAsync(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("INSERT INTO " + TableName
-                + "(timestamp, type, origin, account, reason)"
-                + " VALUES(@timestamp, @type, @origin, @account, @reason)"))
+                + "(timestamp, type, origin, account_name, reason)"
+                + " VALUES(@timestamp, @type, @origin, @account_name, @reason)"))
             {
                 connection.AddParameter(command, "timestamp", Timestamp);
                 connection.AddParameter(command, "type", Type);
                 connection.AddParameter(command, "origin", Origin);
-                connection.AddParameter(command, "account", Account);
+                connection.AddParameter(command, "account_name", AccountName);
                 connection.AddParameter(command, "reason", Reason);
                 await command.ExecuteNonQueryAsync().ConfigureAwait(false);
                 Id = connection.LastInsertRowId;
@@ -73,7 +73,7 @@ namespace EnergonSoftware.Database.Models.Events
 
         public override string ToString()
         {
-            return "AuthEvent(id: " + Id + ", timestamp: " + Timestamp + ", type: " + Type + ", origin: " + Origin + ", account: " + Account + ", reason: " + Reason + ")";
+            return "AuthEvent(id: " + Id + ", timestamp: " + Timestamp + ", type: " + Type + ", origin: " + Origin + ", account_name: " + AccountName + ", reason: " + Reason + ")";
         }
     }
 }

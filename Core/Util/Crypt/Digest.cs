@@ -4,9 +4,9 @@ namespace EnergonSoftware.Core.Util.Crypt
 {
     public abstract class Digest : Hasher
     {
-        public async Task<string> DigestPasswordAsync(string username, string realm, string password)
+        public async Task<string> DigestPasswordAsync(string account_name, string realm, string password)
         {
-            return await HashHexAsync(username + ":" + realm + ":" + password).ConfigureAwait(false);
+            return await HashHexAsync(account_name + ":" + realm + ":" + password).ConfigureAwait(false);
         }
     }
 }

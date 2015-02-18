@@ -11,24 +11,24 @@ namespace EnergonSoftware.Core.Messages
         public const string MessageType = "logout";
         public string Type { get { return MessageType; } }
 
-        public string Username { get; set; }
+        public string AccountName { get; set; }
         public string SessionId { get; set; }
 
         public LogoutMessage()
         {
-            Username = string.Empty;
+            AccountName = string.Empty;
             SessionId = string.Empty;
         }
 
         public async Task SerializeAsync(IMessageFormatter formatter)
         {
-            await formatter.WriteAsync("username", Username).ConfigureAwait(false);
+            await formatter.WriteAsync("account_name", AccountName).ConfigureAwait(false);
             await formatter.WriteAsync("ticket", SessionId).ConfigureAwait(false);
         }
 
         public async Task DeSerializeAsync(IMessageFormatter formatter)
         {
-            Username = await formatter.ReadStringAsync("username").ConfigureAwait(false);
+            AccountName = await formatter.ReadStringAsync("account_name").ConfigureAwait(false);
             SessionId = await formatter.ReadStringAsync("ticket").ConfigureAwait(false);
         }
 

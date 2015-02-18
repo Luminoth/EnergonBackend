@@ -75,7 +75,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public async Task ChallengeAsync(string challenge, AccountInfo accountInfo)
         {
-            await InstanceNotifier.Instance.AuthenticatingAsync(accountInfo.Username, RemoteEndPoint).ConfigureAwait(false);
+            await InstanceNotifier.Instance.AuthenticatingAsync(accountInfo.AccountName, RemoteEndPoint).ConfigureAwait(false);
 
             AccountInfo = accountInfo;
             Authenticated = true;
@@ -88,8 +88,8 @@ namespace EnergonSoftware.Authenticator.Net
 
         public async Task SuccessAsync(string sessionid)
         {
-            await InstanceNotifier.Instance.AuthenticatedAsync(AccountInfo.Username, sessionid, RemoteEndPoint).ConfigureAwait(false);
-            await EventLogger.Instance.SuccessEventAsync(RemoteEndPoint, AccountInfo.Username).ConfigureAwait(false);
+            await InstanceNotifier.Instance.AuthenticatedAsync(AccountInfo.AccountName, sessionid, RemoteEndPoint).ConfigureAwait(false);
+            await EventLogger.Instance.SuccessEventAsync(RemoteEndPoint, AccountInfo.AccountName).ConfigureAwait(false);
 
             AccountInfo.SessionId = sessionid;
             AccountInfo.EndPoint = RemoteEndPoint.ToString();
@@ -108,7 +108,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public async Task FailureAsync(string reason)
         {
-            await EventLogger.Instance.FailedEventAsync(RemoteEndPoint, null == AccountInfo ? null : AccountInfo.Username, reason).ConfigureAwait(false);
+            await EventLogger.Instance.FailedEventAsync(RemoteEndPoint, null == AccountInfo ? null : AccountInfo.AccountName, reason).ConfigureAwait(false);
 
             /*
              * NOTE: we don't update the database here because this

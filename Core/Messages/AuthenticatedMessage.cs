@@ -2,7 +2,7 @@
 {
     public interface IAuthenticatedMessage : IMessage
     {
-        string Username { get; set; }
+        string AccountName { get; set; }
         string SessionId { get; set; }
     }
 }

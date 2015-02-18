@@ -61,6 +61,15 @@ namespace EnergonSoftware.Launcher.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Username:.
+        /// </summary>
+        public static string AccountNameLabel {
+            get {
+                return ResourceManager.GetString("AccountNameLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string CancelLabel {
@@ -165,15 +174,6 @@ namespace EnergonSoftware.Launcher.Properties {
         public static string UpdatesLabel {
             get {
                 return ResourceManager.GetString("UpdatesLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Username:.
-        /// </summary>
-        public static string UsernameLabel {
-            get {
-                return ResourceManager.GetString("UsernameLabel", resourceCulture);
             }
         }
     }

@@ -50,10 +50,10 @@ namespace EnergonSoftware.Overmind.Net
         {
         }
 
-        protected async override Task<Account> LookupAccountAsync(string username)
+        protected async override Task<Account> LookupAccountAsync(string account_name)
         {
-            Logger.Debug("Looking up account for username=" + username);
-            AccountInfo account = new AccountInfo() { Username = username };
+            Logger.Debug("Looking up account for account_name=" + account_name);
+            AccountInfo account = new AccountInfo() { AccountName = account_name };
             using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
                 if(!await account.ReadAsync(connection).ConfigureAwait(false)) {
                     return null;

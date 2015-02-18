@@ -31,13 +31,13 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
         private async Task CompleteAuthenticationAsync(AuthSession session)
         {
             SessionId sessionid = new SessionId(ConfigurationManager.AppSettings["sessionSecret"]);
-            Logger.Info("Session " + session.Id + " generated sessionid '" + sessionid.SessionID + "' for account '" + session.AccountInfo.Username + "'");
+            Logger.Info("Session " + session.Id + " generated sessionid '" + sessionid.SessionID + "' for account '" + session.AccountInfo.AccountName + "'");
             await session.SuccessAsync(sessionid.SessionID).ConfigureAwait(false);
         }
 
-        private async Task AuthenticateAsync(AuthSession session, string username, string nonce, string cnonce, string nc, string qop, string digestURI, string response)
+        private async Task AuthenticateAsync(AuthSession session, string account_name, string nonce, string cnonce, string nc, string qop, string digestURI, string response)
         {
-            AccountInfo account = new AccountInfo() { Username = username };
+            AccountInfo account = new AccountInfo() { AccountName = account_name };
             using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
                 if(!await account.ReadAsync(connection).ConfigureAwait(false)) {
                     await session.FailureAsync("Bad Username or Password").ConfigureAwait(false);
@@ -78,7 +78,7 @@ return;
             }
 
             string challenge = "rspauth=" + rspauth;
-            Logger.Info("Session " + session.Id + " authenticated account '" + username + "', sending response: " + rspauth);
+            Logger.Info("Session " + session.Id + " authenticated account '" + account_name + "', sending response: " + rspauth);
             await session.ChallengeAsync(challenge, account).ConfigureAwait(false);
         }
 

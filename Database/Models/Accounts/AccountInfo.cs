@@ -17,7 +17,9 @@ namespace EnergonSoftware.Database.Models.Accounts
             {
                 { new ColumnDescription("id", DatabaseType.Integer).SetPrimaryKey() },
                 { new ColumnDescription("active", DatabaseType.Boolean).SetNotNull() },
-                { new ColumnDescription("username", DatabaseType.Text).SetNotNull().SetUnique() },
+                { new ColumnDescription("account_name", DatabaseType.Text).SetNotNull().SetUnique() },
+                { new ColumnDescription("email_address", DatabaseType.Text).SetNotNull().SetUnique() },
+                { new ColumnDescription("username", DatabaseType.Text).SetUnique() },
                 { new ColumnDescription("passwordMD5", DatabaseType.Text).SetNotNull() },
                 { new ColumnDescription("passwordSHA512", DatabaseType.Text).SetNotNull() },
                 { new ColumnDescription("endPoint", DatabaseType.Text) },
@@ -47,7 +49,7 @@ namespace EnergonSoftware.Database.Models.Accounts
                     while(await reader.ReadAsync().ConfigureAwait(false)) {
                         Account account = new Account()
                         {
-                            Username = reader.GetString(0),
+                            UserName = reader.GetString(0),
                             Visibility = (Visibility)reader.GetInt32(1),
                         };
 
@@ -90,9 +92,15 @@ namespace EnergonSoftware.Database.Models.Accounts
             }
         }
 
-        // NOTE: changing the username invalidates the password digest!
-        private string _username = string.Empty;
-        public string Username { get { return _username; } set { _username = value; Dirty = true; } }
+        // NOTE: changing the AccountName invalidates the password digest!
+        private string _accountName = string.Empty;
+        public string AccountName { get { return _accountName; } set { _accountName = value; Dirty = true; } }
+
+        private string _emailAddress = string.Empty;
+        public string EmailAddress { get { return _emailAddress; } set { _emailAddress = value; Dirty = true; } }
+
+        private string _userName = string.Empty;
+        public string UserName { get { return _userName; } set { _userName = value; Dirty = true; } }
 
         public string PasswordMD5 { get; private set; }
         public string PasswordSHA512 { get; private set; }
@@ -118,8 +126,8 @@ namespace EnergonSoftware.Database.Models.Accounts
 
         public async Task SetPassword(string realm, string password)
         {
-            PasswordMD5 = await new MD5().DigestPasswordAsync(Username, realm, password).ConfigureAwait(false);
-            PasswordSHA512 = await new SHA512().DigestPasswordAsync(Username, realm, password).ConfigureAwait(false);
+            PasswordMD5 = await new MD5().DigestPasswordAsync(AccountName, realm, password).ConfigureAwait(false);
+            PasswordSHA512 = await new SHA512().DigestPasswordAsync(AccountName, realm, password).ConfigureAwait(false);
 
             Dirty = true;
         }
@@ -131,8 +139,8 @@ namespace EnergonSoftware.Database.Models.Accounts
                 command = connection.BuildCommand("SELECT * FROM " + TableName + " WHERE id=@id");
                 connection.AddParameter(command, "id", Id);
             } else {
-                command = connection.BuildCommand("SELECT * FROM " + TableName + " WHERE username=@username");
-                connection.AddParameter(command, "username", Username);
+                command = connection.BuildCommand("SELECT * FROM " + TableName + " WHERE account_name=@account_name");
+                connection.AddParameter(command, "account_name", AccountName);
             }
 
             using(command) {
@@ -157,7 +165,9 @@ namespace EnergonSoftware.Database.Models.Accounts
 
             Id = reader.GetInt32(AccountsTable["id"].Id);
             _active = reader.GetBoolean(AccountsTable["active"].Id);
-            _username = reader.GetString(AccountsTable["username"].Id);
+            _accountName = reader.GetString(AccountsTable["account_name"].Id);
+            _emailAddress = reader.GetString(AccountsTable["email_address"].Id);
+            _userName = reader.GetString(AccountsTable["username"].Id);
             PasswordMD5 = reader.GetString(AccountsTable["passwordMD5"].Id);
             PasswordSHA512 = reader.GetString(AccountsTable["passwordSHA512"].Id);
 
@@ -179,11 +189,13 @@ namespace EnergonSoftware.Database.Models.Accounts
         public async Task InsertAsync(DatabaseConnection connection)
         {
             using(DbCommand command = connection.BuildCommand("INSERT INTO " + TableName
-                + "(active, username, passwordMD5, passwordSHA512, visibility, status)"
-                + " VALUES(@active, @username, @passwordMD5, @passwordSHA512, @visibility, @status)"))
+                + "(active, account_name, email_address, username, passwordMD5, passwordSHA512, visibility, status)"
+                + " VALUES(@active, @account_name, @email_address, @username, @passwordMD5, @passwordSHA512, @visibility, @status)"))
             {
                 connection.AddParameter(command, "active", Active);
-                connection.AddParameter(command, "username", Username);
+                connection.AddParameter(command, "account_name", AccountName);
+                connection.AddParameter(command, "email_address", EmailAddress);
+                connection.AddParameter(command, "username", UserName);
                 connection.AddParameter(command, "passwordMD5", PasswordMD5);
                 connection.AddParameter(command, "passwordSHA512", PasswordSHA512);
                 connection.AddParameter(command, "visibility", Visibility);
@@ -233,7 +245,8 @@ namespace EnergonSoftware.Database.Models.Accounts
             return new Account()
             {
                 Id = Id,
-                Username = Username,
+                AccountName = AccountName,
+                UserName = UserName,
                 SessionId = SessionId,
                 EndPoint = endPoint,
                 Visibility = Visibility,
@@ -243,7 +256,8 @@ namespace EnergonSoftware.Database.Models.Accounts
         public override string ToString()
         {
             return "Account(id: " + Id + ", active: " + Active
-                + ", username: " + Username + ", passwordMD5: " + PasswordMD5 + ", passwordSHA512: " + PasswordSHA512
+                + ", account_name: " + AccountName + ", email_address=" + EmailAddress + ", username=" + UserName
+                + ", passwordMD5: " + PasswordMD5 + ", passwordSHA512: " + PasswordSHA512
                 + ", endPoint: " + EndPoint + ", sessionid: " + SessionId + ", visibility: " + Visibility + ", status: " + Status + ")";
         }
     }

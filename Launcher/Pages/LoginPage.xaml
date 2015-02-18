@@ -24,7 +24,7 @@
         </Border>
 
         <Border Grid.Row="1" Grid.Column="0" Margin="5" BorderThickness="1" BorderBrush="Black">
-            <Grid Margin="5" FocusManager.FocusedElement="{Binding ElementName=Username}">
+            <Grid Margin="5" FocusManager.FocusedElement="{Binding ElementName=AccountName}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -34,8 +34,8 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static launcherprops:Resources.UsernameLabel}" />
-                <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Width="Auto" Name="Username" Text="{Binding Username}" />
+                <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" Text="{x:Static launcherprops:Resources.AccountNameLabel}" />
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="5" Width="Auto" Name="AccountName" Text="{Binding AccountName}" />
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Margin="5"  Text="{x:Static launcherprops:Resources.PasswordLabel}" />
                 <PasswordBox Grid.Row="1" Grid.Column="1" Margin="5" Width="Auto" Name="Password" />

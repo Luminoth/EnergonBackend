@@ -15,18 +15,19 @@ namespace EnergonSoftware.Core.Accounts
 
         public long Id { get; set; }
 
-        private string _username = string.Empty;
-        public string Username
+        private string _accountName = string.Empty;
+        public string AccountName
         {
-            get { return _username; }
+            get { return _accountName; }
 
             set
             {
-                _username = value;
+                _accountName = value;
                 NotifyPropertyChanged();
             }
         }
 
+        public string UserName { get; set; }
         public string Password { get; set; }
         public string SessionId { get; set; }
         public EndPoint EndPoint { get; set; }
@@ -45,7 +46,7 @@ namespace EnergonSoftware.Core.Accounts
         public async Task SerializeAsync(IMessageFormatter formatter)
         {
             // Id not serialized
-            await formatter.WriteAsync("username", Username).ConfigureAwait(false);
+            await formatter.WriteAsync("username", UserName).ConfigureAwait(false);
             await formatter.WriteAsync("visibility", (int)Visibility).ConfigureAwait(false);
             await formatter.WriteAsync("status", Status ?? string.Empty).ConfigureAwait(false);
             await formatter.WriteAsync("group", Group ?? string.Empty).ConfigureAwait(false);
@@ -54,7 +55,7 @@ namespace EnergonSoftware.Core.Accounts
         public async Task DeSerializeAsync(IMessageFormatter formatter)
         {
             // Id not serialized
-            Username = await formatter.ReadStringAsync("username").ConfigureAwait(false);
+            UserName = await formatter.ReadStringAsync("username").ConfigureAwait(false);
             Visibility = (Visibility)await formatter.ReadIntAsync("visibility").ConfigureAwait(false);
             Status = await formatter.ReadStringAsync("status").ConfigureAwait(false);
             Group = await formatter.ReadStringAsync("group").ConfigureAwait(false);
@@ -71,7 +72,7 @@ namespace EnergonSoftware.Core.Accounts
                 return false;
             }
 
-            if((null == Username && null != account.Username) || (null != Username && !Username.Equals(account.Username, StringComparison.InvariantCultureIgnoreCase))) {
+            if((null == AccountName && null != account.AccountName) || (null != AccountName && !AccountName.Equals(account.AccountName, StringComparison.InvariantCultureIgnoreCase))) {
                 return false;
             }
 
@@ -96,7 +97,7 @@ namespace EnergonSoftware.Core.Accounts
 
         public override string ToString()
         {
-            return "Account(Id=" + Id + ", Username=" + Username + ", SessionId=" + SessionId + ", EndPoint=" + EndPoint + ", Visibility=" + Visibility + ", Status=" + Status + ", Group=" + Group + ")";
+            return "Account(Id=" + Id + ", AccountName=" + AccountName + ", UserName=" + UserName + ", SessionId=" + SessionId + ", EndPoint=" + EndPoint + ", Visibility=" + Visibility + ", Status=" + Status + ", Group=" + Group + ")";
         }
 
 #region Property Notifier

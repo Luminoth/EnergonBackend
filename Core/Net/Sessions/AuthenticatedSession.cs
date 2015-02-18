@@ -24,28 +24,28 @@ namespace EnergonSoftware.Core.Net.Sessions
             return null != Account && null != account && Account.Equals(account);
         }
 
-        public bool Authenticate(string username, string sessionid)
+        public bool Authenticate(string account_name, string sessionid)
         {
             return Authenticate(new Account()
             {
-                Username = username,
+                AccountName = account_name,
                 SessionId = sessionid,
                 EndPoint = RemoteEndPoint,
             });
         }
 
-        public async Task<bool> LoginAsync(string username, string sessionid)
+        public async Task<bool> LoginAsync(string account_name, string sessionid)
         {
             if(null != Account) {
                 await ErrorAsync(Resources.ErrorSessionAlreadyAuthenticated).ConfigureAwait(false);
                 return false;
             }
 
-            Logger.Info("Login request from username=" + username + ", with sessionid=" + sessionid);
+            Logger.Info("Login request from account_name=" + account_name + ", with sessionid=" + sessionid);
 
-            Account lookupAccount = await LookupAccountAsync(username).ConfigureAwait(false);
+            Account lookupAccount = await LookupAccountAsync(account_name).ConfigureAwait(false);
             if(null == lookupAccount) {
-                await ErrorAsync(string.Format(Resources.ErrorInvalidLogin, username)).ConfigureAwait(false);
+                await ErrorAsync(string.Format(Resources.ErrorInvalidLogin, account_name)).ConfigureAwait(false);
                 return false;
             }
 
@@ -53,7 +53,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
             EnergonSoftware.Core.Accounts.Account loginAccount = new Account()
             {
-                Username = username,
+                AccountName = account_name,
                 SessionId = sessionid,
                 EndPoint = RemoteEndPoint
             };
@@ -64,7 +64,7 @@ namespace EnergonSoftware.Core.Net.Sessions
                 return false;
             }
 
-            Logger.Info("Login for username=" + username + " successful!");
+            Logger.Info("Login for account_name=" + account_name + " successful!");
             await SendMessageAsync(new LoginMessage()).ConfigureAwait(false);
 
             return true;
@@ -78,6 +78,6 @@ namespace EnergonSoftware.Core.Net.Sessions
             Account = null;
         }
 
-        protected abstract Task<Account> LookupAccountAsync(string username);
+        protected abstract Task<Account> LookupAccountAsync(string account_name);
     }
 }

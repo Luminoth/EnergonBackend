@@ -20,10 +20,10 @@ namespace EnergonSoftware.Launcher.Friends
 
         private static readonly IReadOnlyCollection<Account> TestFriends = new List<Account>()
         {
-            new Account() { Username = "Offline Group Friend", Group = "Test", Visibility = Visibility.Offline, Status = string.Empty, },
-            new Account() { Username = "Online Group Friend", Group = "Test", Visibility = Visibility.Online, Status = string.Empty, },
-            new Account() { Username = "Offline Friend", Group = string.Empty, Visibility = Visibility.Offline, Status = string.Empty, },
-            new Account() { Username = "Online Friend", Group = string.Empty, Visibility = Visibility.Online, Status = string.Empty, },
+            new Account() { UserName = "Offline Group Friend", Group = "Test", Visibility = Visibility.Offline, Status = string.Empty, },
+            new Account() { UserName = "Online Group Friend", Group = "Test", Visibility = Visibility.Online, Status = string.Empty, },
+            new Account() { UserName = "Offline Friend", Group = string.Empty, Visibility = Visibility.Offline, Status = string.Empty, },
+            new Account() { UserName = "Online Friend", Group = string.Empty, Visibility = Visibility.Online, Status = string.Empty, },
         };
 
         private readonly Dictionary<string, Account> _friendList = new Dictionary<string, Account>();
@@ -61,7 +61,7 @@ namespace EnergonSoftware.Launcher.Friends
         private void AddFriendInternal(Account friend)
         {
             Logger.Debug("Adding friend: " + friend);
-            _friendList[friend.Username] = friend;
+            _friendList[friend.UserName] = friend;
 
             FriendGroupEntry group = RootGroupEntry;
             if(!string.IsNullOrEmpty(friend.Group)) {
@@ -73,7 +73,7 @@ namespace EnergonSoftware.Launcher.Friends
                 }
             }
 
-            group.AddFriend(new FriendEntry() { Text = friend.Username });
+            group.AddFriend(new FriendEntry() { Text = friend.UserName });
         }
 
         public void AddFriend(Account friend)
@@ -84,13 +84,13 @@ namespace EnergonSoftware.Launcher.Friends
 
         public void UpdateFriend(Account friend)
         {
-            _friendList[friend.Username] = friend;
+            _friendList[friend.UserName] = friend;
             UpdateOnlineCount();
         }
 
         public void RemoveFriend(Account friend)
         {
-            _friendList.Remove(friend.Username);
+            _friendList.Remove(friend.UserName);
             UpdateOnlineCount();
         }
 

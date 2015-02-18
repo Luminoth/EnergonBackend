@@ -23,30 +23,30 @@ namespace EnergonSoftware.Authenticator
                 }).ConfigureAwait(false);
         }
 
-        public async Task BeginEventAsync(EndPoint origin, string username)
+        public async Task BeginEventAsync(EndPoint origin, string account_name)
         {
             await LogEventAsync(new AuthEvent(AuthEventType.Begin)
                 {
                     Origin = origin.ToString(),
-                    Account = username,
+                    AccountName = account_name,
                 }).ConfigureAwait(false);
         }
 
-        public async Task SuccessEventAsync(EndPoint origin, string username)
+        public async Task SuccessEventAsync(EndPoint origin, string account_name)
         {
             await LogEventAsync(new AuthEvent(AuthEventType.Success)
                 {
                     Origin = origin.ToString(),
-                    Account = username,
+                    AccountName = account_name,
                 }).ConfigureAwait(false);
         }
 
-        public async Task FailedEventAsync(EndPoint origin, string username, string reason)
+        public async Task FailedEventAsync(EndPoint origin, string account_name, string reason)
         {
             await LogEventAsync(new AuthEvent(AuthEventType.Failure)
                 {
                     Origin = origin.ToString(),
-                    Account = username,
+                    AccountName = account_name,
                     Reason = reason,
                 }).ConfigureAwait(false);
         }

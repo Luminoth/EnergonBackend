@@ -44,9 +44,9 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 string nc = "00000001";
                 string digestURI = realm + "/" + ConfigurationManager.AppSettings["authHost"];
 
-                Logger.Debug("Authenticating " + App.Instance.UserAccount.Username + ":" + realm + ":***");
+                Logger.Debug("Authenticating " + App.Instance.UserAccount.AccountName + ":" + realm + ":***");
                 string passwordHash = await new SHA512().DigestPasswordAsync(
-                    App.Instance.UserAccount.Username,
+                    App.Instance.UserAccount.AccountName,
                     realm,
                     App.Instance.UserAccount.Password).ConfigureAwait(false);
                 Logger.Debug("passwordHash=" + passwordHash);
@@ -55,7 +55,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 string qop = values["qop"].Trim(new char[] { '"' });
                 string rsp = await EnergonSoftware.Core.Auth.DigestClientResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI).ConfigureAwait(false);
             
-                string msg = "username=\"" + App.Instance.UserAccount.Username + "\","
+                string msg = "username=\"" + App.Instance.UserAccount.AccountName + "\","
                     + "realm=" + realm + ","
                         + "nonce=" + nonce + ","
                         + "cnonce=\"" + cnonce.NonceHash + "\","

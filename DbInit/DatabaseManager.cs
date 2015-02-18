@@ -61,7 +61,9 @@ namespace EnergonSoftware.DbInit
             AccountInfo shaneAccount = new AccountInfo()
             {
                 Active = true,
-                Username = "shane",
+                AccountName = "shane",
+                EmailAddress = "shane_lillie@energonsoftware.org",
+                UserName = "shane",
             };
             await shaneAccount.SetPassword(authRealm, "password").ConfigureAwait(false);
             await shaneAccount.InsertAsync(connection).ConfigureAwait(false);
@@ -70,7 +72,9 @@ namespace EnergonSoftware.DbInit
             AccountInfo testAccount1 = new AccountInfo()
             {
                 Active = true,
-                Username = "test1",
+                AccountName = "test1",
+                EmailAddress = "test1@energonsoftware.org",
+                UserName = "test1",
             };
             await testAccount1.SetPassword(authRealm, "password").ConfigureAwait(false);
             await testAccount1.InsertAsync(connection).ConfigureAwait(false);
@@ -79,7 +83,9 @@ namespace EnergonSoftware.DbInit
             AccountInfo testAccount2 = new AccountInfo()
             {
                 Active = true,
-                Username = "test2",
+                AccountName = "test2",
+                EmailAddress = "test2@energonsoftware.org",
+                UserName = "test2",
             };
             await testAccount2.SetPassword(authRealm, "password").ConfigureAwait(false);
             await testAccount2.InsertAsync(connection).ConfigureAwait(false);
@@ -115,7 +121,7 @@ namespace EnergonSoftware.DbInit
         {
             Logger.Info("Verifying account data...");
 
-            AccountInfo account = new AccountInfo() { Username = "shane" };
+            AccountInfo account = new AccountInfo() { AccountName = "shane" };
             await account.ReadAsync(connection).ConfigureAwait(false);
             Logger.Info("Read account: " + account);
 

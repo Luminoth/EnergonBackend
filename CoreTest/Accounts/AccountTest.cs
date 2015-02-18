@@ -29,8 +29,9 @@ namespace EnergonSoftware.Core.Test.Accounts
             Account account = new Account()
             {
                 Id = 100,
-                Username = "Test Account",
+                AccountName = "Test Account",
                 SessionId = "123456",
+                UserName = "Test User",
                 EndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 1234),
                 Visibility = Core.Accounts.Visibility.Away,
                 Status = "this is my status!",
@@ -47,7 +48,7 @@ namespace EnergonSoftware.Core.Test.Accounts
                 await deserializedAccount.DeSerializeAsync(_formatter).ConfigureAwait(false);
             }
 
-            Assert.AreEqual(account.Username, deserializedAccount.Username);
+            Assert.AreEqual(account.UserName, deserializedAccount.UserName);
             Assert.AreEqual(account.Visibility, deserializedAccount.Visibility);
             Assert.AreEqual(account.Status, deserializedAccount.Status);
         }
