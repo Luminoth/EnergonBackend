@@ -61,9 +61,9 @@ namespace EnergonSoftware.DbInit
             AccountInfo shaneAccount = new AccountInfo()
             {
                 Active = true,
-                AccountName = "shane",
+                AccountName = "shane_lillie",
                 EmailAddress = "shane_lillie@energonsoftware.org",
-                UserName = "shane",
+                UserName = "Luminoth82",
             };
             await shaneAccount.SetPassword(authRealm, "password").ConfigureAwait(false);
             await shaneAccount.InsertAsync(connection).ConfigureAwait(false);
@@ -72,9 +72,9 @@ namespace EnergonSoftware.DbInit
             AccountInfo testAccount1 = new AccountInfo()
             {
                 Active = true,
-                AccountName = "test1",
-                EmailAddress = "test1@energonsoftware.org",
-                UserName = "test1",
+                AccountName = "test_account1",
+                EmailAddress = "test_account1@energonsoftware.org",
+                UserName = "Test User 1",
             };
             await testAccount1.SetPassword(authRealm, "password").ConfigureAwait(false);
             await testAccount1.InsertAsync(connection).ConfigureAwait(false);
@@ -83,9 +83,9 @@ namespace EnergonSoftware.DbInit
             AccountInfo testAccount2 = new AccountInfo()
             {
                 Active = true,
-                AccountName = "test2",
-                EmailAddress = "test2@energonsoftware.org",
-                UserName = "test2",
+                AccountName = "test_account2",
+                EmailAddress = "test_account2@energonsoftware.org",
+                UserName = "Test User 2",
             };
             await testAccount2.SetPassword(authRealm, "password").ConfigureAwait(false);
             await testAccount2.InsertAsync(connection).ConfigureAwait(false);
@@ -121,7 +121,7 @@ namespace EnergonSoftware.DbInit
         {
             Logger.Info("Verifying account data...");
 
-            AccountInfo account = new AccountInfo() { AccountName = "shane" };
+            AccountInfo account = new AccountInfo() { AccountName = "shane_lillie" };
             await account.ReadAsync(connection).ConfigureAwait(false);
             Logger.Info("Read account: " + account);
 
