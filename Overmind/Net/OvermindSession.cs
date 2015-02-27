@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -9,8 +10,10 @@ using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
-using EnergonSoftware.Database;
-using EnergonSoftware.Database.Models.Accounts;
+
+using EnergonSoftware.DAL;
+using EnergonSoftware.DAL.Models.Accounts;
+
 using EnergonSoftware.Overmind.MessageHandlers;
 
 using log4net;
@@ -50,17 +53,18 @@ namespace EnergonSoftware.Overmind.Net
         {
         }
 
-        protected async override Task<Account> LookupAccountAsync(string account_name)
+        protected async override Task<Account> LookupAccountAsync(string accountName)
         {
-            Logger.Debug("Looking up account for account_name=" + account_name);
-            AccountInfo account = new AccountInfo() { AccountName = account_name };
-            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
-                if(!await account.ReadAsync(connection).ConfigureAwait(false)) {
+            Logger.Debug("Looking up account for accountName=" + accountName);
+            using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
+                var accounts = from a in context.Accounts where a.AccountName == accountName select a;
+                if(accounts.Count() < 1) {
                     return null;
                 }
-            }
 
-            return account.ToAccount();
+                await Task.Delay(0).ConfigureAwait(false);
+                return accounts.First().ToAccount();
+            }
         }
 
         public async Task PingAsync()

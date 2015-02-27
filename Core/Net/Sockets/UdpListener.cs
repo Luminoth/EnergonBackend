@@ -50,7 +50,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                         socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                         socket.Bind(endpoint);
                         _listenSockets.Add(socket);
-                    } catch(Exception e) {
+                    } catch(SocketException e) {
                         if(null != socket) {
                             socket.Dispose();
                         }

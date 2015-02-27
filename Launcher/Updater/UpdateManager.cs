@@ -24,7 +24,16 @@ namespace EnergonSoftware.Launcher.Updater
 #endregion
 
         private string _updateStatus = Properties.Resources.UpdatesLabel;
-        public string UpdateStatus { get { return _updateStatus; } private set { _updateStatus = value; NotifyPropertyChanged(); } }
+        public string UpdateStatus
+        {
+            get { return _updateStatus; }
+
+            private set
+            {
+                _updateStatus = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public async Task CheckForUpdatesAsync()
         {

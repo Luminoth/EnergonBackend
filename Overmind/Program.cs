@@ -31,11 +31,6 @@ namespace EnergonSoftware.Overmind
         {
             ConfigureLogging();
 
-            if(!DatabaseManager.TestDatabaseConnectionAsync().Result) {
-                Logger.Fatal("Could not connect to database!");
-                return;
-            }
-
             Overmind overmind = new Overmind();
             Console.Title = overmind.ServiceName;
             Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>

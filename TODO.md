@@ -1,0 +1,1 @@
+TLS for auth/chat connections

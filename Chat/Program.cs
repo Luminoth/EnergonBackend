@@ -31,11 +31,6 @@ namespace EnergonSoftware.Chat
         {
             ConfigureLogging();
 
-            if(!DatabaseManager.TestDatabaseConnectionAsync().Result) {
-                Logger.Fatal("Could not connect to database!");
-                return;
-            }
-
             Chat chat = new Chat();
             Console.Title = chat.ServiceName;
             Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>

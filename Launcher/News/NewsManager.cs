@@ -26,7 +26,16 @@ namespace EnergonSoftware.Launcher.News
         private long _lastCheckTimeMS = 0;
 
         private string _news = "Checking for news updates...";
-        public string News { get { return _news; } set { _news = value; NotifyPropertyChanged(); } }
+        public string News
+        {
+            get { return _news; }
+
+            set
+            {
+                _news = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public async Task UpdateNewsAsync()
         {

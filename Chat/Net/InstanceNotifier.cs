@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Chat.MessageHandlers;
+
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;

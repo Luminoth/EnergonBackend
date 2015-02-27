@@ -13,9 +13,12 @@
                 <Separator />
                 <MenuItem Header="E_xit" Click="MenuFileExit_Click" />
             </MenuItem>
+            <MenuItem Header="_Tools">
+                <MenuItem Header="Settings..." Click="MenuItemToolsSettings_Click" />
+            </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="Debug Window..." Click="MenuHelpDebugWindow_Click" />
-                <MenuItem Header="Settings..." Click="MenuItemHelpSettings_Click" />
+                <MenuItem Header="About..." Click="MenuItemHelpAbout_Click" />
             </MenuItem>
         </Menu>
 

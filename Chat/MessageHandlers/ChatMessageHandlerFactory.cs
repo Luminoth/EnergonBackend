@@ -1,4 +1,5 @@
 ﻿using EnergonSoftware.Chat.Net;
+
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Chat;

@@ -14,13 +14,15 @@ namespace EnergonSoftware.Core.Util
         private readonly byte[] _iv = new byte[IVLength];
         private readonly string _secret;
 
-        public readonly int ExpiryMS = -1;
-        public readonly string SessionID;
-        public readonly long CreationTime = Time.CurrentTimeMs;
+        public int ExpiryMS { get; private set; }
+        public string SessionID { get; private set; }
+        public long CreationTime { get; private set; }
         public bool Expired { get { return ExpiryMS < 0 ? false : Time.CurrentTimeMs >= (CreationTime + ExpiryMS); } }
 
         private SessionId()
         {
+            ExpiryMS = -1;
+            CreationTime = Time.CurrentTimeMs;
         }
 
         public SessionId(string secret) : this()

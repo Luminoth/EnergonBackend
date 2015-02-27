@@ -27,9 +27,24 @@ namespace EnergonSoftware.Launcher
 
         public static App Instance { get { return (App)Application.Current; } }
 
+#region Debug Properties
+        public static bool UseDummyNetwork
+        {
+            get
+            {
+#if DEBUG
+                return Convert.ToBoolean(ConfigurationManager.AppSettings["dummyNetwork"]);
+#else
+                return false;
+#endif
+            }
+        }
+#endregion
+
 #region Window Properties
-        public readonly DebugWindow DebugWindow = new DebugWindow();
-        public readonly SettingsWindow SettingsWindow = new SettingsWindow();
+        // TODO: these should be read-only
+        public DebugWindow DebugWindow = new DebugWindow();
+        public SettingsWindow SettingsWindow = new SettingsWindow();
 #endregion
 
 #region Network Properties
@@ -45,20 +60,6 @@ namespace EnergonSoftware.Launcher
         public AuthenticationStage AuthStage { get; set; }
         public bool Authenticating { get { return AuthStage > AuthenticationStage.NotAuthenticated && AuthStage < AuthenticationStage.Authenticated; } }
         public bool Authenticated { get { return AuthenticationStage.Authenticated == AuthStage; } }
-#endregion
-
-#region Debug Properties
-        public bool UseDummyNetwork
-        {
-            get
-            {
-#if DEBUG
-                return Convert.ToBoolean(ConfigurationManager.AppSettings["dummyNetwork"]);
-#else
-                return false;
-#endif
-            }
-        }
 #endregion
 
 #region Idle Properties

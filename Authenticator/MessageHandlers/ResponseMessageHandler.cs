@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,8 +12,9 @@ using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Core.Util.Crypt;
-using EnergonSoftware.Database;
-using EnergonSoftware.Database.Models.Accounts;
+
+using EnergonSoftware.DAL;
+using EnergonSoftware.DAL.Models.Accounts;
 
 using log4net;
 
@@ -35,51 +37,51 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             await session.SuccessAsync(sessionid.SessionID).ConfigureAwait(false);
         }
 
-        private async Task AuthenticateAsync(AuthSession session, string account_name, string nonce, string cnonce, string nc, string qop, string digestURI, string response)
+        private async Task AuthenticateAsync(AuthSession session, string accountName, string nonce, string cnonce, string nc, string qop, string digestURI, string response)
         {
-            AccountInfo account = new AccountInfo() { AccountName = account_name };
-            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
-                if(!await account.ReadAsync(connection).ConfigureAwait(false)) {
+            using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
+                var accounts = from a in context.Accounts where a.AccountName == accountName select a;
+                if(accounts.Count() < 1) {
                     await session.FailureAsync("Bad Username or Password").ConfigureAwait(false);
                     return;
                 }
-            }
 
-            if(!account.Active) {
-                await session.FailureAsync("Account Inactive").ConfigureAwait(false);
-                return;
-            }
+                AccountInfo account = accounts.First();
+                if(!account.IsActive) {
+                    await session.FailureAsync("Account Inactive").ConfigureAwait(false);
+                    return;
+                }
 
-            string expected = string.Empty, rspauth = string.Empty;
-            switch(session.AuthType)
-            {
-            case EnergonSoftware.Core.AuthType.DigestMD5:
-                /*Logger.Debug("Handling MD5 response...");
-                ////Logger.Debug("passwordHash=" + account.PasswordMD5);
-                expected = await EnergonSoftware.Core.Auth.DigestClientResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
-                rspauth = await EnergonSoftware.Core.Auth.DigestServerResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
-                break;*/
+                string expected = string.Empty, rspauth = string.Empty;
+                switch(session.AuthType)
+                {
+                case EnergonSoftware.Core.AuthType.DigestMD5:
+                    /*Logger.Debug("Handling MD5 response...");
+                    ////Logger.Debug("passwordHash=" + account.PasswordMD5);
+                    expected = await EnergonSoftware.Core.Auth.DigestClientResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
+                    rspauth = await EnergonSoftware.Core.Auth.DigestServerResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
+                    break;*/
 await session.FailureAsync("MD5 auth type not supported!").ConfigureAwait(false);
 return;
-            case EnergonSoftware.Core.AuthType.DigestSHA512:
-                Logger.Debug("Handling SHA512 response...");
-                ////Logger.Debug("passwordHash=" + account.PasswordSHA512);
-                expected = await EnergonSoftware.Core.Auth.DigestClientResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
-                rspauth = await EnergonSoftware.Core.Auth.DigestServerResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
-                break;
-            default:
-                await session.FailureAsync("Unsupported auth type!").ConfigureAwait(false);
-                return;
-            }
+                case EnergonSoftware.Core.AuthType.DigestSHA512:
+                    Logger.Debug("Handling SHA512 response...");
+                    ////Logger.Debug("passwordHash=" + account.PasswordSHA512);
+                    expected = await EnergonSoftware.Core.Auth.DigestClientResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
+                    rspauth = await EnergonSoftware.Core.Auth.DigestServerResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
+                    break;
+                default:
+                    await session.FailureAsync("Unsupported auth type!").ConfigureAwait(false);
+                    return;
+                }
 
-            if(!expected.Equals(response)) {
-                await session.FailureAsync("Bad Username or Password").ConfigureAwait(false);
-                return;
-            }
+                if(!expected.Equals(response)) {
+                    await session.FailureAsync("Bad Username or Password").ConfigureAwait(false);
+                    return;
+                }
 
-            string challenge = "rspauth=" + rspauth;
-            Logger.Info("Session " + session.Id + " authenticated account '" + account_name + "', sending response: " + rspauth);
-            await session.ChallengeAsync(challenge, account).ConfigureAwait(false);
+                Logger.Info("Session " + session.Id + " authenticated account '" + accountName + "', sending response: " + rspauth);
+                await session.ChallengeAsync("rspauth=" + rspauth, account).ConfigureAwait(false);
+            }
         }
 
         protected async override Task OnHandleMessageAsync(IMessage message, Session session)

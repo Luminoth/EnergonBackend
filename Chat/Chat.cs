@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Chat.Net;
+
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
@@ -81,6 +82,7 @@ namespace EnergonSoftware.Chat
             Logger.Info("Running...");
             Running = true;
 
+            EventLogger.Instance.StartupEventAsync().Wait();
             InstanceNotifier.Instance.StartupAsync().Wait();
 
             Run();
@@ -108,6 +110,8 @@ namespace EnergonSoftware.Chat
 
             Logger.Debug("Stopping diagnostic interface...");
             _diagnosticServer.Stop();
+
+            EventLogger.Instance.ShutdownEventAsync().Wait();
         }
 
         private async Task PollAndRunAsync()

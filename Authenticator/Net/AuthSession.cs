@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Authenticator.MessageHandlers;
+
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages.Auth;
@@ -12,8 +13,9 @@ using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
-using EnergonSoftware.Database;
-using EnergonSoftware.Database.Models.Accounts;
+
+using EnergonSoftware.DAL;
+using EnergonSoftware.DAL.Models.Accounts;
 
 using log4net;
 
@@ -91,11 +93,13 @@ namespace EnergonSoftware.Authenticator.Net
             await InstanceNotifier.Instance.AuthenticatedAsync(AccountInfo.AccountName, sessionid, RemoteEndPoint).ConfigureAwait(false);
             await EventLogger.Instance.SuccessEventAsync(RemoteEndPoint, AccountInfo.AccountName).ConfigureAwait(false);
 
-            AccountInfo.SessionId = sessionid;
-            AccountInfo.EndPoint = RemoteEndPoint.ToString();
+            using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
+                context.Accounts.Attach(AccountInfo);
 
-            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
-                await AccountInfo.UpdateAsync(connection).ConfigureAwait(false);
+                AccountInfo.SessionId = sessionid;
+                AccountInfo.EndPoint = RemoteEndPoint.ToString();
+
+                await context.SaveChangesAsync().ConfigureAwait(false);
             }
 
             await SendMessageAsync(new SuccessMessage()

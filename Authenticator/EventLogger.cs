@@ -2,61 +2,86 @@
 using System.Net;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Database;
-using EnergonSoftware.Database.Models.Events;
-
-using log4net;
+using EnergonSoftware.DAL;
+using EnergonSoftware.DAL.Models.Events;
 
 namespace EnergonSoftware.Authenticator
 {
     internal sealed class EventLogger
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(EventLogger));
-
         public static readonly EventLogger Instance = new EventLogger();
+
+        public async Task StartupEventAsync()
+        {
+            await StartupEventAsync(new StartupEvent()
+                {
+                    Type = StartupEventType.Startup,
+                    Application = Authenticator.ServiceId,
+                }).ConfigureAwait(false);
+        }
+
+        public async Task ShutdownEventAsync()
+        {
+            await StartupEventAsync(new StartupEvent()
+                {
+                    Type = StartupEventType.Shutdown,
+                    Application = Authenticator.ServiceId,
+                }).ConfigureAwait(false);
+        }
 
         public async Task RequestEventAsync(EndPoint origin)
         {
-            await LogEventAsync(new AuthEvent(AuthEventType.Request)
+            await AuthenticateEventAsync(new AuthenticateEvent()
                 {
+                    Type = AuthenticateEventType.Request,
                     Origin = origin.ToString(),
                 }).ConfigureAwait(false);
         }
 
-        public async Task BeginEventAsync(EndPoint origin, string account_name)
+        public async Task BeginEventAsync(EndPoint origin, string accountName)
         {
-            await LogEventAsync(new AuthEvent(AuthEventType.Begin)
+            await AuthenticateEventAsync(new AuthenticateEvent()
                 {
+                    Type = AuthenticateEventType.Begin,
                     Origin = origin.ToString(),
-                    AccountName = account_name,
+                    AccountName = accountName,
                 }).ConfigureAwait(false);
         }
 
-        public async Task SuccessEventAsync(EndPoint origin, string account_name)
+        public async Task SuccessEventAsync(EndPoint origin, string accountName)
         {
-            await LogEventAsync(new AuthEvent(AuthEventType.Success)
+            await AuthenticateEventAsync(new AuthenticateEvent()
                 {
+                    Type = AuthenticateEventType.Success,
                     Origin = origin.ToString(),
-                    AccountName = account_name,
+                    AccountName = accountName,
                 }).ConfigureAwait(false);
         }
 
-        public async Task FailedEventAsync(EndPoint origin, string account_name, string reason)
+        public async Task FailedEventAsync(EndPoint origin, string accountName, string reason)
         {
-            await LogEventAsync(new AuthEvent(AuthEventType.Failure)
+            await AuthenticateEventAsync(new AuthenticateEvent()
                 {
+                    Type = AuthenticateEventType.Failure,
                     Origin = origin.ToString(),
-                    AccountName = account_name,
+                    AccountName = accountName,
                     Reason = reason,
                 }).ConfigureAwait(false);
         }
 
-        // TODO: move this to a base class
-        private async Task LogEventAsync(Event evt)
+        private async Task StartupEventAsync(StartupEvent evt)
         {
-            Logger.Debug("Logging event: " + evt);
-            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
-                await evt.InsertAsync(connection).ConfigureAwait(false);
+            using(EventsDatabaseContext context = new EventsDatabaseContext()) {
+                context.StartupEvents.Add(evt);
+                await context.SaveChangesAsync().ConfigureAwait(false);
+            }
+        }
+
+        private async Task AuthenticateEventAsync(AuthenticateEvent evt)
+        {
+            using(EventsDatabaseContext context = new EventsDatabaseContext()) {
+                context.AuthenticationEvents.Add(evt);
+                await context.SaveChangesAsync().ConfigureAwait(false);
             }
         }
 

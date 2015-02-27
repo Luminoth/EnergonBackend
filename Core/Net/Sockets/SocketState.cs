@@ -21,7 +21,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         private static int NextId { get { return ++_nextId; } }
 #endregion
 
-        public readonly int Id;
+        public int Id { get; private set; }
 
         private SemaphoreSlim _socketLock = new SemaphoreSlim(1);
         private Socket _socket;
@@ -44,13 +44,14 @@ namespace EnergonSoftware.Core.Net.Sockets
         public bool Connected { get { return null != Socket && Socket.Connected; } }
         public EndPoint RemoteEndPoint { get { return null != Socket ? Socket.RemoteEndPoint : null; } }
 
-        public readonly LockingMemoryStream Buffer = new LockingMemoryStream();
+        public LockingMemoryStream Buffer { get; private set; }
 
         public long LastMessageTimeMS { get; private set; }
 
         public SocketState()
         {
             Id = NextId;
+            Buffer = new LockingMemoryStream();
         }
 
         public SocketState(Socket socket) : this()

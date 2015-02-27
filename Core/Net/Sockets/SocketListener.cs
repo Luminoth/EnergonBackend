@@ -53,7 +53,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                         socket.Bind(endpoint);
                         socket.Listen(SocketBacklog);
                         _listenSockets.Add(socket);
-                    } catch(Exception e) {
+                    } catch(SocketException e) {
                         if(null != socket) {
                             socket.Dispose();
                         }

@@ -37,7 +37,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         public event EventHandler<ErrorEventArgs> OnError;
 #endregion
 
-        public readonly int Id;
+        public int Id { get; private set; }
 
         public abstract string Name { get; }
 
@@ -46,7 +46,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         public abstract string FormatterType { get; }
         protected abstract IMessageHandlerFactory HandlerFactory { get; }
 
-        protected readonly MessageProcessor Processor;
+        protected MessageProcessor Processor { get; private set; }
 #endregion
 
 #region Network Properties

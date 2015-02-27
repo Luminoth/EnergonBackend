@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Chat.MessageHandlers;
+
 using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
@@ -12,8 +14,9 @@ using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
-using EnergonSoftware.Database;
-using EnergonSoftware.Database.Models.Accounts;
+
+using EnergonSoftware.DAL;
+using EnergonSoftware.DAL.Models.Accounts;
 
 using log4net;
 
@@ -52,17 +55,18 @@ namespace EnergonSoftware.Chat.Net
         {
         }
 
-        protected async override Task<Account> LookupAccountAsync(string account_name)
+        protected async override Task<Account> LookupAccountAsync(string accountName)
         {
-            Logger.Debug("Looking up account for account_name=" + account_name);
-            AccountInfo account = new AccountInfo() { AccountName = account_name };
-            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
-                if(!await account.ReadAsync(connection).ConfigureAwait(false)) {
+            Logger.Debug("Looking up account for accountName=" + accountName);
+            using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
+                var accounts = from a in context.Accounts where a.AccountName == accountName select a;
+                if(accounts.Count() < 1) {
                     return null;
                 }
-            }
 
-            return account.ToAccount();
+                await Task.Delay(0).ConfigureAwait(false);
+                return accounts.First().ToAccount();
+            }
         }
 
         public async Task PingAsync()
@@ -72,17 +76,27 @@ namespace EnergonSoftware.Chat.Net
 
         public async Task SyncFriends()
         {
-            List<Account> friends = new List<Account>();
-            using(DatabaseConnection connection = await DatabaseManager.AcquireDatabaseConnectionAsync().ConfigureAwait(false)) {
-                friends = await AccountInfo.ReadFriendsAsync(connection, Account.Id).ConfigureAwait(false);
+            using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
+                var accounts = from a in context.Accounts where a.Id == Account.Id select a;
+                if(accounts.Count() < 1) {
+                    Logger.Warn("No such account Id=" + Account.Id + "!");
+                    await SendMessageAsync(new FriendListMessage()).ConfigureAwait(false);
+                    return;
+                }
+
+                AccountInfo account = accounts.First();
+                Logger.Debug("Read " + account.Friends.Count + " friends...");
+
+                List<Account> friends = new List<Account>();
+                foreach(AccountFriend friend in account.Friends) {
+                    friends.Add(friend.FriendAccount.ToAccount());
+                }
+
+                await SendMessageAsync(new FriendListMessage()
+                    {
+                        Friends = friends,
+                    }).ConfigureAwait(false);
             }
-
-            Logger.Debug("Read " + friends.Count + " friends...");
-
-            await SendMessageAsync(new FriendListMessage()
-                {
-                    Friends = friends,
-                }).ConfigureAwait(false);
         }
     }
 }

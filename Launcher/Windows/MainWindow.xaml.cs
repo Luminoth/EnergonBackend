@@ -57,14 +57,18 @@ namespace EnergonSoftware.Launcher.Windows
             Close();
         }
 
+        private void MenuItemToolsSettings_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow.Instance.Show();
+        }
+
         private void MenuHelpDebugWindow_Click(object sender, RoutedEventArgs e)
         {
             DebugWindow.Instance.Show();
         }
 
-        private void MenuItemHelpSettings_Click(object sender, RoutedEventArgs e)
+        private void MenuItemHelpAbout_Click(object sender, RoutedEventArgs e)
         {
-            SettingsWindow.Instance.Show();
         }
 #endregion
     }

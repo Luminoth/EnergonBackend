@@ -31,11 +31,6 @@ namespace EnergonSoftware.Authenticator
         {
             ConfigureLogging();
 
-            if(!DatabaseManager.TestDatabaseConnectionAsync().Result) {
-                Logger.Fatal("Could not connect to database!");
-                return;
-            }
-
             Authenticator authenticator = new Authenticator();
             Console.Title = authenticator.ServiceName;
             Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>

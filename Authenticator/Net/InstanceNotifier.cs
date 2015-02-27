@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Authenticator.MessageHandlers;
+
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
@@ -71,12 +72,12 @@ namespace EnergonSoftware.Authenticator.Net
                 }).ConfigureAwait(false);
         }
 
-        public async Task AuthenticatingAsync(string account_name, EndPoint endpoint)
+        public async Task AuthenticatingAsync(string accountName, EndPoint endpoint)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }
 
-        public async Task AuthenticatedAsync(string account_name, string sessionId, EndPoint endpoint)
+        public async Task AuthenticatedAsync(string accountName, string sessionId, EndPoint endpoint)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }

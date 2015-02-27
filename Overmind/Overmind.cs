@@ -9,6 +9,7 @@ using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Net.Sockets;
 using EnergonSoftware.Core.Util;
+
 using EnergonSoftware.Overmind.Net;
 
 using log4net;
@@ -81,6 +82,7 @@ namespace EnergonSoftware.Overmind
             Logger.Info("Running...");
             Running = true;
 
+            EventLogger.Instance.StartupEventAsync().Wait();
             InstanceNotifier.Instance.StartupAsync().Wait();
 
             Run();
@@ -108,6 +110,8 @@ namespace EnergonSoftware.Overmind
 
             Logger.Debug("Stopping diagnostic interface...");
             _diagnosticServer.Stop();
+
+            EventLogger.Instance.ShutdownEventAsync().Wait();
         }
 
         private async Task PollAndRunAsync()
