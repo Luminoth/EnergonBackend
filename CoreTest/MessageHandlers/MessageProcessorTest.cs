@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Test.Messages;
-using EnergonSoftware.Core.Test.Net;
+using EnergonSoftware.Core.Test.Net.Sessions;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
