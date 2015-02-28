@@ -60,6 +60,15 @@ namespace EnergonSoftware.Core.Messages.Formatter
             }
         }
 
+        public async Task WriteAsync<T>(string name, IReadOnlyDictionary<string, T> values) where T : IMessageSerializable
+        {
+            await _stream.WriteNetworkAsync(values.Count).ConfigureAwait(false);
+            foreach(var entry in values) {
+                await _stream.WriteNetworkAsync(entry.Key).ConfigureAwait(false);
+                await WriteAsync(entry.Value).ConfigureAwait(false);
+            }
+        }
+
         public async Task WriteAsync(IMessageSerializable value)
         {
             await StartElementAsync(value.Type).ConfigureAwait(false);
@@ -116,6 +125,20 @@ namespace EnergonSoftware.Core.Messages.Formatter
             int count = await _stream.ReadNetworkIntAsync().ConfigureAwait(false);
             for(int i = 0; i < count; ++i) {
                 values.Add(await ReadAsync<T>(name).ConfigureAwait(false));
+            }
+
+            return values;
+        }
+
+        public async Task<Dictionary<string, T>> ReadDictionaryAsync<T>(string name) where T : IMessageSerializable, new()
+        {
+            Dictionary<string, T> values = new Dictionary<string, T>();
+
+            int count = await _stream.ReadNetworkIntAsync().ConfigureAwait(false);
+            for(int i = 0; i < count; ++i) {
+                string key = await _stream.ReadNetworkStringAsync().ConfigureAwait(false);
+                T value = await ReadAsync<T>(name).ConfigureAwait(false);
+                values[key] = value;
             }
 
             return values;

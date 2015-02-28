@@ -89,7 +89,11 @@ namespace EnergonSoftware.Chat.Net
 
                 List<Account> friends = new List<Account>();
                 foreach(AccountFriend friend in account.Friends) {
-                    friends.Add(friend.FriendAccount.ToAccount());
+                    Account friendAccount = friend.FriendAccount.ToAccount();
+                    if(null != friend.Group) {
+                        friendAccount.GroupName = friend.Group.GroupName;
+                    }
+                    friends.Add(friendAccount);
                 }
 
                 await SendMessageAsync(new FriendListMessage()

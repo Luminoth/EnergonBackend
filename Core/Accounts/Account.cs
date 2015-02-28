@@ -35,7 +35,7 @@ namespace EnergonSoftware.Core.Accounts
         public Visibility Visibility { get; set; }
         public string Status { get; set; }
 
-        public string Group { get; set; }
+        public string GroupName { get; set; }
 
         public Account()
         {
@@ -46,19 +46,19 @@ namespace EnergonSoftware.Core.Accounts
         public async Task SerializeAsync(IMessageFormatter formatter)
         {
             // Id not serialized
-            await formatter.WriteAsync("username", UserName).ConfigureAwait(false);
+            await formatter.WriteAsync("user_name", UserName).ConfigureAwait(false);
             await formatter.WriteAsync("visibility", (int)Visibility).ConfigureAwait(false);
             await formatter.WriteAsync("status", Status ?? string.Empty).ConfigureAwait(false);
-            await formatter.WriteAsync("group", Group ?? string.Empty).ConfigureAwait(false);
+            await formatter.WriteAsync("group_name", GroupName ?? string.Empty).ConfigureAwait(false);
         }
 
         public async Task DeSerializeAsync(IMessageFormatter formatter)
         {
             // Id not serialized
-            UserName = await formatter.ReadStringAsync("username").ConfigureAwait(false);
+            UserName = await formatter.ReadStringAsync("user_name").ConfigureAwait(false);
             Visibility = (Visibility)await formatter.ReadIntAsync("visibility").ConfigureAwait(false);
             Status = await formatter.ReadStringAsync("status").ConfigureAwait(false);
-            Group = await formatter.ReadStringAsync("group").ConfigureAwait(false);
+            GroupName = await formatter.ReadStringAsync("group_name").ConfigureAwait(false);
         }
 
         public override bool Equals(object obj)
@@ -97,7 +97,7 @@ namespace EnergonSoftware.Core.Accounts
 
         public override string ToString()
         {
-            return "Account(Id=" + Id + ", AccountName=" + AccountName + ", UserName=" + UserName + ", SessionId=" + SessionId + ", EndPoint=" + EndPoint + ", Visibility=" + Visibility + ", Status=" + Status + ", Group=" + Group + ")";
+            return "Account(Id=" + Id + ", AccountName=" + AccountName + ", UserName=" + UserName + ", SessionId=" + SessionId + ", EndPoint=" + EndPoint + ", Visibility=" + Visibility + ", Status=" + Status + ", GroupName=" + GroupName + ")";
         }
 
 #region Property Notifier

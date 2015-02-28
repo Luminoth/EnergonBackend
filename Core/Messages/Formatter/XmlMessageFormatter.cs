@@ -76,6 +76,17 @@ namespace EnergonSoftware.Core.Messages.Formatter
             await EndElementAsync().ConfigureAwait(false);
         }
 
+        public async Task WriteAsync<T>(string name, IReadOnlyDictionary<string, T> values) where T : IMessageSerializable
+        {
+            await StartElementAsync(name).ConfigureAwait(false);
+            foreach(var value in values) {
+                ////await WriteAsync(value.Key).ConfigureAwait(false);
+                await WriteAsync(value.Value).ConfigureAwait(false);
+            }
+
+            await EndElementAsync().ConfigureAwait(false);
+        }
+
         public async Task WriteAsync(IMessageSerializable value)
         {
             await StartElementAsync(value.Type).ConfigureAwait(false);
@@ -126,6 +137,11 @@ namespace EnergonSoftware.Core.Messages.Formatter
 
 #region Reading
         public Task<List<T>> ReadListAsync<T>(string name) where T : IMessageSerializable, new()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Dictionary<string, T>> ReadDictionaryAsync<T>(string name) where T : IMessageSerializable, new()
         {
             throw new NotImplementedException();
         }

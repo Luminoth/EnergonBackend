@@ -25,6 +25,7 @@ namespace EnergonSoftware.Core.Messages.Formatter
         Task EndElementAsync();
 
         Task WriteAsync<T>(string name, IReadOnlyCollection<T> values) where T : IMessageSerializable;
+        Task WriteAsync<T>(string name, IReadOnlyDictionary<string, T> values) where T : IMessageSerializable;
         Task WriteAsync(IMessageSerializable value);
         Task WriteAsync(string name, string value);
         Task WriteAsync(string name, byte value);
@@ -39,6 +40,7 @@ namespace EnergonSoftware.Core.Messages.Formatter
 
 #region Reading
         Task<List<T>> ReadListAsync<T>(string name) where T : IMessageSerializable, new();
+        Task<Dictionary<string, T>> ReadDictionaryAsync<T>(string name) where T : IMessageSerializable, new();
         Task<T> ReadAsync<T>(string name) where T : IMessageSerializable, new();
 
         Task<string> ReadStringAsync(string name);

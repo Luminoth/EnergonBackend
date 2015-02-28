@@ -20,10 +20,10 @@ namespace EnergonSoftware.Launcher.Friends
 
         private static readonly IReadOnlyCollection<Account> TestFriends = new List<Account>()
         {
-            new Account() { UserName = "Offline Group Friend", Group = "Test", Visibility = Visibility.Offline, Status = string.Empty, },
-            new Account() { UserName = "Online Group Friend", Group = "Test", Visibility = Visibility.Online, Status = string.Empty, },
-            new Account() { UserName = "Offline Friend", Group = string.Empty, Visibility = Visibility.Offline, Status = string.Empty, },
-            new Account() { UserName = "Online Friend", Group = string.Empty, Visibility = Visibility.Online, Status = string.Empty, },
+            new Account() { UserName = "Offline Group Friend", GroupName = "Test", Visibility = Visibility.Offline, Status = string.Empty, },
+            new Account() { UserName = "Online Group Friend", GroupName = "Test", Visibility = Visibility.Online, Status = string.Empty, },
+            new Account() { UserName = "Offline Friend", GroupName = string.Empty, Visibility = Visibility.Offline, Status = string.Empty, },
+            new Account() { UserName = "Online Friend", GroupName = string.Empty, Visibility = Visibility.Online, Status = string.Empty, },
         };
 
         private readonly Dictionary<string, Account> _friendList = new Dictionary<string, Account>();
@@ -64,11 +64,11 @@ namespace EnergonSoftware.Launcher.Friends
             _friendList[friend.UserName] = friend;
 
             FriendGroupEntry group = RootGroupEntry;
-            if(!string.IsNullOrEmpty(friend.Group)) {
+            if(!string.IsNullOrEmpty(friend.GroupName)) {
                 try {
-                    group = RootGroupEntry.Groups[friend.Group];
+                    group = RootGroupEntry.Groups[friend.GroupName];
                 } catch(KeyNotFoundException) {
-                    group = new FriendGroupEntry() { Text = friend.Group };
+                    group = new FriendGroupEntry() { Text = friend.GroupName };
                     RootGroupEntry.AddGroup(group);
                 }
             }
