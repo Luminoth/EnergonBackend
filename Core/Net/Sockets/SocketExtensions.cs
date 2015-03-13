@@ -1,8 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Util;
-
 namespace System.Net.Sockets
 {
     public static class SocketExtensions

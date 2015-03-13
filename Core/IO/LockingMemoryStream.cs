@@ -6,8 +6,17 @@ namespace EnergonSoftware.Core.IO
 {
     public class LockingMemoryStream : MemoryStream
     {
-        // TODO: this never gets disposed of correctly
         private SemaphoreSlim _lock = new SemaphoreSlim(1);
+
+#region Dispose
+        protected override void Dispose(bool disposing)
+        {
+            if(disposing) {
+                _lock.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+#endregion
 
         public async Task LockAsync()
         {

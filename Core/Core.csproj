@@ -83,7 +83,6 @@
     <Compile Include="Messages\Parser\MessagePacketParser.cs" />
     <Compile Include="Messages\Parser\NetworkPacketParser.cs" />
     <Compile Include="Messages\PingMessage.cs" />
-    <Compile Include="IO\NetworkStreamExtensions.cs" />
     <Compile Include="Net\Sessions\AuthenticatedSession.cs" />
     <Compile Include="Net\DisconnectEventArgs.cs" />
     <Compile Include="Net\HttpServer.cs" />
