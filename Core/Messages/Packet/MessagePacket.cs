@@ -60,7 +60,7 @@ namespace EnergonSoftware.Core.Messages.Packet
             Id = NextId;
         }
 
-        protected async Task SerializeContentAsync(Stream stream, IMessageFormatter formatter)
+        protected async Task SerializeContentAsync(IMessageFormatter formatter)
         {
             if(null == Content) {
                 return;

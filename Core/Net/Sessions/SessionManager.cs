@@ -70,11 +70,11 @@ namespace EnergonSoftware.Core.Net.Sessions
             }
         }
 
-        public async Task PollAndRunAsync()
+        public async Task PollAndRunAsync(int microSeconds)
         {
             List<Task> tasks = new List<Task>();
             lock(_lock) {
-                _sessions.ForEach(session => tasks.Add(session.PollAndRunAsync()));
+                _sessions.ForEach(session => tasks.Add(session.PollAndRunAsync(microSeconds)));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);

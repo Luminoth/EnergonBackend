@@ -70,7 +70,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
-        private async Task PollAsync(Socket socket, SessionManager manager)
+        private async Task PollAsync(Socket socket, SessionManager manager, int microSeconds)
         {
             // TODO: this probably doesn't work correctly
             try {
@@ -78,7 +78,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                     Socket remote = await socket.AcceptFromAsync().ConfigureAwait(false);
                     if(manager.Contains(remote.RemoteEndPoint)) {
                         Session session = manager.Get(remote.RemoteEndPoint);
-                        await session.PollAndReceiveAllAsync().ConfigureAwait(false);
+                        await session.PollAndReceiveAllAsync(microSeconds).ConfigureAwait(false);
                         return;
                     }
 
@@ -90,7 +90,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                     } else {
                         Logger.Debug("Allowing new connection...");
                         Session session = _factory.Create(remote);
-                        await session.PollAndReceiveAllAsync().ConfigureAwait(false);
+                        await session.PollAndReceiveAllAsync(microSeconds).ConfigureAwait(false);
                         manager.Add(session);
                     }
                 }
@@ -99,11 +99,11 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
-        public async Task PollAsync(SessionManager manager)
+        public async Task PollAsync(SessionManager manager, int microSeconds)
         {
             List<Task> tasks = new List<Task>();
             lock(_lock) {
-                _listenSockets.ForEach(socket => tasks.Add(PollAsync(socket, manager)));
+                _listenSockets.ForEach(socket => tasks.Add(PollAsync(socket, manager, microSeconds)));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);

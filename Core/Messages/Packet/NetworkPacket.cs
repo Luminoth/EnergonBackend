@@ -11,34 +11,39 @@ namespace EnergonSoftware.Core.Messages.Packet
 {
     /*
      * Binary Packet Format:
-     *      MARKER | ID | TYPE | CONTENT LENGTH | CONTENT | TERMINATOR
+     *      MARKER | ID | ENCODING | CONTENT TYPE | CONTENT LEN | CONTENT
      */
     [Serializable]
     public sealed class NetworkPacket : MessagePacket
     {
         public static readonly byte[] Marker = new byte[] { (byte)'E', (byte)'S', (byte)'N', (byte)'M', 0 };
-        private static readonly byte[] Terminator = new byte[] { (byte)'\r', (byte)'\n', 0 };
 
         public const string PacketType = "network";
         public override string Type { get { return PacketType; } }
 
         public async override Task SerializeAsync(Stream stream, string formatterType)
         {
+            // header values
             await stream.WriteAsync(Marker, 0, Marker.Length).ConfigureAwait(false);
             await stream.WriteNetworkAsync(Id).ConfigureAwait(false);
-
             await stream.WriteNetworkAsync(formatterType).ConfigureAwait(false);
-            IMessageFormatter formatter = MessageFormatterFactory.Create(formatterType);
-            formatter.Attach(stream);
-
             await stream.WriteNetworkAsync(null == Content ? "null" : Content.Type).ConfigureAwait(false);
-            await SerializeContentAsync(stream, formatter).ConfigureAwait(false);
 
-            await stream.WriteAsync(Terminator, 0, Terminator.Length).ConfigureAwait(false);
+            // serialize content to a separate stream so we can get the length of it
+            using(MemoryStream contentStream = new MemoryStream()) {
+                IMessageFormatter formatter = MessageFormatterFactory.Create(formatterType);
+                formatter.Attach(contentStream);
+                await SerializeContentAsync(formatter).ConfigureAwait(false);
+
+                byte[] content = contentStream.ToArray();
+                await stream.WriteNetworkAsync(content.Length).ConfigureAwait(false);
+                await stream.WriteAsync(content, 0, content.Length).ConfigureAwait(false);
+            }
         }
 
         public async override Task DeSerializeAsync(Stream stream)
         {
+            // header values
             byte[] marker = new byte[Marker.Length];
             await stream.ReadAsync(marker, 0, marker.Length).ConfigureAwait(false);
             if(!marker.SequenceEqual(Marker)) {
@@ -48,17 +53,28 @@ namespace EnergonSoftware.Core.Messages.Packet
             Id = await stream.ReadNetworkIntAsync().ConfigureAwait(false);
 
             string formatterType = await stream.ReadNetworkStringAsync().ConfigureAwait(false);
-            IMessageFormatter formatter = MessageFormatterFactory.Create(formatterType);
-            formatter.Attach(stream);
+            string contentType = await stream.ReadNetworkStringAsync().ConfigureAwait(false);
 
-            string messageType = await stream.ReadNetworkStringAsync().ConfigureAwait(false);
-            Content = MessageFactory.Create(messageType);
-            await DeSerializeContentAsync(formatter).ConfigureAwait(false);
+            int contentLen = await stream.ReadNetworkIntAsync().ConfigureAwait(false);
+            if(stream.Length < contentLen) {
+                // TODO: handle this better
+                throw new MessageException(Resources.ErrorIncompleteNetworkPacket);
+            }
 
-            byte[] terminator = new byte[Terminator.Length];
-            await stream.ReadAsync(terminator, 0, terminator.Length).ConfigureAwait(false);
-            if(!terminator.SequenceEqual(Terminator)) {
-                throw new MessageException(Resources.ErrorInvalidNetworkPacketTerminator);
+            // read the content as a set of bytes
+            byte[] content = new byte[contentLen];
+            await stream.ReadAsync(content, 0, content.Length).ConfigureAwait(false);
+
+            // serialize the content to a separate stream to match the original serialize process
+            // this is very likely superfluous, but keeps the process consistent between serialize/deserialize
+            using(MemoryStream contentStream = new MemoryStream()) {
+                await contentStream.WriteAsync(content, 0, content.Length);
+
+                IMessageFormatter formatter = MessageFormatterFactory.Create(formatterType);
+                formatter.Attach(contentStream);
+
+                Content = MessageFactory.Create(contentType);
+                await DeSerializeContentAsync(formatter).ConfigureAwait(false);
             }
         }
 

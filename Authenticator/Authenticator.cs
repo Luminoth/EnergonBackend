@@ -118,7 +118,7 @@ namespace EnergonSoftware.Authenticator
         {
             await _listener.PollAsync(_sessions).ConfigureAwait(false);
 
-            await _sessions.PollAndRunAsync().ConfigureAwait(false);
+            await _sessions.PollAndRunAsync(100).ConfigureAwait(false);
             _sessions.Cleanup();
         }
 

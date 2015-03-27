@@ -133,6 +133,15 @@ namespace EnergonSoftware.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Incomplete network packet!.
+        /// </summary>
+        internal static string ErrorIncompleteNetworkPacket {
+            get {
+                return ResourceManager.GetString("ErrorIncompleteNetworkPacket", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid login: {0}.
         /// </summary>
         internal static string ErrorInvalidLogin {
@@ -228,6 +237,15 @@ namespace EnergonSoftware.Core.Properties {
         internal static string ErrorSessionNotAuthenticated {
             get {
                 return ResourceManager.GetString("ErrorSessionNotAuthenticated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SSL handshake failed!.
+        /// </summary>
+        internal static string ErrorSSLHandshakeFailed {
+            get {
+                return ResourceManager.GetString("ErrorSSLHandshakeFailed", resourceCulture);
             }
         }
         

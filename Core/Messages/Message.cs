@@ -1,6 +1,7 @@
 ﻿using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Network;
 using EnergonSoftware.Core.Messages.Notification;
 using EnergonSoftware.Core.Properties;
 
@@ -32,6 +33,10 @@ namespace EnergonSoftware.Core.Messages
                 return new LoginMessage();
             case LogoutMessage.MessageType:
                 return new LogoutMessage();
+
+            /* network */
+            case StartTLSMessage.MessageType:
+                return new StartTLSMessage();
 
             /* auth */
             case AuthMessage.MessageType:

@@ -80,6 +80,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AuthenticationStage.cs" />
+    <Compile Include="Net\AuthFailedEventArgs.cs" />
+    <Compile Include="Net\AuthSuccessEventArgs.cs" />
     <Compile Include="Controls\FriendEntry.cs" />
     <Compile Include="Controls\FriendGroupEntry.cs" />
     <Compile Include="Controls\FriendsListControl.xaml.cs">

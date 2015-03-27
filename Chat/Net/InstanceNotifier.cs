@@ -50,7 +50,7 @@ namespace EnergonSoftware.Chat.Net
 
         public async Task RunAsync()
         {
-            await _sessions.PollAndRunAsync().ConfigureAwait(false);
+            await _sessions.PollAndRunAsync(100).ConfigureAwait(false);
             _sessions.Cleanup();
         }
 

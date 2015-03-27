@@ -37,7 +37,7 @@ namespace EnergonSoftware.Overmind.Net
 
         protected async override Task OnRunAsync()
         {
-            int count = await _listener.PollAndReceiveAllAsync().ConfigureAwait(false);
+            int count = await _listener.PollAndReceiveAllAsync(100).ConfigureAwait(false);
             if(count > 0) {
                 Logger.Debug("Instance notifier session " + Id + " read " + count + " bytes");
             }

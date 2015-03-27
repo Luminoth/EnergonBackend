@@ -52,9 +52,11 @@ namespace EnergonSoftware.Launcher.Net
 
         public async Task ConnectAsync(string host, int port)
         {
+            bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);
+
             try {
                 Logger.Info("Connecting to overmind server...");
-                await ConnectAsync(host, port, SocketType.Stream, ProtocolType.Tcp).ConfigureAwait(false);
+                await ConnectAsync(host, port, SocketType.Stream, ProtocolType.Tcp, useIPv6).ConfigureAwait(false);
                 if(!Connected) {
                     await ErrorAsync("Failed to connect to the overmind server").ConfigureAwait(false);
                     return;

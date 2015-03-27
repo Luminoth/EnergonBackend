@@ -75,6 +75,7 @@
     <Compile Include="Messages\MessageException.cs" />
     <Compile Include="MessageHandlers\MessageHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandlerException.cs" />
+    <Compile Include="Messages\Network\StartTLSMessage.cs" />
     <Compile Include="Messages\Packet\MessagePacket.cs" />
     <Compile Include="Messages\Notification\NotificationMessage.cs" />
     <Compile Include="Messages\Notification\ShutdownMessage.cs" />
@@ -83,17 +84,22 @@
     <Compile Include="Messages\Parser\MessagePacketParser.cs" />
     <Compile Include="Messages\Parser\NetworkPacketParser.cs" />
     <Compile Include="Messages\PingMessage.cs" />
+    <Compile Include="Net\Sessions\ConnectedEventArgs.cs" />
     <Compile Include="Net\Sessions\AuthenticatedSession.cs" />
-    <Compile Include="Net\DisconnectEventArgs.cs" />
+    <Compile Include="Net\Sessions\DataReceivedEventArgs.cs" />
+    <Compile Include="Net\Sessions\DisconnectedEventArgs.cs" />
     <Compile Include="Net\HttpServer.cs" />
+    <Compile Include="Net\Sessions\NetworkSession.cs" />
+    <Compile Include="Net\Sessions\SessionFactory.cs" />
     <Compile Include="Net\Sockets\SocketExtensions.cs" />
+    <Compile Include="Net\Sockets\SocketState.cs" />
+    <Compile Include="Net\Sockets\SSLSocketWrapper.cs" />
     <Compile Include="Net\Sockets\UdpListener.cs" />
     <Compile Include="Net\NetUtil.cs" />
     <Compile Include="Messages\Packet\NetworkPacket.cs" />
     <Compile Include="Net\Sessions\Session.cs" />
     <Compile Include="Net\Sessions\SessionManager.cs" />
     <Compile Include="Net\Sockets\SocketListener.cs" />
-    <Compile Include="Net\Sockets\SocketState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -118,7 +124,7 @@
     </Compile>
     <Compile Include="Util\SessionId.cs" />
     <Compile Include="Util\Time.cs" />
-    <Compile Include="Util\Util.cs" />
+    <Compile Include="Util\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,4 +1,6 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Configuration;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core;
@@ -18,11 +20,8 @@ namespace EnergonSoftware.Launcher.Net
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthSession));
 
 #region Events
-        public delegate void OnAuthSuccessHandler();
-        public event OnAuthSuccessHandler OnAuthSuccess;
-
-        public delegate void OnAuthFailedHandler(string reason);
-        public event OnAuthFailedHandler OnAuthFailed;
+        public event EventHandler<AuthSuccessEventArgs> AuthSuccessEvent;
+        public event EventHandler<AuthFailedEventArgs> AuthFailedEvent;
 #endregion
 
         public string RspAuth { get; private set; }
@@ -39,9 +38,11 @@ namespace EnergonSoftware.Launcher.Net
 
         public async Task BeginConnectAsync(string host, int port)
         {
+            bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);
+
             try {
                 Logger.Info("Connecting to authentication server...");
-                await ConnectAsync(host, port, SocketType.Stream, ProtocolType.Tcp).ConfigureAwait(false);
+                await ConnectAsync(host, port, SocketType.Stream, ProtocolType.Tcp, useIPv6).ConfigureAwait(false);
                 if(!Connected) {
                     await ErrorAsync("Failed to connect to the authentication server").ConfigureAwait(false);
                     return;
@@ -92,8 +93,8 @@ namespace EnergonSoftware.Launcher.Net
             App.Instance.UserAccount.SessionId = ticket;
             App.Instance.UserAccount.Password = null;
 
-            if(null != OnAuthSuccess) {
-                OnAuthSuccess();
+            if(null != AuthSuccessEvent) {
+                AuthSuccessEvent(this, new AuthSuccessEventArgs());
             }
 
             await DisconnectAsync().ConfigureAwait(false);
@@ -106,8 +107,8 @@ namespace EnergonSoftware.Launcher.Net
             App.Instance.AuthStage = AuthenticationStage.NotAuthenticated;
             App.Instance.UserAccount.Password = null;
 
-            if(null != OnAuthFailed) {
-                OnAuthFailed(reason);
+            if(null != AuthFailedEvent) {
+                AuthFailedEvent(this, new AuthFailedEventArgs() { Reason = reason });
             }
 
             await DisconnectAsync().ConfigureAwait(false);

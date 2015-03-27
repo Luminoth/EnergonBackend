@@ -18,11 +18,6 @@ using log4net;
 
 namespace EnergonSoftware.Core.Net.Sessions
 {
-    public interface ISessionFactory
-    {
-        Session Create(Socket socket);
-    }
-
     public abstract class Session : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Session));
@@ -33,8 +28,10 @@ namespace EnergonSoftware.Core.Net.Sessions
 #endregion
 
 #region Events
-        public event EventHandler<DisconnectEventArgs> OnDisconnect;
-        public event EventHandler<ErrorEventArgs> OnError;
+        public event EventHandler<ConnectedEventArgs> ConnectEvent;
+        public event EventHandler<DisconnectedEventArgs> DisconnectEvent;
+        public event EventHandler<ErrorEventArgs> ErrorEvent;
+        public event EventHandler<DataReceivedEventArgs> DataReceivedEvent;
 #endregion
 
         public int Id { get; private set; }
@@ -78,10 +75,10 @@ namespace EnergonSoftware.Core.Net.Sessions
         }
 #endregion
 
-        public async Task ConnectAsync(string host, int port, SocketType socketType, ProtocolType protocolType)
+        public async Task ConnectAsync(string host, int port, SocketType socketType, ProtocolType protocolType, bool useIPv6)
         {
             Logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
-            _socketState.Socket = await NetUtil.ConnectAsync(host, port, socketType, protocolType).ConfigureAwait(false);
+            _socketState.Socket = await NetUtil.ConnectAsync(host, port, socketType, protocolType, useIPv6).ConfigureAwait(false);
         }
 
         public async Task ConnectMulticastAsync(IPAddress group, int port, int ttl)
@@ -105,8 +102,8 @@ namespace EnergonSoftware.Core.Net.Sessions
                 Logger.Info("Session " + Id + " disconnecting: " + reason);
                 await _socketState.ShutdownDisconnectCloseAsync(false).ConfigureAwait(false);
 
-                if(null != OnDisconnect) {
-                    OnDisconnect(this, new DisconnectEventArgs() { Reason = reason });
+                if(null != DisconnectEvent) {
+                    DisconnectEvent(this, new DisconnectedEventArgs() { Reason = reason });
                 }
 
                 Processor.Stop();
@@ -115,14 +112,14 @@ namespace EnergonSoftware.Core.Net.Sessions
             }
         }
 
-        public async Task<int> PollAndReceiveAllAsync()
+        public async Task<int> PollAndReceiveAllAsync(int microSeconds)
         {
             try {
                 if(!Connected) {
                     return -1;
                 }
 
-                int count = await _socketState.PollAndReceiveAllAsync().ConfigureAwait(false);
+                int count = await _socketState.PollAndReceiveAllAsync(microSeconds).ConfigureAwait(false);
                 if(count > 0) {
                     Logger.Debug("Session " + Id + " read " + count + " bytes");
                 }
@@ -134,9 +131,9 @@ namespace EnergonSoftware.Core.Net.Sessions
             }
         }
 
-        public async Task PollAndRunAsync()
+        public async Task PollAndRunAsync(int microSeconds)
         {
-            int count = await PollAndReceiveAllAsync().ConfigureAwait(false);
+            int count = await PollAndReceiveAllAsync(microSeconds).ConfigureAwait(false);
             if(count < 0) {
                 await DisconnectAsync(Resources.DisconnectSocketClosed).ConfigureAwait(false);
                 return;
@@ -211,8 +208,8 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Error("Session " + Id + " encountered an internal error: " + error);
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
-            if(null != OnError) {
-                OnError(this, new ErrorEventArgs() { Error = error });
+            if(null != ErrorEvent) {
+                ErrorEvent(this, new ErrorEventArgs() { Error = error });
             }
         }
 
@@ -221,8 +218,8 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Error("Session " + Id + " encountered an internal error: " + error, ex);
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
-            if(null != OnError) {
-                OnError(this, new ErrorEventArgs() { Error = error, Exception = ex });
+            if(null != ErrorEvent) {
+                ErrorEvent(this, new ErrorEventArgs() { Error = error, Exception = ex });
             }
         }
 
@@ -231,8 +228,8 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Error("Session " + Id + " encountered an internal error", ex);
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
-            if(null != OnError) {
-                OnError(this, new ErrorEventArgs() { Exception = ex });
+            if(null != ErrorEvent) {
+                ErrorEvent(this, new ErrorEventArgs() { Exception = ex });
             }
         }
 #endregion
@@ -243,8 +240,8 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Error("Session " + Id + " encountered an error: " + error);
             await DisconnectAsync(error).ConfigureAwait(false);
 
-            if(null != OnError) {
-                OnError(this, new ErrorEventArgs() { Error = error });
+            if(null != ErrorEvent) {
+                ErrorEvent(this, new ErrorEventArgs() { Error = error });
             }
         }
 
@@ -253,8 +250,8 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Error("Session " + Id + " encountered an error: " + error, ex);
             await DisconnectAsync(error).ConfigureAwait(false);
 
-            if(null != OnError) {
-                OnError(this, new ErrorEventArgs() { Error = error, Exception = ex });
+            if(null != ErrorEvent) {
+                ErrorEvent(this, new ErrorEventArgs() { Error = error, Exception = ex });
             }
         }
 
@@ -263,8 +260,8 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Error("Session " + Id + " encountered an error", ex);
             await DisconnectAsync(ex.Message).ConfigureAwait(false);
 
-            if(null != OnError) {
-                OnError(this, new ErrorEventArgs() { Exception = ex });
+            if(null != ErrorEvent) {
+                ErrorEvent(this, new ErrorEventArgs() { Exception = ex });
             }
         }
 #endregion

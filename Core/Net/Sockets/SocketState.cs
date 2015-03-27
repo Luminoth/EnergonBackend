@@ -79,7 +79,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         }
 #endregion
 
-        public async Task<int> PollAndReceiveAllAsync()
+        public async Task<int> PollAndReceiveAllAsync(int microSeconds)
         {
             await _socketLock.WaitAsync().ConfigureAwait(false);
             await Buffer.LockAsync().ConfigureAwait(false);
@@ -89,7 +89,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                     return -1;
                 }
 
-                int count = await Socket.PollAndReceiveAllAsync(Buffer).ConfigureAwait(false);
+                int count = await Socket.PollAndReceiveAllAsync(microSeconds, Buffer).ConfigureAwait(false);
                 if(count > 0) {
                     LastMessageTimeMS = Time.CurrentTimeMs;
                 }

@@ -78,7 +78,7 @@ namespace EnergonSoftware.Launcher
             Logger.Debug("**Idle mark**");
             while(!_cancellationToken.IsCancellationRequested) {
                 try {
-                    await Sessions.PollAndRunAsync().ConfigureAwait(false);
+                    await Sessions.PollAndRunAsync(100).ConfigureAwait(false);
                     Sessions.Cleanup();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
@@ -143,12 +143,12 @@ namespace EnergonSoftware.Launcher
 #endregion
 
 #region Event Handlers
-        private async void OnAuthFailedCallback(string reason)
+        private async void AuthFailedEventHandler(object sender, AuthFailedEventArgs e)
         {
-            await OnErrorAsync("Authentication failed: " + reason, "Authentication Failed").ConfigureAwait(false);
+            await OnErrorAsync("Authentication failed: " + e.Reason, "Authentication Failed").ConfigureAwait(false);
         }
 
-        private async void OnAuthSuccessCallback()
+        private async void AuthSuccessEventHandler(object sender, AuthSuccessEventArgs e)
         {
             if(UseDummyNetwork) {
                 await EnergonSoftware.Launcher.Windows.MainWindow.ShowMainPageAsync().ConfigureAwait(false);
@@ -157,19 +157,19 @@ namespace EnergonSoftware.Launcher
             }
 
             _overmindSession = new OvermindSession();
-            _overmindSession.OnDisconnect += OnDisconnectCallback;
-            _overmindSession.OnError += OnErrorCallback;
+            _overmindSession.DisconnectEvent += DisconnectEventHandler;
+            _overmindSession.ErrorEvent += ErrorEventHandler;
             await _overmindSession.ConnectAsync(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"])).ConfigureAwait(false);
             Sessions.Add(_overmindSession);
 
             _chatSession = new ChatSession();
-            _chatSession.OnDisconnect += OnDisconnectCallback;
-            _chatSession.OnError += OnErrorCallback;
+            _chatSession.DisconnectEvent += DisconnectEventHandler;
+            _chatSession.ErrorEvent += ErrorEventHandler;
             await _chatSession.ConnectAsync(ConfigurationManager.AppSettings["chatHost"], Convert.ToInt32(ConfigurationManager.AppSettings["chatPort"])).ConfigureAwait(false);
             Sessions.Add(_chatSession);
         }
 
-        private async void OnDisconnectCallback(object sender, DisconnectEventArgs e)
+        private async void DisconnectEventHandler(object sender, DisconnectedEventArgs e)
         {
             AuthSession authSession = sender as AuthSession;
             if(null != authSession && Authenticated) {
@@ -182,7 +182,7 @@ namespace EnergonSoftware.Launcher
             await OnErrorAsync(e.Reason, "Disconnected!").ConfigureAwait(false);
         }
 
-        private async void OnErrorCallback(object sender, ErrorEventArgs e)
+        private async void ErrorEventHandler(object sender, ErrorEventArgs e)
         {
             await OnErrorAsync(e.Error, "Error!").ConfigureAwait(false);
             await LogoutAsync().ConfigureAwait(false);
@@ -194,10 +194,10 @@ namespace EnergonSoftware.Launcher
             Logger.Info("Logging in...");
 
             AuthSession session = new AuthSession();
-            session.OnAuthFailed += OnAuthFailedCallback;
-            session.OnAuthSuccess += OnAuthSuccessCallback;
-            session.OnDisconnect += OnDisconnectCallback;
-            session.OnError += OnErrorCallback;
+            session.AuthFailedEvent += AuthFailedEventHandler;
+            session.AuthSuccessEvent += AuthSuccessEventHandler;
+            session.DisconnectEvent += DisconnectEventHandler;
+            session.ErrorEvent += ErrorEventHandler;
 
             AuthStage = AuthenticationStage.NotAuthenticated;
             UserAccount.Password = password;

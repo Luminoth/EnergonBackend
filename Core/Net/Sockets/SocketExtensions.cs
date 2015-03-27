@@ -163,19 +163,17 @@ namespace System.Net.Sockets
             return len;
         }
 
-        public static async Task<int> PollAndReceiveAllAsync(this Socket socket, Stream stream)
+        public static async Task<int> PollAndReceiveAllAsync(this Socket socket, int microSeconds, Stream stream)
         {
-            int count = 0;
-            while(socket.Poll(100, SelectMode.SelectRead)) {
+            int total = 0;
+            while(socket.Poll(microSeconds, SelectMode.SelectRead)) {
                 int len = await socket.ReceiveAsync(stream).ConfigureAwait(false);
                 if(len <= 0) {
-                    return count > 0 ? count : -1;
+                    return total > 0 ? total : -1;
                 }
-
-                count += len;
+                total += len;
             }
-
-            return count;
+            return total;
         }
 #endregion
     }

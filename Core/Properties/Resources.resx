@@ -174,10 +174,16 @@
   <data name="ErrorSessionNotAuthenticated" xml:space="preserve">
     <value>Session is not authenticated!</value>
   </data>
+  <data name="ErrorSSLHandshakeFailed" xml:space="preserve">
+    <value>SSL handshake failed!</value>
+  </data>
   <data name="ErrorUnsupportedMessage" xml:space="preserve">
     <value>Unsupported message type for construction: {0}</value>
   </data>
   <data name="ErrorUnsupportedMessageFormatter" xml:space="preserve">
     <value>Unsupported message formatter type for construction: {0}</value>
+  </data>
+  <data name="ErrorIncompleteNetworkPacket" xml:space="preserve">
+    <value>Incomplete network packet!</value>
   </data>
 </root>
