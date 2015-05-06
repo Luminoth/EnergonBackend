@@ -17,7 +17,7 @@ namespace EnergonSoftware.Core.Test.Net.Sessions
         public bool MessageProcessed { get; private set; }
 
         private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
-        private readonly MessageProcessor _messageProcessor =  new MessageProcessor();
+        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
         private readonly IMessageHandlerFactory _messageHandlerFactory = new MessageHandlerFactory();
 
         protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }

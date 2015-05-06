@@ -210,6 +210,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Backend\Backend.csproj">
+      <Project>{6c631fcf-23cc-4bd0-9245-3e2080421f62}</Project>
+      <Name>Backend</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{b8cf252f-2fbc-4d35-90a9-c0adf2b0b9e0}</Project>
       <Name>Core</Name>

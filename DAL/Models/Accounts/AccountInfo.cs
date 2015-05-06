@@ -4,7 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Net;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Accounts;
+using EnergonSoftware.Backend.Accounts;
+
 using EnergonSoftware.Core.Util.Crypt;
 
 namespace EnergonSoftware.DAL.Models.Accounts

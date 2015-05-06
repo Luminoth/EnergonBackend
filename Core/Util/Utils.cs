@@ -15,12 +15,12 @@ namespace EnergonSoftware.Core.Util
             int rowCount = (int)Math.Ceiling((decimal)length / (decimal)BytesPerLine);
 
             StringBuilder builder = new StringBuilder();
-            for(int row=0; row<rowCount; ++row) {
+            for(int row = 0; row < rowCount; ++row) {
                 int start = offset + (row * BytesPerLine);
                 int end = Math.Min(start + BytesPerLine, length);
 
                 // hex
-                for(int j=start; j<start + BytesPerLine; ++j) {
+                for(int j = start; j < (start + BytesPerLine); ++j) {
                     if(j < end) {
                         builder.Append(string.Format("{0:X2} ", buffer[j]));
                     } else {
@@ -31,13 +31,14 @@ namespace EnergonSoftware.Core.Util
                 builder.Append(" ");
 
                 // ascii
-                for(int j=start; j<end; ++j) {
+                for(int j = start; j < end; ++j) {
                     char ch = (char)buffer[j];
-                    builder.Append(string.Format("{0} ", Char.IsControl(ch) ? '.' : ch));
+                    builder.Append(string.Format("{0} ", char.IsControl(ch) ? '.' : ch));
                 }
 
                 builder.Append(Environment.NewLine);
             }
+
             return builder.ToString();
         }
     }

@@ -1,13 +1,15 @@
 ﻿using System.Net.Sockets;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Accounts;
-using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Properties;
+using EnergonSoftware.Backend.Accounts;
+using EnergonSoftware.Backend.Messages;
+using EnergonSoftware.Backend.Properties;
+
+using EnergonSoftware.Core.Net.Sessions;
 
 using log4net;
 
-namespace EnergonSoftware.Core.Net.Sessions
+namespace EnergonSoftware.Backend.Net.Sessions
 {
     public abstract class AuthenticatedSession : NetworkSession
     {
@@ -51,7 +53,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
             Account = lookupAccount;
 
-            EnergonSoftware.Core.Accounts.Account loginAccount = new Account()
+            EnergonSoftware.Backend.Accounts.Account loginAccount = new Account()
             {
                 AccountName = accountName,
                 SessionId = sessionid,

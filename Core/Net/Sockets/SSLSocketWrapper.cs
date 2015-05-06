@@ -8,9 +8,9 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
-using log4net;
-
 using EnergonSoftware.Core.Util;
+
+using log4net;
 
 namespace EnergonSoftware.Core.Net.Sockets
 {
@@ -144,6 +144,7 @@ namespace EnergonSoftware.Core.Net.Sockets
 
                     await Task.Delay(0).ConfigureAwait(false);
                 }
+
                 return total;
             } finally {
                 _lock.Release();

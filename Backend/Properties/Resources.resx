@@ -117,58 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DisconnectInternalError" xml:space="preserve">
-    <value>Disconnect due to internal error!</value>
+  <data name="ErrorInvalidLogin" xml:space="preserve">
+    <value>Invalid login: {0}</value>
   </data>
-  <data name="DisconnectSocketClosed" xml:space="preserve">
-    <value>Disconnect due to socket closed!</value>
+  <data name="ErrorInvalidLoginAccount" xml:space="preserve">
+    <value>Invalid login account: {0}, expected: {1}</value>
   </data>
-  <data name="DisconnectTimeout" xml:space="preserve">
-    <value>Disconnect due to timeout!</value>
+  <data name="ErrorSessionAlreadyAuthenticated" xml:space="preserve">
+    <value>Session is already authenticated!</value>
   </data>
-  <data name="ErrorCreatingMessageHandler" xml:space="preserve">
-    <value>Could not create handler for message type: {0}</value>
+  <data name="ErrorSessionNotAuthenticated" xml:space="preserve">
+    <value>Session is not authenticated!</value>
   </data>
-  <data name="ErrorCreatingSocket" xml:space="preserve">
-    <value>Exception while creating socket!</value>
-  </data>
-  <data name="ErrorDeserializingNetworkPacketContent" xml:space="preserve">
-    <value>Exception encountered while deserializing content!</value>
-  </data>
-  <data name="ErrorHandlingMessage" xml:space="preserve">
-    <value>Exception while handling message!</value>
-  </data>
-  <data name="ErrorHttpServerAlreadyRunning" xml:space="preserve">
-    <value>HTTP server is already running!</value>
-  </data>
-  <data name="ErrorInvalidNetworkPacketMarker" xml:space="preserve">
-    <value>Invalid network packet marker found!</value>
-  </data>
-  <data name="ErrorInvalidNetworkPacketTerminator" xml:space="preserve">
-    <value>Invalid network packet terminator found!</value>
-  </data>
-  <data name="ErrorMessageHandlerAlreadyRunning" xml:space="preserve">
-    <value>Message handler is already running!</value>
-  </data>
-  <data name="ErrorMessageProcessorAlreadyRunning" xml:space="preserve">
-    <value>Message processor already running!</value>
-  </data>
-  <data name="ErrorParsingMessages" xml:space="preserve">
-    <value>Exception while parsing messages!</value>
-  </data>
-  <data name="ErrorParsingNetworkPacket" xml:space="preserve">
-    <value>Exception while parsing network packet!</value>
-  </data>
-  <data name="ErrorSendingMessage" xml:space="preserve">
-    <value>Exception while sending message!</value>
-  </data>
-  <data name="ErrorSSLHandshakeFailed" xml:space="preserve">
-    <value>SSL handshake failed!</value>
-  </data>
-  <data name="ErrorUnsupportedMessageFormatter" xml:space="preserve">
-    <value>Unsupported message formatter type for construction: {0}</value>
-  </data>
-  <data name="ErrorIncompleteNetworkPacket" xml:space="preserve">
-    <value>Incomplete network packet!</value>
+  <data name="ErrorUnsupportedMessage" xml:space="preserve">
+    <value>Unsupported message type for construction: {0}</value>
   </data>
 </root>

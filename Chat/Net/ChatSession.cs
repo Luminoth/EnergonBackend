@@ -5,12 +5,14 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Backend.Accounts;
+using EnergonSoftware.Backend.Messages.Chat;
+using EnergonSoftware.Backend.Net.Sessions;
+
 using EnergonSoftware.Chat.MessageHandlers;
 
-using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
@@ -96,6 +98,7 @@ namespace EnergonSoftware.Chat.Net
                     if(null != friend.Group) {
                         friendAccount.GroupName = friend.Group.GroupName;
                     }
+
                     friends.Add(friendAccount);
                 }
 

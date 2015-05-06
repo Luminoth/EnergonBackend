@@ -171,8 +171,10 @@ namespace System.Net.Sockets
                 if(len <= 0) {
                     return total > 0 ? total : -1;
                 }
+
                 total += len;
             }
+
             return total;
         }
 #endregion

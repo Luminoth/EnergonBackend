@@ -1,9 +1,11 @@
 ﻿using System.Threading.Tasks;
 
+using EnergonSoftware.Backend.Messages.Chat;
+
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Core.Net.Sessions;
+
 using EnergonSoftware.Launcher.Net;
 
 namespace EnergonSoftware.Launcher.MessageHandlers.Chat

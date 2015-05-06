@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 
-namespace EnergonSoftware.Core.Messages.Auth
+namespace EnergonSoftware.Backend.Messages.Auth
 {
     [Serializable]
     public sealed class ChallengeMessage : IMessage

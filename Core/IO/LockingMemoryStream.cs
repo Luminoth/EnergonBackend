@@ -14,6 +14,7 @@ namespace EnergonSoftware.Core.IO
             if(disposing) {
                 _lock.Dispose();
             }
+
             base.Dispose(disposing);
         }
 #endregion

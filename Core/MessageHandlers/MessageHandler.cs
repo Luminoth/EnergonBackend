@@ -16,15 +16,6 @@ namespace EnergonSoftware.Core.MessageHandlers
 
     public class MessageHandler
     {
-        private static void Authenticate(IAuthenticatedMessage message, AuthenticatedSession session)
-        {
-            if(null != message && null != session) {
-                if(!session.Authenticate(message.AccountName, message.SessionId)) {
-                    throw new MessageHandlerException(Resources.ErrorSessionNotAuthenticated);
-                }
-            }
-        }
-
         private bool _running = false;
         public bool Finished { get; private set; }
 
@@ -38,9 +29,6 @@ namespace EnergonSoftware.Core.MessageHandlers
             }
 
             _running = true;
-
-            Authenticate(message as IAuthenticatedMessage, session as AuthenticatedSession);
-
             Finished = false;
             _startTime = Time.CurrentTimeMs;
 
@@ -50,6 +38,7 @@ namespace EnergonSoftware.Core.MessageHandlers
             Finished = true;
         }
 
+        // NOTE: subclasses must call base.OnHandleMessageAsync() before doing anything
         protected async virtual Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             await Task.Delay(0).ConfigureAwait(false);

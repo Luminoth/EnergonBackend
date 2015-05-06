@@ -4,10 +4,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
+using EnergonSoftware.Backend.Accounts;
+
 using EnergonSoftware.Core;
-using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
+
 using EnergonSoftware.Launcher.Friends;
 using EnergonSoftware.Launcher.Net;
 using EnergonSoftware.Launcher.Updater;

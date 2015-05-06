@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-using EnergonSoftware.Core.Accounts;
+using EnergonSoftware.Backend.Accounts;
 using EnergonSoftware.Launcher.Controls;
 using EnergonSoftware.Launcher.Properties;
 

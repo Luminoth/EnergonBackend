@@ -10,9 +10,7 @@ namespace EnergonSoftware.Core.Messages.Parser
 {
     public interface IMessagePacketParser
     {
-        MessagePacket Create();
-
         // NOTE: this locks the stream, so do not lock before calling
-        Task ParseAsync();
+        Task ParseAsync(IMessageFactory messageFactory);
     }
 }

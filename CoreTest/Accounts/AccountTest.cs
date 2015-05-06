@@ -3,7 +3,8 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Accounts;
+using EnergonSoftware.Backend.Accounts;
+
 using EnergonSoftware.Core.IO;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Util;
@@ -33,7 +34,7 @@ namespace EnergonSoftware.Core.Test.Accounts
                 SessionId = "123456",
                 UserName = "Test User",
                 EndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 1234),
-                Visibility = Core.Accounts.Visibility.Away,
+                Visibility = Backend.Accounts.Visibility.Away,
                 Status = "this is my status!",
             };
 

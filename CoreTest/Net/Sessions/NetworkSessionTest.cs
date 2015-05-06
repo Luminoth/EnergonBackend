@@ -49,10 +49,11 @@ namespace EnergonSoftware.Core.Test.Net.Sessions
 
         private void SetupManager(int count)
         {
-            for(int i=0; i<count; ++i) {
+            for(int i = 0; i < count; ++i) {
                 TestSession session = new TestSession();
                 _sessionManager.Add(session);
             }
+
             Assert.IsFalse(_sessionManager.IsEmpty);
             Assert.AreEqual(count, _sessionManager.Count);
         }

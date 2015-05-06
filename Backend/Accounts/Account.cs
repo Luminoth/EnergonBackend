@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Messages.Formatter;
 
-namespace EnergonSoftware.Core.Accounts
+namespace EnergonSoftware.Backend.Accounts
 {
     [Serializable]
     public sealed class Account : IMessageSerializable, INotifyPropertyChanged

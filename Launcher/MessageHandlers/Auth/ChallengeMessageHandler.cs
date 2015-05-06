@@ -4,12 +4,14 @@ using System.Configuration;
 using System.Text;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Backend.Messages.Auth;
+
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
 using EnergonSoftware.Core.Util.Crypt;
+
 using EnergonSoftware.Launcher.Net;
 
 using log4net;

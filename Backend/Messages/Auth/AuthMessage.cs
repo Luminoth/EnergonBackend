@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core;
+using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Util;
 
-namespace EnergonSoftware.Core.Messages.Auth
+namespace EnergonSoftware.Backend.Messages.Auth
 {
     [Serializable]
     public sealed class AuthMessage : IMessage

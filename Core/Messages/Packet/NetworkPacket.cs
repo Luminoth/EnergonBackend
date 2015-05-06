@@ -41,7 +41,7 @@ namespace EnergonSoftware.Core.Messages.Packet
             }
         }
 
-        public async override Task DeSerializeAsync(Stream stream)
+        public async override Task DeSerializeAsync(Stream stream, IMessageFactory messageFactory)
         {
             // header values
             byte[] marker = new byte[Marker.Length];
@@ -73,7 +73,7 @@ namespace EnergonSoftware.Core.Messages.Packet
                 IMessageFormatter formatter = MessageFormatterFactory.Create(formatterType);
                 formatter.Attach(contentStream);
 
-                Content = MessageFactory.Create(contentType);
+                Content = messageFactory.Create(contentType);
                 await DeSerializeContentAsync(formatter).ConfigureAwait(false);
             }
         }

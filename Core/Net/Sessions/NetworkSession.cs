@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Net.Sockets;
-using EnergonSoftware.Core.Util;
 using EnergonSoftware.Core.Properties;
+using EnergonSoftware.Core.Util;
 
 using log4net;
 
@@ -73,7 +73,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
         public async Task ConnectAsync(string host, int port, SocketType socketType, ProtocolType protocolType, bool useIPv6)
         {
-            // TODO: disconnect first?
+            /* TODO: disconnect first? */
 
             Logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
             _socket = new SSLSocketWrapper(await NetUtil.ConnectAsync(host, port, socketType, protocolType, useIPv6).ConfigureAwait(false));
@@ -89,7 +89,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
         public async Task ConnectMulticastAsync(IPAddress group, int port, int ttl)
         {
-            // TODO: disconnect first?
+            /* TODO: disconnect first? */
 
             Logger.Info("Session " + Id + " connecting to multicast group " + group + ":" + port + "...");
             _socket = new SSLSocketWrapper(await NetUtil.ConnectMulticastAsync(group, port, ttl).ConfigureAwait(false));
@@ -166,10 +166,12 @@ namespace EnergonSoftware.Core.Net.Sessions
                     if(null != DisconnectedEvent) {
                         DisconnectedEvent(this, new DisconnectedEventArgs() { Reason = Resources.DisconnectSocketClosed });
                     }
+
                     return;
                 } else if(0 == count) {
                     return;
                 }
+
                 OnDataReceived(stream.ToArray());
             }
         }
@@ -179,7 +181,8 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Debug("Session " + Id + " read " + data.Length + " bytes");
 
             if(null != DataReceivedEvent) {
-                DataReceivedEvent(this, new DataReceivedEventArgs()
+                DataReceivedEvent(this,
+                    new DataReceivedEventArgs()
                     {
                         Count = data.Length,
                         Data = data,

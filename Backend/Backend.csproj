@@ -46,7 +46,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Accounts\Account.cs" />
+    <Compile Include="Accounts\Visibility.cs" />
+    <Compile Include="MessageHandlers\AuthenticatedMessageHandler.cs" />
+    <Compile Include="Messages\Auth\AuthMessage.cs" />
+    <Compile Include="Messages\Auth\ChallengeMessage.cs" />
+    <Compile Include="Messages\Auth\FailureMessage.cs" />
+    <Compile Include="Messages\Auth\ResponseMessage.cs" />
+    <Compile Include="Messages\Auth\SuccessMessage.cs" />
+    <Compile Include="Messages\Chat\FriendListMessage.cs" />
+    <Compile Include="Messages\Chat\VisibilityMessage.cs" />
+    <Compile Include="Messages\LoginMessage.cs" />
+    <Compile Include="Messages\LogoutMessage.cs" />
+    <Compile Include="Messages\MessageFactory.cs" />
+    <Compile Include="Net\Sessions\AuthenticatedSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -56,6 +75,12 @@
       <Project>{b8cf252f-2fbc-4d35-90a9-c0adf2b0b9e0}</Project>
       <Name>Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -142,24 +142,6 @@ namespace EnergonSoftware.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid login: {0}.
-        /// </summary>
-        internal static string ErrorInvalidLogin {
-            get {
-                return ResourceManager.GetString("ErrorInvalidLogin", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid login account: {0}, expected: {1}.
-        /// </summary>
-        internal static string ErrorInvalidLoginAccount {
-            get {
-                return ResourceManager.GetString("ErrorInvalidLoginAccount", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Invalid network packet marker found!.
         /// </summary>
         internal static string ErrorInvalidNetworkPacketMarker {
@@ -223,38 +205,11 @@ namespace EnergonSoftware.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Session is already authenticated!.
-        /// </summary>
-        internal static string ErrorSessionAlreadyAuthenticated {
-            get {
-                return ResourceManager.GetString("ErrorSessionAlreadyAuthenticated", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Session is not authenticated!.
-        /// </summary>
-        internal static string ErrorSessionNotAuthenticated {
-            get {
-                return ResourceManager.GetString("ErrorSessionNotAuthenticated", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to SSL handshake failed!.
         /// </summary>
         internal static string ErrorSSLHandshakeFailed {
             get {
                 return ResourceManager.GetString("ErrorSSLHandshakeFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unsupported message type for construction: {0}.
-        /// </summary>
-        internal static string ErrorUnsupportedMessage {
-            get {
-                return ResourceManager.GetString("ErrorUnsupportedMessage", resourceCulture);
             }
         }
         

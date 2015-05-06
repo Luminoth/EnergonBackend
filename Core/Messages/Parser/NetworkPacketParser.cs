@@ -46,12 +46,6 @@ namespace EnergonSoftware.Core.Messages.Parser
         }
 #endregion
 
-        // TODO: does this go away?
-        public MessagePacket Create()
-        {
-            return new NetworkPacket();
-        }
-
 #region Event Handlers
         public async void DataReceivedEventHandlerAsync(object sender, DataReceivedEventArgs e)
         {
@@ -67,7 +61,7 @@ namespace EnergonSoftware.Core.Messages.Parser
         }
 #endregion
 
-        public async Task ParseAsync()
+        public async Task ParseAsync(IMessageFactory messageFactory)
         {
 // TODO: loop!
             await _streamLock.WaitAsync().ConfigureAwait(false);
@@ -81,7 +75,7 @@ namespace EnergonSoftware.Core.Messages.Parser
 
                 NetworkPacket packet = new NetworkPacket();
                 try {
-                    await packet.DeSerializeAsync(_stream).ConfigureAwait(false);
+                    await packet.DeSerializeAsync(_stream, messageFactory).ConfigureAwait(false);
                 } catch(MessageException e) {
                     Logger.Warn(Resources.ErrorParsingNetworkPacket, e);
                     _stream.Reset();

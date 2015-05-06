@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
 
+using EnergonSoftware.Backend.Messages;
+
 using EnergonSoftware.Chat.Net;
 
 using EnergonSoftware.Core.MessageHandlers;

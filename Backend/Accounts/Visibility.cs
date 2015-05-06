@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace EnergonSoftware.Core.Accounts
+namespace EnergonSoftware.Backend.Accounts
 {
     public enum Visibility
     {

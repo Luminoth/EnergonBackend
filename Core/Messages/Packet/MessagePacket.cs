@@ -24,7 +24,7 @@ namespace EnergonSoftware.Core.Messages.Packet
 
         // NOTE: these can throw MessageException
         public abstract Task SerializeAsync(Stream stream, string formatterType);
-        public abstract Task DeSerializeAsync(Stream stream);
+        public abstract Task DeSerializeAsync(Stream stream, IMessageFactory messageFactory);
 
         public int CompareTo(object obj)
         {

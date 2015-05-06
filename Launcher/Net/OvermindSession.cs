@@ -3,15 +3,18 @@ using System.Configuration;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Accounts;
+using EnergonSoftware.Backend.Accounts;
+using EnergonSoftware.Backend.Messages;
+using EnergonSoftware.Backend.Messages.Chat;
+
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
+
 using EnergonSoftware.Launcher.MessageHandlers;
 
 using log4net;

@@ -116,6 +116,7 @@ namespace EnergonSoftware.Core.MessageHandlers
                 if(null != HandleMessageEvent) {
                     HandleMessageEvent(this, new HandleMessageEventArgs() { Message = message });
                 }
+
                 await Task.Delay(0).ConfigureAwait(false);
             }
         }

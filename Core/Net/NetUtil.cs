@@ -37,8 +37,10 @@ namespace EnergonSoftware.Core.Net
                 } catch(SocketException) {
                     continue;
                 }
+
                 return socket;
             }
+
             return null;
         }
 

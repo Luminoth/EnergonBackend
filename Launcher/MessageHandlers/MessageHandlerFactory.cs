@@ -1,7 +1,10 @@
-﻿using EnergonSoftware.Core.MessageHandlers;
+﻿using EnergonSoftware.Backend.Messages;
+using EnergonSoftware.Backend.Messages.Auth;
+using EnergonSoftware.Backend.Messages.Chat;
+
+using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Auth;
-using EnergonSoftware.Core.Messages.Chat;
+
 using EnergonSoftware.Launcher.MessageHandlers.Auth;
 using EnergonSoftware.Launcher.MessageHandlers.Chat;
 
