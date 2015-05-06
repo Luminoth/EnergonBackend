@@ -28,7 +28,7 @@ namespace EnergonSoftware.Chat
         private readonly HttpServer _diagnosticServer = new HttpServer();
 
         private readonly SocketListener _listener = new SocketListener(new ChatSessionFactory());
-        private readonly SessionManager _sessions = new SessionManager();
+        private readonly NetworkSessionManager _sessions = new NetworkSessionManager();
 
         public Chat()
         {
@@ -114,11 +114,11 @@ namespace EnergonSoftware.Chat
             EventLogger.Instance.ShutdownEventAsync().Wait();
         }
 
-        private async Task PollAndRunAsync()
+        private async Task PollAndReadAllAsync()
         {
             await _listener.PollAsync(_sessions).ConfigureAwait(false);
 
-            await _sessions.PollAndRunAsync(100).ConfigureAwait(false);
+            await _sessions.PollAndReadAllAsync(100).ConfigureAwait(false);
             _sessions.Cleanup();
         }
 
@@ -129,7 +129,7 @@ namespace EnergonSoftware.Chat
                     Task.WhenAll(new Task[]
                         {
                             InstanceNotifier.Instance.RunAsync(),
-                            PollAndRunAsync(),
+                            PollAndReadAllAsync(),
                         }).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);

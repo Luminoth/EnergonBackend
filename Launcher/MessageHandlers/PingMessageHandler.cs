@@ -12,7 +12,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers
         {
         }
 
-        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }

@@ -19,7 +19,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         private readonly object _lock = new object();
 
         private readonly List<Socket> _listenSockets = new List<Socket>();
-        private readonly ISessionFactory _factory;
+        private readonly INetworkSessionFactory _factory;
 
         public int MaxConnections { get; set; }
 
@@ -28,7 +28,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             MaxConnections = -1;
         }
 
-        public UdpListener(ISessionFactory factory) : this()
+        public UdpListener(INetworkSessionFactory factory) : this()
         {
             _factory = factory;
         }
@@ -70,15 +70,15 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
-        private async Task PollAsync(Socket socket, SessionManager manager, int microSeconds)
+        private async Task PollAsync(Socket socket, NetworkSessionManager manager, int microSeconds)
         {
             // TODO: this probably doesn't work correctly
             try {
                 if(socket.Poll(100, SelectMode.SelectRead)) {
                     Socket remote = await socket.AcceptFromAsync().ConfigureAwait(false);
                     if(manager.Contains(remote.RemoteEndPoint)) {
-                        Session session = manager.Get(remote.RemoteEndPoint);
-                        await session.PollAndReceiveAllAsync(microSeconds).ConfigureAwait(false);
+                        NetworkSession session = manager.Get(remote.RemoteEndPoint);
+                        await session.PollAndReadAllAsync(microSeconds).ConfigureAwait(false);
                         return;
                     }
 
@@ -89,8 +89,8 @@ namespace EnergonSoftware.Core.Net.Sockets
                         remote.Close();
                     } else {
                         Logger.Debug("Allowing new connection...");
-                        Session session = _factory.Create(remote);
-                        await session.PollAndReceiveAllAsync(microSeconds).ConfigureAwait(false);
+                        NetworkSession session = _factory.Create(remote);
+                        await session.PollAndReadAllAsync(microSeconds).ConfigureAwait(false);
                         manager.Add(session);
                     }
                 }
@@ -99,7 +99,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
-        public async Task PollAsync(SessionManager manager, int microSeconds)
+        public async Task PollAsync(NetworkSessionManager manager, int microSeconds)
         {
             List<Task> tasks = new List<Task>();
             lock(_lock) {

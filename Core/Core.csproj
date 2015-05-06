@@ -56,6 +56,7 @@
     <Compile Include="Configuration\ListenAddressConfigurationElement.cs" />
     <Compile Include="Configuration\ListenAddressConfigurationElementCollection.cs" />
     <Compile Include="ErrorEventArgs.cs" />
+    <Compile Include="MessageHandlers\HandleMessageEventArgs.cs" />
     <Compile Include="MessageHandlers\MessageProcessor.cs" />
     <Compile Include="Messages\AuthenticatedMessage.cs" />
     <Compile Include="Messages\Auth\AuthMessage.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Messages\Notification\StartupMessage.cs" />
     <Compile Include="Messages\LogoutMessage.cs" />
     <Compile Include="Messages\Parser\MessagePacketParser.cs" />
+    <Compile Include="Messages\Parser\MessageParsedEventArgs.cs" />
     <Compile Include="Messages\Parser\NetworkPacketParser.cs" />
     <Compile Include="Messages\PingMessage.cs" />
     <Compile Include="Net\Sessions\ConnectedEventArgs.cs" />
@@ -90,15 +92,13 @@
     <Compile Include="Net\Sessions\DisconnectedEventArgs.cs" />
     <Compile Include="Net\HttpServer.cs" />
     <Compile Include="Net\Sessions\NetworkSession.cs" />
-    <Compile Include="Net\Sessions\SessionFactory.cs" />
+    <Compile Include="Net\Sessions\NetworkSessionFactory.cs" />
     <Compile Include="Net\Sockets\SocketExtensions.cs" />
-    <Compile Include="Net\Sockets\SocketState.cs" />
     <Compile Include="Net\Sockets\SSLSocketWrapper.cs" />
     <Compile Include="Net\Sockets\UdpListener.cs" />
     <Compile Include="Net\NetUtil.cs" />
     <Compile Include="Messages\Packet\NetworkPacket.cs" />
-    <Compile Include="Net\Sessions\Session.cs" />
-    <Compile Include="Net\Sessions\SessionManager.cs" />
+    <Compile Include="Net\Sessions\NetworkSessionManager.cs" />
     <Compile Include="Net\Sockets\SocketListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

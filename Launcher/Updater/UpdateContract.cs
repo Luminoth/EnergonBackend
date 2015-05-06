@@ -5,21 +5,21 @@ namespace EnergonSoftware.Launcher.Updater
     [DataContract]
     internal sealed class UpdateContract
     {
-        [DataMember(Name = "category")]
-        public string Category { get; set; }
+        [DataMember(Name = "Id")]
+        public int Id { get; set; }
 
-        [DataMember(Name = "version")]
+        [DataMember(Name = "Version")]
         public string Version { get; set; }
 
-        [DataMember(Name = "release_date")]
+        [DataMember(Name = "ReleaseDate")]
         public /*DateTime*/string ReleaseDate { get; set; }
 
-        [DataMember(Name = "url")]
+        [DataMember(Name = "Url")]
         public string Url { get; set; }
 
         public override string ToString()
         {
-            return "UpdateContract(category=" + Category + ", version=" + Version + ", release date=" + ReleaseDate + ", url=" + Url + ")";
+            return "UpdateContract(Id=" + Id + ", Version=" + Version + ", ReleaseDate=" + ReleaseDate + ", Url=" + Url + ")";
         }
     }
 }

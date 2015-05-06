@@ -46,7 +46,7 @@ namespace EnergonSoftware.Launcher.Updater
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    HttpResponseMessage response = await client.GetAsync("updates/launcher").ConfigureAwait(false);
+                    HttpResponseMessage response = await client.GetAsync("Launcher/Updates").ConfigureAwait(false);
 await Task.Delay(2000).ConfigureAwait(false);
                     if(response.IsSuccessStatusCode) {
                         List<UpdateContract> updates = new List<UpdateContract>();

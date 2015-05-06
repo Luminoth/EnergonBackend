@@ -14,7 +14,7 @@ namespace EnergonSoftware.Overmind.MessageHandlers
         {
         }
 
-        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             OvermindSession overmindSession = (OvermindSession)session;
             await overmindSession.PingAsync().ConfigureAwait(false);

@@ -14,7 +14,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers
         {
         }
 
-        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             OvermindSession overmindSession = session as OvermindSession;
             if(null == overmindSession) {

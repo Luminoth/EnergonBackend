@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net;
@@ -14,35 +16,38 @@ using log4net;
 
 namespace EnergonSoftware.Manager.Net
 {
-    internal sealed class InstanceNotifierSession : Session
+    internal sealed class InstanceNotifierSession : NetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(InstanceNotifierSession));
 
-        private readonly SocketState _listener;
-
         public override string Name { get { return "instanceNotifier"; } }
 
-        public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
-        public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
-        protected override IMessageHandlerFactory HandlerFactory { get { return new InstanceNotifierMessageHandlerFactory(); } }
+        private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
+        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
+        private readonly IMessageHandlerFactory _messageHandlerFactory = new InstanceNotifierMessageHandlerFactory();
 
-        private InstanceNotifierSession(Socket socket) : base(socket)
+        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
+
+        public InstanceNotifierSession(Socket socket) : base(socket)
         {
+            DataReceivedEvent += _messageParser.DataReceivedEventHandlerAsync;
+            _messageParser.MessageParsedEvent += _messageProcessor.MessageParsedEventHandler;
+            _messageProcessor.HandleMessageEvent += HandleMessageEventHandler;
         }
 
-        public InstanceNotifierSession(SocketState listener) : base()
+        protected override MessagePacket CreatePacket(IMessage message)
         {
-            _listener = listener;
+            return new NetworkPacket();
         }
 
-        protected async override Task OnRunAsync()
+        private async void HandleMessageEventHandler(object sender, HandleMessageEventArgs e)
         {
-            int count = await _listener.PollAndReceiveAllAsync(100).ConfigureAwait(false);
-            if(count > 0) {
-                Logger.Debug("Instance notifier session " + Id + " read " + count + " bytes");
-            }
+            MessageHandler handler = _messageHandlerFactory.Create(e.Message.Type);
+            await handler.HandleMessageAsync(e.Message, this).ConfigureAwait(false);
+        }
 
-            await Processor.ParseMessagesAsync(_listener.Buffer).ConfigureAwait(false);
+        private InstanceNotifierSession() : base()
+        {
         }
     }
 }

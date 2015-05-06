@@ -8,8 +8,10 @@ using EnergonSoftware.Authenticator.MessageHandlers;
 
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
@@ -21,9 +23,9 @@ using log4net;
 
 namespace EnergonSoftware.Authenticator.Net
 {
-    internal sealed class AuthSessionFactory : ISessionFactory
+    internal sealed class AuthSessionFactory : INetworkSessionFactory
     {
-        public Session Create(Socket socket)
+        public NetworkSession Create(Socket socket)
         {
             AuthSession session = null;
             try {
@@ -40,7 +42,7 @@ namespace EnergonSoftware.Authenticator.Net
         }
     }
 
-    internal sealed class AuthSession : Session
+    internal sealed class AuthSession : NetworkSession
     {
         public AuthType AuthType { get; private set; }
         public Nonce AuthNonce { get; private set; }
@@ -52,9 +54,11 @@ namespace EnergonSoftware.Authenticator.Net
 
         public override string Name { get { return "auth"; } }
 
-        public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
-        public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
-        protected override IMessageHandlerFactory HandlerFactory { get { return new AuthMessageHandlerFactory(); } }
+        private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
+        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
+        private readonly IMessageHandlerFactory _messageHandlerFactory = new AuthMessageHandlerFactory();
+
+        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
 
         public AuthSession(Socket socket) : base(socket)
         {
@@ -128,6 +132,11 @@ namespace EnergonSoftware.Authenticator.Net
                 }).ConfigureAwait(false);
 
             await DisconnectAsync().ConfigureAwait(false);
+        }
+
+        protected override MessagePacket CreatePacket(IMessage message)
+        {
+            return new NetworkPacket();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         private readonly object _lock = new object();
 
         private readonly List<Socket> _listenSockets = new List<Socket>();
-        private readonly ISessionFactory _factory;
+        private readonly INetworkSessionFactory _factory;
 
         public int MaxConnections { get; set; }
         public int SocketBacklog { get; set; }
@@ -30,7 +30,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             SocketBacklog = 10;
         }
 
-        public SocketListener(ISessionFactory factory) : this()
+        public SocketListener(INetworkSessionFactory factory) : this()
         {
             _factory = factory;
         }
@@ -73,7 +73,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
-        private async Task PollAsync(Socket socket, SessionManager manager)
+        private async Task PollAsync(Socket socket, NetworkSessionManager manager)
         {
             try {
                 if(socket.Poll(100, SelectMode.SelectRead)) {
@@ -85,7 +85,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                         remote.Close();
                     } else {
                         Logger.Debug("Allowing new connection...");
-                        Session session = _factory.Create(remote);
+                        NetworkSession session = _factory.Create(remote);
                         manager.Add(session);
                     }
                 }
@@ -94,7 +94,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
-        public async Task PollAsync(SessionManager manager)
+        public async Task PollAsync(NetworkSessionManager manager)
         {
             List<Task> tasks = new List<Task>();
             lock(_lock) {

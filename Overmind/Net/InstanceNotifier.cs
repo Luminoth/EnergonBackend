@@ -24,7 +24,7 @@ namespace EnergonSoftware.Overmind.Net
 
         public static readonly InstanceNotifier Instance = new InstanceNotifier();
 
-        private readonly SessionManager _sessions = new SessionManager();
+        private readonly NetworkSessionManager _sessions = new NetworkSessionManager();
 
         public async Task StartAsync(ListenAddressConfigurationElementCollection listenAddresses)
         {
@@ -36,7 +36,7 @@ namespace EnergonSoftware.Overmind.Net
                     listenAddress.MulticastGroupIPAddress,
                     listenAddress.MulticastTTL);
 
-                Session sender = new InstanceNotifierSession(new SocketState(listener));
+                NetworkSession sender = new InstanceNotifierSession(listener);
                 await sender.ConnectMulticastAsync(listenAddress.MulticastGroupIPAddress, listenAddress.Port, listenAddress.MulticastTTL).ConfigureAwait(false);
                 _sessions.Add(sender);
             }
@@ -50,7 +50,7 @@ namespace EnergonSoftware.Overmind.Net
 
         public async Task RunAsync()
         {
-            await _sessions.PollAndRunAsync(100).ConfigureAwait(false);
+            await _sessions.PollAndReadAllAsync(100).ConfigureAwait(false);
             _sessions.Cleanup();
         }
 

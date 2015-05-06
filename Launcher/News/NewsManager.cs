@@ -54,7 +54,7 @@ namespace EnergonSoftware.Launcher.News
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    HttpResponseMessage response = await client.GetAsync("news/launcher").ConfigureAwait(false);
+                    HttpResponseMessage response = await client.GetAsync("Launcher/News").ConfigureAwait(false);
 await Task.Delay(2000).ConfigureAwait(false);
                     if(response.IsSuccessStatusCode) {
                         List<NewsContract> news = new List<NewsContract>();
@@ -68,7 +68,7 @@ await Task.Delay(2000).ConfigureAwait(false);
                         if(news.Count < 1) {
                             News = "No news updates!";
                         } else {
-                            News = news[0].NewsUpdate;
+                            News = news[0].NewsValue;
                         }
                     } else {
                         News = "Error contacting news server: " + response.ReasonPhrase;

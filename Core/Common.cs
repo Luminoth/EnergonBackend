@@ -16,6 +16,8 @@ namespace EnergonSoftware.Core
         public const string AppDir = "EnergonSoftware";
 
         // TODO: read this from the registry/CLI/whatever
+        // and really this probably has no business existing in Core
+        // maybe should go in some sort of "common" lib
         private static string _installDir = Path.Combine("/", AppDir);
         public static string InstallDir { get { return _installDir; } set { _installDir = value; } }
 

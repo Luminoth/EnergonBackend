@@ -48,7 +48,7 @@ namespace EnergonSoftware.Launcher
 #endregion
 
 #region Network Properties
-        private static readonly SessionManager Sessions = new SessionManager();
+        private static readonly NetworkSessionManager Sessions = new NetworkSessionManager();
         private static OvermindSession _overmindSession;
         private static ChatSession _chatSession;
 #endregion
@@ -78,7 +78,7 @@ namespace EnergonSoftware.Launcher
             Logger.Debug("**Idle mark**");
             while(!_cancellationToken.IsCancellationRequested) {
                 try {
-                    await Sessions.PollAndRunAsync(100).ConfigureAwait(false);
+                    await Sessions.PollAndReadAllAsync(100).ConfigureAwait(false);
                     Sessions.Cleanup();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
@@ -157,13 +157,13 @@ namespace EnergonSoftware.Launcher
             }
 
             _overmindSession = new OvermindSession();
-            _overmindSession.DisconnectEvent += DisconnectEventHandler;
+            _overmindSession.DisconnectedEvent += DisconnectEventHandler;
             _overmindSession.ErrorEvent += ErrorEventHandler;
             await _overmindSession.ConnectAsync(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"])).ConfigureAwait(false);
             Sessions.Add(_overmindSession);
 
             _chatSession = new ChatSession();
-            _chatSession.DisconnectEvent += DisconnectEventHandler;
+            _chatSession.DisconnectedEvent += DisconnectEventHandler;
             _chatSession.ErrorEvent += ErrorEventHandler;
             await _chatSession.ConnectAsync(ConfigurationManager.AppSettings["chatHost"], Convert.ToInt32(ConfigurationManager.AppSettings["chatPort"])).ConfigureAwait(false);
             Sessions.Add(_chatSession);
@@ -177,7 +177,7 @@ namespace EnergonSoftware.Launcher
                 return;
             }
 
-            Session session = (Session)sender;
+            NetworkSession session = (NetworkSession)sender;
             Logger.Debug("Session " + session.Name + " disconnected: " + e.Reason);
             await OnErrorAsync(e.Reason, "Disconnected!").ConfigureAwait(false);
         }
@@ -196,7 +196,7 @@ namespace EnergonSoftware.Launcher
             AuthSession session = new AuthSession();
             session.AuthFailedEvent += AuthFailedEventHandler;
             session.AuthSuccessEvent += AuthSuccessEventHandler;
-            session.DisconnectEvent += DisconnectEventHandler;
+            session.DisconnectedEvent += DisconnectEventHandler;
             session.ErrorEvent += ErrorEventHandler;
 
             AuthStage = AuthenticationStage.NotAuthenticated;

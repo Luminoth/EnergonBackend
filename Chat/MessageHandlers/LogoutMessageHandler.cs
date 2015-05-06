@@ -14,7 +14,7 @@ namespace EnergonSoftware.Chat.MessageHandlers
         {
         }
 
-        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             ChatSession chatSession = (ChatSession)session;
             await chatSession.LogoutAsync().ConfigureAwait(false);

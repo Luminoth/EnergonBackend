@@ -5,20 +5,23 @@ namespace EnergonSoftware.Launcher.News
     [DataContract]
     internal sealed class NewsContract
     {
-        [DataMember(Name = "category")]
-        public string Category { get; set; }
+        [DataMember(Name = "Id")]
+        public int Id { get; set; }
 
-        [DataMember(Name = "date")]
+        [DataMember(Name = "Date")]
         public string Date { get; set; }
 
-        [DataMember(Name = "news")]
-        public /*DateTime*/string NewsValue { get; set; }
+        [DataMember(Name = "Headline")]
+        public string Headline { get; set; }
 
-        public string NewsUpdate { get { return Date + "\r\n\r\n" + NewsValue; } }
+        [DataMember(Name = "NewsUpdate")]
+        public /*DateTime*/string NewsUpdate { get; set; }
+
+        public string NewsValue { get { return Headline + "\r\n" + Date + "\r\n\r\n" + NewsUpdate; } }
 
         public override string ToString()
         {
-            return "NewsContract(category=" + Category + ", date=" + Date + ", news=" + NewsValue + ")";
+            return "NewsContract(Id=" + Id + ", Date=" + Date + ", Headline=" + Headline + ", NewsUpdate=" + NewsUpdate + ")";
         }
     }
 }

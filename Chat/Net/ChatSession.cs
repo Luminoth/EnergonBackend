@@ -12,6 +12,7 @@ using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 
@@ -22,9 +23,9 @@ using log4net;
 
 namespace EnergonSoftware.Chat.Net
 {
-    internal sealed class ChatSessionFactory : ISessionFactory
+    internal sealed class ChatSessionFactory : INetworkSessionFactory
     {
-        public Session Create(Socket socket)
+        public NetworkSession Create(Socket socket)
         {
             ChatSession session = null;
             try {
@@ -47,9 +48,11 @@ namespace EnergonSoftware.Chat.Net
 
         public override string Name { get { return "chat"; } }
 
-        public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
-        public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
-        protected override IMessageHandlerFactory HandlerFactory { get { return new ChatMessageHandlerFactory(); } }
+        private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
+        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
+        private readonly IMessageHandlerFactory _messageHandlerFactory = new ChatMessageHandlerFactory();
+
+        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
 
         public ChatSession(Socket socket) : base(socket)
         {
@@ -101,6 +104,11 @@ namespace EnergonSoftware.Chat.Net
                         Friends = friends,
                     }).ConfigureAwait(false);
             }
+        }
+
+        protected override MessagePacket CreatePacket(IMessage message)
+        {
+            return new NetworkPacket();
         }
     }
 }

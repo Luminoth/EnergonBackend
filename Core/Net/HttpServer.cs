@@ -12,6 +12,10 @@ using log4net;
 
 namespace EnergonSoftware.Core.Net
 {
+    // TODO: this isn't really the way to do this
+    // instead we should just open up a port and feed
+    // JSON-encoded data down it and then whatever
+    // the front-end wants to be, it can be that
     public sealed class HttpServer : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpServer));

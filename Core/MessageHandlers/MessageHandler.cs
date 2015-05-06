@@ -31,7 +31,7 @@ namespace EnergonSoftware.Core.MessageHandlers
         private long _startTime, _finishTime;
         public long RuntimeMs { get { return Finished ? _finishTime - _startTime : Time.CurrentTimeMs - _startTime; } }
 
-        public async Task HandleMessageAsync(IMessage message, Session session)
+        public async Task HandleMessageAsync(IMessage message, NetworkSession session)
         {
             if(_running) {
                 throw new MessageHandlerException(Resources.ErrorMessageHandlerAlreadyRunning);
@@ -50,7 +50,7 @@ namespace EnergonSoftware.Core.MessageHandlers
             Finished = true;
         }
 
-        protected async virtual Task OnHandleMessageAsync(IMessage message, Session session)
+        protected async virtual Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }

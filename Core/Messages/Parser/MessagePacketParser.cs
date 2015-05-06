@@ -13,6 +13,6 @@ namespace EnergonSoftware.Core.Messages.Parser
         MessagePacket Create();
 
         // NOTE: this locks the stream, so do not lock before calling
-        Task<MessagePacket> ParseAsync(LockingMemoryStream stream);
+        Task ParseAsync();
     }
 }

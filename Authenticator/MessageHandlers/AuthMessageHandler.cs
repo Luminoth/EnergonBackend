@@ -42,7 +42,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
         {
         }
 
-        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             AuthSession authSession = (AuthSession)session;
 
@@ -55,6 +55,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 
             AuthMessage authMessage = (AuthMessage)message;
             if(Common.AuthVersion != authMessage.Version) {
+                Logger.Debug("Bad version, expected: " + Common.AuthVersion + ", got: " + authMessage.Version);
                 await authSession.FailureAsync("Bad Version").ConfigureAwait(false);
                 return;
             }

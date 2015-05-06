@@ -14,7 +14,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
         {
         }
 
-        protected async override Task OnHandleMessageAsync(IMessage message, Session session)
+        protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             SuccessMessage successMessage = (SuccessMessage)message;
             AuthSession authSession = (AuthSession)session;

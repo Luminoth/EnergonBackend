@@ -8,6 +8,7 @@ using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Chat;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
@@ -17,7 +18,7 @@ using log4net;
 
 namespace EnergonSoftware.Launcher.Net
 {
-    internal sealed class OvermindSession : Session
+    internal sealed class OvermindSession : NetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(OvermindSession));
 
@@ -37,18 +38,20 @@ namespace EnergonSoftware.Launcher.Net
 
         public override string Name { get { return "overmind"; } }
 
-        public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
-        public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
-        protected override IMessageHandlerFactory HandlerFactory { get { return new MessageHandlerFactory(); } }
+        private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
+        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
+        private readonly IMessageHandlerFactory _messageHandlerFactory = new MessageHandlerFactory();
+
+        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
 
         public OvermindSession() : base()
         {
         }
 
-        protected async override Task OnRunAsync()
+        /*protected async override Task OnRunAsync()
         {
             await PingAsync().ConfigureAwait(false);
-        }
+        }*/
 
         public async Task ConnectAsync(string host, int port)
         {
@@ -57,7 +60,7 @@ namespace EnergonSoftware.Launcher.Net
             try {
                 Logger.Info("Connecting to overmind server...");
                 await ConnectAsync(host, port, SocketType.Stream, ProtocolType.Tcp, useIPv6).ConfigureAwait(false);
-                if(!Connected) {
+                if(!IsConnected) {
                     await ErrorAsync("Failed to connect to the overmind server").ConfigureAwait(false);
                     return;
                 }
@@ -100,6 +103,11 @@ namespace EnergonSoftware.Launcher.Net
 
             await SendMessageAsync(new PingMessage()).ConfigureAwait(false);
             LastPingTimeMS = Time.CurrentTimeMs;
+        }
+
+        protected override MessagePacket CreatePacket(IMessage message)
+        {
+            return new NetworkPacket();
         }
     }
 }

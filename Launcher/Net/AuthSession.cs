@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Auth;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Launcher.MessageHandlers;
@@ -15,7 +17,7 @@ using log4net;
 
 namespace EnergonSoftware.Launcher.Net
 {
-    internal sealed class AuthSession : Session
+    internal sealed class AuthSession : NetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthSession));
 
@@ -28,9 +30,11 @@ namespace EnergonSoftware.Launcher.Net
 
         public override string Name { get { return "auth"; } }
 
-        public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
-        public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
-        protected override IMessageHandlerFactory HandlerFactory { get { return new MessageHandlerFactory(); } }
+        private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
+        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
+        private readonly IMessageHandlerFactory _messageHandlerFactory = new MessageHandlerFactory();
+
+        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
 
         public AuthSession() : base()
         {
@@ -43,7 +47,7 @@ namespace EnergonSoftware.Launcher.Net
             try {
                 Logger.Info("Connecting to authentication server...");
                 await ConnectAsync(host, port, SocketType.Stream, ProtocolType.Tcp, useIPv6).ConfigureAwait(false);
-                if(!Connected) {
+                if(!IsConnected) {
                     await ErrorAsync("Failed to connect to the authentication server").ConfigureAwait(false);
                     return;
                 }
@@ -112,6 +116,11 @@ namespace EnergonSoftware.Launcher.Net
             }
 
             await DisconnectAsync().ConfigureAwait(false);
+        }
+
+        protected override MessagePacket CreatePacket(IMessage message)
+        {
+            return new NetworkPacket();
         }
     }
 }

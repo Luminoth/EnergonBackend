@@ -8,6 +8,7 @@ using EnergonSoftware.Core.Accounts;
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 
@@ -20,9 +21,9 @@ using log4net;
 
 namespace EnergonSoftware.Overmind.Net
 {
-    internal sealed class OvermindSessionFactory : ISessionFactory
+    internal sealed class OvermindSessionFactory : INetworkSessionFactory
     {
-        public Session Create(Socket socket)
+        public NetworkSession Create(Socket socket)
         {
             OvermindSession session = null;
             try {
@@ -45,9 +46,11 @@ namespace EnergonSoftware.Overmind.Net
 
         public override string Name { get { return "overmind"; } }
 
-        public override IMessagePacketParser Parser { get { return new NetworkPacketParser(); } }
-        public override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
-        protected override IMessageHandlerFactory HandlerFactory { get { return new OvermindMessageHandlerFactory(); } }
+        private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
+        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
+        private readonly IMessageHandlerFactory _messageHandlerFactory = new OvermindMessageHandlerFactory();
+
+        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
 
         public OvermindSession(Socket socket) : base(socket)
         {
@@ -65,6 +68,11 @@ namespace EnergonSoftware.Overmind.Net
                 await Task.Delay(0).ConfigureAwait(false);
                 return accounts.First().ToAccount();
             }
+        }
+
+        protected override MessagePacket CreatePacket(IMessage message)
+        {
+            return new NetworkPacket();
         }
 
         public async Task PingAsync()

@@ -9,7 +9,7 @@ using log4net;
 
 namespace EnergonSoftware.Core.Net.Sessions
 {
-    public abstract class AuthenticatedSession : Session
+    public abstract class AuthenticatedSession : NetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthenticatedSession));
 

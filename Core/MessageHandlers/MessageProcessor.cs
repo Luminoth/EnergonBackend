@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using EnergonSoftware.Core.IO;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Packet;
+using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Util;
@@ -19,23 +20,20 @@ namespace EnergonSoftware.Core.MessageHandlers
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageProcessor));
 
-        private readonly Session _session;
-
         private readonly AutoResetEvent _messageQueueEvent = new AutoResetEvent(false);
         private /*readonly*/ ConcurrentQueue<IMessage> _messageQueue = new ConcurrentQueue<IMessage>();
+
+#region Events
+        public event EventHandler<HandleMessageEventArgs> HandleMessageEvent;
+#endregion
 
         public int QueueSize { get { return _messageQueue.Count; } }
 
         private CancellationTokenSource _cancellationToken;
         private Task _task;
 
-        private MessageProcessor()
+        public MessageProcessor()
         {
-        }
-
-        public MessageProcessor(Session session) : this()
-        {
-            _session = session;
         }
 
 #region Dispose
@@ -54,20 +52,20 @@ namespace EnergonSoftware.Core.MessageHandlers
         }
 #endregion
 
+#region Event Handlers
+        public void MessageParsedEventHandler(object sender, MessageParsedEventArgs e)
+        {
+            Logger.Debug("Queueing message: " + e.Message.ToString());
+
+            _messageQueue.Enqueue(e.Message);
+            _messageQueueEvent.Set();
+        }
+#endregion
+
         public void QueueMessage(IMessage message)
         {
             _messageQueue.Enqueue(message);
             _messageQueueEvent.Set();
-        }
-
-        public async Task ParseMessagesAsync(LockingMemoryStream buffer)
-        {
-            MessagePacket packet = await _session.Parser.ParseAsync(buffer).ConfigureAwait(false);
-            while(null != packet) {
-                Logger.Debug("Session " + _session.Id + " parsed message type: " + packet.Content.Type);
-                QueueMessage(packet.Content);
-                packet = await _session.Parser.ParseAsync(buffer).ConfigureAwait(false);
-            }
         }
 
         public void Start()
@@ -76,7 +74,7 @@ namespace EnergonSoftware.Core.MessageHandlers
                 throw new InvalidOperationException(Resources.ErrorMessageProcessorAlreadyRunning);
             }
 
-            Logger.Debug("Starting message processor for session " + _session.Id + "...");
+            Logger.Debug("Starting message processor...");
 
             _cancellationToken = new CancellationTokenSource();
             _task = Task.Run(
@@ -97,7 +95,7 @@ namespace EnergonSoftware.Core.MessageHandlers
                 return;
             }
 
-            Logger.Debug("Stopping message processor for session " + _session.Id + "...");
+            Logger.Debug("Stopping message processor...");
 
             _cancellationToken.Cancel();
             _messageQueueEvent.Set();
@@ -108,14 +106,17 @@ namespace EnergonSoftware.Core.MessageHandlers
 
             _messageQueue = new ConcurrentQueue<IMessage>();
 
-            Logger.Debug("Message processor for session " + _session.Id + " finished!");
+            Logger.Debug("Message processor finished!");
         }
 
         private async Task RunAsync()
         {
             IMessage message;
             while(!_cancellationToken.IsCancellationRequested && _messageQueue.TryDequeue(out message)) {
-                await _session.HandleMessageAsync(message).ConfigureAwait(false);
+                if(null != HandleMessageEvent) {
+                    HandleMessageEvent(this, new HandleMessageEventArgs() { Message = message });
+                }
+                await Task.Delay(0).ConfigureAwait(false);
             }
         }
     }
