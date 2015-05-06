@@ -41,6 +41,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "EventsDatabase", "EventsDat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DALTest", "DALTest\DALTest.csproj", "{697F0DD1-554C-44E5-8A38-ADDF7804ED13}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend", "Backend\Backend.csproj", "{6C631FCF-23CC-4BD0-9245-3E2080421F62}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,10 @@ Global
 		{697F0DD1-554C-44E5-8A38-ADDF7804ED13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{697F0DD1-554C-44E5-8A38-ADDF7804ED13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{697F0DD1-554C-44E5-8A38-ADDF7804ED13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C631FCF-23CC-4BD0-9245-3E2080421F62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C631FCF-23CC-4BD0-9245-3E2080421F62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C631FCF-23CC-4BD0-9245-3E2080421F62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C631FCF-23CC-4BD0-9245-3E2080421F62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,3 +4,4 @@ obj/
 *.user
 StyleCop.Cache
 TestResults/
+*.dbmdl
