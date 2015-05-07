@@ -4,7 +4,9 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Accounts;
+using EnergonSoftware.Backend.Accounts;
+using EnergonSoftware.Backend.Net.Sessions;
+
 using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
