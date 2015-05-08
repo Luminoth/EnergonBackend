@@ -10,6 +10,8 @@ using EnergonSoftware.Core.Properties;
 
 using log4net;
 
+// TODO: decouple this from the session concept
+
 namespace EnergonSoftware.Core.Net.Sockets
 {
     public sealed class UdpListener

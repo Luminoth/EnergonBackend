@@ -10,6 +10,7 @@ using EnergonSoftware.Backend.Accounts;
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
+using EnergonSoftware.Core.Util;
 
 using EnergonSoftware.Launcher.Friends;
 using EnergonSoftware.Launcher.Net;

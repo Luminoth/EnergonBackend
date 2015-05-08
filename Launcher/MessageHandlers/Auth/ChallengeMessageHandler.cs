@@ -28,7 +28,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 
         private async Task HandleChallengeStateAsync(AuthSession session, string message)
         {
-            Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(message);
+            Dictionary<string, string> values = AuthUtil.ParseDigestValues(message);
             if(null == values || 0 == values.Count) {
                 await session.ErrorAsync("Invalid challenge!").ConfigureAwait(false);
                 return;
@@ -55,7 +55,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 
                 string nonce = values["nonce"].Trim(new char[] { '"' });
                 string qop = values["qop"].Trim(new char[] { '"' });
-                string rsp = await EnergonSoftware.Core.Auth.DigestClientResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI).ConfigureAwait(false);
+                string rsp = await AuthUtil.DigestClientResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI).ConfigureAwait(false);
             
                 string msg = "username=\"" + App.Instance.UserAccount.AccountName + "\","
                     + "realm=" + realm + ","
@@ -68,7 +68,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                         + "charset=" + charset;
                 Logger.Debug("Generated response: " + msg);
 
-                string rspAuth = await EnergonSoftware.Core.Auth.DigestServerResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI).ConfigureAwait(false);
+                string rspAuth = await AuthUtil.DigestServerResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI).ConfigureAwait(false);
                 await session.AuthResponseAsync(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)), rspAuth).ConfigureAwait(false);
             } catch(KeyNotFoundException e) {
                 session.ErrorAsync("Invalid challenge: " + e.Message).Wait();
@@ -77,7 +77,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 
         private async Task HandleResponseStateAsync(AuthSession session, string message)
         {
-            Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(message);
+            Dictionary<string, string> values = AuthUtil.ParseDigestValues(message);
             if(null == values || 0 == values.Count) {
                 await session.ErrorAsync("Invalid challenge!").ConfigureAwait(false);
                 return;

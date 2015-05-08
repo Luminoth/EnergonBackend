@@ -27,7 +27,7 @@ namespace EnergonSoftware.Authenticator
 
         private readonly HttpServer _diagnosticServer = new HttpServer();
 
-        private readonly SocketListener _listener = new SocketListener(new AuthSessionFactory());
+        private readonly TcpListener _listener = new TcpListener(new AuthSessionFactory());
         private readonly NetworkSessionManager _sessions = new NetworkSessionManager();
 
         public Authenticator()

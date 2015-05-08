@@ -48,11 +48,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Auth.cs" />
+    <Compile Include="Util\AuthUtil.cs" />
     <Compile Include="Configuration\ListenAddressesConfigurationSection.cs" />
     <Compile Include="Configuration\ListenAddressConfigurationElement.cs" />
     <Compile Include="Configuration\ListenAddressConfigurationElementCollection.cs" />
-    <Compile Include="ErrorEventArgs.cs" />
+    <Compile Include="Util\ErrorEventArgs.cs" />
     <Compile Include="Messages\AuthenticatedMessage.cs" />
     <Compile Include="Messages\Formatter\BinaryMessageFormatter.cs" />
     <Compile Include="Messages\Formatter\MessageFormatter.cs" />
@@ -83,7 +83,7 @@
     <Compile Include="Net\NetUtil.cs" />
     <Compile Include="Messages\Packet\NetworkPacket.cs" />
     <Compile Include="Net\Sessions\NetworkSessionManager.cs" />
-    <Compile Include="Net\Sockets\SocketListener.cs" />
+    <Compile Include="Net\Sockets\TcpListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

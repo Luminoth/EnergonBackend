@@ -27,7 +27,7 @@ namespace EnergonSoftware.Overmind
 
         private readonly HttpServer _diagnosticServer = new HttpServer();
 
-        private readonly SocketListener _listener = new SocketListener(new OvermindSessionFactory());
+        private readonly TcpListener _listener = new TcpListener(new OvermindSessionFactory());
         private readonly NetworkSessionManager _sessions = new NetworkSessionManager();
 
         public Overmind()

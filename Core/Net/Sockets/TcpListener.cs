@@ -10,11 +10,13 @@ using EnergonSoftware.Core.Properties;
 
 using log4net;
 
+// TODO: decouple this from the session concept
+
 namespace EnergonSoftware.Core.Net.Sockets
 {
-    public sealed class SocketListener
+    public sealed class TcpListener
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(SocketListener));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(TcpListener));
 
         private readonly object _lock = new object();
 
@@ -24,13 +26,13 @@ namespace EnergonSoftware.Core.Net.Sockets
         public int MaxConnections { get; set; }
         public int SocketBacklog { get; set; }
 
-        private SocketListener()
+        private TcpListener()
         {
             MaxConnections = -1;
             SocketBacklog = 10;
         }
 
-        public SocketListener(INetworkSessionFactory factory) : this()
+        public TcpListener(INetworkSessionFactory factory) : this()
         {
             _factory = factory;
         }

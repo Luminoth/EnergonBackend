@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EnergonSoftware.Core
+namespace EnergonSoftware.Core.Util
 {
     public sealed class ErrorEventArgs : EventArgs
     {

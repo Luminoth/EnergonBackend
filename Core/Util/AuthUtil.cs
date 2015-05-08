@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Util.Crypt;
 
-namespace EnergonSoftware.Core
+namespace EnergonSoftware.Core.Util
 {
     public enum AuthType
     {
@@ -20,7 +20,7 @@ namespace EnergonSoftware.Core
         DigestSHA512,
     }
 
-    public static class Auth
+    public static class AuthUtil
     {
         public static Dictionary<string, string> ParseDigestValues(string message)
         {

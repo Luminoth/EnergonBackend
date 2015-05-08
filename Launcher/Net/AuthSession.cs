@@ -12,6 +12,7 @@ using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
+using EnergonSoftware.Core.Util;
 
 using EnergonSoftware.Launcher.MessageHandlers;
 

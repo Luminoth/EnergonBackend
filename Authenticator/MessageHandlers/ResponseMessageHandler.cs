@@ -57,19 +57,19 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 string expected = string.Empty, rspauth = string.Empty;
                 switch(session.AuthType)
                 {
-                case EnergonSoftware.Core.AuthType.DigestMD5:
+                case AuthType.DigestMD5:
                     /*Logger.Debug("Handling MD5 response...");
                     ////Logger.Debug("passwordHash=" + account.PasswordMD5);
-                    expected = await EnergonSoftware.Core.Auth.DigestClientResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
-                    rspauth = await EnergonSoftware.Core.Auth.DigestServerResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
+                    expected = await AuthUtil.DigestClientResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
+                    rspauth = await AuthUtil.DigestServerResponse(new MD5(), account.PasswordMD5, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
                     break;*/
 await session.FailureAsync("MD5 auth type not supported!").ConfigureAwait(false);
 return;
-                case EnergonSoftware.Core.AuthType.DigestSHA512:
+                case AuthType.DigestSHA512:
                     Logger.Debug("Handling SHA512 response...");
                     ////Logger.Debug("passwordHash=" + account.PasswordSHA512);
-                    expected = await EnergonSoftware.Core.Auth.DigestClientResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
-                    rspauth = await EnergonSoftware.Core.Auth.DigestServerResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
+                    expected = await AuthUtil.DigestClientResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
+                    rspauth = await AuthUtil.DigestServerResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
                     break;
                 default:
                     await session.FailureAsync("Unsupported auth type!").ConfigureAwait(false);
@@ -110,7 +110,7 @@ return;
             string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(responseMessage.Response));
             Logger.Debug("Decoded response: " + decoded);
 
-            Dictionary<string, string> values = EnergonSoftware.Core.Auth.ParseDigestValues(decoded);
+            Dictionary<string, string> values = AuthUtil.ParseDigestValues(decoded);
             if(null == values || 0 == values.Count) {
                 await authSession.FailureAsync("Invalid Response").ConfigureAwait(false);
                 return;

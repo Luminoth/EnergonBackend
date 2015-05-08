@@ -27,7 +27,7 @@ namespace EnergonSoftware.Chat
 
         private readonly HttpServer _diagnosticServer = new HttpServer();
 
-        private readonly SocketListener _listener = new SocketListener(new ChatSessionFactory());
+        private readonly TcpListener _listener = new TcpListener(new ChatSessionFactory());
         private readonly NetworkSessionManager _sessions = new NetworkSessionManager();
 
         public Chat()

@@ -15,6 +15,8 @@ using EnergonSoftware.Core.Util;
 
 using log4net;
 
+// TODO: decouple this from the message concept
+
 namespace EnergonSoftware.Core.Net.Sessions
 {
     public abstract class NetworkSession : IDisposable
@@ -29,7 +31,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 #region Events
         public event EventHandler<ConnectedEventArgs> ConnectedEvent;
         public event EventHandler<DisconnectedEventArgs> DisconnectedEvent;
-        public event EventHandler<ErrorEventArgs> ErrorEvent;
+        public event EventHandler<EnergonSoftware.Core.Util.ErrorEventArgs> ErrorEvent;
         public event EventHandler<DataReceivedEventArgs> DataReceivedEvent;
 #endregion
 
@@ -219,7 +221,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
             if(null != ErrorEvent) {
-                ErrorEvent(this, new ErrorEventArgs() { Error = error });
+                ErrorEvent(this, new EnergonSoftware.Core.Util.ErrorEventArgs() { Error = error });
             }
         }
 
@@ -229,7 +231,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
             if(null != ErrorEvent) {
-                ErrorEvent(this, new ErrorEventArgs() { Error = error, Exception = ex });
+                ErrorEvent(this, new EnergonSoftware.Core.Util.ErrorEventArgs() { Error = error, Exception = ex });
             }
         }
 
@@ -239,7 +241,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
             if(null != ErrorEvent) {
-                ErrorEvent(this, new ErrorEventArgs() { Exception = ex });
+                ErrorEvent(this, new EnergonSoftware.Core.Util.ErrorEventArgs() { Exception = ex });
             }
         }
 #endregion
@@ -251,7 +253,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             await DisconnectAsync(error).ConfigureAwait(false);
 
             if(null != ErrorEvent) {
-                ErrorEvent(this, new ErrorEventArgs() { Error = error });
+                ErrorEvent(this, new EnergonSoftware.Core.Util.ErrorEventArgs() { Error = error });
             }
         }
 
@@ -261,7 +263,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             await DisconnectAsync(error).ConfigureAwait(false);
 
             if(null != ErrorEvent) {
-                ErrorEvent(this, new ErrorEventArgs() { Error = error, Exception = ex });
+                ErrorEvent(this, new EnergonSoftware.Core.Util.ErrorEventArgs() { Error = error, Exception = ex });
             }
         }
 
@@ -271,7 +273,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             await DisconnectAsync(ex.Message).ConfigureAwait(false);
 
             if(null != ErrorEvent) {
-                ErrorEvent(this, new ErrorEventArgs() { Exception = ex });
+                ErrorEvent(this, new EnergonSoftware.Core.Util.ErrorEventArgs() { Exception = ex });
             }
         }
 #endregion
