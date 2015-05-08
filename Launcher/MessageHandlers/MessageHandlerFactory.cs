@@ -1,8 +1,8 @@
-﻿using EnergonSoftware.Backend.Messages;
+﻿using EnergonSoftware.Backend.MessageHandlers;
+using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Messages.Chat;
 
-using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 
 using EnergonSoftware.Launcher.MessageHandlers.Auth;

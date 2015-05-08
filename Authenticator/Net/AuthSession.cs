@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Authenticator.MessageHandlers;
 
+using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages.Auth;
 
 using EnergonSoftware.Core;
-using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Messages.Packet;

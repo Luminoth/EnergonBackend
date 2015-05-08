@@ -1,6 +1,6 @@
-﻿using EnergonSoftware.Backend.Messages.Auth;
+﻿using EnergonSoftware.Backend.MessageHandlers;
+using EnergonSoftware.Backend.Messages.Auth;
 
-using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Net;
 
 namespace EnergonSoftware.Authenticator.MessageHandlers

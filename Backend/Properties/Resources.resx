@@ -123,6 +123,12 @@
   <data name="ErrorInvalidLoginAccount" xml:space="preserve">
     <value>Invalid login account: {0}, expected: {1}</value>
   </data>
+  <data name="ErrorMessageHandlerAlreadyRunning" xml:space="preserve">
+    <value>Message handler is already running!</value>
+  </data>
+  <data name="ErrorMessageProcessorAlreadyRunning" xml:space="preserve">
+    <value>Message processor already running!</value>
+  </data>
   <data name="ErrorSessionAlreadyAuthenticated" xml:space="preserve">
     <value>Session is already authenticated!</value>
   </data>

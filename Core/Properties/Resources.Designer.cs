@@ -160,24 +160,6 @@ namespace EnergonSoftware.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Message handler is already running!.
-        /// </summary>
-        internal static string ErrorMessageHandlerAlreadyRunning {
-            get {
-                return ResourceManager.GetString("ErrorMessageHandlerAlreadyRunning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Message processor already running!.
-        /// </summary>
-        internal static string ErrorMessageProcessorAlreadyRunning {
-            get {
-                return ResourceManager.GetString("ErrorMessageProcessorAlreadyRunning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Exception while parsing messages!.
         /// </summary>
         internal static string ErrorParsingMessages {

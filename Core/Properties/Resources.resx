@@ -147,12 +147,6 @@
   <data name="ErrorInvalidNetworkPacketTerminator" xml:space="preserve">
     <value>Invalid network packet terminator found!</value>
   </data>
-  <data name="ErrorMessageHandlerAlreadyRunning" xml:space="preserve">
-    <value>Message handler is already running!</value>
-  </data>
-  <data name="ErrorMessageProcessorAlreadyRunning" xml:space="preserve">
-    <value>Message processor already running!</value>
-  </data>
   <data name="ErrorParsingMessages" xml:space="preserve">
     <value>Exception while parsing messages!</value>
   </data>

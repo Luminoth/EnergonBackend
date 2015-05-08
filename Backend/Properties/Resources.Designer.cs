@@ -79,6 +79,24 @@ namespace EnergonSoftware.Backend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Message handler is already running!.
+        /// </summary>
+        public static string ErrorMessageHandlerAlreadyRunning {
+            get {
+                return ResourceManager.GetString("ErrorMessageHandlerAlreadyRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Message processor already running!.
+        /// </summary>
+        public static string ErrorMessageProcessorAlreadyRunning {
+            get {
+                return ResourceManager.GetString("ErrorMessageProcessorAlreadyRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Session is already authenticated!.
         /// </summary>
         public static string ErrorSessionAlreadyAuthenticated {

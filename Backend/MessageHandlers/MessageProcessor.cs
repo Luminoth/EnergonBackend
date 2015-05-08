@@ -4,17 +4,18 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Backend.Properties;
+
 using EnergonSoftware.Core.IO;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
-using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Util;
 
 using log4net;
 
-namespace EnergonSoftware.Core.MessageHandlers
+namespace EnergonSoftware.Backend.MessageHandlers
 {
     public sealed class MessageProcessor : IDisposable
     {

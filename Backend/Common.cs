@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using log4net;
 
-namespace EnergonSoftware.Core
+namespace EnergonSoftware.Backend
 {
     public static class Common
     {

@@ -1,13 +1,13 @@
 ﻿using System.Threading.Tasks;
 
+using EnergonSoftware.Backend.Net.Sessions;
+using EnergonSoftware.Backend.Properties;
+
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net.Sessions;
-using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Util;
 
-using log4net;
-
-namespace EnergonSoftware.Core.MessageHandlers
+namespace EnergonSoftware.Backend.MessageHandlers
 {
     public interface IMessageHandlerFactory
     {
@@ -29,6 +29,9 @@ namespace EnergonSoftware.Core.MessageHandlers
             }
 
             _running = true;
+
+            Authenticate(message as IAuthenticatedMessage, session as AuthenticatedSession);
+
             Finished = false;
             _startTime = Time.CurrentTimeMs;
 
@@ -38,7 +41,15 @@ namespace EnergonSoftware.Core.MessageHandlers
             Finished = true;
         }
 
-        // NOTE: subclasses must call base.OnHandleMessageAsync() before doing anything
+        private static void Authenticate(IAuthenticatedMessage message, AuthenticatedSession session)
+        {
+            if(null != message && null != session) {
+                if(!session.Authenticate(message.AccountName, message.SessionId)) {
+                    throw new MessageHandlerException(Resources.ErrorSessionNotAuthenticated);
+                }
+            }
+        }
+
         protected async virtual Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             await Task.Delay(0).ConfigureAwait(false);

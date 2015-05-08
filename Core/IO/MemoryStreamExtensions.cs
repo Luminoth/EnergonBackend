@@ -16,6 +16,7 @@ namespace System.IO
             long position = stream.Position;
 
             stream.Clear();
+
             await stream.WriteAsync(buffer, (int)position, (int)(buffer.Length - position)).ConfigureAwait(false);
         }
     }

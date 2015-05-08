@@ -1,9 +1,9 @@
-﻿using EnergonSoftware.Backend.Messages;
+﻿using EnergonSoftware.Backend.MessageHandlers;
+using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Chat;
 
 using EnergonSoftware.Chat.Net;
 
-using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 
 namespace EnergonSoftware.Chat.MessageHandlers

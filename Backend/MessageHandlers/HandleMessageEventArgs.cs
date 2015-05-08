@@ -2,7 +2,7 @@
 
 using EnergonSoftware.Core.Messages;
 
-namespace EnergonSoftware.Core.MessageHandlers
+namespace EnergonSoftware.Backend.MessageHandlers
 {
     public sealed class HandleMessageEventArgs : EventArgs
     {

@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
 using System.Windows;
 
-using EnergonSoftware.Core.MessageHandlers;
+using EnergonSoftware.Backend.MessageHandlers;
+
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net.Sessions;
 

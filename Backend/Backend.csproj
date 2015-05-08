@@ -48,7 +48,11 @@
   <ItemGroup>
     <Compile Include="Accounts\Account.cs" />
     <Compile Include="Accounts\Visibility.cs" />
-    <Compile Include="MessageHandlers\AuthenticatedMessageHandler.cs" />
+    <Compile Include="Common.cs" />
+    <Compile Include="MessageHandlers\HandleMessageEventArgs.cs" />
+    <Compile Include="MessageHandlers\MessageHandler.cs" />
+    <Compile Include="MessageHandlers\MessageHandlerException.cs" />
+    <Compile Include="MessageHandlers\MessageProcessor.cs" />
     <Compile Include="Messages\Auth\AuthMessage.cs" />
     <Compile Include="Messages\Auth\ChallengeMessage.cs" />
     <Compile Include="Messages\Auth\FailureMessage.cs" />

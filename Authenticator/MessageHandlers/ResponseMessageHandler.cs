@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Authenticator.Net;
 
+using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages.Auth;
 
-using EnergonSoftware.Core.MessageHandlers;
 using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
