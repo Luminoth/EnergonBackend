@@ -55,7 +55,7 @@ namespace EnergonSoftware.Launcher.News
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                     HttpResponseMessage response = await client.GetAsync("Launcher/News").ConfigureAwait(false);
-await Task.Delay(2000).ConfigureAwait(false);
+await Task.Delay(1000).ConfigureAwait(false);
                     if(response.IsSuccessStatusCode) {
                         List<NewsContract> news = new List<NewsContract>();
                         using(Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false)) {
