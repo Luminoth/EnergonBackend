@@ -1,6 +1,6 @@
 ﻿using EnergonSoftware.Backend.MessageHandlers;
+using EnergonSoftware.Backend.Messages.Notification;
 
-using EnergonSoftware.Core.Messages.Notification;
 using EnergonSoftware.Core.Net;
 
 namespace EnergonSoftware.Chat.MessageHandlers

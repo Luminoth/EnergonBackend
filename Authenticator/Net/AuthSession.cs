@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 using EnergonSoftware.Authenticator.MessageHandlers;
 
 using EnergonSoftware.Backend.MessageHandlers;
+using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Auth;
+using EnergonSoftware.Backend.Messages.Formatter;
+using EnergonSoftware.Backend.Messages.Packet;
+using EnergonSoftware.Backend.Messages.Parser;
+using EnergonSoftware.Backend.Net.Sessions;
 
 using EnergonSoftware.Core;
-using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Formatter;
-using EnergonSoftware.Core.Messages.Packet;
-using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
 
@@ -43,7 +44,7 @@ namespace EnergonSoftware.Authenticator.Net
         }
     }
 
-    internal sealed class AuthSession : NetworkSession
+    internal sealed class AuthSession : MessageSession
     {
         public AuthType AuthType { get; private set; }
         public Nonce AuthNonce { get; private set; }

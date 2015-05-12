@@ -3,19 +3,17 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Messages;
-
 using log4net;
 
 namespace EnergonSoftware.Core.Net.Sessions
 {
-    public sealed class NetworkSessionManager
+    public class NetworkSessionManager
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(NetworkSessionManager));
 
-        private readonly object _lock = new object();
+        protected readonly object _lock = new object();
  
-        private readonly List<NetworkSession> _sessions = new List<NetworkSession>();
+        protected readonly List<NetworkSession> _sessions = new List<NetworkSession>();
 
         public int Count { get { return _sessions.Count; } }
 
@@ -82,11 +80,11 @@ namespace EnergonSoftware.Core.Net.Sessions
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
-        public async Task BroadcastMessageAsync(IMessage message)
+        public async Task BroadcastAsync(byte[] data)
         {
             List<Task> tasks = new List<Task>();
             lock(_lock) {
-                _sessions.ForEach(session => tasks.Add(session.SendMessageAsync(message)));
+                _sessions.ForEach(session => tasks.Add(session.SendAsync(data, 0, data.Length)));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);

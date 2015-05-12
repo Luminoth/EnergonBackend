@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Authenticator.Net;
 
+using EnergonSoftware.Backend.Net.Sessions;
+
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
-using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Net.Sockets;
 using EnergonSoftware.Core.Util;
 
@@ -28,7 +29,7 @@ namespace EnergonSoftware.Authenticator
         private readonly HttpServer _diagnosticServer = new HttpServer();
 
         private readonly TcpListener _listener = new TcpListener(new AuthSessionFactory());
-        private readonly NetworkSessionManager _sessions = new NetworkSessionManager();
+        private readonly MessageSessionManager _sessions = new MessageSessionManager();
 
         public Authenticator()
         {

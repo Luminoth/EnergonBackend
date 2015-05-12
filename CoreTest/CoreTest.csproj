@@ -36,18 +36,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Moq, Version=4.2.1502.911, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.2.1502.0911\lib\net40\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="mscorlib.4.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.4.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -62,28 +55,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Accounts\AccountTest.cs" />
-    <Compile Include="MessageHandlers\ExceptionMessageHandler.cs" />
-    <Compile Include="MessageHandlers\MessageHandlerFactory.cs" />
-    <Compile Include="Messages\ExceptionMessage.cs" />
-    <Compile Include="Net\Sessions\NetworkSessionTest.cs" />
-    <Compile Include="Net\Sessions\TestSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IO\StreamExtensionsTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Backend\Backend.csproj">
-      <Project>{6c631fcf-23cc-4bd0-9245-3e2080421f62}</Project>
-      <Name>Backend</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{b8cf252f-2fbc-4d35-90a9-c0adf2b0b9e0}</Project>
       <Name>Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\System.fakes" />
-    <Fakes Include="Fakes\mscorlib.fakes" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -6,9 +6,8 @@ using System.Windows;
 
 using EnergonSoftware.Backend;
 using EnergonSoftware.Backend.Accounts;
+using EnergonSoftware.Backend.Net.Sessions;
 
-using EnergonSoftware.Core;
-using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
 
@@ -52,7 +51,7 @@ namespace EnergonSoftware.Launcher
 #endregion
 
 #region Network Properties
-        private static readonly NetworkSessionManager Sessions = new NetworkSessionManager();
+        private static readonly MessageSessionManager Sessions = new MessageSessionManager();
         private static OvermindSession _overmindSession;
         private static ChatSession _chatSession;
 #endregion

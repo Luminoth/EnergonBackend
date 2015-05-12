@@ -4,12 +4,14 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Backend.Messages;
+using EnergonSoftware.Backend.Messages.Formatter;
+using EnergonSoftware.Backend.Messages.Notification;
+using EnergonSoftware.Backend.Net.Sessions;
+
 using EnergonSoftware.Chat.MessageHandlers;
 
 using EnergonSoftware.Core.Configuration;
-using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Formatter;
-using EnergonSoftware.Core.Messages.Notification;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Net.Sockets;
@@ -24,7 +26,7 @@ namespace EnergonSoftware.Chat.Net
 
         public static readonly InstanceNotifier Instance = new InstanceNotifier();
 
-        private readonly NetworkSessionManager _sessions = new NetworkSessionManager();
+        private readonly MessageSessionManager _sessions = new MessageSessionManager();
 
         public async Task StartAsync(ListenAddressConfigurationElementCollection listenAddresses)
         {

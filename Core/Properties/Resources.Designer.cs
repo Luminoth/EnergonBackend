@@ -88,38 +88,11 @@ namespace EnergonSoftware.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not create handler for message type: {0}.
-        /// </summary>
-        internal static string ErrorCreatingMessageHandler {
-            get {
-                return ResourceManager.GetString("ErrorCreatingMessageHandler", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Exception while creating socket!.
         /// </summary>
         internal static string ErrorCreatingSocket {
             get {
                 return ResourceManager.GetString("ErrorCreatingSocket", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Exception encountered while deserializing content!.
-        /// </summary>
-        internal static string ErrorDeserializingNetworkPacketContent {
-            get {
-                return ResourceManager.GetString("ErrorDeserializingNetworkPacketContent", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Exception while handling message!.
-        /// </summary>
-        internal static string ErrorHandlingMessage {
-            get {
-                return ResourceManager.GetString("ErrorHandlingMessage", resourceCulture);
             }
         }
         
@@ -133,56 +106,11 @@ namespace EnergonSoftware.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Incomplete network packet!.
+        ///   Looks up a localized string similar to Exception while sending session data!.
         /// </summary>
-        internal static string ErrorIncompleteNetworkPacket {
+        internal static string ErrorSendingSessionData {
             get {
-                return ResourceManager.GetString("ErrorIncompleteNetworkPacket", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid network packet marker found!.
-        /// </summary>
-        internal static string ErrorInvalidNetworkPacketMarker {
-            get {
-                return ResourceManager.GetString("ErrorInvalidNetworkPacketMarker", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid network packet terminator found!.
-        /// </summary>
-        internal static string ErrorInvalidNetworkPacketTerminator {
-            get {
-                return ResourceManager.GetString("ErrorInvalidNetworkPacketTerminator", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Exception while parsing messages!.
-        /// </summary>
-        internal static string ErrorParsingMessages {
-            get {
-                return ResourceManager.GetString("ErrorParsingMessages", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Exception while parsing network packet!.
-        /// </summary>
-        internal static string ErrorParsingNetworkPacket {
-            get {
-                return ResourceManager.GetString("ErrorParsingNetworkPacket", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Exception while sending message!.
-        /// </summary>
-        internal static string ErrorSendingMessage {
-            get {
-                return ResourceManager.GetString("ErrorSendingMessage", resourceCulture);
+                return ResourceManager.GetString("ErrorSendingSessionData", resourceCulture);
             }
         }
         
@@ -192,15 +120,6 @@ namespace EnergonSoftware.Core.Properties {
         internal static string ErrorSSLHandshakeFailed {
             get {
                 return ResourceManager.GetString("ErrorSSLHandshakeFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unsupported message formatter type for construction: {0}.
-        /// </summary>
-        internal static string ErrorUnsupportedMessageFormatter {
-            get {
-                return ResourceManager.GetString("ErrorUnsupportedMessageFormatter", resourceCulture);
             }
         }
     }

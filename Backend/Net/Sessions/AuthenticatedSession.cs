@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Accounts;
 using EnergonSoftware.Backend.Messages;
+using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Properties;
 
 using EnergonSoftware.Core.Net.Sessions;
@@ -11,15 +12,11 @@ using log4net;
 
 namespace EnergonSoftware.Backend.Net.Sessions
 {
-    public abstract class AuthenticatedSession : NetworkSession
+    public abstract class AuthenticatedSession : MessageSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthenticatedSession));
 
         public Account Account { get; protected set; }
-
-        protected AuthenticatedSession(Socket socket) : base(socket)
-        {
-        }
 
         public bool Authenticate(Account account)
         {
@@ -78,6 +75,14 @@ namespace EnergonSoftware.Backend.Net.Sessions
             await DisconnectAsync().ConfigureAwait(false);
 
             Account = null;
+        }
+
+        protected AuthenticatedSession() : base()
+        {
+        }
+
+        protected AuthenticatedSession(Socket socket) : base(socket)
+        {
         }
 
         protected abstract Task<Account> LookupAccountAsync(string accountName);

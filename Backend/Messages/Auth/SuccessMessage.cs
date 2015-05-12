@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Formatter;
+using EnergonSoftware.Backend.Messages.Formatter;
 
 namespace EnergonSoftware.Backend.Messages.Auth
 {

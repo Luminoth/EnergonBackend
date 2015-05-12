@@ -2,8 +2,8 @@
 using System.Windows;
 
 using EnergonSoftware.Backend.MessageHandlers;
+using EnergonSoftware.Backend.Messages;
 
-using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net.Sessions;
 
 namespace EnergonSoftware.Launcher.MessageHandlers

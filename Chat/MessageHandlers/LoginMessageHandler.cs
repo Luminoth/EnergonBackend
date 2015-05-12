@@ -2,10 +2,10 @@
 
 using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
+using EnergonSoftware.Backend.Messages.Auth;
 
 using EnergonSoftware.Chat.Net;
 
-using EnergonSoftware.Core.Messages;
 using EnergonSoftware.Core.Net.Sessions;
 
 namespace EnergonSoftware.Chat.MessageHandlers

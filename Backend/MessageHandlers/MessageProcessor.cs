@@ -4,12 +4,12 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Backend.Messages;
+using EnergonSoftware.Backend.Messages.Packet;
+using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Properties;
 
 using EnergonSoftware.Core.IO;
-using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Packet;
-using EnergonSoftware.Core.Messages.Parser;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
 

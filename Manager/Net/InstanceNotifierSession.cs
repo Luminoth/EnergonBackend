@@ -1,15 +1,12 @@
 ﻿using System.Net.Sockets;
-using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.MessageHandlers;
+using EnergonSoftware.Backend.Messages;
+using EnergonSoftware.Backend.Messages.Formatter;
+using EnergonSoftware.Backend.Messages.Packet;
+using EnergonSoftware.Backend.Messages.Parser;
+using EnergonSoftware.Backend.Net.Sessions;
 
-using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Formatter;
-using EnergonSoftware.Core.Messages.Packet;
-using EnergonSoftware.Core.Messages.Parser;
-using EnergonSoftware.Core.Net;
-using EnergonSoftware.Core.Net.Sessions;
-using EnergonSoftware.Core.Net.Sockets;
 
 using EnergonSoftware.Manager.MessageHandlers;
 
@@ -17,7 +14,7 @@ using log4net;
 
 namespace EnergonSoftware.Manager.Net
 {
-    internal sealed class InstanceNotifierSession : NetworkSession
+    internal sealed class InstanceNotifierSession : MessageSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(InstanceNotifierSession));
 

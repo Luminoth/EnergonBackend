@@ -3,8 +3,6 @@ using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Messages.Chat;
 
-using EnergonSoftware.Core.Messages;
-
 using EnergonSoftware.Launcher.MessageHandlers.Auth;
 using EnergonSoftware.Launcher.MessageHandlers.Chat;
 

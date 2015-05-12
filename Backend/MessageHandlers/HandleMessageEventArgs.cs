@@ -1,6 +1,6 @@
 ﻿using System;
 
-using EnergonSoftware.Core.Messages;
+using EnergonSoftware.Backend.Messages;
 
 namespace EnergonSoftware.Backend.MessageHandlers
 {

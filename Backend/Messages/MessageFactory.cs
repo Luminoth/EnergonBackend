@@ -1,13 +1,16 @@
 ﻿using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Messages.Chat;
+using EnergonSoftware.Backend.Messages.Network;
+using EnergonSoftware.Backend.Messages.Notification;
 using EnergonSoftware.Backend.Properties;
-
-using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Network;
-using EnergonSoftware.Core.Messages.Notification;
 
 namespace EnergonSoftware.Backend.Messages
 {
+    public interface IMessageFactory
+    {
+        IMessage Create(string messageType);
+    }
+
     public class MessageFactory : IMessageFactory
     {
         public IMessage Create(string type)

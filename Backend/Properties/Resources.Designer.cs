@@ -61,6 +61,15 @@ namespace EnergonSoftware.Backend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Incomplete network packet!.
+        /// </summary>
+        public static string ErrorIncompleteNetworkPacket {
+            get {
+                return ResourceManager.GetString("ErrorIncompleteNetworkPacket", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid login: {0}.
         /// </summary>
         public static string ErrorInvalidLogin {
@@ -79,6 +88,24 @@ namespace EnergonSoftware.Backend.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid network packet marker found!.
+        /// </summary>
+        public static string ErrorInvalidNetworkPacketMarker {
+            get {
+                return ResourceManager.GetString("ErrorInvalidNetworkPacketMarker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid network packet terminator found!.
+        /// </summary>
+        public static string ErrorInvalidNetworkPacketTerminator {
+            get {
+                return ResourceManager.GetString("ErrorInvalidNetworkPacketTerminator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Message handler is already running!.
         /// </summary>
         public static string ErrorMessageHandlerAlreadyRunning {
@@ -93,6 +120,24 @@ namespace EnergonSoftware.Backend.Properties {
         public static string ErrorMessageProcessorAlreadyRunning {
             get {
                 return ResourceManager.GetString("ErrorMessageProcessorAlreadyRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exception while parsing network packet!.
+        /// </summary>
+        public static string ErrorParsingNetworkPacket {
+            get {
+                return ResourceManager.GetString("ErrorParsingNetworkPacket", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exception while sending message!.
+        /// </summary>
+        public static string ErrorSendingMessage {
+            get {
+                return ResourceManager.GetString("ErrorSendingMessage", resourceCulture);
             }
         }
         
@@ -120,6 +165,15 @@ namespace EnergonSoftware.Backend.Properties {
         public static string ErrorUnsupportedMessage {
             get {
                 return ResourceManager.GetString("ErrorUnsupportedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported message formatter type for construction: {0}.
+        /// </summary>
+        public static string ErrorUnsupportedMessageFormatter {
+            get {
+                return ResourceManager.GetString("ErrorUnsupportedMessageFormatter", resourceCulture);
             }
         }
     }

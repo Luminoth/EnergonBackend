@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Backend.Messages.Formatter;
+
 using EnergonSoftware.Core;
-using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Formatter;
 using EnergonSoftware.Core.Util;
 
 namespace EnergonSoftware.Backend.Messages.Auth
