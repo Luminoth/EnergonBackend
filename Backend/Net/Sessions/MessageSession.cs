@@ -3,7 +3,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Messages.Packet;
+using EnergonSoftware.Backend.Packet;
 using EnergonSoftware.Backend.Properties;
 
 using EnergonSoftware.Core.Net.Sessions;
@@ -15,6 +15,8 @@ namespace EnergonSoftware.Backend.Net.Sessions
     public abstract class MessageSession : NetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageSession));
+
+        protected abstract string FormatterType { get; }
 
         public async Task SendMessageAsync(IMessage message)
         {

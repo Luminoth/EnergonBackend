@@ -3,10 +3,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Messages.Formatter;
+using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Properties;
 
-namespace EnergonSoftware.Backend.Messages.Packet
+using EnergonSoftware.Core.Serialization;
+
+namespace EnergonSoftware.Backend.Packet
 {
     /*
      * Binary Packet Format:
@@ -30,7 +32,7 @@ namespace EnergonSoftware.Backend.Messages.Packet
 
             // serialize content to a separate stream so we can get the length of it
             using(MemoryStream contentStream = new MemoryStream()) {
-                IMessageFormatter formatter = MessageFormatterFactory.Create(formatterType);
+                IFormatter formatter = FormatterFactory.Create(formatterType);
                 formatter.Attach(contentStream);
                 await SerializeContentAsync(formatter).ConfigureAwait(false);
 
@@ -69,7 +71,7 @@ namespace EnergonSoftware.Backend.Messages.Packet
             using(MemoryStream contentStream = new MemoryStream()) {
                 await contentStream.WriteAsync(content, 0, content.Length);
 
-                IMessageFormatter formatter = MessageFormatterFactory.Create(formatterType);
+                IFormatter formatter = FormatterFactory.Create(formatterType);
                 formatter.Attach(contentStream);
 
                 Content = messageFactory.Create(contentType);

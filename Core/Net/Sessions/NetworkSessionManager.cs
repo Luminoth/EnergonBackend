@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -11,9 +12,9 @@ namespace EnergonSoftware.Core.Net.Sessions
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(NetworkSessionManager));
 
-        protected readonly object _lock = new object();
+        private readonly object _lock = new object();
  
-        protected readonly List<NetworkSession> _sessions = new List<NetworkSession>();
+        private readonly List<NetworkSession> _sessions = new List<NetworkSession>();
 
         public int Count { get { return _sessions.Count; } }
 
@@ -80,11 +81,21 @@ namespace EnergonSoftware.Core.Net.Sessions
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
-        public async Task BroadcastAsync(byte[] data)
+        public async Task BroadcastAsync(byte[] data, int offset, int count)
         {
             List<Task> tasks = new List<Task>();
             lock(_lock) {
-                _sessions.ForEach(session => tasks.Add(session.SendAsync(data, 0, data.Length)));
+                _sessions.ForEach(session => tasks.Add(session.SendAsync(data, offset, count)));
+            }
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+        }
+
+        public async Task BroadcastAsync(MemoryStream buffer)
+        {
+            List<Task> tasks = new List<Task>();
+            lock(_lock) {
+                _sessions.ForEach(session => tasks.Add(session.CopyAsync(buffer)));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);

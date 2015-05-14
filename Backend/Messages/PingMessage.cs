@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Messages.Formatter;
+using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Messages
 {
@@ -15,12 +15,12 @@ namespace EnergonSoftware.Backend.Messages
         {
         }
 
-        public async Task SerializeAsync(IMessageFormatter formatter)
+        public async Task SerializeAsync(IFormatter formatter)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }
 
-        public async Task DeSerializeAsync(IMessageFormatter formatter)
+        public async Task DeserializeAsync(IFormatter formatter)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }

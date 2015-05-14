@@ -4,12 +4,14 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Messages.Formatter;
+using EnergonSoftware.Backend.Messages;
+
+using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Accounts
 {
     [Serializable]
-    public sealed class Account : IMessageSerializable, INotifyPropertyChanged
+    public sealed class Account : EnergonSoftware.Core.Serialization.IFormattable, INotifyPropertyChanged
     {
         public string Type { get { return "account"; } }
 
@@ -43,22 +45,22 @@ namespace EnergonSoftware.Backend.Accounts
             Visibility = Visibility.Offline;
         }
 
-        public async Task SerializeAsync(IMessageFormatter formatter)
+        public async Task SerializeAsync(IFormatter formatter)
         {
             // Id not serialized
-            await formatter.WriteAsync("user_name", UserName).ConfigureAwait(false);
-            await formatter.WriteAsync("visibility", (int)Visibility).ConfigureAwait(false);
-            await formatter.WriteAsync("status", Status ?? string.Empty).ConfigureAwait(false);
-            await formatter.WriteAsync("group_name", GroupName ?? string.Empty).ConfigureAwait(false);
+            await formatter.WriteAsync("UserName", UserName).ConfigureAwait(false);
+            await formatter.WriteAsync("Visibility", (int)Visibility).ConfigureAwait(false);
+            await formatter.WriteAsync("Status", Status ?? string.Empty).ConfigureAwait(false);
+            await formatter.WriteAsync("GroupName", GroupName ?? string.Empty).ConfigureAwait(false);
         }
 
-        public async Task DeSerializeAsync(IMessageFormatter formatter)
+        public async Task DeserializeAsync(IFormatter formatter)
         {
             // Id not serialized
-            UserName = await formatter.ReadStringAsync("user_name").ConfigureAwait(false);
-            Visibility = (Visibility)await formatter.ReadIntAsync("visibility").ConfigureAwait(false);
-            Status = await formatter.ReadStringAsync("status").ConfigureAwait(false);
-            GroupName = await formatter.ReadStringAsync("group_name").ConfigureAwait(false);
+            UserName = await formatter.ReadStringAsync("UserName").ConfigureAwait(false);
+            Visibility = (Visibility)await formatter.ReadIntAsync("Visibility").ConfigureAwait(false);
+            Status = await formatter.ReadStringAsync("Status").ConfigureAwait(false);
+            GroupName = await formatter.ReadStringAsync("GroupName").ConfigureAwait(false);
         }
 
         public override bool Equals(object obj)

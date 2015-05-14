@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Messages.Packet;
+using EnergonSoftware.Backend.Packet;
 using EnergonSoftware.Backend.Properties;
 
 using EnergonSoftware.Core.Net.Sessions;
@@ -12,17 +12,12 @@ namespace EnergonSoftware.Backend.Net.Sessions
 {
     public class MessageSessionManager : NetworkSessionManager
     {
-        public async Task BroadcastMessageAsync(IMessage message)
+        public async Task BroadcastMessageAsync(MessagePacket packet, string formatterType)
         {
-            List<Task> tasks = new List<Task>();
-            lock(_lock) {
-                _sessions.ForEach(session => {
-                    MessageSession messageSession = (MessageSession)session;
-                    tasks.Add(messageSession.SendMessageAsync(message));
-                });
+            using(MemoryStream buffer = new MemoryStream()) {
+                await packet.SerializeAsync(buffer, formatterType).ConfigureAwait(false);
+                await BroadcastAsync(buffer).ConfigureAwait(false);
             }
-
-            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }
 }

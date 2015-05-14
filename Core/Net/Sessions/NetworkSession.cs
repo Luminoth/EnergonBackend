@@ -7,8 +7,6 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Messages;
-using EnergonSoftware.Core.Messages.Packet;
 using EnergonSoftware.Core.Net.Sockets;
 using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Util;
@@ -56,8 +54,6 @@ namespace EnergonSoftware.Core.Net.Sessions
         private SSLSocketWrapper _socket = new SSLSocketWrapper();
 #endregion
 
-        protected abstract string FormatterType { get; }
-
 #region Dispose
         public void Dispose()
         {
@@ -75,7 +71,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
         public async Task ConnectAsync(string host, int port, SocketType socketType, ProtocolType protocolType, bool useIPv6)
         {
-            /* TODO: disconnect first? */
+            // TODO: disconnect first?
 
             Logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
             _socket = new SSLSocketWrapper(await NetUtil.ConnectAsync(host, port, socketType, protocolType, useIPv6).ConfigureAwait(false));
@@ -91,7 +87,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
         public async Task ConnectMulticastAsync(IPAddress group, int port, int ttl)
         {
-            /* TODO: disconnect first? */
+            // TODO: disconnect first?
 
             Logger.Info("Session " + Id + " connecting to multicast group " + group + ":" + port + "...");
             _socket = new SSLSocketWrapper(await NetUtil.ConnectMulticastAsync(group, port, ttl).ConfigureAwait(false));
@@ -192,25 +188,29 @@ namespace EnergonSoftware.Core.Net.Sessions
             }
         }
 
-        public async Task SendMessageAsync(IMessage message)
+        public async Task SendAsync(byte[] data, int offset, int count)
         {
             try {
                 if(!IsConnected) {
                     return;
                 }
 
-                MessagePacket packet = CreatePacket(message);
-                packet.Content = message;
-                Logger.Debug("Sending packet: " + packet);
-
-                using(MemoryStream buffer = new MemoryStream()) {
-                    await packet.SerializeAsync(buffer, FormatterType).ConfigureAwait(false);
-                    await _socket.CopyAsync(buffer).ConfigureAwait(false);
-                }
+                await _socket.WriteAsync(data, offset, count).ConfigureAwait(false);
             } catch(SocketException e) {
-                InternalErrorAsync(Resources.ErrorSendingMessage, e).Wait();
-            } catch(MessageException e) {
-                InternalErrorAsync(Resources.ErrorSendingMessage, e).Wait(); 
+                InternalErrorAsync(Resources.ErrorSendingSessionData, e).Wait();
+            }
+        }
+
+        public async Task CopyAsync(MemoryStream stream)
+        {
+            try {
+                if(!IsConnected) {
+                    return;
+                }
+
+                await _socket.CopyAsync(stream).ConfigureAwait(false);
+            } catch(SocketException e) {
+                InternalErrorAsync(Resources.ErrorSendingSessionData, e).Wait();
             }
         }
 
@@ -277,8 +277,6 @@ namespace EnergonSoftware.Core.Net.Sessions
             }
         }
 #endregion
-
-        protected abstract MessagePacket CreatePacket(IMessage message);
 
         protected NetworkSession()
         {

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Accounts;
-using EnergonSoftware.Backend.Messages.Formatter;
+
+using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Messages.Chat
 {
@@ -26,18 +27,18 @@ namespace EnergonSoftware.Backend.Messages.Chat
             Friends = new List<Account>();
         }
 
-        public async Task SerializeAsync(IMessageFormatter formatter)
+        public async Task SerializeAsync(IFormatter formatter)
         {
-            await formatter.WriteAsync("account_name", AccountName).ConfigureAwait(false);
-            await formatter.WriteAsync("ticket", SessionId).ConfigureAwait(false);
-            await formatter.WriteAsync<Account>("friendList", Friends).ConfigureAwait(false);
+            await formatter.WriteAsync("AccountName", AccountName).ConfigureAwait(false);
+            await formatter.WriteAsync("Ticket", SessionId).ConfigureAwait(false);
+            await formatter.WriteAsync<Account>("FriendList", Friends).ConfigureAwait(false);
         }
 
-        public async Task DeSerializeAsync(IMessageFormatter formatter)
+        public async Task DeserializeAsync(IFormatter formatter)
         {
-            AccountName = await formatter.ReadStringAsync("account_name").ConfigureAwait(false);
-            SessionId = await formatter.ReadStringAsync("sessionid").ConfigureAwait(false);
-            Friends = await formatter.ReadListAsync<Account>("friendList").ConfigureAwait(false);
+            AccountName = await formatter.ReadStringAsync("AccountName").ConfigureAwait(false);
+            SessionId = await formatter.ReadStringAsync("Ticket").ConfigureAwait(false);
+            Friends = await formatter.ReadListAsync<Account>("FriendList").ConfigureAwait(false);
         }
 
         public override string ToString()

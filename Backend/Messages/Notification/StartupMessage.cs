@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Messages.Formatter;
+using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Messages.Notification
 {
@@ -20,16 +20,16 @@ namespace EnergonSoftware.Backend.Messages.Notification
             ServiceId = string.Empty;
         }
 
-        public async Task SerializeAsync(IMessageFormatter formatter)
+        public async Task SerializeAsync(IFormatter formatter)
         {
-            await formatter.WriteAsync("service", ServiceName).ConfigureAwait(false);
-            await formatter.WriteAsync("id", ServiceId).ConfigureAwait(false);
+            await formatter.WriteAsync("Service", ServiceName).ConfigureAwait(false);
+            await formatter.WriteAsync("Id", ServiceId).ConfigureAwait(false);
         }
 
-        public async Task DeSerializeAsync(IMessageFormatter formatter)
+        public async Task DeserializeAsync(IFormatter formatter)
         {
-            ServiceName = await formatter.ReadStringAsync("service").ConfigureAwait(false);
-            ServiceId = await formatter.ReadStringAsync("id").ConfigureAwait(false);
+            ServiceName = await formatter.ReadStringAsync("Service").ConfigureAwait(false);
+            ServiceId = await formatter.ReadStringAsync("Id").ConfigureAwait(false);
         }
 
         public override string ToString()

@@ -61,11 +61,6 @@
     <Compile Include="Messages\Auth\SuccessMessage.cs" />
     <Compile Include="Messages\Chat\FriendListMessage.cs" />
     <Compile Include="Messages\Chat\VisibilityMessage.cs" />
-    <Compile Include="Messages\Formatter\BinaryMessageFormatter.cs" />
-    <Compile Include="Messages\Formatter\MessageFormatter.cs" />
-    <Compile Include="Messages\Formatter\MessageFormatterException.cs" />
-    <Compile Include="Messages\Formatter\MessageSerializable.cs" />
-    <Compile Include="Messages\Formatter\XmlMessageFormatter.cs" />
     <Compile Include="Messages\Auth\LoginMessage.cs" />
     <Compile Include="Messages\Auth\LogoutMessage.cs" />
     <Compile Include="Messages\Message.cs" />
@@ -75,8 +70,8 @@
     <Compile Include="Messages\Notification\NotificationMessage.cs" />
     <Compile Include="Messages\Notification\ShutdownMessage.cs" />
     <Compile Include="Messages\Notification\StartupMessage.cs" />
-    <Compile Include="Messages\Packet\MessagePacket.cs" />
-    <Compile Include="Messages\Packet\NetworkPacket.cs" />
+    <Compile Include="Packet\MessagePacket.cs" />
+    <Compile Include="Packet\NetworkPacket.cs" />
     <Compile Include="Messages\Parser\MessagePacketParser.cs" />
     <Compile Include="Messages\Parser\MessageParsedEventArgs.cs" />
     <Compile Include="Messages\Parser\NetworkPacketParser.cs" />

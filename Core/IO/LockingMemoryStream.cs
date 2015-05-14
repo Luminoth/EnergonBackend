@@ -19,11 +19,17 @@ namespace EnergonSoftware.Core.IO
         }
 #endregion
 
+        /// <summary>
+        /// Acquires the stream lock.
+        /// </summary>
         public async Task LockAsync()
         {
             await _lock.WaitAsync().ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Releases this stream lock.
+        /// </summary>
         public void Release()
         {
             _lock.Release();

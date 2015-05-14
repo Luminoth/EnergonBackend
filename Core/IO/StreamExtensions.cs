@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -6,6 +7,42 @@ namespace System.IO
 {
     public static class StreamExtensions
     {
+        /// <summary>
+        /// Finds the index of the first occurrence of the given byte value.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="value">The value to look for.</param>
+        /// <returns>The index of the first occurrence of the given byte value</returns>
+        public static async Task<long> IndexOfAsync(this Stream stream, byte[] value)
+        {
+            long index = -1;
+            while(stream.GetRemaining() > 0) {
+                byte[] buffer = new byte[value.Length];
+                await stream.ReadAsync(buffer, 0, buffer.Length);
+
+                if(buffer.SequenceEqual(value)) {
+                    index = stream.Position;
+                    break;
+                }
+
+                stream.Seek(-buffer.Length + 1, SeekOrigin.Current);
+            }
+
+            stream.Position = 0;
+            return index;
+        }
+
+        /// <summary>
+        /// Consumes the given number of bytes from the stream without returning them.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="count">The number of bytes to consume.</param>
+        public static async Task ConsumeAsync(this Stream stream, int count)
+        {
+            byte[] consumed = new byte[count];
+            await stream.ReadAsync(consumed, 0, consumed.Length).ConfigureAwait(false);
+        }
+
 #region Write
         /// <summary>
         /// Writes a single byte to the stream.

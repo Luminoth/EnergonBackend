@@ -1,8 +1,8 @@
-﻿using EnergonSoftware.Backend.Messages.Formatter;
+﻿using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Messages
 {
-    public interface IMessage : IMessageSerializable
+    public interface IMessage : IFormattable
     {
     }
 }

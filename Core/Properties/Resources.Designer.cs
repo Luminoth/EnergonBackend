@@ -122,5 +122,14 @@ namespace EnergonSoftware.Core.Properties {
                 return ResourceManager.GetString("ErrorSSLHandshakeFailed", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported formatter type for construction: {0}.
+        /// </summary>
+        internal static string ErrorUnsupportedFormatter {
+            get {
+                return ResourceManager.GetString("ErrorUnsupportedFormatter", resourceCulture);
+            }
+        }
     }
 }

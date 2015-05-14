@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Messages.Formatter;
+using EnergonSoftware.Core.Serialization;
 
 using EnergonSoftware.Core;
 using EnergonSoftware.Core.Util;
@@ -25,16 +25,16 @@ namespace EnergonSoftware.Backend.Messages.Auth
             MechanismType = AuthType.DigestSHA512;
         }
 
-        public async Task SerializeAsync(IMessageFormatter formatter)
+        public async Task SerializeAsync(IFormatter formatter)
         {
-            await formatter.WriteAsync("version", Version).ConfigureAwait(false);
-            await formatter.WriteAsync("mechanism", (int)MechanismType).ConfigureAwait(false);
+            await formatter.WriteAsync("Version", Version).ConfigureAwait(false);
+            await formatter.WriteAsync("Mechanism", (int)MechanismType).ConfigureAwait(false);
         }
 
-        public async Task DeSerializeAsync(IMessageFormatter formatter)
+        public async Task DeserializeAsync(IFormatter formatter)
         {
-            Version = await formatter.ReadIntAsync("version").ConfigureAwait(false);
-            MechanismType = (AuthType)await formatter.ReadIntAsync("mechanism").ConfigureAwait(false);
+            Version = await formatter.ReadIntAsync("Version").ConfigureAwait(false);
+            MechanismType = (AuthType)await formatter.ReadIntAsync("Mechanism").ConfigureAwait(false);
         }
 
         public override string ToString()

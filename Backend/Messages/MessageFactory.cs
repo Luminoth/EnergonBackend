@@ -1,4 +1,6 @@
-﻿using EnergonSoftware.Backend.Messages.Auth;
+﻿using System;
+
+using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Messages.Chat;
 using EnergonSoftware.Backend.Messages.Network;
 using EnergonSoftware.Backend.Messages.Notification;
@@ -13,9 +15,9 @@ namespace EnergonSoftware.Backend.Messages
 
     public class MessageFactory : IMessageFactory
     {
-        public IMessage Create(string type)
+        public IMessage Create(string messageType)
         {
-            switch(type)
+            switch(messageType)
             {
             case "null":
                 return null;
@@ -57,7 +59,7 @@ namespace EnergonSoftware.Backend.Messages
                 return new VisibilityMessage();
             }
 
-            throw new MessageException(string.Format(Resources.ErrorUnsupportedMessage, type));
+            throw new ArgumentException(string.Format(Resources.ErrorUnsupportedMessage, messageType), "messageType");
         }
     }
 }

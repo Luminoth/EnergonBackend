@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Messages.Formatter;
+using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Messages.Auth
 {
@@ -18,14 +18,14 @@ namespace EnergonSoftware.Backend.Messages.Auth
             SessionId = string.Empty;
         }
 
-        public async Task SerializeAsync(IMessageFormatter formatter)
+        public async Task SerializeAsync(IFormatter formatter)
         {
-            await formatter.WriteAsync("ticket", SessionId).ConfigureAwait(false);
+            await formatter.WriteAsync("Ticket", SessionId).ConfigureAwait(false);
         }
 
-        public async Task DeSerializeAsync(IMessageFormatter formatter)
+        public async Task DeserializeAsync(IFormatter formatter)
         {
-            SessionId = await formatter.ReadStringAsync("ticket").ConfigureAwait(false);
+            SessionId = await formatter.ReadStringAsync("Ticket").ConfigureAwait(false);
         }
 
         public override string ToString()

@@ -48,6 +48,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Serialization\Formattable.cs" />
+    <Compile Include="Serialization\Formatter.cs" />
+    <Compile Include="Serialization\FormatterFactory.cs" />
+    <Compile Include="Serialization\Formatters\BinaryNetworkFormatter.cs" />
+    <Compile Include="Serialization\Formatters\XmlFormatter.cs" />
     <Compile Include="Util\AuthUtil.cs" />
     <Compile Include="Configuration\ListenAddressesConfigurationSection.cs" />
     <Compile Include="Configuration\ListenAddressConfigurationElement.cs" />
@@ -101,6 +106,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

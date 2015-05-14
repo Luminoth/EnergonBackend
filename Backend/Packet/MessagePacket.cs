@@ -2,9 +2,11 @@
 using System.IO;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Messages.Formatter;
+using EnergonSoftware.Backend.Messages;
 
-namespace EnergonSoftware.Backend.Messages.Packet
+using EnergonSoftware.Core.Serialization;
+
+namespace EnergonSoftware.Backend.Packet
 {
     [Serializable]
     public abstract class MessagePacket : IComparable
@@ -58,25 +60,25 @@ namespace EnergonSoftware.Backend.Messages.Packet
             Id = NextId;
         }
 
-        protected async Task SerializeContentAsync(IMessageFormatter formatter)
+        protected async Task SerializeContentAsync(IFormatter formatter)
         {
             if(null == Content) {
                 return;
             }
 
-            await formatter.StartDocumentAsync().ConfigureAwait(false);
+            await formatter.BeginAsync("message").ConfigureAwait(false);
             await Content.SerializeAsync(formatter).ConfigureAwait(false);
-            await formatter.EndDocumentAsync().ConfigureAwait(false);
+            await formatter.FinishAsync().ConfigureAwait(false);
             await formatter.FlushAsync().ConfigureAwait(false);
         }
 
-        protected async Task DeSerializeContentAsync(IMessageFormatter formatter)
+        protected async Task DeSerializeContentAsync(IFormatter formatter)
         {
             if(null == Content) {
                 return;
             }
 
-            await Content.DeSerializeAsync(formatter).ConfigureAwait(false);
+            await Content.DeserializeAsync(formatter).ConfigureAwait(false);
         }
     }
 }

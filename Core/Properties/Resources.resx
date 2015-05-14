@@ -138,4 +138,7 @@
   <data name="ErrorSSLHandshakeFailed" xml:space="preserve">
     <value>SSL handshake failed!</value>
   </data>
+  <data name="ErrorUnsupportedFormatter" xml:space="preserve">
+    <value>Unsupported formatter type for construction: {0}</value>
+  </data>
 </root>

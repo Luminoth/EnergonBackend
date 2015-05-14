@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Messages.Packet;
 using EnergonSoftware.Backend.Messages.Parser;
+using EnergonSoftware.Backend.Packet;
 using EnergonSoftware.Backend.Properties;
 
 using EnergonSoftware.Core.IO;

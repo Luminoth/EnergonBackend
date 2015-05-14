@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Messages.Formatter;
+using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Messages.Auth
 {
@@ -18,14 +18,14 @@ namespace EnergonSoftware.Backend.Messages.Auth
             Reason = string.Empty;
         }
 
-        public async Task SerializeAsync(IMessageFormatter formatter)
+        public async Task SerializeAsync(IFormatter formatter)
         {
-            await formatter.WriteAsync("reason", Reason).ConfigureAwait(false);
+            await formatter.WriteAsync("Reason", Reason).ConfigureAwait(false);
         }
 
-        public async Task DeSerializeAsync(IMessageFormatter formatter)
+        public async Task DeserializeAsync(IFormatter formatter)
         {
-            Reason = await formatter.ReadStringAsync("reason").ConfigureAwait(false);
+            Reason = await formatter.ReadStringAsync("Reason").ConfigureAwait(false);
         }
 
         public override string ToString()
