@@ -1,4 +1,6 @@
-﻿namespace EnergonSoftware.DAL.Models.Events
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EnergonSoftware.DAL.Models.Events
 {
     public enum StartupEventType
     {
@@ -9,7 +11,10 @@
 
     public class StartupEvent : Event
     {
+        [Required]
         public StartupEventType Type { get; set; }
+
+        [Required, MaxLength(32)]
         public string Application { get; set; }
 
         public StartupEvent() : base()

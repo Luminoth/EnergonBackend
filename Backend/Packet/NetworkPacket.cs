@@ -3,85 +3,124 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Properties;
-
-using EnergonSoftware.Core.Serialization;
-
 namespace EnergonSoftware.Backend.Packet
 {
-    /*
-     * Binary Packet Format:
-     *      MARKER | ID | ENCODING | CONTENT TYPE | CONTENT LEN | CONTENT
-     */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// Binary Packet Format:
+    ///     MARKER | ID | ENCODING | CONTENT TYPE | CONTENT LEN | CONTENT
+    /// </remarks>
     [Serializable]
-    public sealed class NetworkPacket : MessagePacket
+    public class NetworkPacket : IPacket
     {
-        public static readonly byte[] Marker = new byte[] { (byte)'E', (byte)'S', (byte)'N', (byte)'M', 0 };
+#region Id Generator
+        private static int _nextId = 0;
+        private static int NextId { get { return ++_nextId; } }
+#endregion
 
-        public const string PacketType = "network";
-        public override string Type { get { return PacketType; } }
+        public const string PacketType = "Network";
 
-        public async override Task SerializeAsync(Stream stream, string formatterType)
+        public static readonly byte[] Header = new byte[] { (byte)'E', (byte)'S', (byte)'N', (byte)'P' };
+        public static readonly byte[] Separator = new byte[] { (byte)'\r', (byte)'\n' };
+
+        public string Type { get { return PacketType; } }
+
+        public int Id { get; protected set; }
+
+        public string ContentType { get; set; }
+
+        public string Encoding { get; set; }
+
+        public int ContentLength { get { return null == Content ? 0 : Content.Length; } }
+
+        public byte[] Content { get; set; }
+
+        public NetworkPacket()
         {
-            // header values
-            await stream.WriteAsync(Marker, 0, Marker.Length).ConfigureAwait(false);
-            await stream.WriteNetworkAsync(Id).ConfigureAwait(false);
-            await stream.WriteNetworkAsync(formatterType).ConfigureAwait(false);
-            await stream.WriteNetworkAsync(null == Content ? "null" : Content.Type).ConfigureAwait(false);
-
-            // serialize content to a separate stream so we can get the length of it
-            using(MemoryStream contentStream = new MemoryStream()) {
-                IFormatter formatter = FormatterFactory.Create(formatterType);
-                formatter.Attach(contentStream);
-                await SerializeContentAsync(formatter).ConfigureAwait(false);
-
-                byte[] content = contentStream.ToArray();
-                await stream.WriteNetworkAsync(content.Length).ConfigureAwait(false);
-                await stream.WriteAsync(content, 0, content.Length).ConfigureAwait(false);
-            }
+            Id = NextId;
         }
 
-        public async override Task DeSerializeAsync(Stream stream, IMessageFactory messageFactory)
+        public async Task SerializeAsync(Stream stream)
         {
-            // header values
-            byte[] marker = new byte[Marker.Length];
-            await stream.ReadAsync(marker, 0, marker.Length).ConfigureAwait(false);
-            if(!marker.SequenceEqual(Marker)) {
-                throw new MessageException(Resources.ErrorInvalidNetworkPacketMarker);
+            await stream.WriteAsync(Header, 0, Header.Length).ConfigureAwait(false);
+            await stream.WriteNetworkAsync(Id).ConfigureAwait(false);
+            await stream.WriteNetworkAsync(ContentType).ConfigureAwait(false);
+            await stream.WriteNetworkAsync(Encoding).ConfigureAwait(false);
+            await stream.WriteNetworkAsync(ContentLength).ConfigureAwait(false);
+            await stream.WriteAsync(Separator, 0, Separator.Length).ConfigureAwait(false);
+            await stream.WriteAsync(Content, 0, Content.Length).ConfigureAwait(false);
+        }
+
+        public async Task<bool> DeserializeAsync(Stream stream)
+        {
+            // look for the header separator
+            long separatorIndex = await stream.IndexOfAsync(Separator).ConfigureAwait(false);
+            if(-1 == separatorIndex) {
+                return false;
+            }
+
+            // read the header values
+            byte[] header = new byte[Header.Length];
+            await stream.ReadAsync(header, 0, header.Length).ConfigureAwait(false);
+            if(!header.SequenceEqual(Header)) {
+                throw new PacketException("Invalid packet header!");
             }
 
             Id = await stream.ReadNetworkIntAsync().ConfigureAwait(false);
+            ContentType = await stream.ReadNetworkStringAsync().ConfigureAwait(false);
+            Encoding = await stream.ReadNetworkStringAsync().ConfigureAwait(false);
+            int contentLength = await stream.ReadNetworkIntAsync().ConfigureAwait(false);
 
-            string formatterType = await stream.ReadNetworkStringAsync().ConfigureAwait(false);
-            string contentType = await stream.ReadNetworkStringAsync().ConfigureAwait(false);
-
-            int contentLen = await stream.ReadNetworkIntAsync().ConfigureAwait(false);
-            if(stream.Length < contentLen) {
-                // TODO: handle this better
-                throw new MessageException(Resources.ErrorIncompleteNetworkPacket);
+            // make sure we have the entire message
+            if(stream.GetRemaining() < Separator.Length + contentLength) {
+                return false;
             }
 
-            // read the content as a set of bytes
-            byte[] content = new byte[contentLen];
-            await stream.ReadAsync(content, 0, content.Length).ConfigureAwait(false);
+            // consume the separator
+            await stream.ConsumeAsync(Separator.Length).ConfigureAwait(false);
 
-            // serialize the content to a separate stream to match the original serialize process
-            // this is very likely superfluous, but keeps the process consistent between serialize/deserialize
-            using(MemoryStream contentStream = new MemoryStream()) {
-                await contentStream.WriteAsync(content, 0, content.Length);
+            // read the content
+            Content = new byte[contentLength];
+            await stream.ReadAsync(Content, 0, Content.Length).ConfigureAwait(false);
 
-                IFormatter formatter = FormatterFactory.Create(formatterType);
-                formatter.Attach(contentStream);
+            return true;
+        }
 
-                Content = messageFactory.Create(contentType);
-                await DeSerializeContentAsync(formatter).ConfigureAwait(false);
+        public int CompareTo(object obj)
+        {
+            NetworkPacket rhs = obj as NetworkPacket;
+            if(null == rhs) {
+                return 0;
             }
+
+            return (int)(Id - rhs.Id);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if(null == obj) {
+                return false;
+            }
+
+            NetworkPacket packet = obj as NetworkPacket;
+            if(null == packet) {
+                return false;
+            }
+
+            return Type == packet.Type && Id == packet.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
 
         public override string ToString()
         {
-            return "NetworkMessage(Id: " + Id + ", Content: " + Content + ")";
+            return "NetworkPacket(Type: " + Type + ", Id: " + Id + ", ContentType: " + ContentType
+                + ", Encoding: " + Encoding + ", ContentLength: " + ContentLength + ")";
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Net;
 using System.Threading.Tasks;
@@ -13,16 +14,37 @@ namespace EnergonSoftware.DAL.Models.Accounts
     [Table("Accounts")]
     public class AccountInfo
     {
+        [Key]
         public int Id { get; set; }
+
+        [Required]
         public bool IsActive { get; set; }
+
+        [Required, MaxLength(256)]
         public string AccountName { get; set; }
+
+        [Required, MaxLength(64)]
         public string EmailAddress { get; set; }
+
+        [Required, MaxLength(256)]
         public string UserName { get; set; }
+
+        [Required, MaxLength(32)]
         public string PasswordMD5 { get; set; }
+
+        [Required, MaxLength(128)]
         public string PasswordSHA512 { get; set; }
+
+        [MaxLength(32)]
         public string EndPoint { get; set; }
+
+        [MaxLength(256)]
         public string SessionId { get; set; }
+
+        [Required]
         public Visibility Visibility { get; set; }
+
+        [MaxLength(256)]
         public string Status { get; set; }
 
         public virtual ICollection<FriendGroup> FriendGroups { get; set; }

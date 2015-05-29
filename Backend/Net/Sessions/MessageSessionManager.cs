@@ -12,7 +12,7 @@ namespace EnergonSoftware.Backend.Net.Sessions
 {
     public class MessageSessionManager : NetworkSessionManager
     {
-        public async Task BroadcastMessageAsync(MessagePacket packet, string formatterType)
+        public async Task BroadcastMessageAsync(IPacket packet, string formatterType)
         {
             using(MemoryStream buffer = new MemoryStream()) {
                 await packet.SerializeAsync(buffer, formatterType).ConfigureAwait(false);

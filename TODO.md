@@ -6,3 +6,6 @@
 3. "New Account" page in Launcher
  * Remove dev account from post-deploy script
 5. ASP.NET account setup page?
+6. Self-Host MVC instead of implementing an HttpListener
+ * Requires ASP.NET 5 and MVC 6 which is coming with Visual Studio 2015
+ * http://www.asp.net/vnext/overview/aspnet-vnext/create-a-web-api-with-mvc-6 (Microsoft.AspNet.Hosting ?)

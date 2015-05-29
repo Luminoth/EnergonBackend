@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="*" Name="LauncherInstaller" Language="1033" Version="1.0.0.0" Manufacturer="Energon Software" UpgradeCode="6792a1ae-f45e-48ea-8255-7928ceaecdb0">
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+        <MediaTemplate />
+
+        <Feature Id="ProductFeature" Title="LauncherInstaller" Level="1">
+            <ComponentGroupRef Id="ProductComponents" />
+        </Feature>
+    </Product>
+
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLFOLDER" Name="LauncherInstaller" />
+            </Directory>
+        </Directory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component Id="ProductComponent">
+                <File Source="$(var.Launcher.TargetPath)" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

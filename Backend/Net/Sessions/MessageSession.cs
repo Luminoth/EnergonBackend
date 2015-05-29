@@ -21,7 +21,7 @@ namespace EnergonSoftware.Backend.Net.Sessions
         public async Task SendMessageAsync(IMessage message)
         {
             try {
-                MessagePacket packet = CreatePacket(message);
+                IPacket packet = CreatePacket(message);
                 packet.Content = message;
                 Logger.Debug("Sending packet: " + packet);
 
@@ -42,6 +42,6 @@ namespace EnergonSoftware.Backend.Net.Sessions
         {
         }
 
-        protected abstract MessagePacket CreatePacket(IMessage message);
+        protected abstract IPacket CreatePacket(IMessage message);
     }
 }
