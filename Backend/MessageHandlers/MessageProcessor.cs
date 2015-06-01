@@ -100,7 +100,15 @@ namespace EnergonSoftware.Backend.MessageHandlers
 
             _cancellationToken.Cancel();
             _messageQueueEvent.Set();
-            _task.Wait();
+            try {
+                _task.Wait();
+            } catch(AggregateException e) {
+                if(e.InnerException is TaskCanceledException) {
+                    // ignore this
+                } else {
+                    throw;
+                }
+            }
 
             _task = null;
             _cancellationToken = null;
