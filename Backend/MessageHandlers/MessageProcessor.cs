@@ -84,10 +84,13 @@ namespace EnergonSoftware.Backend.MessageHandlers
                     // TODO: trap exceptions
                     while(!_cancellationToken.IsCancellationRequested) {
                         _messageQueueEvent.WaitOne();
+                        if(_cancellationToken.IsCancellationRequested) {
+                            break;
+                        }
+
                         await RunAsync().ConfigureAwait(false);
                     }
-                },
-                _cancellationToken.Token);
+                });
         }
 
         public void Stop()
@@ -100,15 +103,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
 
             _cancellationToken.Cancel();
             _messageQueueEvent.Set();
-            try {
-                _task.Wait();
-            } catch(AggregateException e) {
-                if(e.InnerException is TaskCanceledException) {
-                    // ignore this
-                } else {
-                    throw;
-                }
-            }
+            _task.Wait();
 
             _task = null;
             _cancellationToken = null;

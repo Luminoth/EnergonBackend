@@ -127,7 +127,7 @@ namespace EnergonSoftware.Launcher
             // have to run this in a separate thread
             // so that we don't lock up the UI
             Logger.Info("Starting idle thread...");
-            _idleTask = Task.Run(() => OnIdle(), _cancellationToken.Token);
+            _idleTask = Task.Run(() => OnIdle());
 
             await UpdateManager.Instance.CheckForUpdatesAsync();
         }

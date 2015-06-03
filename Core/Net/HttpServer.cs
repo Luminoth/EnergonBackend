@@ -70,8 +70,7 @@ namespace EnergonSoftware.Core.Net
                     while(!_cancellationToken.IsCancellationRequested) {
                         await RunAsync().ConfigureAwait(false);
                     }
-                },
-                _cancellationToken.Token);
+                });
         }
 
         public void Stop()
@@ -84,15 +83,7 @@ namespace EnergonSoftware.Core.Net
 
             _listener.Stop();
             _cancellationToken.Cancel();
-            try {
-                _task.Wait();
-            } catch(AggregateException e) {
-                if(e.InnerException is TaskCanceledException) {
-                    // ignore this
-                } else {
-                    throw;
-                }
-            }
+            _task.Wait();
 
             _task = null;
             _cancellationToken = null;
@@ -150,7 +141,11 @@ namespace EnergonSoftware.Core.Net
             if(DefaultIndex == url) {
                 // TODO: read from disk or whatever
 string data = "<html><head><title>HttpServer Test</title></head><body>Hello World!</body></html>";
-await Task.Delay(1, _cancellationToken.Token).ConfigureAwait(false);
+try {
+    await Task.Delay(1, _cancellationToken.Token).ConfigureAwait(false);
+} catch(TaskCanceledException) {
+    // ignore this
+}
                 return encoding.GetBytes(data);
             }
 
