@@ -4,12 +4,15 @@ namespace EnergonSoftware.Core.Net
 {
     public class HttpServerResult
     {
-        public Encoding Encoding { get; set; }
-        public byte[] Result { get; set; }
+        public Encoding ContentEncoding { get; set; }
+        public string ContentType { get; set; }
+        public byte[] Content { get; set; }
+
+        public int ContentLength { get { return null == Content ? 0 : Content.Length; } }
 
         public HttpServerResult()
         {
-            Encoding = Encoding.UTF8;
+            ContentEncoding = Encoding.UTF8;
         }
     }
 }

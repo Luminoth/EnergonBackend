@@ -16,7 +16,7 @@ namespace EnergonSoftware.Chat.Diagnostics
             return await ViewResultAsync().ConfigureAwait(false);
         }
 
-// TODO: the goal here basically is "create a model object in Diagnostics/Models
+// TODO: the goal here basically is to create a model object in Diagnostics/Models (that makes use of DataContract/DataMember)
 // Register a handler for /diagnostics
 // fill out the diagnostic object
 // return the diagnostic object using JsonResult()

@@ -111,6 +111,7 @@ namespace EnergonSoftware.Core.Net
         protected async Task<HttpServerResult> ViewResultAsync(string path)
         {
             HttpServerResult result = new HttpServerResult();
+            result.ContentType = "text/html";
 
             // TODO: read the view from disk
 await Task.Delay(0).ConfigureAwait(false);
@@ -125,7 +126,9 @@ await Task.Delay(0).ConfigureAwait(false);
             using(MemoryStream stream = new MemoryStream()) {
                 DataContractJsonSerializer json = new DataContractJsonSerializer(obj.GetType());
                 json.WriteObject(stream, obj);
-                result.Result = stream.ToArray();
+
+                result.ContentType = "application/json";
+                result.Content = stream.ToArray();
             }
 
             return result;
@@ -156,11 +159,13 @@ await Task.Delay(0).ConfigureAwait(false);
                 response.StatusCode = (int)HttpStatusCode.NotFound;
             } else {
                 HttpServerResult result = await _handlers[request.RawUrl]().ConfigureAwait(false);
-                response.ContentEncoding = result.Encoding;
+
                 response.StatusCode = (int)HttpStatusCode.OK;
-                response.ContentLength64 = null == result.Result ? 0 : result.Result.Length;
-                if(null != result.Result) {
-                    await response.OutputStream.WriteAsync(result.Result, 0, result.Result.Length).ConfigureAwait(false);
+                response.ContentEncoding = result.ContentEncoding;
+                response.ContentType = result.ContentType;
+                response.ContentLength64 = result.ContentLength;
+                if(null != result.Content) {
+                    await response.OutputStream.WriteAsync(result.Content, 0, result.ContentLength).ConfigureAwait(false);
                 }
             }
 
