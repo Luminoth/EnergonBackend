@@ -108,13 +108,27 @@ namespace EnergonSoftware.Core.Net
             _handlers[url] = handler;
         }
 
-        protected string ToJson(object obj, Encoding encoding)
+        protected async Task<HttpServerResult> ViewResultAsync(string path)
         {
+            HttpServerResult result = new HttpServerResult();
+
+            // TODO: read the view from disk
+await Task.Delay(0).ConfigureAwait(false);
+
+            return result;
+        }
+
+        protected HttpServerResult JsonResult(object obj)
+        {
+            HttpServerResult result = new HttpServerResult();
+
             using(MemoryStream stream = new MemoryStream()) {
                 DataContractJsonSerializer json = new DataContractJsonSerializer(obj.GetType());
                 json.WriteObject(stream, obj);
-                return encoding.GetString(stream.ToArray());
+                result.Result = stream.ToArray();
             }
+
+            return result;
         }
 
         private async Task RunAsync()
