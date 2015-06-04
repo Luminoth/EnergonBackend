@@ -11,6 +11,7 @@ using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sockets;
 using EnergonSoftware.Core.Util;
 
+using EnergonSoftware.Overmind.Diagnostics;
 using EnergonSoftware.Overmind.Net;
 
 using log4net;
@@ -26,7 +27,7 @@ namespace EnergonSoftware.Overmind
 
         public bool Running { get; private set; }
 
-        private readonly HttpServer _diagnosticServer = new HttpServer();
+        private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
 
         private readonly TcpListener _listener = new TcpListener(new OvermindSessionFactory());
         private readonly MessageSessionManager _sessions = new MessageSessionManager();

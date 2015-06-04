@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Authenticator.Diagnostics;
 using EnergonSoftware.Authenticator.Net;
 
 using EnergonSoftware.Backend.Net.Sessions;
@@ -26,7 +27,7 @@ namespace EnergonSoftware.Authenticator
 
         public bool Running { get; private set; }
 
-        private readonly HttpServer _diagnosticServer = new HttpServer();
+        private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
 
         private readonly TcpListener _listener = new TcpListener(new AuthSessionFactory());
         private readonly MessageSessionManager _sessions = new MessageSessionManager();

@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Diagnostics\DiagnosticsServer.cs" />
     <Compile Include="EventLogger.cs" />
     <Compile Include="MessageHandlers\InstanceNotifierMessageHandlerFactory.cs" />
     <Compile Include="Net\InstanceNotifier.cs" />

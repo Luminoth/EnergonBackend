@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Net.Sessions;
 
+using EnergonSoftware.Chat.Diagnostics;
 using EnergonSoftware.Chat.Net;
 
 using EnergonSoftware.Core.Configuration;
@@ -26,7 +27,7 @@ namespace EnergonSoftware.Chat
 
         public bool Running { get; private set; }
 
-        private readonly HttpServer _diagnosticServer = new HttpServer();
+        private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
 
         private readonly TcpListener _listener = new TcpListener(new ChatSessionFactory());
         private readonly MessageSessionManager _sessions = new MessageSessionManager();

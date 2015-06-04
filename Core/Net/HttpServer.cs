@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,20 +15,29 @@ using log4net;
 
 namespace EnergonSoftware.Core.Net
 {
-    public sealed class HttpServer : IDisposable
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// This class should only be considered temporary. Embedding MVC is coming in ASP.NET 5
+    /// and should be used as a replacement for this when available. The MVC design is much
+    /// cleaner and has a lot more tools available for rapid development.
+    /// </remarks>
+    public class HttpServer : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpServer));
 
+        public delegate Task<HttpServerResult> HttpRequestDelegate();
+
         private readonly HttpListener _listener = new HttpListener();
+
+        private ConcurrentDictionary<string, HttpRequestDelegate> _handlers = new ConcurrentDictionary<string,HttpRequestDelegate>();
 
         private CancellationTokenSource _cancellationToken;
         private Task _task;
 
-        public string DefaultIndex { get; set; }
-
         public HttpServer()
         {
-            DefaultIndex = "/index.html";
         }
 
 #region Dispose
@@ -66,9 +78,9 @@ namespace EnergonSoftware.Core.Net
             _task = Task.Run(
                 async () =>
                 {
-                    // TODO: trap exceptions
                     while(!_cancellationToken.IsCancellationRequested) {
                         await RunAsync().ConfigureAwait(false);
+                        await Task.Delay(0).ConfigureAwait(false);
                     }
                 });
         }
@@ -89,6 +101,20 @@ namespace EnergonSoftware.Core.Net
             _cancellationToken = null;
 
             Logger.Debug("HTTP server finished!");
+        }
+
+        protected void RegisterHandler(string url, HttpRequestDelegate handler)
+        {
+            _handlers[url] = handler;
+        }
+
+        protected string ToJson(object obj, Encoding encoding)
+        {
+            using(MemoryStream stream = new MemoryStream()) {
+                DataContractJsonSerializer json = new DataContractJsonSerializer(obj.GetType());
+                json.WriteObject(stream, obj);
+                return encoding.GetString(stream.ToArray());
+            }
         }
 
         private async Task RunAsync()
@@ -112,44 +138,19 @@ namespace EnergonSoftware.Core.Net
         {
             Logger.Debug("New HttpListenerRequest: " + request.Url);
 
-            Encoding encoding = response.ContentEncoding;
-            if(null == encoding) {
-                encoding = Encoding.UTF8;
-                response.ContentEncoding = encoding;
-            }
-
-            byte[] data = await ReadContentAsync(request.RawUrl, encoding).ConfigureAwait(false);
-            if(null == data) {
-                Logger.Debug("Content not found!");
+            if(!_handlers.ContainsKey(request.RawUrl)) {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
             } else {
+                HttpServerResult result = await _handlers[request.RawUrl]().ConfigureAwait(false);
+                response.ContentEncoding = result.Encoding;
                 response.StatusCode = (int)HttpStatusCode.OK;
-                response.ContentLength64 = data.Length;
-                await response.OutputStream.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
+                response.ContentLength64 = null == result.Result ? 0 : result.Result.Length;
+                if(null != result.Result) {
+                    await response.OutputStream.WriteAsync(result.Result, 0, result.Result.Length).ConfigureAwait(false);
+                }
             }
 
             response.OutputStream.Close();
-        }
-
-        private async Task<byte[]> ReadContentAsync(string url, Encoding encoding)
-        {
-            if("/" == url) {
-                url = DefaultIndex;
-            }
-
-            Logger.Debug("Reading content for url=" + url);
-            if(DefaultIndex == url) {
-                // TODO: read from disk or whatever
-string data = "<html><head><title>HttpServer Test</title></head><body>Hello World!</body></html>";
-try {
-    await Task.Delay(1, _cancellationToken.Token).ConfigureAwait(false);
-} catch(TaskCanceledException) {
-    // ignore this
-}
-                return encoding.GetBytes(data);
-            }
-
-            return null;
         }
     }
 }

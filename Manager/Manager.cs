@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
+
+using EnergonSoftware.Manager.Diagnostics;
 using EnergonSoftware.Manager.Net;
 
 using log4net;
@@ -22,7 +24,7 @@ namespace EnergonSoftware.Manager
 
         public bool Running { get; private set; }
 
-        private readonly HttpServer _diagnosticServer = new HttpServer();
+        private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
 
         public Manager()
         {
