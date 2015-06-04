@@ -15,5 +15,10 @@ namespace EnergonSoftware.Chat.Diagnostics
         {
             return await ViewResultAsync().ConfigureAwait(false);
         }
+
+// TODO: the goal here basically is "create a model object in Diagnostics/Models
+// Register a handler for /diagnostics
+// fill out the diagnostic object
+// return the diagnostic object using JsonResult()
     }
 }
