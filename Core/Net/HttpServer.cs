@@ -122,12 +122,16 @@ await Task.Delay(0).ConfigureAwait(false);
         protected HttpServerResult JsonResult(object obj)
         {
             HttpServerResult result = new HttpServerResult();
+            result.ContentType = "application/json";
+
+            if(null == obj) {
+                return result;
+            }
 
             using(MemoryStream stream = new MemoryStream()) {
                 DataContractJsonSerializer json = new DataContractJsonSerializer(obj.GetType());
                 json.WriteObject(stream, obj);
 
-                result.ContentType = "application/json";
                 result.Content = stream.ToArray();
             }
 
