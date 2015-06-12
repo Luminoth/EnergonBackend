@@ -4,6 +4,8 @@ namespace EnergonSoftware.Core.Net
 {
     public class HttpServerResult
     {
+        public bool AllowCrossOrigin { get; set; }
+
         public Encoding ContentEncoding { get; set; }
         public string ContentType { get; set; }
         public byte[] Content { get; set; }
@@ -12,6 +14,7 @@ namespace EnergonSoftware.Core.Net
 
         public HttpServerResult()
         {
+            AllowCrossOrigin = false;
             ContentEncoding = Encoding.UTF8;
         }
     }

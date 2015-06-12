@@ -164,6 +164,11 @@ await Task.Delay(0).ConfigureAwait(false);
                 response.ContentEncoding = result.ContentEncoding;
                 response.ContentType = result.ContentType;
                 response.ContentLength64 = result.ContentLength;
+
+                if(result.AllowCrossOrigin) {
+                    response.AddHeader("Access-Control-Allow-Origin", "*");
+                }
+
                 if(null != result.Content) {
                     await response.OutputStream.WriteAsync(result.Content, 0, result.ContentLength).ConfigureAwait(false);
                 }
