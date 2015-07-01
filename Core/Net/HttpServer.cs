@@ -2,10 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Runtime.Serialization.Json;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,14 +29,10 @@ namespace EnergonSoftware.Core.Net
 
         private readonly HttpListener _listener = new HttpListener();
 
-        private ConcurrentDictionary<string, HttpRequestDelegate> _handlers = new ConcurrentDictionary<string,HttpRequestDelegate>();
+        private readonly ConcurrentDictionary<string, HttpRequestDelegate> _handlers = new ConcurrentDictionary<string,HttpRequestDelegate>();
 
         private CancellationTokenSource _cancellationToken;
         private Task _task;
-
-        public HttpServer()
-        {
-        }
 
 #region Dispose
         public void Dispose()
@@ -110,8 +104,10 @@ namespace EnergonSoftware.Core.Net
 
         protected async Task<HttpServerResult> ViewResultAsync(string path)
         {
-            HttpServerResult result = new HttpServerResult();
-            result.ContentType = "text/html";
+            HttpServerResult result = new HttpServerResult()
+            {
+                ContentType = "text/html",
+            };
 
             // TODO: read the view from disk
 await Task.Delay(0).ConfigureAwait(false);
@@ -121,8 +117,10 @@ await Task.Delay(0).ConfigureAwait(false);
 
         protected HttpServerResult JsonResult(object obj)
         {
-            HttpServerResult result = new HttpServerResult();
-            result.ContentType = "application/json";
+            HttpServerResult result = new HttpServerResult()
+            {
+                ContentType = "application/json",
+            };
 
             if(null == obj) {
                 return result;

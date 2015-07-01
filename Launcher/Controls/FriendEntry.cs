@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-
-namespace EnergonSoftware.Launcher.Controls
+﻿namespace EnergonSoftware.Launcher.Controls
 {
     internal sealed class FriendEntry
     {

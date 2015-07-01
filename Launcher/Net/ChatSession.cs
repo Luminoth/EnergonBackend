@@ -9,8 +9,6 @@ using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Messages.Chat;
-using EnergonSoftware.Backend.Messages.Formatter;
-using EnergonSoftware.Backend.Messages.Packet;
 using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
 
@@ -27,6 +25,7 @@ namespace EnergonSoftware.Launcher.Net
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ChatSession));
 
+        // ReSharper disable once InconsistentNaming
         private long LastPingTimeMS { get; set; }
         private bool ShouldPing
         {
@@ -48,10 +47,6 @@ namespace EnergonSoftware.Launcher.Net
         private readonly IMessageHandlerFactory _messageHandlerFactory = new MessageHandlerFactory();
 
         protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
-
-        public ChatSession() : base()
-        {
-        }
 
         /*protected async override Task OnRunAsync()
         {
@@ -130,7 +125,7 @@ namespace EnergonSoftware.Launcher.Net
             FriendListManager.Instance.Clear();
             FriendListManager.Instance.AddAll(friendList);
 
-            Logger.Debug("Friends: " + FriendListManager.Instance.ToString());
+            Logger.Debug("Friends: " + FriendListManager.Instance);
         }
 
         protected override MessagePacket CreatePacket(IMessage message)

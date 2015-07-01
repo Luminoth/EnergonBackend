@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -32,7 +31,7 @@ namespace EnergonSoftware.Launcher.Friends
         public FriendGroupEntry RootGroupEntry { get; private set; }
 
         public int Total { get { return FriendList.Count; } }
-        public int OnlineCount { get { return FriendList.Where(e => e.Value.Visibility.IsOnline()).Count(); } }
+        public int OnlineCount { get { return FriendList.Count(e => e.Value.Visibility.IsOnline()); } }
 
         public string FriendButtonText { get { return string.Format(Resources.FriendsLabel, OnlineCount, Total); } }
 

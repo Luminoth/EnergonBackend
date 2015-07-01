@@ -8,11 +8,10 @@ namespace EnergonSoftware.Core.Util
         public void Start(bool runAsService, string[] args)
         {
             if(runAsService) {
-                ServiceBase[] services = new ServiceBase[]
-                { 
+                ServiceBase[] services = { 
                     this
                 };
-                ServiceBase.Run(services);
+                Run(services);
             } else {
                 OnStart(args);
             }

@@ -2,8 +2,6 @@
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Serialization;
-
-using EnergonSoftware.Core;
 using EnergonSoftware.Core.Util;
 
 namespace EnergonSoftware.Backend.Messages.Auth

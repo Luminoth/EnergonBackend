@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Configuration;
 using System.Diagnostics;
-using System.ServiceProcess;
-using System.Threading;
-using System.Threading.Tasks;
 
 using log4net;
 using log4net.Config;
@@ -33,7 +30,7 @@ namespace EnergonSoftware.Authenticator
 
             Authenticator authenticator = new Authenticator();
             Console.Title = authenticator.ServiceName;
-            Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
+            Console.CancelKeyPress += (sender, e) =>
                 {
                     Logger.Info("Caught CancelKeyPress, stopping...");
                     authenticator.Stop();

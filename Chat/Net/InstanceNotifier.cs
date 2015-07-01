@@ -1,20 +1,12 @@
-﻿using System;
-using System.Configuration;
-using System.Net;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Messages.Formatter;
 using EnergonSoftware.Backend.Messages.Notification;
 using EnergonSoftware.Backend.Net.Sessions;
-
-using EnergonSoftware.Chat.MessageHandlers;
 
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
-using EnergonSoftware.Core.Net.Sockets;
 
 using log4net;
 

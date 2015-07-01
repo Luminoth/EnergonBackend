@@ -9,19 +9,15 @@ using EnergonSoftware.Authenticator.MessageHandlers;
 using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Auth;
-using EnergonSoftware.Backend.Messages.Formatter;
-using EnergonSoftware.Backend.Messages.Packet;
 using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
 
-using EnergonSoftware.Core;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
 
 using EnergonSoftware.DAL;
 using EnergonSoftware.DAL.Models.Accounts;
 
-using log4net;
 
 namespace EnergonSoftware.Authenticator.Net
 {
@@ -31,8 +27,10 @@ namespace EnergonSoftware.Authenticator.Net
         {
             AuthSession session = null;
             try {
-                session = new AuthSession(socket);
-                session.Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
+                session = new AuthSession(socket)
+                {
+                    Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
+                };
                 return session;
             } catch(Exception) {
                 if(null != session) {

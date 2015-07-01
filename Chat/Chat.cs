@@ -10,7 +10,6 @@ using EnergonSoftware.Chat.Diagnostics;
 using EnergonSoftware.Chat.Net;
 
 using EnergonSoftware.Core.Configuration;
-using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sockets;
 using EnergonSoftware.Core.Util;
 
@@ -18,7 +17,7 @@ using log4net;
 
 namespace EnergonSoftware.Chat
 {
-    internal sealed partial class Chat : ServiceWrapper, IDisposable
+    internal sealed partial class Chat : ServiceWrapper
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Chat));
 
@@ -128,11 +127,7 @@ namespace EnergonSoftware.Chat
         {
             while(Running) {
                 try {
-                    Task.WhenAll(new Task[]
-                        {
-                            InstanceNotifier.Instance.RunAsync(),
-                            PollAndReadAllAsync(),
-                        }).Wait();
+                    Task.WhenAll(InstanceNotifier.Instance.RunAsync(), PollAndReadAllAsync()).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();

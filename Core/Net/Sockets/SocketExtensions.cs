@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
+// ReSharper disable once CheckNamespace
 namespace System.Net.Sockets
 {
     public static class SocketExtensions
@@ -9,7 +10,7 @@ namespace System.Net.Sockets
         public static Socket AcceptFrom(this Socket socket)
         {
             IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
-            EndPoint remoteEndpoint = (EndPoint)sender;
+            EndPoint remoteEndpoint = sender;
 
             // peek at the available data to get at the remote endpoint
             byte[] buffer = new byte[1];

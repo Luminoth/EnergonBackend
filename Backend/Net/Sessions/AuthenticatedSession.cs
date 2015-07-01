@@ -2,11 +2,8 @@
 using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Accounts;
-using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Properties;
-
-using EnergonSoftware.Core.Net.Sessions;
 
 using log4net;
 
@@ -50,7 +47,7 @@ namespace EnergonSoftware.Backend.Net.Sessions
 
             Account = lookupAccount;
 
-            EnergonSoftware.Backend.Accounts.Account loginAccount = new Account()
+            Account loginAccount = new Account()
             {
                 AccountName = accountName,
                 SessionId = sessionid,
@@ -77,7 +74,7 @@ namespace EnergonSoftware.Backend.Net.Sessions
             Account = null;
         }
 
-        protected AuthenticatedSession() : base()
+        protected AuthenticatedSession()
         {
         }
 

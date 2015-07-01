@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel;
-using System.Windows;
 
 namespace EnergonSoftware.Launcher.Windows
 {
     /// <summary>
     /// Interaction logic for SettingsWindow.xaml
     /// </summary>
-    public partial class SettingsWindow : Window
+    public partial class SettingsWindow
     {
         public static SettingsWindow Instance { get { return App.Instance.SettingsWindow; } }
 

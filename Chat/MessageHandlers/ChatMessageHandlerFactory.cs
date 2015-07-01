@@ -3,8 +3,6 @@ using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Messages.Chat;
 
-using EnergonSoftware.Chat.Net;
-
 namespace EnergonSoftware.Chat.MessageHandlers
 {
     internal sealed class ChatMessageHandlerFactory : IMessageHandlerFactory

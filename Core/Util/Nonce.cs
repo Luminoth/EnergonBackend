@@ -8,11 +8,12 @@ namespace EnergonSoftware.Core.Util
     public sealed class Nonce
     {
         public string Realm { get; private set; }
+        // ReSharper disable once InconsistentNaming
         public int ExpiryMS { get; private set; }
         public string NonceValue { get; private set; }
         public string NonceHash { get; private set; }
         public long CreationTime { get; private set; }
-        public bool Expired { get { return ExpiryMS < 0 ? false : Time.CurrentTimeMs >= (CreationTime + ExpiryMS); } }
+        public bool Expired { get { return ExpiryMS >= 0 && Time.CurrentTimeMs >= (CreationTime + ExpiryMS); } }
 
         private Nonce()
         {

@@ -6,7 +6,7 @@ namespace EnergonSoftware.Backend.Messages
     [Serializable]
     public class MessageException : Exception
     {
-        public MessageException() : base()
+        public MessageException()
         {
         }
 

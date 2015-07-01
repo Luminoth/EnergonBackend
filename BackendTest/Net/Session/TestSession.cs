@@ -1,7 +1,5 @@
 ﻿using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Messages.Formatter;
-using EnergonSoftware.Backend.Messages.Packet;
 using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
 

@@ -7,20 +7,20 @@ namespace EnergonSoftware.Core.Util
     {
         public static string HexDump(byte[] buffer, int offset, int count)
         {
-            const int GroupCount = 2;
-            const int BytesPerGroup = 4;
-            const int BytesPerLine = BytesPerGroup * GroupCount;
+            const int groupCount = 2;
+            const int bytesPerGroup = 4;
+            const int bytesPerLine = bytesPerGroup * groupCount;
 
             int length = Math.Min(offset + count, buffer.Length);
-            int rowCount = (int)Math.Ceiling((decimal)length / (decimal)BytesPerLine);
+            int rowCount = (int)Math.Ceiling(length / (decimal)bytesPerLine);
 
             StringBuilder builder = new StringBuilder();
             for(int row = 0; row < rowCount; ++row) {
-                int start = offset + (row * BytesPerLine);
-                int end = Math.Min(start + BytesPerLine, length);
+                int start = offset + (row * bytesPerLine);
+                int end = Math.Min(start + bytesPerLine, length);
 
                 // hex
-                for(int j = start; j < (start + BytesPerLine); ++j) {
+                for(int j = start; j < (start + bytesPerLine); ++j) {
                     if(j < end) {
                         builder.Append(string.Format("{0:X2} ", buffer[j]));
                     } else {

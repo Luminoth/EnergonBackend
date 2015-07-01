@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
 
 using EnergonSoftware.Launcher.Pages;
@@ -9,7 +8,7 @@ namespace EnergonSoftware.Launcher.Windows
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         public static MainWindow Instance { get { return (MainWindow)Application.Current.MainWindow; } }
 
@@ -18,8 +17,8 @@ namespace EnergonSoftware.Launcher.Windows
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    MainWindow.Instance.MenuFileLogout.IsEnabled = false;
-                    MainWindow.Instance.MainFrame.Navigate(new LoginPage());
+                    Instance.MenuFileLogout.IsEnabled = false;
+                    Instance.MainFrame.Navigate(new LoginPage());
                 });
         }
 
@@ -27,8 +26,8 @@ namespace EnergonSoftware.Launcher.Windows
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    MainWindow.Instance.MenuFileLogout.IsEnabled = true;
-                    MainWindow.Instance.MainFrame.Navigate(new MainPage());
+                    Instance.MenuFileLogout.IsEnabled = true;
+                    Instance.MainFrame.Navigate(new MainPage());
                 });
         }
 
@@ -36,7 +35,7 @@ namespace EnergonSoftware.Launcher.Windows
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    MainWindow.Instance.MainFrame.GoBack();
+                    Instance.MainFrame.GoBack();
                 });
         }
 #endregion

@@ -14,7 +14,7 @@ namespace EnergonSoftware.Backend.Messages.Notification
         public string ServiceName { get; set; }
         public string ServiceId { get; set; }
 
-        public StartupMessage() : base()
+        public StartupMessage()
         {
             ServiceName = string.Empty;
             ServiceId = string.Empty;

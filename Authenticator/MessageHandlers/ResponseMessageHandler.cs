@@ -26,10 +26,6 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ResponseMessageHandler));
 
-        internal ResponseMessageHandler()
-        {
-        }
-
         //// TODO: handle the case of a user authenticating a second time
 
         private async Task CompleteAuthenticationAsync(AuthSession session)
@@ -39,11 +35,11 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             await session.SuccessAsync(sessionid.SessionID).ConfigureAwait(false);
         }
 
-        private async Task AuthenticateAsync(AuthSession session, string accountName, string nonce, string cnonce, string nc, string qop, string digestURI, string response)
+        private async Task AuthenticateAsync(AuthSession session, string accountName, string nonce, string cnonce, string nc, string qop, string digestUri, string response)
         {
             using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
                 var accounts = from a in context.Accounts where a.AccountName == accountName select a;
-                if(accounts.Count() < 1) {
+                if(accounts.Any()) {
                     await session.FailureAsync("Bad Username or Password").ConfigureAwait(false);
                     return;
                 }
@@ -54,7 +50,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                     return;
                 }
 
-                string expected = string.Empty, rspauth = string.Empty;
+                string expected, rspauth;
                 switch(session.AuthType)
                 {
                 case AuthType.DigestMD5:
@@ -68,8 +64,8 @@ return;
                 case AuthType.DigestSHA512:
                     Logger.Debug("Handling SHA512 response...");
                     ////Logger.Debug("passwordHash=" + account.PasswordSHA512);
-                    expected = await AuthUtil.DigestClientResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
-                    rspauth = await AuthUtil.DigestServerResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestURI).ConfigureAwait(false);
+                    expected = await AuthUtil.DigestClientResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestUri).ConfigureAwait(false);
+                    rspauth = await AuthUtil.DigestServerResponseAsync(new SHA512(), account.PasswordSHA512, nonce, nc, qop, cnonce, digestUri).ConfigureAwait(false);
                     break;
                 default:
                     await session.FailureAsync("Unsupported auth type!").ConfigureAwait(false);
@@ -117,41 +113,41 @@ return;
             }
 
             try {
-                string username = values["username"].Trim(new char[] { '"' });
+                string username = values["username"].Trim('"');
                 await EventLogger.Instance.BeginEventAsync(authSession.RemoteEndPoint, username).ConfigureAwait(false);
 
-                string charset = values["charset"].Trim(new char[] { '"' });
+                string charset = values["charset"].Trim('"');
                 if(!"utf-8".Equals(charset, StringComparison.InvariantCultureIgnoreCase)) {
                     await authSession.FailureAsync("Invalid Response").ConfigureAwait(false);
                     return;
                 }
 
-                string qop = values["qop"].Trim(new char[] { '"' });
+                string qop = values["qop"].Trim('"');
                 if(!"auth".Equals(qop, StringComparison.InvariantCultureIgnoreCase)) {
                     await authSession.FailureAsync("Invalid Response").ConfigureAwait(false);
                     return;
                 }
 
-                string realm = values["realm"].Trim(new char[] { '"' });
+                string realm = values["realm"].Trim('"');
                 if(!ConfigurationManager.AppSettings["authRealm"].Equals(realm, StringComparison.InvariantCultureIgnoreCase)) {
                     await authSession.FailureAsync("Invalid Response").ConfigureAwait(false);
                     return;
                 }
 
-                string nonce = values["nonce"].Trim(new char[] { '"' });
+                string nonce = values["nonce"].Trim('"');
                 if(!authSession.AuthNonce.NonceHash.Equals(nonce)) {
                     await authSession.FailureAsync("Invalid Response").ConfigureAwait(false);
                     return;
                 }
 
-                string digestURI = values["digest-uri"].Trim(new char[] { '"' });
+                string digestUri = values["digest-uri"].Trim('"');
                 //// TODO: validate the digest-uri
 
-                string cnonce = values["cnonce"].Trim(new char[] { '"' });
-                string nc = values["nc"].Trim(new char[] { '"' });
-                string rsp = values["response"].Trim(new char[] { '"' });
+                string cnonce = values["cnonce"].Trim('"');
+                string nc = values["nc"].Trim('"');
+                string rsp = values["response"].Trim('"');
 
-                await AuthenticateAsync(authSession, username, nonce, cnonce, nc, qop, digestURI, rsp).ConfigureAwait(false);
+                await AuthenticateAsync(authSession, username, nonce, cnonce, nc, qop, digestUri, rsp).ConfigureAwait(false);
             } catch(KeyNotFoundException) {
                 authSession.FailureAsync("Invalid response!").Wait();
             }

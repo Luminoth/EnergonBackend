@@ -2,8 +2,6 @@
 using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Auth;
 
-using EnergonSoftware.Core.Net;
-
 namespace EnergonSoftware.Overmind.MessageHandlers
 {
     internal sealed class OvermindMessageHandlerFactory : IMessageHandlerFactory

@@ -9,10 +9,6 @@ namespace EnergonSoftware.Chat.MessageHandlers
 {
     internal sealed class VisibilityMessageHandler : MessageHandler
     {
-        internal VisibilityMessageHandler()
-        {
-        }
-
         protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             await Task.Delay(0).ConfigureAwait(false);

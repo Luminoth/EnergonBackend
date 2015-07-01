@@ -11,10 +11,6 @@ namespace EnergonSoftware.Overmind.MessageHandlers
 {
     internal sealed class LogoutMessageHandler : MessageHandler
     {
-        internal LogoutMessageHandler()
-        {
-        }
-
         protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             OvermindSession overmindSession = (OvermindSession)session;

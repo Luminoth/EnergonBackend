@@ -6,7 +6,7 @@ namespace EnergonSoftware.Core.IO
 {
     public class LockingMemoryStream : MemoryStream
     {
-        private SemaphoreSlim _lock = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
 #region Dispose
         protected override void Dispose(bool disposing)

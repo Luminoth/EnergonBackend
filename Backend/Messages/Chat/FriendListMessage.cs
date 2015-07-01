@@ -31,7 +31,7 @@ namespace EnergonSoftware.Backend.Messages.Chat
         {
             await formatter.WriteAsync("AccountName", AccountName).ConfigureAwait(false);
             await formatter.WriteAsync("Ticket", SessionId).ConfigureAwait(false);
-            await formatter.WriteAsync<Account>("FriendList", Friends).ConfigureAwait(false);
+            await formatter.WriteAsync("FriendList", Friends).ConfigureAwait(false);
         }
 
         public async Task DeserializeAsync(IFormatter formatter)

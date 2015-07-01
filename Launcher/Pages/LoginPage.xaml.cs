@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 
 using EnergonSoftware.Launcher.News;
 
@@ -10,7 +9,7 @@ namespace EnergonSoftware.Launcher.Pages
     /// <summary>
     /// Interaction logic for LoginPage.xaml
     /// </summary>
-    public partial class LoginPage : Page
+    public partial class LoginPage
     {
         public LoginPage()
         {

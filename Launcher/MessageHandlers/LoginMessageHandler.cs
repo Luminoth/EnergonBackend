@@ -12,10 +12,6 @@ namespace EnergonSoftware.Launcher.MessageHandlers
 {
     internal sealed class LoginMessageHandler : MessageHandler
     {
-        internal LoginMessageHandler()
-        {
-        }
-
         protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             OvermindSession overmindSession = session as OvermindSession;

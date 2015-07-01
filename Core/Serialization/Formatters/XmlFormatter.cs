@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
@@ -23,12 +24,16 @@ namespace EnergonSoftware.Core.Serialization.Formatters
         {
             _stream = stream;
 
-            XmlWriterSettings writerSettings = new XmlWriterSettings();
-            writerSettings.Async = true;
+            XmlWriterSettings writerSettings = new XmlWriterSettings()
+            {
+                Async = true,
+            };
             _writer = XmlWriter.Create(_stream, writerSettings);
 
-            XmlReaderSettings readerSettings = new XmlReaderSettings();
-            readerSettings.Async = true;
+            XmlReaderSettings readerSettings = new XmlReaderSettings()
+            {
+                Async = true,
+            };
             _reader = XmlReader.Create(_stream, readerSettings);
         }
 
@@ -87,12 +92,12 @@ namespace EnergonSoftware.Core.Serialization.Formatters
 
         public async Task WriteAsync(string name, float value)
         {
-            await _writer.WriteElementStringAsync(Prefix, name, Namespace, value.ToString()).ConfigureAwait(false);
+            await _writer.WriteElementStringAsync(Prefix, name, Namespace, value.ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
         }
 
         public async Task WriteAsync(string name, double value)
         {
-            await _writer.WriteElementStringAsync(Prefix, name, Namespace, value.ToString()).ConfigureAwait(false);
+            await _writer.WriteElementStringAsync(Prefix, name, Namespace, value.ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
         }
 
         public async Task WriteAsync(string name, byte[] value, int offset, int count)

@@ -18,9 +18,11 @@ namespace EnergonSoftware.Core.Configuration
 
         [ConfigurationProperty("multicastGroup")]
         public string MulticastGroup { get { return (string)this["multicastGroup"]; } }
+        // ReSharper disable once InconsistentNaming
         public IPAddress MulticastGroupIPAddress { get { return IPAddress.Parse(MulticastGroup); } }
 
         [ConfigurationProperty("multicastTTL", DefaultValue = 1)]
+        // ReSharper disable once InconsistentNaming
         public int MulticastTTL { get { return (int)this["multicastTTL"]; } }
 
         public override string ToString()

@@ -6,7 +6,7 @@ namespace EnergonSoftware.Backend.Packet
     [Serializable]
     public class PacketException : Exception
     {
-        public PacketException() : base()
+        public PacketException()
         {
         }
 

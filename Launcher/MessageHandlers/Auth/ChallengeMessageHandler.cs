@@ -22,10 +22,6 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ChallengeMessageHandler));
 
-        internal ChallengeMessageHandler()
-        {
-        }
-
         private async Task HandleChallengeStateAsync(AuthSession session, string message)
         {
             Dictionary<string, string> values = AuthUtil.ParseDigestValues(message);
@@ -35,16 +31,16 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             }
 
             try {
-                string charset = values["charset"].Trim(new char[] { '"' });
+                string charset = values["charset"].Trim('"');
                 if(!"utf-8".Equals(charset, StringComparison.InvariantCultureIgnoreCase)) {
                     await session.ErrorAsync("Invalid charset!").ConfigureAwait(false);
                     return;
                 }
 
-                string realm = values["realm"].Trim(new char[] { '"' });
+                string realm = values["realm"].Trim('"');
                 Nonce cnonce = new Nonce(realm, -1);
                 string nc = "00000001";
-                string digestURI = realm + "/" + ConfigurationManager.AppSettings["authHost"];
+                string digestUri = realm + "/" + ConfigurationManager.AppSettings["authHost"];
 
                 Logger.Debug("Authenticating " + App.Instance.UserAccount.AccountName + ":" + realm + ":***");
                 string passwordHash = await new SHA512().DigestPasswordAsync(
@@ -53,9 +49,9 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                     App.Instance.UserAccount.Password).ConfigureAwait(false);
                 Logger.Debug("passwordHash=" + passwordHash);
 
-                string nonce = values["nonce"].Trim(new char[] { '"' });
-                string qop = values["qop"].Trim(new char[] { '"' });
-                string rsp = await AuthUtil.DigestClientResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI).ConfigureAwait(false);
+                string nonce = values["nonce"].Trim('"');
+                string qop = values["qop"].Trim('"');
+                string rsp = await AuthUtil.DigestClientResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestUri).ConfigureAwait(false);
             
                 string msg = "username=\"" + App.Instance.UserAccount.AccountName + "\","
                     + "realm=" + realm + ","
@@ -63,12 +59,12 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                         + "cnonce=\"" + cnonce.NonceHash + "\","
                         + "nc=" + nc + ","
                         + "qop=" + qop + ","
-                        + "digest-uri=\"" + digestURI + "\","
+                        + "digest-uri=\"" + digestUri + "\","
                         + "response=" + rsp + ","
                         + "charset=" + charset;
                 Logger.Debug("Generated response: " + msg);
 
-                string rspAuth = await AuthUtil.DigestServerResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestURI).ConfigureAwait(false);
+                string rspAuth = await AuthUtil.DigestServerResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestUri).ConfigureAwait(false);
                 await session.AuthResponseAsync(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)), rspAuth).ConfigureAwait(false);
             } catch(KeyNotFoundException e) {
                 session.ErrorAsync("Invalid challenge: " + e.Message).Wait();
@@ -84,7 +80,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             }
 
             try {
-                string rspauth = values["rspauth"].Trim(new char[] { '"' });
+                string rspauth = values["rspauth"].Trim('"');
                 if(session.RspAuth != rspauth) {
                     await session.ErrorAsync("rspauth mismatch, expected: '" + session.RspAuth + "', got: '" + rspauth + "'").ConfigureAwait(false);
                     return;
@@ -93,7 +89,6 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 await session.AuthFinalizeAsync().ConfigureAwait(false);
             } catch(KeyNotFoundException e) {
                 session.ErrorAsync("Invalid challenge: " + e.Message).Wait();
-                return;
             }
         }
 

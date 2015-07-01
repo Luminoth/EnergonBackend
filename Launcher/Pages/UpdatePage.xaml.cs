@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 
 using EnergonSoftware.Launcher.Updater;
 using EnergonSoftware.Launcher.Windows;
@@ -9,7 +8,7 @@ namespace EnergonSoftware.Launcher.Pages
     /// <summary>
     /// Interaction logic for UpdatePage.xaml
     /// </summary>
-    public partial class UpdatePage : Page
+    public partial class UpdatePage
     {
         public UpdatePage()
         {

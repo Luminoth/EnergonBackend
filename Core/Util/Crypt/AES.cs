@@ -4,11 +4,16 @@ using System.Threading.Tasks;
 
 namespace EnergonSoftware.Core.Util.Crypt
 {
+    // ReSharper disable once InconsistentNaming
     public static class AES
     {
         public static async Task<byte[]> EncryptAsync(string data, byte[] key, byte[] iv)
         {
             using(Aes aes = Aes.Create()) {
+                if(null == aes) {
+                    return null;
+                }
+
                 aes.Key = key;
                 aes.IV = iv;
                 ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
@@ -25,6 +30,10 @@ namespace EnergonSoftware.Core.Util.Crypt
         public static async Task<string> DecryptAsync(byte[] data, byte[] key, byte[] iv)
         {
             using(Aes aes = Aes.Create()) {
+                if(null == aes) {
+                    return null;
+                }
+
                 aes.Key = key;
                 aes.IV = iv;
                 ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);

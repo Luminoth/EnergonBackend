@@ -1,8 +1,6 @@
 ﻿using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages.Notification;
 
-using EnergonSoftware.Core.Net;
-
 namespace EnergonSoftware.Authenticator.MessageHandlers
 {
     internal sealed class InstanceNotifierMessageHandlerFactory : IMessageHandlerFactory

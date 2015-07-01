@@ -1,8 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-using EnergonSoftware.DAL;
 using EnergonSoftware.DAL.Models.Accounts;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;

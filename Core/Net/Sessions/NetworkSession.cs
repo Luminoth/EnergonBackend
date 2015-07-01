@@ -22,14 +22,14 @@ namespace EnergonSoftware.Core.Net.Sessions
         private static readonly ILog Logger = LogManager.GetLogger(typeof(NetworkSession));
 
 #region Id Generator
-        private static int _nextId = 0;
+        private static int _nextId;
         private static int NextId { get { return ++_nextId; } }
 #endregion
 
 #region Events
         public event EventHandler<ConnectedEventArgs> ConnectedEvent;
         public event EventHandler<DisconnectedEventArgs> DisconnectedEvent;
-        public event EventHandler<EnergonSoftware.Core.Util.ErrorEventArgs> ErrorEvent;
+        public event EventHandler<Util.ErrorEventArgs> ErrorEvent;
         public event EventHandler<DataReceivedEventArgs> DataReceivedEvent;
 #endregion
 
@@ -46,10 +46,11 @@ namespace EnergonSoftware.Core.Net.Sessions
 
         public EndPoint RemoteEndPoint { get { return _socket.RemoteEndPoint; } }
 
+        // ReSharper disable once InconsistentNaming
         public long LastMessageTimeMS { get; private set; }
 
         public long Timeout { get; set; }
-        public bool TimedOut { get { return Timeout < 0 ? false : Time.CurrentTimeMs >= (LastMessageTimeMS + Timeout); } }
+        public bool TimedOut { get { return Timeout >= 0 && Time.CurrentTimeMs >= (LastMessageTimeMS + Timeout); } }
 
         private SSLSocketWrapper _socket = new SSLSocketWrapper();
 #endregion
@@ -221,7 +222,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
             if(null != ErrorEvent) {
-                ErrorEvent(this, new EnergonSoftware.Core.Util.ErrorEventArgs() { Error = error });
+                ErrorEvent(this, new Util.ErrorEventArgs() { Error = error });
             }
         }
 
@@ -231,7 +232,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
             if(null != ErrorEvent) {
-                ErrorEvent(this, new EnergonSoftware.Core.Util.ErrorEventArgs() { Error = error, Exception = ex });
+                ErrorEvent(this, new Util.ErrorEventArgs() { Error = error, Exception = ex });
             }
         }
 
@@ -241,7 +242,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
             if(null != ErrorEvent) {
-                ErrorEvent(this, new EnergonSoftware.Core.Util.ErrorEventArgs() { Exception = ex });
+                ErrorEvent(this, new Util.ErrorEventArgs() { Exception = ex });
             }
         }
 #endregion
@@ -253,7 +254,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             await DisconnectAsync(error).ConfigureAwait(false);
 
             if(null != ErrorEvent) {
-                ErrorEvent(this, new EnergonSoftware.Core.Util.ErrorEventArgs() { Error = error });
+                ErrorEvent(this, new Util.ErrorEventArgs() { Error = error });
             }
         }
 
@@ -263,7 +264,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             await DisconnectAsync(error).ConfigureAwait(false);
 
             if(null != ErrorEvent) {
-                ErrorEvent(this, new EnergonSoftware.Core.Util.ErrorEventArgs() { Error = error, Exception = ex });
+                ErrorEvent(this, new Util.ErrorEventArgs() { Error = error, Exception = ex });
             }
         }
 
@@ -273,7 +274,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             await DisconnectAsync(ex.Message).ConfigureAwait(false);
 
             if(null != ErrorEvent) {
-                ErrorEvent(this, new EnergonSoftware.Core.Util.ErrorEventArgs() { Exception = ex });
+                ErrorEvent(this, new Util.ErrorEventArgs() { Exception = ex });
             }
         }
 #endregion

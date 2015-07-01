@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 
+// ReSharper disable once CheckNamespace
 namespace System.IO
 {
     public static class MemoryStreamExtensions

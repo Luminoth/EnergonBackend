@@ -16,7 +16,7 @@ namespace EnergonSoftware.Backend.Packet
     public class NetworkPacket : IPacket
     {
 #region Id Generator
-        private static int _nextId = 0;
+        private static int _nextId;
         private static int NextId { get { return ++_nextId; } }
 #endregion
 
@@ -95,15 +95,11 @@ namespace EnergonSoftware.Backend.Packet
                 return 0;
             }
 
-            return (int)(Id - rhs.Id);
+            return Id - rhs.Id;
         }
 
         public override bool Equals(object obj)
         {
-            if(null == obj) {
-                return false;
-            }
-
             NetworkPacket packet = obj as NetworkPacket;
             if(null == packet) {
                 return false;

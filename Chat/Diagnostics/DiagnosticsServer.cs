@@ -13,7 +13,7 @@ namespace EnergonSoftware.Chat.Diagnostics
 
         private async Task<HttpServerResult> RootHandler()
         {
-            return await ViewResultAsync().ConfigureAwait(false);
+            return await ViewResultAsync("index.html").ConfigureAwait(false);
         }
 
 // TODO: the goal here basically is to create a model object in Diagnostics/Models (that makes use of DataContract/DataMember)

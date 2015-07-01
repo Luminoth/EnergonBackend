@@ -2,8 +2,6 @@
 
 using EnergonSoftware.Backend.Test.Messages;
 
-using EnergonSoftware.Core.Net;
-
 namespace EnergonSoftware.Backend.Test.MessageHandlers
 {
     internal sealed class MessageHandlerFactory : IMessageHandlerFactory

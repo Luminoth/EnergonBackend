@@ -11,10 +11,6 @@ namespace EnergonSoftware.Backend.Messages
         public const string MessageType = "ping";
         public string Type { get { return MessageType; } }
 
-        public PingMessage()
-        {
-        }
-
         public async Task SerializeAsync(IFormatter formatter)
         {
             await Task.Delay(0).ConfigureAwait(false);

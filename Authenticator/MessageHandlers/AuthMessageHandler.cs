@@ -3,13 +3,10 @@ using System.Configuration;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Authenticator.Net;
-
 using EnergonSoftware.Backend;
 using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Auth;
-
-using EnergonSoftware.Core;
 using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Util;
 
@@ -22,6 +19,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthMessageHandler));
 
         [Obsolete]
+        // ReSharper disable once InconsistentNaming
         private static string BuildDigestMD5Challenge(Nonce nonce)
         {
             Logger.Debug("Building MD5 challenge...");
@@ -31,6 +29,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 + ",qop=\"auth\",charset=utf-8,algorithm=md5-sess";
         }
 
+        // ReSharper disable once InconsistentNaming
         private static string BuildDigestSHA512Challenge(Nonce nonce)
         {
             Logger.Debug("Building SHA512 challenge...");
@@ -38,10 +37,6 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             return "realm=\"" + ConfigurationManager.AppSettings["authRealm"] + "\""
                 + ",nonce=\"" + nonce.NonceHash + "\""
                 + ",qop=\"auth\",charset=utf-8,algorithm=sha512-sess";
-        }
-
-        internal AuthMessageHandler()
-        {
         }
 
         protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
@@ -64,7 +59,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 
             Nonce nonce = new Nonce(ConfigurationManager.AppSettings["authRealm"], Convert.ToInt32(ConfigurationManager.AppSettings["authExpiry"]));
 
-            string challenge = string.Empty;
+            string challenge;
             switch(authMessage.MechanismType)
             {
             case AuthType.DigestMD5:

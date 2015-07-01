@@ -12,10 +12,6 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 {
     internal sealed class FailureMessageHandler : MessageHandler
     {
-        internal FailureMessageHandler()
-        {
-        }
-
         protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             FailureMessage failureMessage = (FailureMessage)message;

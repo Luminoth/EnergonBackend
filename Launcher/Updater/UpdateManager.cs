@@ -49,7 +49,7 @@ namespace EnergonSoftware.Launcher.Updater
                     HttpResponseMessage response = await client.GetAsync("Launcher/Updates").ConfigureAwait(false);
 await Task.Delay(1000).ConfigureAwait(false);
                     if(response.IsSuccessStatusCode) {
-                        List<UpdateContract> updates = new List<UpdateContract>();
+                        List<UpdateContract> updates;
                         using(Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false)) {
                             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<UpdateContract>));
                             updates = (List<UpdateContract>)serializer.ReadObject(stream);

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Windows.Documents;
+﻿using System.Windows.Documents;
 using System.Windows.Media;
 
+// ReSharper disable once CheckNamespace
 namespace System.Windows.Controls
 {
     public static class RichTextBoxExtensions
@@ -12,8 +12,10 @@ namespace System.Windows.Controls
                 throw new ArgumentNullException("box");
             }
 
-            TextRange range = new TextRange(box.Document.ContentEnd, box.Document.ContentEnd);
-            range.Text = text;
+            TextRange range = new TextRange(box.Document.ContentEnd, box.Document.ContentEnd)
+            {
+                Text = text,
+            };
             range.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(color));
         }
     }

@@ -10,7 +10,6 @@ using EnergonSoftware.Authenticator.Net;
 using EnergonSoftware.Backend.Net.Sessions;
 
 using EnergonSoftware.Core.Configuration;
-using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sockets;
 using EnergonSoftware.Core.Util;
 
@@ -18,7 +17,7 @@ using log4net;
 
 namespace EnergonSoftware.Authenticator
 {
-    internal sealed partial class Authenticator : ServiceWrapper, IDisposable
+    internal sealed partial class Authenticator : ServiceWrapper
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Authenticator));
 
@@ -128,11 +127,7 @@ namespace EnergonSoftware.Authenticator
         {
             while(Running) {
                 try {
-                    Task.WhenAll(new Task[]
-                        {
-                            InstanceNotifier.Instance.RunAsync(),
-                            PollAndReadAllAsync(),
-                        }).Wait();
+                    Task.WhenAll(InstanceNotifier.Instance.RunAsync(), PollAndReadAllAsync()).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();

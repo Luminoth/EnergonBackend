@@ -6,14 +6,11 @@ using EnergonSoftware.Core.Serialization;
 namespace EnergonSoftware.Backend.Messages.Network
 {
     [Serializable]
+    // ReSharper disable once InconsistentNaming
     public sealed class StartTLSMessage : IMessage
     {
         public const string MessageType = "starttls";
         public string Type { get { return MessageType; } }
-
-        public StartTLSMessage()
-        {
-        }
 
         public async Task SerializeAsync(IFormatter formatter)
         {

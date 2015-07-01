@@ -2,21 +2,15 @@
 
 using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Messages.Formatter;
-using EnergonSoftware.Backend.Messages.Packet;
 using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
 
 using EnergonSoftware.Overmind.MessageHandlers;
 
-using log4net;
-
 namespace EnergonSoftware.Overmind.Net
 {
     internal sealed class InstanceNotifierSession : MessageSession
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(InstanceNotifierSession));
-
         public override string Name { get { return "instanceNotifier"; } }
 
         private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
@@ -43,7 +37,7 @@ namespace EnergonSoftware.Overmind.Net
             await handler.HandleMessageAsync(e.Message, this).ConfigureAwait(false);
         }
 
-        private InstanceNotifierSession() : base()
+        private InstanceNotifierSession()
         {
         }
     }

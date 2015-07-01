@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Configuration;
-using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Util;
 
 using EnergonSoftware.Manager.Diagnostics;
@@ -15,7 +14,7 @@ using log4net;
 
 namespace EnergonSoftware.Manager
 {
-    internal sealed partial class Manager : ServiceWrapper, IDisposable
+    internal sealed partial class Manager : ServiceWrapper
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Manager));
 
@@ -93,10 +92,7 @@ namespace EnergonSoftware.Manager
         {
             while(Running) {
                 try {
-                    Task.WhenAll(new Task[]
-                        {
-                            InstanceNotifier.Instance.RunAsync(),
-                        }).Wait();
+                    Task.WhenAll(InstanceNotifier.Instance.RunAsync()).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();

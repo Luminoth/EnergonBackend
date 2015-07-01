@@ -4,14 +4,12 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Messages;
-
 using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Accounts
 {
     [Serializable]
-    public sealed class Account : EnergonSoftware.Core.Serialization.IFormattable, INotifyPropertyChanged
+    public sealed class Account : Core.Serialization.IFormattable, INotifyPropertyChanged
     {
         public string Type { get { return "account"; } }
 
@@ -65,12 +63,8 @@ namespace EnergonSoftware.Backend.Accounts
 
         public override bool Equals(object obj)
         {
-            if(null == obj) {
-                return false;
-            }
-
             Account account = obj as Account;
-            if(null == account) {
+            if(account == null) {
                 return false;
             }
 

@@ -10,7 +10,7 @@ namespace EnergonSoftware.Launcher.Windows
     /// <summary>
     /// Interaction logic for DebugWindow.xaml
     /// </summary>
-    public partial class DebugWindow : Window
+    public partial class DebugWindow
     {
         public static DebugWindow Instance { get { return App.Instance.DebugWindow; } }
 
@@ -19,8 +19,8 @@ namespace EnergonSoftware.Launcher.Windows
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    DebugWindow.Instance.OutputText.AppendText(logEntry, LoggerColor.ParseColor(logEntry));
-                    ////DebugWindow.Instance.OutputText.ScrollToEnd();
+                    Instance.OutputText.AppendText(logEntry, LoggerColor.ParseColor(logEntry));
+                    ////Instance.OutputText.ScrollToEnd();
                 });
         }
 #endregion

@@ -23,7 +23,7 @@ namespace EnergonSoftware.Backend.Messages.Chat
             AccountName = string.Empty;
             SessionId = string.Empty;
 
-            Visibility = Accounts.Visibility.Online;
+            Visibility = Visibility.Online;
         }
 
         public async Task SerializeAsync(IFormatter formatter)

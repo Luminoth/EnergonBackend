@@ -21,19 +21,15 @@ namespace EnergonSoftware.Backend.Messages.Parser
         public event EventHandler<MessageParsedEventArgs> MessageParsedEvent;
 #endregion
 
-        private SemaphoreSlim _streamLock = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim _streamLock = new SemaphoreSlim(1);
 
-        private MemoryStream _stream = new MemoryStream();
-
-        public NetworkPacketParser()
-        {
-        }
+        private readonly MemoryStream _stream = new MemoryStream();
 
 #region Dispose
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
+            ////GC.SuppressFinalize(this);
         }
 
         private void Dispose(bool disposing)

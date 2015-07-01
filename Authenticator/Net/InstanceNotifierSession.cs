@@ -1,25 +1,16 @@
 ﻿using System.Net.Sockets;
-using System.Threading.Tasks;
 
 using EnergonSoftware.Authenticator.MessageHandlers;
 
 using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Messages.Formatter;
-using EnergonSoftware.Backend.Messages.Packet;
 using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
-
-using EnergonSoftware.Core.Net.Sockets;
-
-using log4net;
 
 namespace EnergonSoftware.Authenticator.Net
 {
     internal sealed class InstanceNotifierSession : MessageSession
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(InstanceNotifierSession));
-
         public override string Name { get { return "instanceNotifier"; } }
 
         private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
@@ -46,7 +37,7 @@ namespace EnergonSoftware.Authenticator.Net
             await handler.HandleMessageAsync(e.Message, this).ConfigureAwait(false);
         }
 
-        private InstanceNotifierSession() : base()
+        private InstanceNotifierSession()
         {
         }
     }

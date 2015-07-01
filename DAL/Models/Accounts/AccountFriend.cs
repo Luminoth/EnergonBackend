@@ -18,7 +18,9 @@ namespace EnergonSoftware.DAL.Models.Accounts
         public int? GroupId { get; set; }
 
         public virtual AccountInfo Account { get; set; }
+
         public virtual AccountInfo FriendAccount { get; set; }
+
         public virtual FriendGroup Group { get; set; }
 
         public override string ToString()

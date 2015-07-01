@@ -14,18 +14,19 @@ using log4net;
 
 namespace EnergonSoftware.Core.Net.Sockets
 {
+    // ReSharper disable once InconsistentNaming
     public sealed class SSLSocketWrapper : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SSLSocketWrapper));
 
         public int Id { get { return null != _socket ? _socket.Handle.ToInt32() : -1; } }
 
-        private SemaphoreSlim _lock = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
 #region Socket Properties
         public bool IsConnecting { get; private set; }
 
-        public bool IsConnected { get { return null != _socket ? _socket.Connected : false; } }
+        public bool IsConnected { get { return null != _socket && _socket.Connected; } }
 
         public bool IsEncrypted { get { return null != _sslStream && _sslStream.IsEncrypted; } }
 
@@ -39,7 +40,7 @@ namespace EnergonSoftware.Core.Net.Sockets
 
         private SslStream _sslStream;
 
-        private Stream Stream { get { return null != _sslStream ? (Stream)_sslStream : (Stream)_stream; } }
+        private Stream Stream { get { return _sslStream ?? (Stream)_stream; } }
 #endregion
 
         public SSLSocketWrapper()
@@ -56,7 +57,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
+            ////GC.SuppressFinalize(this);
         }
 
         private void Dispose(bool disposing)

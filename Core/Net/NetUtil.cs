@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -123,12 +122,12 @@ namespace EnergonSoftware.Core.Net
                 throw new ArgumentNullException("b");
             }
 
-            string[] aparts = a.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] aparts = a.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
             if(aparts.Length < 1) {
                 return false;
             }
 
-            string[] bparts = b.ToString().Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] bparts = b.ToString().Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
             if(bparts.Length < 1) {
                 return false;
             }

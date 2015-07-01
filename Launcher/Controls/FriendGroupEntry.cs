@@ -26,10 +26,6 @@ namespace EnergonSoftware.Launcher.Controls
             }
         }
 
-        public FriendGroupEntry()
-        {
-        }
-
         public void AddGroup(FriendGroupEntry group)
         {
             _groups[group.Text] = group;

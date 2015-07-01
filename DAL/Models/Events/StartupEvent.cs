@@ -17,7 +17,7 @@ namespace EnergonSoftware.DAL.Models.Events
         [Required, MaxLength(32)]
         public string Application { get; set; }
 
-        public StartupEvent() : base()
+        public StartupEvent()
         {
             Type = StartupEventType.Invalid;
         }

@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
+// ReSharper disable once CheckNamespace
 namespace System.IO
 {
     public static class StreamExtensions
@@ -52,7 +53,7 @@ namespace System.IO
         /// <returns></returns>
         public static async Task WriteAsync(this Stream stream, byte value)
         {
-            await stream.WriteAsync(new byte[1] { value }, 0, 1).ConfigureAwait(false);
+            await stream.WriteAsync(new[] { value }, 0, 1).ConfigureAwait(false);
         }
 
         /// <summary>

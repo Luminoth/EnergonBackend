@@ -12,10 +12,6 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Chat
 {
     internal sealed class FriendListMessageHandler : MessageHandler
     {
-        internal FriendListMessageHandler()
-        {
-        }
-
         protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             FriendListMessage friendListMessage = (FriendListMessage)message;

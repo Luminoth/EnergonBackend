@@ -9,8 +9,6 @@ using EnergonSoftware.Backend.Accounts;
 using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Chat;
-using EnergonSoftware.Backend.Messages.Formatter;
-using EnergonSoftware.Backend.Messages.Packet;
 using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
 
@@ -31,8 +29,10 @@ namespace EnergonSoftware.Chat.Net
         {
             ChatSession session = null;
             try {
-                session = new ChatSession(socket);
-                session.Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
+                session = new ChatSession(socket)
+                {
+                    Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
+                };
                 return session;
             } catch(Exception) {
                 if(null != session) {
@@ -65,7 +65,7 @@ namespace EnergonSoftware.Chat.Net
             Logger.Debug("Looking up account for accountName=" + accountName);
             using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
                 var accounts = from a in context.Accounts where a.AccountName == accountName select a;
-                if(accounts.Count() < 1) {
+                if(accounts.Any()) {
                     return null;
                 }
 
@@ -83,7 +83,7 @@ namespace EnergonSoftware.Chat.Net
         {
             using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
                 var accounts = from a in context.Accounts where a.Id == Account.Id select a;
-                if(accounts.Count() < 1) {
+                if(accounts.Any()) {
                     Logger.Warn("No such account Id=" + Account.Id + "!");
                     await SendMessageAsync(new FriendListMessage()).ConfigureAwait(false);
                     return;

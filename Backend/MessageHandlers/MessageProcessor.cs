@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Parser;
-using EnergonSoftware.Backend.Packet;
 using EnergonSoftware.Backend.Properties;
-
-using EnergonSoftware.Core.IO;
-using EnergonSoftware.Core.Net.Sessions;
-using EnergonSoftware.Core.Util;
 
 using log4net;
 
@@ -33,15 +27,11 @@ namespace EnergonSoftware.Backend.MessageHandlers
         private CancellationTokenSource _cancellationToken;
         private Task _task;
 
-        public MessageProcessor()
-        {
-        }
-
 #region Dispose
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
+            ////GC.SuppressFinalize(this);
         }
 
         private void Dispose(bool disposing)
@@ -56,7 +46,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
 #region Event Handlers
         public void MessageParsedEventHandler(object sender, MessageParsedEventArgs e)
         {
-            Logger.Debug("Queueing message: " + e.Message.ToString());
+            Logger.Debug("Queueing message: " + e.Message);
 
             _messageQueue.Enqueue(e.Message);
             _messageQueueEvent.Set();

@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Messages.Formatter;
-using EnergonSoftware.Backend.Messages.Packet;
 using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Net.Sessions;
@@ -37,10 +35,6 @@ namespace EnergonSoftware.Launcher.Net
         private readonly IMessageHandlerFactory _messageHandlerFactory = new MessageHandlerFactory();
 
         protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
-
-        public AuthSession() : base()
-        {
-        }
 
         public async Task BeginConnectAsync(string host, int port)
         {

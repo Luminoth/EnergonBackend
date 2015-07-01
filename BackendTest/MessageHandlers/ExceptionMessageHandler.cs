@@ -9,10 +9,6 @@ namespace EnergonSoftware.Backend.Test.MessageHandlers
 {
     internal sealed class ExceptionMessageHandler : MessageHandler
     {
-        internal ExceptionMessageHandler()
-        {
-        }
-
         protected override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             throw new MessageHandlerException("Test Exception");

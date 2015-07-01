@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using EnergonSoftware.Backend.Accounts;
 using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Messages.Formatter;
-using EnergonSoftware.Backend.Messages.Packet;
 using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
 
@@ -28,8 +26,10 @@ namespace EnergonSoftware.Overmind.Net
         {
             OvermindSession session = null;
             try {
-                session = new OvermindSession(socket);
-                session.Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]);
+                session = new OvermindSession(socket)
+                {
+                    Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
+                };
                 return session;
             } catch(Exception) {
                 if(null != session) {
@@ -62,7 +62,7 @@ namespace EnergonSoftware.Overmind.Net
             Logger.Debug("Looking up account for accountName=" + accountName);
             using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
                 var accounts = from a in context.Accounts where a.AccountName == accountName select a;
-                if(accounts.Count() < 1) {
+                if(accounts.Any()) {
                     return null;
                 }
 

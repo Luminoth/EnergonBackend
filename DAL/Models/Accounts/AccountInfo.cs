@@ -30,9 +30,11 @@ namespace EnergonSoftware.DAL.Models.Accounts
         public string UserName { get; set; }
 
         [Required, MaxLength(32)]
+        // ReSharper disable once InconsistentNaming
         public string PasswordMD5 { get; set; }
 
         [Required, MaxLength(128)]
+        // ReSharper disable once InconsistentNaming
         public string PasswordSHA512 { get; set; }
 
         [MaxLength(32)]

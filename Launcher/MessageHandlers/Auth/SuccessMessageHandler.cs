@@ -12,10 +12,6 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
 {
     internal sealed class SuccessMessageHandler : MessageHandler
     {
-        internal SuccessMessageHandler()
-        {
-        }
-
         protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             SuccessMessage successMessage = (SuccessMessage)message;

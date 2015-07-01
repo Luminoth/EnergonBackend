@@ -17,13 +17,15 @@ namespace EnergonSoftware.Launcher.News
 {
     internal sealed class NewsManager : INotifyPropertyChanged
     {
+        // ReSharper disable once InconsistentNaming
         private const int MinCheckTimeMS = 1000 * 60;
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(NewsManager));
 
         public static readonly NewsManager Instance = new NewsManager();
 
-        private long _lastCheckTimeMS = 0;
+        // ReSharper disable once InconsistentNaming
+        private long _lastCheckTimeMS;
 
         private string _news = "Checking for news updates...";
         public string News
@@ -57,19 +59,14 @@ namespace EnergonSoftware.Launcher.News
                     HttpResponseMessage response = await client.GetAsync("Launcher/News").ConfigureAwait(false);
 await Task.Delay(1000).ConfigureAwait(false);
                     if(response.IsSuccessStatusCode) {
-                        List<NewsContract> news = new List<NewsContract>();
+                        List<NewsContract> news;
                         using(Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false)) {
                             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(List<NewsContract>));
                             news = (List<NewsContract>)serializer.ReadObject(stream);
                         }
 
                         Logger.Debug("Read news: " + string.Join(",", (object[])news.ToArray()));
-
-                        if(news.Count < 1) {
-                            News = "No news updates!";
-                        } else {
-                            News = news[0].NewsValue;
-                        }
+                        News = news.Count < 1 ? "No news updates!" : news[0].NewsValue;
                     } else {
                         News = "Error contacting news server: " + response.ReasonPhrase;
                     }

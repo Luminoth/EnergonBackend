@@ -16,7 +16,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
 
     public class MessageHandler
     {
-        private bool _running = false;
+        private bool _running;
         public bool Finished { get; private set; }
 
         private long _startTime, _finishTime;

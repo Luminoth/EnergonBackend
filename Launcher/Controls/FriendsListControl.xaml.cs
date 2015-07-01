@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 
 using EnergonSoftware.Launcher.Friends;
 
@@ -8,7 +7,7 @@ namespace EnergonSoftware.Launcher.Controls
     /// <summary>
     /// Interaction logic for FriendsListControl.xaml
     /// </summary>
-    public partial class FriendsListControl : UserControl
+    public partial class FriendsListControl
     {
 /*
  * http://www.wpf-tutorial.com/treeview-control/simple-treeview/

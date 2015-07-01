@@ -25,7 +25,7 @@ namespace EnergonSoftware.DAL.Models.Events
         [MaxLength(256)]
         public string Reason { get; set; }
 
-        public AuthenticateEvent() : base()
+        public AuthenticateEvent()
         {
             Type = AuthenticateEventType.Invalid;
         }

@@ -9,10 +9,6 @@ namespace EnergonSoftware.Launcher.MessageHandlers
 {
     internal sealed class PingMessageHandler : MessageHandler
     {
-        internal PingMessageHandler()
-        {
-        }
-
         protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             await Task.Delay(0).ConfigureAwait(false);

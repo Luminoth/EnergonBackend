@@ -11,10 +11,6 @@ namespace EnergonSoftware.Overmind.MessageHandlers
 {
     internal sealed class PingMessageHandler : MessageHandler
     {
-        internal PingMessageHandler()
-        {
-        }
-
         protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
         {
             OvermindSession overmindSession = (OvermindSession)session;

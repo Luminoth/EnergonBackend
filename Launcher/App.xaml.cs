@@ -24,11 +24,11 @@ namespace EnergonSoftware.Launcher
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(App));
 
-        public static App Instance { get { return (App)Application.Current; } }
+        public static App Instance { get { return (App)Current; } }
 
 #region Debug Properties
         public static bool UseDummyNetwork
@@ -67,7 +67,7 @@ namespace EnergonSoftware.Launcher
 
 #region Idle Properties
         private Task _idleTask;
-        private static CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+        private static readonly CancellationTokenSource _cancellationToken = new CancellationTokenSource();
 #endregion
 
 #region Idle Handlers
@@ -85,7 +85,7 @@ namespace EnergonSoftware.Launcher
                     Sessions.Cleanup();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
-                    App.Instance.OnErrorAsync(e.Message, "Unhandled Exception!").Wait();
+                    Instance.OnErrorAsync(e.Message, "Unhandled Exception!").Wait();
                 }
 
                 await Task.Delay(0).ConfigureAwait(false);
@@ -109,9 +109,9 @@ namespace EnergonSoftware.Launcher
 #region UI Helpers
         public async Task OnErrorAsync(string message, string title)
         {
-            await Application.Current.Dispatcher.InvokeAsync(() =>
+            await Current.Dispatcher.InvokeAsync(() =>
                 {
-                    MessageBox.Show(Application.Current.MainWindow, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Current.MainWindow, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
                 });
 
             await LogoutAsync().ConfigureAwait(false);
@@ -154,7 +154,7 @@ namespace EnergonSoftware.Launcher
         private async void AuthSuccessEventHandler(object sender, AuthSuccessEventArgs e)
         {
             if(UseDummyNetwork) {
-                await EnergonSoftware.Launcher.Windows.MainWindow.ShowMainPageAsync().ConfigureAwait(false);
+                await Launcher.Windows.MainWindow.ShowMainPageAsync().ConfigureAwait(false);
                 FriendListManager.Instance.PopulateTestFriends();
                 return;
             }
@@ -229,7 +229,7 @@ namespace EnergonSoftware.Launcher
                 _overmindSession = null;
             }
 
-            await EnergonSoftware.Launcher.Windows.MainWindow.ShowLoginPageAsync().ConfigureAwait(false);
+            await Launcher.Windows.MainWindow.ShowLoginPageAsync().ConfigureAwait(false);
         }
     }
 }

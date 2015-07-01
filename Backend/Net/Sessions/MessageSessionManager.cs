@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Packet;
-using EnergonSoftware.Backend.Properties;
 
 using EnergonSoftware.Core.Net.Sessions;
 

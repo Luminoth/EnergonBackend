@@ -34,7 +34,7 @@ namespace EnergonSoftware.Backend.Net.Sessions
             }
         }
 
-        protected MessageSession() : base()
+        protected MessageSession()
         {
         }
 
