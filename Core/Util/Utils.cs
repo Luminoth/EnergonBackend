@@ -21,11 +21,7 @@ namespace EnergonSoftware.Core.Util
 
                 // hex
                 for(int j = start; j < (start + bytesPerLine); ++j) {
-                    if(j < end) {
-                        builder.Append(string.Format("{0:X2} ", buffer[j]));
-                    } else {
-                        builder.Append("   ");
-                    }
+                    builder.Append(j < end ? string.Format("{0:X2} ", buffer[j]) : "   ");
                 }
 
                 builder.Append(" ");

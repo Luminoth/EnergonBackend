@@ -38,12 +38,8 @@ namespace EnergonSoftware.Launcher.Controls
 
         public override bool Equals(object obj)
         {
-            if(null == obj) {
-                return false;
-            }
-
             FriendGroupEntry entry = obj as FriendGroupEntry;
-            if(null == entry) {
+            if(entry == null) {
                 return false;
             }
 

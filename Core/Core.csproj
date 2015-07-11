@@ -54,6 +54,7 @@
     <Compile Include="Serialization\Formatter.cs" />
     <Compile Include="Serialization\FormatterFactory.cs" />
     <Compile Include="Serialization\Formatters\BinaryNetworkFormatter.cs" />
+    <Compile Include="Serialization\Formatters\ProtoBufFormatter.cs" />
     <Compile Include="Serialization\Formatters\XmlFormatter.cs" />
     <Compile Include="Util\AuthUtil.cs" />
     <Compile Include="Configuration\ListenAddressesConfigurationSection.cs" />

@@ -34,7 +34,7 @@ namespace EnergonSoftware.DAL
         public async Task<AccountInfo> GetAccountAsync(string accountName)
         {
             var accounts = from a in Accounts where a.AccountName == accountName select a;
-            if(accounts.Count() < 1) {
+            if(!accounts.Any()) {
                 return null;
             }
 
