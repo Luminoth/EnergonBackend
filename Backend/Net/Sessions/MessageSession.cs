@@ -27,7 +27,7 @@ namespace EnergonSoftware.Backend.Net.Sessions
 
                 using(MemoryStream buffer = new MemoryStream()) {
                     await packet.SerializeAsync(buffer, FormatterType).ConfigureAwait(false);
-                    await CopyAsync(buffer).ConfigureAwait(false);
+                    await SendAsync(buffer).ConfigureAwait(false);
                 }
             } catch(MessageException e) {
                 InternalErrorAsync(Resources.ErrorSendingMessage, e).Wait(); 

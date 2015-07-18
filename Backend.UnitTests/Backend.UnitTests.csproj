@@ -52,12 +52,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Accounts\AccountTest.cs" />
-    <Compile Include="MessageHandlers\ExceptionMessageHandler.cs" />
-    <Compile Include="MessageHandlers\MessageHandlerFactory.cs" />
-    <Compile Include="Messages\ExceptionMessage.cs" />
-    <Compile Include="Net\Sessions\MessageSessionTest.cs" />
-    <Compile Include="Net\Sessions\TestSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
