@@ -89,6 +89,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                 IsConnecting = true;
 
                 _socket = await NetUtil.ConnectMulticastAsync(group, port, ttl).ConfigureAwait(false);
+                _stream = new NetworkStream(_socket);
             } finally {
                 IsConnecting = false;
                 _lock.Release();
@@ -137,13 +138,15 @@ namespace EnergonSoftware.Core.Net.Sockets
                         return total > 0 ? total : -1;
                     }
 
+                    // read from the network stream, not the socket
                     byte[] buffer = new byte[_socket.Available];
                     int len = await Stream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+                    if(len <= 0) {
+                        return total > 0 ? total : -1;
+                    }
 
                     total += len;
                     await stream.WriteAsync(buffer, 0, len);
-
-                    await Task.Delay(0).ConfigureAwait(false);
                 }
 
                 return total;
@@ -166,7 +169,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
-        public async Task CopyAsync(MemoryStream stream)
+        public async Task WriteAsync(MemoryStream stream)
         {
             byte[] buffer = stream.ToArray();
             await WriteAsync(buffer, 0, buffer.Length);

@@ -116,7 +116,7 @@ namespace EnergonSoftware.Core.Serialization.Formatters
 
         public async Task<byte> ReadByteAsync(string name)
         {
-            return await _stream.ReadByteAsync().ConfigureAwait(false);
+            return (byte)await _stream.ReadByteAsync().ConfigureAwait(false);
         }
 
         public async Task<bool> ReadBoolAsync(string name)

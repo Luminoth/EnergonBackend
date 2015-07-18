@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -8,25 +10,31 @@ namespace EnergonSoftware.Core.UnitTests.IO
     public class MemoryStreamExtensionsTest
     {
         [TestMethod]
-        public void Compact_State()
+        public async Task CompactAsync_State()
         {
-            // Arraynge
+            // Arrange
+            byte[][] testData = {
+                Encoding.ASCII.GetBytes("test"),
+                Encoding.ASCII.GetBytes("one"),
+                Encoding.ASCII.GetBytes("twelve"),
+            };
+
             using(MemoryStream stream = new MemoryStream()) {
 
                 // Act
-                stream.WriteNetworkAsync("test").Wait();
-                stream.WriteNetworkAsync("one").Wait();
-                stream.WriteNetworkAsync("two").Wait();
+                await stream.WriteAsync(testData[0], 0, testData[0].Length).ConfigureAwait(false);
+                await stream.WriteAsync(testData[1], 0, testData[1].Length).ConfigureAwait(false);
+                await stream.WriteAsync(testData[2], 0, testData[2].Length).ConfigureAwait(false);
                 stream.Flip();
 
-                string testString = stream.ReadNetworkStringAsync().Result;
-                stream.CompactAsync().Wait();
+                byte[] readData = new byte[testData[0].Length];
+                await stream.ReadAsync(readData, 0, readData.Length).ConfigureAwait(false);
+                await stream.CompactAsync().ConfigureAwait(false);
 
                 // Assert
-                Assert.AreEqual("test", testString);
+                CollectionAssert.AreEqual(testData[0], readData);
                 Assert.AreEqual(stream.Length, stream.Position);
-                // TODO: test something more concrete here to "prove"
-                // that the buffer is actually compacted and not just flipped
+                Assert.AreEqual(testData[1].Length + testData[2].Length, stream.Length);
             }
         }
     }

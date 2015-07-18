@@ -7,6 +7,7 @@ namespace EnergonSoftware.Core.Net
 {
     public static class NetUtil
     {
+#region Socket Connectors
         /// <summary>
         /// Creates a Socket and connects it to the given host or address.
         /// </summary>
@@ -100,9 +101,11 @@ namespace EnergonSoftware.Core.Net
 
             return socket;
         }
+#endregion
 
         /// <summary>
         /// Compares a string-value EndPoint with an EndPoint object.
+        /// Does not consider the EndPoint port, only the address.
         /// </summary>
         /// <param name="a">A string-value EndPoint (host:port).</param>
         /// <param name="b">The EndPoint to compare against.</param>

@@ -95,7 +95,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         {
             List<Task> tasks = new List<Task>();
             lock(_lock) {
-                _sessions.ForEach(session => tasks.Add(session.CopyAsync(buffer)));
+                _sessions.ForEach(session => tasks.Add(session.SendAsync(buffer)));
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(false);

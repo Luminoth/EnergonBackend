@@ -11,6 +11,7 @@ using EnergonSoftware.Core.Properties;
 using log4net;
 
 // TODO: decouple this from the session concept
+// and use events instead
 
 namespace EnergonSoftware.Core.Net.Sockets
 {

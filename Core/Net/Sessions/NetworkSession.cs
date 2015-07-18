@@ -167,7 +167,9 @@ namespace EnergonSoftware.Core.Net.Sessions
                     }
 
                     return;
-                } else if(0 == count) {
+                }
+
+                if(0 == count) {
                     return;
                 }
 
@@ -202,14 +204,14 @@ namespace EnergonSoftware.Core.Net.Sessions
             }
         }
 
-        public async Task CopyAsync(MemoryStream stream)
+        public async Task SendAsync(MemoryStream stream)
         {
             try {
                 if(!IsConnected) {
                     return;
                 }
 
-                await _socket.CopyAsync(stream).ConfigureAwait(false);
+                await _socket.WriteAsync(stream).ConfigureAwait(false);
             } catch(SocketException e) {
                 InternalErrorAsync(Resources.ErrorSendingSessionData, e).Wait();
             }

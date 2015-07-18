@@ -16,20 +16,27 @@ namespace System.IO
         /// <returns>The index of the first occurrence of the given byte value</returns>
         public static async Task<long> IndexOfAsync(this Stream stream, byte[] value)
         {
+            if(null == value) {
+                return -1;
+            }
+
+            long startPosition = stream.Position;
+            long currentPosition = startPosition;
+
             long index = -1;
-            while(stream.GetRemaining() > 0) {
+            while(currentPosition < stream.Length) {
                 byte[] buffer = new byte[value.Length];
-                await stream.ReadAsync(buffer, 0, buffer.Length);
+                await stream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
 
                 if(buffer.SequenceEqual(value)) {
-                    index = stream.Position;
+                    index = currentPosition;
                     break;
                 }
 
-                stream.Seek(-buffer.Length + 1, SeekOrigin.Current);
+                stream.Position = ++currentPosition;
             }
 
-            stream.Position = 0;
+            stream.Position = startPosition;
             return index;
         }
 
@@ -38,10 +45,15 @@ namespace System.IO
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="count">The number of bytes to consume.</param>
-        public static async Task ConsumeAsync(this Stream stream, int count)
+        public static async Task<int> ConsumeAsync(this Stream stream, int count)
         {
+            if(count < 0) {
+                return 0;
+            }
+
             byte[] consumed = new byte[count];
-            await stream.ReadAsync(consumed, 0, consumed.Length).ConfigureAwait(false);
+            int read = await stream.ReadAsync(consumed, 0, consumed.Length).ConfigureAwait(false);
+            return read;
         }
 
 #region Write
@@ -51,9 +63,20 @@ namespace System.IO
         /// <param name="stream">The stream.</param>
         /// <param name="value">The byte to write.</param>
         /// <returns></returns>
+        public static Task WriteByteAsync(this Stream stream, byte value)
+        {
+            return Task.Run(() => stream.WriteByte(value));
+        }
+
+        /// <summary>
+        /// Writes a single byte to the stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <param name="value">The byte to write.</param>
+        /// <returns></returns>
         public static async Task WriteAsync(this Stream stream, byte value)
         {
-            await stream.WriteAsync(new[] { value }, 0, 1).ConfigureAwait(false);
+            await stream.WriteByteAsync(value).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -91,11 +114,9 @@ namespace System.IO
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <returns>The byte that was read.</returns>
-        public static async Task<byte> ReadByteAsync(this Stream stream)
+        public static Task<int> ReadByteAsync(this Stream stream)
         {
-            byte[] bytes = new byte[1];
-            await stream.ReadAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
-            return bytes[0];
+            return Task.Run(() => stream.ReadByte());
         }
 
         /// <summary>
