@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Messages;
 
-namespace EnergonSoftware.Backend.Test.Messages
+namespace EnergonSoftware.Backend.UnitTests.Messages
 {
     [Serializable]
     public sealed class ExceptionMessage : IMessage

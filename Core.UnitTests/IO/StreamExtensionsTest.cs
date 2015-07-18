@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EnergonSoftware.Core.Test.IO
+namespace EnergonSoftware.Core.UnitTests.IO
 {
     [TestClass]
     public class StreamExtensionsTest

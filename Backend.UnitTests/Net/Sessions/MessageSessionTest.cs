@@ -4,7 +4,7 @@ using EnergonSoftware.Backend.Net.Sessions;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EnergonSoftware.Backend.Test.Net.Sessions
+namespace EnergonSoftware.Backend.UnitTests.Net.Sessions
 {
     [TestClass]
     public class MessageSessionTest

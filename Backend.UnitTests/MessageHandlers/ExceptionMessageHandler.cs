@@ -5,7 +5,7 @@ using EnergonSoftware.Backend.Messages;
 
 using EnergonSoftware.Core.Net.Sessions;
 
-namespace EnergonSoftware.Backend.Test.MessageHandlers
+namespace EnergonSoftware.Backend.UnitTests.MessageHandlers
 {
     internal sealed class ExceptionMessageHandler : MessageHandler
     {

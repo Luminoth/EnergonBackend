@@ -5,7 +5,7 @@ using EnergonSoftware.Backend.Net.Sessions;
 
 using EnergonSoftware.Backend.Test.MessageHandlers;
 
-namespace EnergonSoftware.Backend.Test.Net.Sessions
+namespace EnergonSoftware.Backend.UnitTests.Net.Sessions
 {
     internal sealed class TestSession : MessageSession
     {

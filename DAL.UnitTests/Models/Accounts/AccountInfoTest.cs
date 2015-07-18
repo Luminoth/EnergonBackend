@@ -4,7 +4,7 @@ using EnergonSoftware.DAL.Models.Accounts;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EnergonSoftware.DAL.Test.Models.Accounts
+namespace EnergonSoftware.DAL.UnitTests.Models.Accounts
 {
     [TestClass]
     public class AccountInfoTest

@@ -2,7 +2,7 @@
 
 using EnergonSoftware.Backend.Test.Messages;
 
-namespace EnergonSoftware.Backend.Test.MessageHandlers
+namespace EnergonSoftware.Backend.UnitTests.MessageHandlers
 {
     internal sealed class MessageHandlerFactory : IMessageHandlerFactory
     {

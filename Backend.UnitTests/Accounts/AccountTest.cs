@@ -6,7 +6,7 @@ using EnergonSoftware.Backend.Accounts;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EnergonSoftware.Backend.Test.Accounts
+namespace EnergonSoftware.Backend.UnitTests.Accounts
 {
     [TestClass]
     public class AccountTest

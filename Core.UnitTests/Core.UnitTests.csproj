@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A66DBF76-FC4B-47F8-8F0A-4D2D75B4E6CF}</ProjectGuid>
+    <ProjectGuid>{BBBCA3E5-31A9-48E8-A501-5DFD00B62F45}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BackendTest</RootNamespace>
-    <AssemblyName>BackendTest</AssemblyName>
+    <RootNamespace>EnergonSoftware.Core.UnitTests</RootNamespace>
+    <AssemblyName>CoreTest</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -55,19 +56,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Accounts\AccountTest.cs" />
-    <Compile Include="MessageHandlers\ExceptionMessageHandler.cs" />
-    <Compile Include="MessageHandlers\MessageHandlerFactory.cs" />
-    <Compile Include="Messages\ExceptionMessage.cs" />
-    <Compile Include="Net\Session\MessageSessionTest.cs" />
-    <Compile Include="Net\Session\TestSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="IO\StreamExtensionsTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Backend\Backend.csproj">
-      <Project>{6c631fcf-23cc-4bd0-9245-3e2080421f62}</Project>
-      <Name>Backend</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{b8cf252f-2fbc-4d35-90a9-c0adf2b0b9e0}</Project>
       <Name>Core</Name>
