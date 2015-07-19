@@ -5,3 +5,4 @@ obj/
 StyleCop.Cache
 TestResults/
 *.dbmdl
+*.GhostDoc.xml
