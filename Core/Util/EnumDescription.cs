@@ -22,7 +22,7 @@ namespace EnergonSoftware.Core.Util
         public static string GetDescriptionFromEnumValue(Enum value)
         {
             if(null == value) {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
 
             DescriptionAttribute attribute = value.GetType()

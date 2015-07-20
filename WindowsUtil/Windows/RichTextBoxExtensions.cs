@@ -19,7 +19,7 @@ namespace System.Windows.Controls
         public static void AppendText(this RichTextBox box, string text, Color color)
         {
             if(null == box) {
-                throw new ArgumentNullException("box");
+                throw new ArgumentNullException(nameof(box));
             }
 
             TextRange range = new TextRange(box.Document.ContentEnd, box.Document.ContentEnd)

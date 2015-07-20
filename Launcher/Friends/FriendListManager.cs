@@ -19,21 +19,21 @@ namespace EnergonSoftware.Launcher.Friends
 
         private static readonly IReadOnlyCollection<Account> TestFriends = new List<Account>()
         {
-            new Account() { UserName = "Offline Group Friend", GroupName = "Test", Visibility = Visibility.Offline, Status = string.Empty, },
-            new Account() { UserName = "Online Group Friend", GroupName = "Test", Visibility = Visibility.Online, Status = string.Empty, },
-            new Account() { UserName = "Offline Friend", GroupName = string.Empty, Visibility = Visibility.Offline, Status = string.Empty, },
-            new Account() { UserName = "Online Friend", GroupName = string.Empty, Visibility = Visibility.Online, Status = string.Empty, },
+            new Account { Username = "Offline Group Friend", GroupName = "Test", Visibility = Visibility.Offline, Status = string.Empty, },
+            new Account { Username = "Online Group Friend", GroupName = "Test", Visibility = Visibility.Online, Status = string.Empty, },
+            new Account { Username = "Offline Friend", GroupName = string.Empty, Visibility = Visibility.Offline, Status = string.Empty, },
+            new Account { Username = "Online Friend", GroupName = string.Empty, Visibility = Visibility.Online, Status = string.Empty, },
         };
 
         private readonly Dictionary<string, Account> _friendList = new Dictionary<string, Account>();
-        public IReadOnlyDictionary<string, Account> FriendList { get { return _friendList; } }
+        public IReadOnlyDictionary<string, Account> FriendList => _friendList;
 
-        public FriendGroupEntry RootGroupEntry { get; private set; }
+        public FriendGroupEntry RootGroupEntry { get; }
 
-        public int Total { get { return FriendList.Count; } }
+        public int Total => FriendList.Count;
         public int OnlineCount { get { return FriendList.Count(e => e.Value.Visibility.IsOnline()); } }
 
-        public string FriendButtonText { get { return string.Format(Resources.FriendsLabel, OnlineCount, Total); } }
+        public string FriendButtonText => string.Format(Resources.FriendsLabel, OnlineCount, Total);
 
         private void UpdateOnlineCount()
         {
@@ -60,7 +60,7 @@ namespace EnergonSoftware.Launcher.Friends
         private void AddFriendInternal(Account friend)
         {
             Logger.Debug("Adding friend: " + friend);
-            _friendList[friend.UserName] = friend;
+            _friendList[friend.Username] = friend;
 
             FriendGroupEntry group = RootGroupEntry;
             if(!string.IsNullOrEmpty(friend.GroupName)) {
@@ -72,7 +72,7 @@ namespace EnergonSoftware.Launcher.Friends
                 }
             }
 
-            group.AddFriend(new FriendEntry() { Text = friend.UserName });
+            group.AddFriend(new FriendEntry() { Text = friend.Username });
         }
 
         public void AddFriend(Account friend)
@@ -83,13 +83,13 @@ namespace EnergonSoftware.Launcher.Friends
 
         public void UpdateFriend(Account friend)
         {
-            _friendList[friend.UserName] = friend;
+            _friendList[friend.Username] = friend;
             UpdateOnlineCount();
         }
 
         public void RemoveFriend(Account friend)
         {
-            _friendList.Remove(friend.UserName);
+            _friendList.Remove(friend.Username);
             UpdateOnlineCount();
         }
 
@@ -107,9 +107,7 @@ namespace EnergonSoftware.Launcher.Friends
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string property = null)
         {
-            if(null != PropertyChanged) {
-                PropertyChanged(this, new PropertyChangedEventArgs(property));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 #endregion
 

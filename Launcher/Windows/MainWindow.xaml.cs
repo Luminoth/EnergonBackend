@@ -10,7 +10,7 @@ namespace EnergonSoftware.Launcher.Windows
     /// </summary>
     public partial class MainWindow
     {
-        public static MainWindow Instance { get { return (MainWindow)Application.Current.MainWindow; } }
+        public static MainWindow Instance => (MainWindow)Application.Current.MainWindow;
 
 #region UI Helpers
         public static async Task ShowLoginPageAsync()

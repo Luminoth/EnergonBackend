@@ -6,7 +6,6 @@
         Height="600" Width="700"
         IsVisibleChanged="Window_IsVisibleChanged"
         Closing="Window_Closing">
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />

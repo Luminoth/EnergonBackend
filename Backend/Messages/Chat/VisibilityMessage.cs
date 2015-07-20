@@ -18,11 +18,11 @@ namespace EnergonSoftware.Backend.Messages.Chat
         /// </summary>
         public const string MessageType = "visibility";
 
-        public string Type { get { return MessageType; } }
+        public string Type => MessageType;
 
-        public string AccountName { get; set; }
+        public string AccountName { get; set; } = string.Empty;
 
-        public string SessionId { get; set; }
+        public string SessionId { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the visibility.
@@ -30,18 +30,7 @@ namespace EnergonSoftware.Backend.Messages.Chat
         /// <value>
         /// The visibility.
         /// </value>
-        public Visibility Visibility { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VisibilityMessage"/> class.
-        /// </summary>
-        public VisibilityMessage()
-        {
-            AccountName = string.Empty;
-            SessionId = string.Empty;
-
-            Visibility = Visibility.Online;
-        }
+        public Visibility Visibility { get; set; } = Visibility.Online;
 
         public async Task SerializeAsync(IFormatter formatter)
         {

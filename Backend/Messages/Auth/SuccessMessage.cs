@@ -16,7 +16,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// </summary>
         public const string MessageType = "success";
 
-        public string Type { get { return MessageType; } }
+        public string Type => MessageType;
 
         /// <summary>
         /// Gets or sets the session identifier.
@@ -24,15 +24,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// <value>
         /// The session identifier.
         /// </value>
-        public string SessionId { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SuccessMessage"/> class.
-        /// </summary>
-        public SuccessMessage()
-        {
-            SessionId = string.Empty;
-        }
+        public string SessionId { get; set; } = string.Empty;
 
         public async Task SerializeAsync(IFormatter formatter)
         {

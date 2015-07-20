@@ -16,7 +16,7 @@ namespace EnergonSoftware.Core.Configuration
         /// The listen address name name.
         /// </value>
         [ConfigurationProperty("name", IsRequired = true, IsKey = true)]
-        public string Name { get { return (string)this["name"]; } }
+        public string Name => (string)this["name"];
 
         /// <summary>
         /// Gets the interface (IP address) to listen on.
@@ -25,7 +25,7 @@ namespace EnergonSoftware.Core.Configuration
         /// The interface (IP address) to listen on.
         /// </value>
         [ConfigurationProperty("interface", IsRequired = true)]
-        public string Interface { get { return (string)this["interface"]; } }
+        public string Interface => (string)this["interface"];
 
         /// <summary>
         /// Gets the interface as an IPAddress.
@@ -33,7 +33,7 @@ namespace EnergonSoftware.Core.Configuration
         /// <value>
         /// The interface as an IPAddress.
         /// </value>
-        public IPAddress InterfaceAddress { get { return IPAddress.Parse(Interface); } }
+        public IPAddress InterfaceAddress => IPAddress.Parse(Interface);
 
         /// <summary>
         /// Gets the port to listen on.
@@ -42,7 +42,7 @@ namespace EnergonSoftware.Core.Configuration
         /// The port to listen on.
         /// </value>
         [ConfigurationProperty("port", IsRequired = true)]
-        public int Port { get { return(int)this["port"]; } }
+        public int Port => (int)this["port"];
 
         /// <summary>
         /// Gets the multicast group (IP address) to join.
@@ -51,7 +51,7 @@ namespace EnergonSoftware.Core.Configuration
         /// The multicast group (IP address) to join.
         /// </value>
         [ConfigurationProperty("multicastGroup")]
-        public string MulticastGroup { get { return (string)this["multicastGroup"]; } }
+        public string MulticastGroup => (string)this["multicastGroup"];
 
         /// <summary>
         /// Gets the multicast group as an IPAddress.
@@ -60,7 +60,7 @@ namespace EnergonSoftware.Core.Configuration
         /// The multicast group as an IPAddress.
         /// </value>
         // ReSharper disable once InconsistentNaming
-        public IPAddress MulticastGroupIPAddress { get { return IPAddress.Parse(MulticastGroup); } }
+        public IPAddress MulticastGroupIPAddress => IPAddress.Parse(MulticastGroup);
 
         /// <summary>
         /// Gets the multicast time to live (TTL).
@@ -70,7 +70,7 @@ namespace EnergonSoftware.Core.Configuration
         /// </value>
         [ConfigurationProperty("multicastTTL", DefaultValue = 1)]
         // ReSharper disable once InconsistentNaming
-        public int MulticastTTL { get { return (int)this["multicastTTL"]; } }
+        public int MulticastTTL => (int)this["multicastTTL"];
 
         public override string ToString()
         {

@@ -79,9 +79,7 @@ namespace EnergonSoftware.Backend.Messages.Parser
 
                 await _stream.CompactAsync().ConfigureAwait(false);
 
-                if(null != MessageParsedEvent) {
-                    MessageParsedEvent(this, new MessageParsedEventArgs() { Message = packet.Content });
-                }
+                MessageParsedEvent?.Invoke(this, new MessageParsedEventArgs() { Message = packet.Content });
             } finally {
                 _streamLock.Release();
             }

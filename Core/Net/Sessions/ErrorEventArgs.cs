@@ -13,7 +13,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// The event timestamp.
         /// </value>
-        public DateTime Timestamp { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.Now;
 
         private string _error;
 
@@ -36,13 +36,5 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// The exception associated with the error, if one exists.
         /// </value>
         public Exception Exception { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ErrorEventArgs"/> class.
-        /// </summary>
-        public ErrorEventArgs()
-        {
-            Timestamp = DateTime.Now;
-        }
     }
 }

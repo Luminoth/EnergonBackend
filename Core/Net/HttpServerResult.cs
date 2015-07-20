@@ -1,10 +1,12 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace EnergonSoftware.Core.Net
 {
     /// <summary>
     /// An HTTP server result.
     /// </summary>
+    [Obsolete]
     public class HttpServerResult
     {
         /// <summary>
@@ -13,7 +15,7 @@ namespace EnergonSoftware.Core.Net
         /// <value>
         ///   <c>true</c> if cross origins are allowed; otherwise, <c>false</c>.
         /// </value>
-        public bool AllowCrossOrigin { get; set; }
+        public bool AllowCrossOrigin { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the content encoding.
@@ -21,7 +23,7 @@ namespace EnergonSoftware.Core.Net
         /// <value>
         /// The content encoding.
         /// </value>
-        public Encoding ContentEncoding { get; set; }
+        public Encoding ContentEncoding { get; set; } = Encoding.UTF8;
 
         /// <summary>
         /// Gets or sets the type of the content.
@@ -45,15 +47,6 @@ namespace EnergonSoftware.Core.Net
         /// <value>
         /// The length of the content in bytes.
         /// </value>
-        public int ContentLength { get { return null == Content ? 0 : Content.Length; } }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HttpServerResult"/> class.
-        /// </summary>
-        public HttpServerResult()
-        {
-            AllowCrossOrigin = false;
-            ContentEncoding = Encoding.UTF8;
-        }
+        public int ContentLength => Content?.Length ?? 0;
     }
 }

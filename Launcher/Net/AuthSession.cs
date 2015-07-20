@@ -28,13 +28,13 @@ namespace EnergonSoftware.Launcher.Net
 
         public string RspAuth { get; private set; }
 
-        public override string Name { get { return "auth"; } }
+        public override string Name => "auth";
 
         private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
         private readonly MessageProcessor _messageProcessor = new MessageProcessor();
         private readonly IMessageHandlerFactory _messageHandlerFactory = new MessageHandlerFactory();
 
-        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
+        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
 
         public async Task BeginConnectAsync(string host, int port)
         {
@@ -93,9 +93,7 @@ namespace EnergonSoftware.Launcher.Net
             App.Instance.UserAccount.SessionId = ticket;
             App.Instance.UserAccount.Password = null;
 
-            if(null != AuthSuccessEvent) {
-                AuthSuccessEvent(this, new AuthSuccessEventArgs());
-            }
+            AuthSuccessEvent?.Invoke(this, new AuthSuccessEventArgs());
 
             await DisconnectAsync().ConfigureAwait(false);
         }
@@ -107,9 +105,7 @@ namespace EnergonSoftware.Launcher.Net
             App.Instance.AuthStage = AuthenticationStage.NotAuthenticated;
             App.Instance.UserAccount.Password = null;
 
-            if(null != AuthFailedEvent) {
-                AuthFailedEvent(this, new AuthFailedEventArgs() { Reason = reason });
-            }
+            AuthFailedEvent?.Invoke(this, new AuthFailedEventArgs() { Reason = reason });
 
             await DisconnectAsync().ConfigureAwait(false);
         }

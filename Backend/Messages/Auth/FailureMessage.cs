@@ -16,7 +16,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// </summary>
         public const string MessageType = "failure";
 
-        public string Type { get { return MessageType; } }
+        public string Type => MessageType;
 
         /// <summary>
         /// Gets or sets the failure reason.
@@ -24,15 +24,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// <value>
         /// The failure reason.
         /// </value>
-        public string Reason { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FailureMessage"/> class.
-        /// </summary>
-        public FailureMessage()
-        {
-            Reason = string.Empty;
-        }
+        public string Reason { get; set; } = string.Empty;
 
         public async Task SerializeAsync(IFormatter formatter)
         {

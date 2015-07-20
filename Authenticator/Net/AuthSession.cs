@@ -21,6 +21,7 @@ using EnergonSoftware.DAL.Models.Accounts;
 
 namespace EnergonSoftware.Authenticator.Net
 {
+    // TODO: move this into its own file
     internal sealed class AuthSessionFactory : INetworkSessionFactory
     {
         public NetworkSession Create(Socket socket)
@@ -29,14 +30,11 @@ namespace EnergonSoftware.Authenticator.Net
             try {
                 session = new AuthSession(socket)
                 {
-                    Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
+                    TimeoutMs = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
                 };
                 return session;
             } catch(Exception) {
-                if(null != session) {
-                    session.Dispose();
-                }
-
+                session?.Dispose();
                 throw;
             }
         }
@@ -45,20 +43,22 @@ namespace EnergonSoftware.Authenticator.Net
     internal sealed class AuthSession : MessageSession
     {
         public AuthType AuthType { get; private set; }
+
         public Nonce AuthNonce { get; private set; }
 
         public bool Authenticating { get; private set; }
+
         public bool Authenticated { get; private set; }
 
         public AccountInfo AccountInfo { get; private set; }
 
-        public override string Name { get { return "auth"; } }
+        public override string Name => "auth";
 
         private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
         private readonly MessageProcessor _messageProcessor = new MessageProcessor();
         private readonly IMessageHandlerFactory _messageHandlerFactory = new AuthMessageHandlerFactory();
 
-        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
+        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
 
         public AuthSession(Socket socket) : base(socket)
         {
@@ -116,7 +116,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public async Task FailureAsync(string reason)
         {
-            await EventLogger.Instance.FailedEventAsync(RemoteEndPoint, null == AccountInfo ? null : AccountInfo.AccountName, reason).ConfigureAwait(false);
+            await EventLogger.Instance.FailedEventAsync(RemoteEndPoint, AccountInfo?.AccountName, reason).ConfigureAwait(false);
 
             /*
              * NOTE: we don't update the database here because this

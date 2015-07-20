@@ -16,7 +16,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// </summary>
         public const string MessageType = "challenge";
 
-        public string Type { get { return MessageType; } }
+        public string Type => MessageType;
 
         /// <summary>
         /// Gets or sets the challenge.
@@ -24,15 +24,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// <value>
         /// The challenge.
         /// </value>
-        public string Challenge { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ChallengeMessage"/> class.
-        /// </summary>
-        public ChallengeMessage()
-        {
-            Challenge = string.Empty;
-        }
+        public string Challenge { get; set; } = string.Empty;
 
         public async Task SerializeAsync(IFormatter formatter)
         {

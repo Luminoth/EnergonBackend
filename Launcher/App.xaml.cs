@@ -8,8 +8,8 @@ using EnergonSoftware.Backend;
 using EnergonSoftware.Backend.Accounts;
 using EnergonSoftware.Backend.Net.Sessions;
 
+using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
-using EnergonSoftware.Core.Util;
 
 using EnergonSoftware.Launcher.Friends;
 using EnergonSoftware.Launcher.Net;
@@ -28,20 +28,10 @@ namespace EnergonSoftware.Launcher
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(App));
 
-        public static App Instance { get { return (App)Current; } }
+        public static App Instance => (App)Current;
 
 #region Debug Properties
-        public static bool UseDummyNetwork
-        {
-            get
-            {
-#if DEBUG
-                return Convert.ToBoolean(ConfigurationManager.AppSettings["dummyNetwork"]);
-#else
-                return false;
-#endif
-            }
-        }
+        public static bool UseDummyNetwork => Convert.ToBoolean(ConfigurationManager.AppSettings["dummyNetwork"]);
 #endregion
 
 #region Window Properties
@@ -56,13 +46,13 @@ namespace EnergonSoftware.Launcher
         private static ChatSession _chatSession;
 #endregion
 
-        public Account UserAccount { get; private set; }
+        public Account UserAccount { get; }
 
 #region Auth Properties
         // TODO: move these into a model object
         public AuthenticationStage AuthStage { get; set; }
-        public bool Authenticating { get { return AuthStage > AuthenticationStage.NotAuthenticated && AuthStage < AuthenticationStage.Authenticated; } }
-        public bool Authenticated { get { return AuthenticationStage.Authenticated == AuthStage; } }
+        public bool Authenticating => AuthStage > AuthenticationStage.NotAuthenticated && AuthStage < AuthenticationStage.Authenticated;
+        public bool Authenticated => AuthenticationStage.Authenticated == AuthStage;
 #endregion
 
 #region Idle Properties

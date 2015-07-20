@@ -8,10 +8,9 @@ namespace EnergonSoftware.Core.Configuration
     [ConfigurationCollection(typeof(ListenAddressConfigurationElement))]
     public class ListenAddressConfigurationElementCollection : ConfigurationElementCollection
     {
-        public override ConfigurationElementCollectionType CollectionType
-        { get { return ConfigurationElementCollectionType.BasicMapAlternate; } }
+        public override ConfigurationElementCollectionType CollectionType => ConfigurationElementCollectionType.BasicMapAlternate;
 
-        protected override string ElementName { get { return "listenAddress"; } }
+        protected override string ElementName => "listenAddress";
 
         protected override ConfigurationElement CreateNewElement()
         { return new ListenAddressConfigurationElement(); }

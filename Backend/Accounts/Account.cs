@@ -14,7 +14,7 @@ namespace EnergonSoftware.Backend.Accounts
     [Serializable]
     public sealed class Account : Core.Serialization.IFormattable, INotifyPropertyChanged
     {
-        public string Type { get { return "account"; } }
+        public string Type => "account";
 
         /// <summary>
         /// Gets or sets the account identifier.
@@ -22,7 +22,7 @@ namespace EnergonSoftware.Backend.Accounts
         /// <value>
         /// The account identifier.
         /// </value>
-        public long Id { get; set; }
+        public long Id { get; set; } = -1;
 
         private string _accountName = string.Empty;
 
@@ -81,7 +81,7 @@ namespace EnergonSoftware.Backend.Accounts
         /// <value>
         /// The account visibility.
         /// </value>
-        public Visibility Visibility { get; set; }
+        public Visibility Visibility { get; set; } = Visibility.Offline;
 
         /// <summary>
         /// Gets or sets the account status.
@@ -98,15 +98,6 @@ namespace EnergonSoftware.Backend.Accounts
         /// The name of the group the account is in.
         /// </value>
         public string GroupName { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Account"/> class.
-        /// </summary>
-        public Account()
-        {
-            Id = -1;
-            Visibility = Visibility.Offline;
-        }
 
         public async Task SerializeAsync(IFormatter formatter)
         {
@@ -164,9 +155,7 @@ namespace EnergonSoftware.Backend.Accounts
 
         private void NotifyPropertyChanged([CallerMemberName] string property = null)
         {
-            if(null != PropertyChanged) {
-                PropertyChanged(this, new PropertyChangedEventArgs(property));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 #endregion
     }

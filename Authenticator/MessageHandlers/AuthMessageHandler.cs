@@ -51,8 +51,8 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             }
 
             AuthMessage authMessage = (AuthMessage)message;
-            if(Common.AuthVersion != authMessage.Version) {
-                Logger.Debug("Bad version, expected: " + Common.AuthVersion + ", got: " + authMessage.Version);
+            if(Common.AuthProtocolVersion != authMessage.ProtocolVersion) {
+                Logger.Debug("Bad version, expected: " + Common.AuthProtocolVersion + ", got: " + authMessage.ProtocolVersion);
                 await authSession.FailureAsync("Bad Version").ConfigureAwait(false);
                 return;
             }

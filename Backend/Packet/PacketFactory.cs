@@ -15,7 +15,7 @@ namespace EnergonSoftware.Backend.Packet
                 return new NetworkPacket();
             }
 
-            throw new ArgumentException("Invalid packet type", "type");
+            throw new ArgumentException("Invalid packet type", nameof(type));
         }
 
         public static async Task<IPacket> CreateAsync(Stream stream)

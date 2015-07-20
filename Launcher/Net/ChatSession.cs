@@ -12,8 +12,6 @@ using EnergonSoftware.Backend.Messages.Chat;
 using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
 
-using EnergonSoftware.Core.Util;
-
 using EnergonSoftware.Launcher.Friends;
 using EnergonSoftware.Launcher.MessageHandlers;
 
@@ -25,28 +23,28 @@ namespace EnergonSoftware.Launcher.Net
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ChatSession));
 
-        // ReSharper disable once InconsistentNaming
-        private long LastPingTimeMS { get; set; }
+        private DateTime LastPingTime { get; set; } = DateTime.MaxValue;
+
         private bool ShouldPing
         {
             get
             {
                 // TODO: this check sucks, find a better way to do it
-                if(0 == LastMessageTimeMS) {
+                if(DateTime.MaxValue.Equals(LastPingTime)) {
                     return false;
                 }
 
-                return Time.CurrentTimeMs > LastPingTimeMS + Convert.ToInt64(ConfigurationManager.AppSettings["chatPingRate"]);
+                return DateTime.Now.Subtract(LastPingTime).Milliseconds > Convert.ToInt64(ConfigurationManager.AppSettings["chatPingRate"]);
             }
         }
 
-        public override string Name { get { return "chat"; } }
+        public override string Name => "chat";
 
         private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
         private readonly MessageProcessor _messageProcessor = new MessageProcessor();
         private readonly IMessageHandlerFactory _messageHandlerFactory = new MessageHandlerFactory();
 
-        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
+        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
 
         /*protected async override Task OnRunAsync()
         {
@@ -103,7 +101,7 @@ namespace EnergonSoftware.Launcher.Net
             }
 
             await SendMessageAsync(new PingMessage()).ConfigureAwait(false);
-            LastPingTimeMS = Time.CurrentTimeMs;
+            LastPingTime = DateTime.Now;
         }
 
         public async Task SetVisibilityAsync(Visibility visibility)

@@ -5,7 +5,6 @@
         Title="{x:Static launcherprops:Resources.SettingsWindowTitle}"
         Height="300" Width="400"
         Closing="Window_Closing">
-
     <Grid>
     </Grid>
 </Window>

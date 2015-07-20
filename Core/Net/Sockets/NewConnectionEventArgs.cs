@@ -11,7 +11,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         /// <value>
         /// The event timestamp.
         /// </value>
-        public DateTime Timestamp { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.Now;
 
         /// <summary>
         /// Gets or sets the newly connected socket.
@@ -20,13 +20,5 @@ namespace EnergonSoftware.Core.Net.Sockets
         /// The newly connected socket.
         /// </value>
         public Socket Socket { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NewConnectionEventArgs" /> class.
-        /// </summary>
-        public NewConnectionEventArgs()
-        {
-            Timestamp = DateTime.Now;
-        }
     }
 }

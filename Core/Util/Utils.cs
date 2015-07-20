@@ -31,7 +31,7 @@ namespace EnergonSoftware.Core.Util
 
                 // hex
                 for(int j = start; j < (start + bytesPerLine); ++j) {
-                    builder.Append(j < end ? string.Format("{0:X2} ", buffer[j]) : "   ");
+                    builder.Append(j < end ? $"{buffer[j]:X2} " : "   ");
                 }
 
                 builder.Append(" ");
@@ -39,7 +39,7 @@ namespace EnergonSoftware.Core.Util
                 // ascii
                 for(int j = start; j < end; ++j) {
                     char ch = (char)buffer[j];
-                    builder.Append(string.Format("{0} ", char.IsControl(ch) ? '.' : ch));
+                    builder.Append($"{(char.IsControl(ch) ? '.' : ch)} ");
                 }
 
                 builder.Append(Environment.NewLine);

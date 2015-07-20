@@ -20,7 +20,7 @@ namespace EnergonSoftware.Core.Serialization.Formatters
         private const string Prefix = "msg";
         private const string Namespace = "energonsoftware";
 
-        public string Type { get { return FormatterType; } }
+        public string Type => FormatterType;
 
         private Stream _stream;
         private XmlWriter _writer;

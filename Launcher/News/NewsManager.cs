@@ -9,8 +9,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Util;
-
 using log4net;
 
 namespace EnergonSoftware.Launcher.News
@@ -18,14 +16,13 @@ namespace EnergonSoftware.Launcher.News
     internal sealed class NewsManager : INotifyPropertyChanged
     {
         // ReSharper disable once InconsistentNaming
-        private const int MinCheckTimeMS = 1000 * 60;
+        private TimeSpan MinCheckTime { get; } = TimeSpan.FromMilliseconds(1000 * 60);
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(NewsManager));
 
         public static readonly NewsManager Instance = new NewsManager();
 
-        // ReSharper disable once InconsistentNaming
-        private long _lastCheckTimeMS;
+        private DateTime _lastCheckTime = DateTime.MinValue;
 
         private string _news = "Checking for news updates...";
         public string News
@@ -41,11 +38,11 @@ namespace EnergonSoftware.Launcher.News
 
         public async Task UpdateNewsAsync()
         {
-            if(Time.CurrentTimeMs < (_lastCheckTimeMS + MinCheckTimeMS)) {
+            if(DateTime.Now < (_lastCheckTime + MinCheckTime)) {
                 return;
             }
 
-            _lastCheckTimeMS = Time.CurrentTimeMs;
+            _lastCheckTime = DateTime.Now;
 
             // TODO: use string resources here
             Logger.Info("Updating news...");
@@ -80,9 +77,7 @@ await Task.Delay(1000).ConfigureAwait(false);
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string property = null)
         {
-            if(null != PropertyChanged) {
-                PropertyChanged(this, new PropertyChangedEventArgs(property));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 #endregion
 

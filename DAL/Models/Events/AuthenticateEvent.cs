@@ -14,7 +14,7 @@ namespace EnergonSoftware.DAL.Models.Events
     public class AuthenticateEvent : Event
     {
         [Required]
-        public AuthenticateEventType Type { get; set; }
+        public AuthenticateEventType Type { get; set; } = AuthenticateEventType.Invalid;
 
         [Required, MaxLength(32)]
         public string Origin { get; set; }
@@ -24,11 +24,6 @@ namespace EnergonSoftware.DAL.Models.Events
 
         [MaxLength(256)]
         public string Reason { get; set; }
-
-        public AuthenticateEvent()
-        {
-            Type = AuthenticateEventType.Invalid;
-        }
 
         public override string ToString()
         {

@@ -36,15 +36,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         /// <value>
         /// The socket backlog.
         /// </value>
-        public int SocketBacklog { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TcpListener"/> class.
-        /// </summary>
-        public TcpListener()
-        {
-            SocketBacklog = 10;
-        }
+        public int SocketBacklog { get; set; } = 10;
 
         /// <summary>
         /// Creates the listen sockets.
@@ -54,7 +46,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         public async Task CreateSocketsAsync(ListenAddressConfigurationElementCollection listenAddresses)
         {
             if(null == listenAddresses) {
-                throw new ArgumentNullException("listenAddresses");
+                throw new ArgumentNullException(nameof(listenAddresses));
             }
 
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
@@ -68,10 +60,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                     socket.Bind(endpoint);
                     socket.Listen(SocketBacklog);
                 } catch(SocketException e) {
-                    if(null != socket) {
-                        socket.Dispose();
-                    }
-
+                    socket?.Dispose();
                     Logger.Error(Resources.ErrorCreatingSocket, e);
                     return;
                 }
@@ -108,13 +97,11 @@ namespace EnergonSoftware.Core.Net.Sockets
                     Socket remote = await socket.AcceptAsync().ConfigureAwait(false);
                     Logger.Info("New connection from " + remote.RemoteEndPoint);
 
-                    if(null != NewConnectionEvent) {
-                        NewConnectionEvent(this, new NewConnectionEventArgs
-                            {
-                                Socket = remote
-                            }
-                        );
-                    }
+                    NewConnectionEvent?.Invoke(this, new NewConnectionEventArgs
+                        {
+                            Socket = remote
+                        }
+                    );
                 }
             } catch(SocketException e) {
                 Logger.Error("Exception polling sockets!", e);

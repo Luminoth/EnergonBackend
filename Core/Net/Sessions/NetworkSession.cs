@@ -23,7 +23,8 @@ namespace EnergonSoftware.Core.Net.Sessions
 
 #region Id Generator
         private static long _nextId;
-        private static long NextId { get { return ++_nextId; } }
+        private static long NextId => ++_nextId;
+
 #endregion
 
 #region Events
@@ -54,7 +55,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// The session identifier.
         /// </value>
-        public long Id { get; private set; }
+        public long Id { get; } = NextId;
 
         /// <summary>
         /// Gets the session name.
@@ -71,7 +72,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// <c>true</c> if this session is connecting; otherwise, <c>false</c>.
         /// </value>
-        public bool IsConnecting { get { return _socket.IsConnecting; } }
+        public bool IsConnecting => _socket.IsConnecting;
 
         /// <summary>
         /// Gets a value indicating whether this session is connected.
@@ -79,7 +80,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// <c>true</c> if this session is connected; otherwise, <c>false</c>.
         /// </value>
-        public bool IsConnected { get { return _socket.IsConnected; } }
+        public bool IsConnected => _socket.IsConnected;
 
         /// <summary>
         /// Gets a value indicating whether this session is encrypted.
@@ -87,7 +88,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// <c>true</c> if this session is encrypted; otherwise, <c>false</c>.
         /// </value>
-        public bool IsEncrypted { get { return _socket.IsEncrypted; } }
+        public bool IsEncrypted => _socket.IsEncrypted;
 
         /// <summary>
         /// Gets the remote end point associated with this session.
@@ -95,7 +96,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// The remote end point associated with this session.
         /// </value>
-        public EndPoint RemoteEndPoint { get { return _socket.RemoteEndPoint; } }
+        public EndPoint RemoteEndPoint => _socket.RemoteEndPoint;
 
         /// <summary>
         /// Gets the last time this session sent data.
@@ -103,7 +104,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// The last time this session sent data.
         /// </value>
-        public DateTime LastSendTime { get; private set; }
+        public DateTime LastSendTime { get; private set; } = DateTime.MaxValue;
 
         /// <summary>
         /// Gets the last time this session received data.
@@ -111,7 +112,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// The last time this session received data.
         /// </value>
-        public DateTime LastRecvTime { get; private set; }
+        public DateTime LastRecvTime { get; private set; } = DateTime.MaxValue;
 
         /// <summary>
         /// Gets or sets the session timeout in milliseconds.
@@ -119,7 +120,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// The session timeout in milliseconds.
         /// </value>
-        public long TimeoutMs { get; set; }
+        public long TimeoutMs { get; set; } = -1;
 
         /// <summary>
         /// Gets a value indicating whether the session has timed out.
@@ -127,7 +128,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         ///   <c>true</c> if the session timed out; otherwise, <c>false</c>.
         /// </value>
-        public bool TimedOut { get { return TimeoutMs >= 0 && (DateTime.Now.Subtract(LastRecvTime).Milliseconds > TimeoutMs); } }
+        public bool TimedOut => TimeoutMs >= 0 && (DateTime.Now.Subtract(LastRecvTime).Milliseconds > TimeoutMs);
 
         private SSLSocketWrapper _socket = new SSLSocketWrapper();
 #endregion
@@ -169,9 +170,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             _socket = new SSLSocketWrapper(socket);
 
             if(IsConnected) {
-                if(null != ConnectedEvent) {
-                    ConnectedEvent(this, new ConnectedEventArgs());
-                }
+                ConnectedEvent?.Invoke(this, new ConnectedEventArgs());
             } else {
                 // TODO: error?
             }
@@ -193,9 +192,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             _socket = new SSLSocketWrapper(socket);
 
             if(IsConnected) {
-                if(null != ConnectedEvent) {
-                    ConnectedEvent(this, new ConnectedEventArgs());
-                }
+                ConnectedEvent?.Invoke(this, new ConnectedEventArgs());
             } else {
                 // TODO: error?
             }
@@ -224,13 +221,11 @@ namespace EnergonSoftware.Core.Net.Sessions
                 Logger.Info("Session " + Id + " disconnecting: " + reason);
                 await _socket.DisconnectAsync(false).ConfigureAwait(false);
 
-                if(null != DisconnectedEvent) {
-                    DisconnectedEvent(this, new DisconnectedEventArgs
-                        {
-                            Reason = reason
-                        }
-                    );
-                }
+                DisconnectedEvent?.Invoke(this, new DisconnectedEventArgs
+                    {
+                        Reason = reason
+                    }
+                );
             } catch(SocketException e) {
                 Logger.Error("Error disconnecting socket!", e);
             }
@@ -287,14 +282,11 @@ namespace EnergonSoftware.Core.Net.Sessions
                 int count = await _socket.PollAndReadAllAsync(microSeconds, stream).ConfigureAwait(false);
                 if(count < 0) {
                     Logger.Warn("Session " + Id + " remote disconnected!");
-                    if(null != DisconnectedEvent) {
-                        DisconnectedEvent(this, new DisconnectedEventArgs
-                            {
-                                Reason = Resources.DisconnectSocketClosed
-                            }
-                        );
-                    }
-
+                    DisconnectedEvent?.Invoke(this, new DisconnectedEventArgs
+                        {
+                            Reason = Resources.DisconnectSocketClosed
+                        }
+                    );
                     return;
                 }
 
@@ -321,15 +313,12 @@ namespace EnergonSoftware.Core.Net.Sessions
             Array.Copy(data, offset, dataCopy, 0, count);
 
             LastRecvTime = DateTime.Now;
-            if(null != DataReceivedEvent) {
-                DataReceivedEvent(this,
-                    new DataReceivedEventArgs
-                    {
-                        Count = count,
-                        Data = dataCopy,
-                    }
-                );
-            }
+            DataReceivedEvent?.Invoke(this, new DataReceivedEventArgs
+                {
+                    Count = count,
+                    Data = dataCopy,
+                }
+            );
         }
 
         /// <summary>
@@ -380,13 +369,11 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Error("Session " + Id + " encountered an internal error: " + error);
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
-            if(null != ErrorEvent) {
-                ErrorEvent(this, new ErrorEventArgs
-                    {
-                        Error = error
-                    }
-                );
-            }
+            ErrorEvent?.Invoke(this, new ErrorEventArgs
+                {
+                    Error = error
+                }
+            );
         }
 
         /// <summary>
@@ -399,14 +386,12 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Error("Session " + Id + " encountered an internal error: " + error, ex);
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
-            if(null != ErrorEvent) {
-                ErrorEvent(this, new ErrorEventArgs
-                    {
-                        Error = error,
-                        Exception = ex
-                    }
-                );
-            }
+            ErrorEvent?.Invoke(this, new ErrorEventArgs
+                {
+                    Error = error,
+                    Exception = ex
+                }
+            );
         }
 
         /// <summary>
@@ -418,13 +403,11 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Error("Session " + Id + " encountered an internal error", ex);
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
-            if(null != ErrorEvent) {
-                ErrorEvent(this, new ErrorEventArgs
-                    {
-                        Exception = ex
-                    }
-                );
-            }
+            ErrorEvent?.Invoke(this, new ErrorEventArgs
+                {
+                    Exception = ex
+                }
+            );
         }
 #endregion
 
@@ -438,13 +421,11 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Error("Session " + Id + " encountered an error: " + error);
             await DisconnectAsync(error).ConfigureAwait(false);
 
-            if(null != ErrorEvent) {
-                ErrorEvent(this, new ErrorEventArgs
-                    {
-                        Error = error
-                    }
-                );
-            }
+            ErrorEvent?.Invoke(this, new ErrorEventArgs
+                {
+                    Error = error
+                }
+            );
         }
 
         /// <summary>
@@ -457,14 +438,12 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Error("Session " + Id + " encountered an error: " + error, ex);
             await DisconnectAsync(error).ConfigureAwait(false);
 
-            if(null != ErrorEvent) {
-                ErrorEvent(this, new ErrorEventArgs
-                    {
-                        Error = error,
-                        Exception = ex
-                    }
-                );
-            }
+            ErrorEvent?.Invoke(this, new ErrorEventArgs
+                {
+                    Error = error,
+                    Exception = ex
+                }
+            );
         }
 
         /// <summary>
@@ -477,13 +456,11 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Error("Session " + Id + " encountered an error", ex);
             await DisconnectAsync(ex.Message).ConfigureAwait(false);
 
-            if(null != ErrorEvent) {
-                ErrorEvent(this, new ErrorEventArgs
-                    {
-                        Exception = ex
-                    }
-                );
-            }
+            ErrorEvent?.Invoke(this, new ErrorEventArgs
+                {
+                    Exception = ex
+                }
+            );
         }
 #endregion
 
@@ -492,11 +469,6 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// </summary>
         protected NetworkSession()
         {
-            Id = NextId;
-
-            LastSendTime = DateTime.MaxValue;
-
-            TimeoutMs = -1;
         }
 
         /// <summary>

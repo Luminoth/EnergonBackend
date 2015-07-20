@@ -44,23 +44,15 @@ namespace EnergonSoftware.DAL.Models.Accounts
         public string SessionId { get; set; }
 
         [Required]
-        public Visibility Visibility { get; set; }
+        public Visibility Visibility { get; set; } = Visibility.Offline;
 
         [MaxLength(256)]
         public string Status { get; set; }
 
-        public virtual ICollection<FriendGroup> FriendGroups { get; set; }
+        public virtual ICollection<FriendGroup> FriendGroups { get; set; } = new List<FriendGroup>();
 
         [InverseProperty("Account")]
-        public virtual ICollection<AccountFriend> Friends { get; set; }
-
-        public AccountInfo()
-        {
-            Visibility = Visibility.Offline;
-
-            FriendGroups = new List<FriendGroup>();
-            Friends = new List<AccountFriend>();
-        }
+        public virtual ICollection<AccountFriend> Friends { get; set; } = new List<AccountFriend>();
 
         public async Task SetPassword(string realm, string password)
         {
@@ -84,7 +76,7 @@ namespace EnergonSoftware.DAL.Models.Accounts
             {
                 Id = Id,
                 AccountName = AccountName,
-                UserName = UserName,
+                Username = UserName,
                 SessionId = SessionId,
                 EndPoint = endPoint,
                 Visibility = Visibility,

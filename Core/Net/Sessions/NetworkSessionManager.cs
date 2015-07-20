@@ -30,7 +30,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// The maximum number of sessions.
         /// </value>
-        public int MaxSessions { get; set; }
+        public int MaxSessions { get; set; } = -1;
 
         /// <summary>
         /// Gets the number of sessions being managed.
@@ -38,7 +38,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// The number of sessions being managed.
         /// </value>
-        public int Count { get { return _sessions.Count; } }
+        public int Count => _sessions.Count;
 
         /// <summary>
         /// Gets a value indicating whether this manager is empty.
@@ -46,7 +46,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         ///   <c>true</c> if this manager is empty; otherwise, <c>false</c>.
         /// </value>
-        public bool IsEmpty { get { return 0 == Count; } }
+        public bool IsEmpty => 0 == Count;
 
         /// <summary>
         /// Gets or sets the session factory.
@@ -55,14 +55,6 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// The session factory.
         /// </value>
         public INetworkSessionFactory SessionFactory { private get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NetworkSessionManager"/> class.
-        /// </summary>
-        public NetworkSessionManager()
-        {
-            MaxSessions = -1;
-        }
 
         /// <summary>
         /// New connection event handler.
@@ -91,7 +83,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         public async Task<bool> AddAsync(NetworkSession session)
         {
             if(null == session) {
-                throw new ArgumentNullException("session");
+                throw new ArgumentNullException(nameof(session));
             }
 
             if(MaxSessions >= 0 && Count >= MaxSessions) {

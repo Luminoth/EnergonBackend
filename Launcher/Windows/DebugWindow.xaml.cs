@@ -12,14 +12,14 @@ namespace EnergonSoftware.Launcher.Windows
     /// </summary>
     public partial class DebugWindow
     {
-        public static DebugWindow Instance { get { return App.Instance.DebugWindow; } }
+        public static DebugWindow Instance => App.Instance.DebugWindow;
 
 #region UI Helpers
         public static async Task AppendOutputTextAsync(string logEntry)
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    Instance.OutputText.AppendText(logEntry, LoggerColor.ParseColor(logEntry));
+                    Instance.OutputText.AppendText(logEntry, LoggerColor.LogEntryColor(logEntry));
                     ////Instance.OutputText.ScrollToEnd();
                 });
         }

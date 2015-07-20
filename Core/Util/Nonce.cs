@@ -16,7 +16,7 @@ namespace EnergonSoftware.Core.Util
         /// <value>
         /// The nonce realm.
         /// </value>
-        public string Realm { get; private set; }
+        public string Realm { get; }
 
         /// <summary>
         /// Gets the expiration in milliseconds.
@@ -24,7 +24,7 @@ namespace EnergonSoftware.Core.Util
         /// <value>
         /// The expiration in milliseconds.
         /// </value>
-        public int ExpiryMs { get; private set; }
+        public int ExpiryMs { get; }
 
         /// <summary>
         /// Gets the nonce value.
@@ -32,7 +32,7 @@ namespace EnergonSoftware.Core.Util
         /// <value>
         /// The nonce value.
         /// </value>
-        public string NonceValue { get; private set; }
+        public string NonceValue { get; }
 
         /// <summary>
         /// Gets the nonce hash.
@@ -48,7 +48,7 @@ namespace EnergonSoftware.Core.Util
         /// <value>
         /// The nonce creation time.
         /// </value>
-        public DateTime CreationTime { get; private set; }
+        public DateTime CreationTime { get; } = DateTime.Now;
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="Nonce"/> is expired.
@@ -56,7 +56,7 @@ namespace EnergonSoftware.Core.Util
         /// <value>
         ///   <c>true</c> if expired; otherwise, <c>false</c>.
         /// </value>
-        public bool Expired { get { return ExpiryMs >= 0 && (DateTime.Now.Subtract(CreationTime).Milliseconds > ExpiryMs); } }
+        public bool Expired => ExpiryMs >= 0 && (DateTime.Now.Subtract(CreationTime).Milliseconds > ExpiryMs);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Nonce" /> class.
@@ -68,7 +68,6 @@ namespace EnergonSoftware.Core.Util
         {
             Realm = realm;
             ExpiryMs = expiryMs;
-            CreationTime = DateTime.Now;
             NonceValue = CreationTime.GetTicksMs() + ":" + Realm;
             NonceHash = new SHA512().HashHexAsync(NonceValue).Result;
         }
@@ -93,7 +92,6 @@ namespace EnergonSoftware.Core.Util
 
         private Nonce()
         {
-            ExpiryMs = -1;
         }
     }
 }

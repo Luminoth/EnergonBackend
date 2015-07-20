@@ -17,7 +17,7 @@ namespace EnergonSoftware.Backend.Packet
     {
 #region Id Generator
         private static int _nextId;
-        private static int NextId { get { return ++_nextId; } }
+        private static int NextId => ++_nextId;
 #endregion
 
         public const string PacketType = "Network";
@@ -25,22 +25,17 @@ namespace EnergonSoftware.Backend.Packet
         public static readonly byte[] Header = new byte[] { (byte)'E', (byte)'S', (byte)'N', (byte)'P' };
         public static readonly byte[] Separator = new byte[] { (byte)'\r', (byte)'\n' };
 
-        public string Type { get { return PacketType; } }
+        public string Type => PacketType;
 
-        public int Id { get; protected set; }
+        public int Id { get; protected set; } = NextId;
 
         public string ContentType { get; set; }
 
         public string Encoding { get; set; }
 
-        public int ContentLength { get { return null == Content ? 0 : Content.Length; } }
+        public int ContentLength => Content?.Length ?? 0;
 
         public byte[] Content { get; set; }
-
-        public NetworkPacket()
-        {
-            Id = NextId;
-        }
 
         public async Task SerializeAsync(Stream stream)
         {

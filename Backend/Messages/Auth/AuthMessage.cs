@@ -17,7 +17,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// </summary>
         public const string MessageType = "auth";
 
-        public string Type { get { return MessageType; } }
+        public string Type => MessageType;
 
         /// <summary>
         /// Gets or sets the authentication protocl version.
@@ -25,7 +25,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// <value>
         /// The protocol version.
         /// </value>
-        public int ProtocolVersion { get; set; }
+        public int ProtocolVersion { get; set; } = Common.AuthProtocolVersion;
 
         /// <summary>
         /// Gets or sets the type of the authentication mechanism.
@@ -33,7 +33,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// <value>
         /// The type of the authentication mechanism.
         /// </value>
-        public AuthType MechanismType { get; set; }
+        public AuthType MechanismType { get; set; } = AuthType.DigestSHA512;
 
         /// <summary>
         /// Gets the authentication mechanism as a string.
@@ -41,16 +41,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// <value>
         /// The authentication mechanism as a string.
         /// </value>
-        public string Mechanism { get { return EnumDescription.GetDescriptionFromEnumValue(MechanismType); } }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AuthMessage"/> class.
-        /// </summary>
-        public AuthMessage()
-        {
-            ProtocolVersion = Common.AuthProtocolVersion;
-            MechanismType = AuthType.DigestSHA512;
-        }
+        public string Mechanism => EnumDescription.GetDescriptionFromEnumValue(MechanismType);
 
         public async Task SerializeAsync(IFormatter formatter)
         {

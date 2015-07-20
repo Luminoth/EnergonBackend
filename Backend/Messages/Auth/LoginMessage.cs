@@ -16,7 +16,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// </summary>
         public const string MessageType = "login";
 
-        public string Type { get { return MessageType; } }
+        public string Type => MessageType;
 
         /// <summary>
         /// Gets or sets the name of the account.
@@ -24,7 +24,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// <value>
         /// The name of the account.
         /// </value>
-        public string AccountName { get; set; }
+        public string AccountName { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the session identifier.
@@ -32,16 +32,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// <value>
         /// The session identifier.
         /// </value>
-        public string SessionId { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LoginMessage"/> class.
-        /// </summary>
-        public LoginMessage()
-        {
-            AccountName = string.Empty;
-            SessionId = string.Empty;
-        }
+        public string SessionId { get; set; } = string.Empty;
 
         public async Task SerializeAsync(IFormatter formatter)
         {

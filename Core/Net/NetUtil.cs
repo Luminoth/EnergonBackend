@@ -74,10 +74,7 @@ namespace EnergonSoftware.Core.Net
 
                 return listener;
             } catch(Exception) {
-                if(null != listener) {
-                    listener.Dispose();
-                }
-
+                listener?.Dispose();
                 throw;
             }
         }
@@ -121,11 +118,11 @@ namespace EnergonSoftware.Core.Net
         public static bool CompareEndPoints(string a, EndPoint b)
         {
             if(null == a) {
-                throw new ArgumentNullException("a");
+                throw new ArgumentNullException(nameof(a));
             }
 
             if(null == b) {
-                throw new ArgumentNullException("b");
+                throw new ArgumentNullException(nameof(b));
             }
 
             string[] aparts = a.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);

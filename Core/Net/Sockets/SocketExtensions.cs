@@ -33,10 +33,7 @@ namespace System.Net.Sockets
                 remote.Connect(remoteEndpoint);
                 return remote;
             } catch(Exception) {
-                if(null != remote) {
-                    remote.Dispose();
-                }
-
+                remote?.Dispose();
                 throw;
             }
         }

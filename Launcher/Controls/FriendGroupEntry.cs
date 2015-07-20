@@ -9,22 +9,16 @@ namespace EnergonSoftware.Launcher.Controls
         public string Text { get; set; }
 
         private readonly Dictionary<string, FriendGroupEntry> _groups = new Dictionary<string, FriendGroupEntry>();
-        public IReadOnlyDictionary<string, FriendGroupEntry> Groups { get { return _groups; } }
+        public IReadOnlyDictionary<string, FriendGroupEntry> Groups => _groups;
 
         private readonly Dictionary<string, FriendEntry> _friends = new Dictionary<string, FriendEntry>();
-        public IReadOnlyDictionary<string, FriendEntry> Friends { get { return _friends; } }
+        public IReadOnlyDictionary<string, FriendEntry> Friends => _friends;
 
-        public IList Entries
+        public IList Entries => new CompositeCollection()
         {
-            get
-            {
-                return new CompositeCollection()
-                {
-                    new CollectionContainer() { Collection = Groups.Values },
-                    new CollectionContainer() { Collection = Friends.Values },
-                };
-            }
-        }
+            new CollectionContainer { Collection = Groups.Values },
+            new CollectionContainer { Collection = Friends.Values },
+        };
 
         public void AddGroup(FriendGroupEntry group)
         {
@@ -47,7 +41,7 @@ namespace EnergonSoftware.Launcher.Controls
                 return null == entry.Text;
             }
 
-            return null == Text ? null == entry.Text : Text.Equals(entry.Text, System.StringComparison.InvariantCultureIgnoreCase);
+            return Text?.Equals(entry.Text, System.StringComparison.InvariantCultureIgnoreCase) ?? null == entry.Text;
         }
 
         public override int GetHashCode()

@@ -11,13 +11,13 @@ namespace EnergonSoftware.Authenticator.Net
 {
     internal sealed class InstanceNotifierSession : MessageSession
     {
-        public override string Name { get { return "instanceNotifier"; } }
+        public override string Name => "instanceNotifier";
 
         private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
         private readonly MessageProcessor _messageProcessor = new MessageProcessor();
         private readonly IMessageHandlerFactory _messageHandlerFactory = new InstanceNotifierMessageHandlerFactory();
 
-        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
+        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
 
         public InstanceNotifierSession(Socket socket) : base(socket)
         {
@@ -35,10 +35,6 @@ namespace EnergonSoftware.Authenticator.Net
         {
             MessageHandler handler = _messageHandlerFactory.Create(e.Message.Type);
             await handler.HandleMessageAsync(e.Message, this).ConfigureAwait(false);
-        }
-
-        private InstanceNotifierSession()
-        {
         }
     }
 }

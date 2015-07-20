@@ -16,19 +16,11 @@ namespace EnergonSoftware.Backend.Messages.Notification
         /// </summary>
         public const string MessageType = "startup";
 
-        public string Type { get { return MessageType; } }
+        public string Type => MessageType;
 
-        public string ServiceName { get; set; }
-        public string ServiceId { get; set; }
+        public string ServiceName { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="StartupMessage"/> class.
-        /// </summary>
-        public StartupMessage()
-        {
-            ServiceName = string.Empty;
-            ServiceId = string.Empty;
-        }
+        public string ServiceId { get; set; } = string.Empty;
 
         public async Task SerializeAsync(IFormatter formatter)
         {

@@ -23,7 +23,7 @@ namespace EnergonSoftware.Core.Util
         /// <value>
         /// The expiration in milliseconds.
         /// </value>
-        public int ExpiryMs { get; private set; }
+        public int ExpiryMs { get; } = -1;
 
         /// <summary>
         /// Gets the session identifier.
@@ -40,7 +40,7 @@ namespace EnergonSoftware.Core.Util
         /// <value>
         /// The creation time.
         /// </value>
-        public DateTime CreationTime { get; private set; }
+        public DateTime CreationTime { get; } = DateTime.Now;
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="SessionId"/> is expired.
@@ -48,7 +48,7 @@ namespace EnergonSoftware.Core.Util
         /// <value>
         ///   <c>true</c> if expired; otherwise, <c>false</c>.
         /// </value>
-        public bool Expired { get { return ExpiryMs >= 0 && (DateTime.Now.Subtract(CreationTime).Milliseconds > ExpiryMs); } }
+        public bool Expired => ExpiryMs >= 0 && (DateTime.Now.Subtract(CreationTime).Milliseconds > ExpiryMs);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionId"/> class.
@@ -122,8 +122,6 @@ throw new NotImplementedException();
 
         private SessionId()
         {
-            ExpiryMs = -1;
-            CreationTime = DateTime.Now;
         }
     }
 }

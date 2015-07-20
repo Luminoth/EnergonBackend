@@ -12,15 +12,10 @@ namespace EnergonSoftware.DAL.Models.Events
     public class StartupEvent : Event
     {
         [Required]
-        public StartupEventType Type { get; set; }
+        public StartupEventType Type { get; set; } = StartupEventType.Invalid;
 
         [Required, MaxLength(32)]
         public string Application { get; set; }
-
-        public StartupEvent()
-        {
-            Type = StartupEventType.Invalid;
-        }
 
         public override string ToString()
         {

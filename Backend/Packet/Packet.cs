@@ -12,6 +12,7 @@ namespace EnergonSoftware.Backend.Packet
 
         string ContentType { get; set; }
 
+        // TODO: what if this was a System.Text.Encoding instead?
         string Encoding { get; set; }
 
         int ContentLength { get; }
@@ -19,6 +20,7 @@ namespace EnergonSoftware.Backend.Packet
         byte[] Content { get; set; }
 
         Task SerializeAsync(Stream stream);
+
         Task<bool> DeserializeAsync(Stream stream);
     }
 }

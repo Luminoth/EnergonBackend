@@ -10,14 +10,6 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// The event timestamp.
         /// </value>
-        public DateTime Timestamp { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConnectedEventArgs"/> class.
-        /// </summary>
-        public ConnectedEventArgs()
-        {
-            Timestamp = DateTime.Now;
-        }
+        public DateTime Timestamp { get; set; } = DateTime.Now;
     }
 }

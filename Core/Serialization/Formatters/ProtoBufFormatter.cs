@@ -15,7 +15,7 @@ namespace EnergonSoftware.Core.Serialization.Formatters
         /// </summary>
         public const string FormatterType = "ProtoBuf";
 
-        public string Type { get { return FormatterType; } }
+        public string Type => FormatterType;
 
         private Stream _stream;
 

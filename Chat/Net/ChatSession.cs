@@ -31,14 +31,11 @@ namespace EnergonSoftware.Chat.Net
             try {
                 session = new ChatSession(socket)
                 {
-                    Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
+                    TimeoutMs = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
                 };
                 return session;
             } catch(Exception) {
-                if(null != session) {
-                    session.Dispose();
-                }
-
+                session?.Dispose();
                 throw;
             }
         }
@@ -48,13 +45,13 @@ namespace EnergonSoftware.Chat.Net
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ChatSession));
 
-        public override string Name { get { return "chat"; } }
+        public override string Name => "chat";
 
         private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
         private readonly MessageProcessor _messageProcessor = new MessageProcessor();
         private readonly IMessageHandlerFactory _messageHandlerFactory = new ChatMessageHandlerFactory();
 
-        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
+        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
 
         public ChatSession(Socket socket) : base(socket)
         {

@@ -19,11 +19,11 @@ namespace EnergonSoftware.Backend.Messages.Chat
         /// </summary>
         public const string MessageType = "friendlist";
 
-        public string Type { get { return MessageType; } }
+        public string Type => MessageType;
 
-        public string AccountName { get; set; }
+        public string AccountName { get; set; } = string.Empty;
 
-        public string SessionId { get; set; }
+        public string SessionId { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the friends.
@@ -31,18 +31,7 @@ namespace EnergonSoftware.Backend.Messages.Chat
         /// <value>
         /// The friends.
         /// </value>
-        public List<Account> Friends { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FriendListMessage"/> class.
-        /// </summary>
-        public FriendListMessage()
-        {
-            AccountName = string.Empty;
-            SessionId = string.Empty;
-
-            Friends = new List<Account>();
-        }
+        public IReadOnlyCollection<Account> Friends { get; set; } = new List<Account>();
 
         public async Task SerializeAsync(IFormatter formatter)
         {

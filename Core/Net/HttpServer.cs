@@ -21,6 +21,7 @@ namespace EnergonSoftware.Core.Net
     /// and should be used as a replacement for this when available. The MVC design is much
     /// cleaner and has a lot more tools available for rapid development.
     /// </remarks>
+    [Obsolete]
     public class HttpServer : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpServer));
@@ -62,7 +63,7 @@ namespace EnergonSoftware.Core.Net
         public void Start(IReadOnlyCollection<string> prefixes)
         {
             if(null == prefixes) {
-                throw new ArgumentNullException("prefixes");
+                throw new ArgumentNullException(nameof(prefixes));
             }
 
             if(null != _task) {

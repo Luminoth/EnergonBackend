@@ -19,7 +19,7 @@ namespace EnergonSoftware.WindowsUtil
         public static Color LogEntryColor(Level level)
         {
             if(null == level) {
-                throw new ArgumentNullException("level");
+                throw new ArgumentNullException(nameof(level));
             }
 
             if(Level.Debug == level) {
@@ -51,7 +51,7 @@ namespace EnergonSoftware.WindowsUtil
         public static Color LogEntryColor(string logEntry)
         {
             if(null == logEntry) {
-                throw new ArgumentNullException("logEntry");
+                throw new ArgumentNullException(nameof(logEntry));
             }
 
             if(logEntry.Contains("INFO")) {

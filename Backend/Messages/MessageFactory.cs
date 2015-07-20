@@ -71,7 +71,7 @@ namespace EnergonSoftware.Backend.Messages
                 return new VisibilityMessage();
             }
 
-            throw new ArgumentException(string.Format(Resources.ErrorUnsupportedMessage, messageType), "messageType");
+            throw new ArgumentException(string.Format(Resources.ErrorUnsupportedMessage, messageType), nameof(messageType));
         }
     }
 }

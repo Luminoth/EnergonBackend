@@ -6,7 +6,6 @@
       xmlns:launcherprops="clr-namespace:EnergonSoftware.Launcher.Properties"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="300">
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

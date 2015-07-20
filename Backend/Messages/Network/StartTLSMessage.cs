@@ -17,7 +17,7 @@ namespace EnergonSoftware.Backend.Messages.Network
         /// </summary>
         public const string MessageType = "starttls";
 
-        public string Type { get { return MessageType; } }
+        public string Type => MessageType;
 
         public async Task SerializeAsync(IFormatter formatter)
         {

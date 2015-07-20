@@ -9,8 +9,6 @@ using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
 
-using EnergonSoftware.Core.Util;
-
 using EnergonSoftware.Launcher.MessageHandlers;
 
 using log4net;
@@ -21,28 +19,28 @@ namespace EnergonSoftware.Launcher.Net
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(OvermindSession));
 
-        // ReSharper disable once InconsistentNaming
-        private long LastPingTimeMS { get; set; }
+        private DateTime LastPingTime { get; set; } = DateTime.MaxValue;
+
         private bool ShouldPing
         {
             get
             {
                 // TODO: this check sucks, find a better way to do it
-                if(0 == LastMessageTimeMS) {
+                if(DateTime.MaxValue.Equals(LastPingTime)) {
                     return false;
                 }
 
-                return Time.CurrentTimeMs > LastPingTimeMS + Convert.ToInt64(ConfigurationManager.AppSettings["overmindPingRate"]);
+                return DateTime.Now.Subtract(LastPingTime).Milliseconds > Convert.ToInt64(ConfigurationManager.AppSettings["overmindPingRate"]);
             }
         }
 
-        public override string Name { get { return "overmind"; } }
+        public override string Name => "overmind";
 
         private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
         private readonly MessageProcessor _messageProcessor = new MessageProcessor();
         private readonly IMessageHandlerFactory _messageHandlerFactory = new MessageHandlerFactory();
 
-        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
+        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
 
         /*protected async override Task OnRunAsync()
         {
@@ -98,7 +96,7 @@ namespace EnergonSoftware.Launcher.Net
             }
 
             await SendMessageAsync(new PingMessage()).ConfigureAwait(false);
-            LastPingTimeMS = Time.CurrentTimeMs;
+            LastPingTime = DateTime.Now;
         }
 
         protected override MessagePacket CreatePacket(IMessage message)

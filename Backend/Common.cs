@@ -1,14 +1,10 @@
-﻿using log4net;
-
-namespace EnergonSoftware.Backend
+﻿namespace EnergonSoftware.Backend
 {
     /// <summary>
     /// Common backend/frontend data
     /// </summary>
     public static class Common
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(Common));
-
 #region Auth Properties
         /// <summary>
         /// The authentication protocol version

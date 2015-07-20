@@ -38,7 +38,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         public async Task CreateSocketsAsync(ListenAddressConfigurationElementCollection listenAddresses)
         {
             if(null == listenAddresses) {
-                throw new ArgumentNullException("listenAddresses");
+                throw new ArgumentNullException(nameof(listenAddresses));
             }
 
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
@@ -51,10 +51,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                     socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                     socket.Bind(endpoint);
                 } catch(SocketException e) {
-                    if(null != socket) {
-                        socket.Dispose();
-                    }
-
+                    socket?.Dispose();
                     Logger.Error(Resources.ErrorCreatingSocket, e);
                     return;
                 }

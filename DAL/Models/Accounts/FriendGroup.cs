@@ -18,6 +18,7 @@ namespace EnergonSoftware.DAL.Models.Accounts
         public int? ParentGroupId { get; set; }
 
         public virtual AccountInfo Account { get; set; }
+
         public virtual FriendGroup ParentGroup { get; set; }
 
         public override string ToString()

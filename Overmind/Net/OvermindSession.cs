@@ -28,14 +28,11 @@ namespace EnergonSoftware.Overmind.Net
             try {
                 session = new OvermindSession(socket)
                 {
-                    Timeout = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
+                    TimeoutMs = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
                 };
                 return session;
             } catch(Exception) {
-                if(null != session) {
-                    session.Dispose();
-                }
-
+                session?.Dispose();
                 throw;
             }
         }
@@ -45,13 +42,13 @@ namespace EnergonSoftware.Overmind.Net
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(OvermindSession));
 
-        public override string Name { get { return "overmind"; } }
+        public override string Name => "overmind";
 
         private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
         private readonly MessageProcessor _messageProcessor = new MessageProcessor();
         private readonly IMessageHandlerFactory _messageHandlerFactory = new OvermindMessageHandlerFactory();
 
-        protected override string FormatterType { get { return BinaryMessageFormatter.FormatterType; } }
+        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
 
         public OvermindSession(Socket socket) : base(socket)
         {

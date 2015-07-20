@@ -7,7 +7,7 @@ namespace EnergonSoftware.Launcher.Windows
     /// </summary>
     public partial class SettingsWindow
     {
-        public static SettingsWindow Instance { get { return App.Instance.SettingsWindow; } }
+        public static SettingsWindow Instance => App.Instance.SettingsWindow;
 
         public SettingsWindow()
         {

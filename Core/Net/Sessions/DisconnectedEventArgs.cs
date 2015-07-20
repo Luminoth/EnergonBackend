@@ -10,7 +10,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// The event timestamp.
         /// </value>
-        public DateTime Timestamp { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.Now;
 
         /// <summary>
         /// Gets or sets the reason for the disconnect.
@@ -20,13 +20,5 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// The reason for the disconnect.
         /// </value>
         public string Reason { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DisconnectedEventArgs"/> class.
-        /// </summary>
-        public DisconnectedEventArgs()
-        {
-            Timestamp = DateTime.Now;
-        }
     }
 }

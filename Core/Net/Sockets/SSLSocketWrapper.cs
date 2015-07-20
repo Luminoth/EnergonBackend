@@ -28,7 +28,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         /// <value>
         /// The socket identifier.
         /// </value>
-        public int SocketId { get { return null != _socket ? _socket.Handle.ToInt32() : -1; } }
+        public int SocketId => _socket?.Handle.ToInt32() ?? -1;
 
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
@@ -47,7 +47,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         /// <value>
         /// <c>true</c> if this instancesocket is connected; otherwise, <c>false</c>.
         /// </value>
-        public bool IsConnected { get { return null != _socket && _socket.Connected; } }
+        public bool IsConnected => null != _socket && _socket.Connected;
 
         /// <summary>
         /// Gets a value indicating whether this socket is encrypted.
@@ -55,7 +55,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         /// <value>
         /// <c>true</c> if this socket is encrypted; otherwise, <c>false</c>.
         /// </value>
-        public bool IsEncrypted { get { return null != _sslStream && _sslStream.IsEncrypted; } }
+        public bool IsEncrypted => null != _sslStream && _sslStream.IsEncrypted;
 
         /// <summary>
         /// Gets the socket remote end point.
@@ -63,7 +63,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         /// <value>
         /// The socket remote end point.
         /// </value>
-        public EndPoint RemoteEndPoint { get { return null != _socket ? _socket.RemoteEndPoint : null; } }
+        public EndPoint RemoteEndPoint => _socket?.RemoteEndPoint;
 
         private Socket _socket;
 #endregion
@@ -73,7 +73,7 @@ namespace EnergonSoftware.Core.Net.Sockets
 
         private SslStream _sslStream;
 
-        private Stream Stream { get { return _sslStream ?? (Stream)_stream; } }
+        private Stream Stream => _sslStream ?? (Stream)_stream;
 #endregion
 
         /// <summary>

@@ -46,7 +46,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
         /// <value>
         /// The runtime.
         /// </value>
-        public TimeSpan Runtime { get { return Finished ? _finishTime.Subtract(_startTime) : DateTime.Now.Subtract(_startTime); } }
+        public TimeSpan Runtime => Finished ? _finishTime.Subtract(_startTime) : DateTime.Now.Subtract(_startTime);
 
         /// <summary>
         /// Handles the message.

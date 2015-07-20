@@ -16,7 +16,7 @@ namespace EnergonSoftware.Core.Configuration
         /// The maximum number of connections to allow.
         /// </value>
         [ConfigurationProperty("maxConnections", DefaultValue = -1)]
-        public int MaxConnections { get { return (int)this["maxConnections"]; } }
+        public int MaxConnections => (int)this["maxConnections"];
 
         /// <summary>
         /// Gets the socket backlog.
@@ -25,7 +25,7 @@ namespace EnergonSoftware.Core.Configuration
         /// The socket backlog.
         /// </value>
         [ConfigurationProperty("backlog", DefaultValue = 10)]
-        public int Backlog { get { return (int)this["backlog"]; } }
+        public int Backlog => (int)this["backlog"];
 
         /// <summary>
         /// Gets the listen addresses.
@@ -34,9 +34,6 @@ namespace EnergonSoftware.Core.Configuration
         /// The listen addresses.
         /// </value>
         [ConfigurationProperty("", IsDefaultCollection = true)]
-        public ListenAddressConfigurationElementCollection ListenAddresses
-        {
-            get { return (ListenAddressConfigurationElementCollection)base[string.Empty]; }
-        }
+        public ListenAddressConfigurationElementCollection ListenAddresses => (ListenAddressConfigurationElementCollection)base[string.Empty];
     }
 }

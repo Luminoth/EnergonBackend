@@ -10,7 +10,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// The event timestamp.
         /// </value>
-        public DateTime Timestamp { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.Now;
 
         /// <summary>
         /// Gets or sets the number of bytes received.
@@ -27,13 +27,5 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// The bytes received.
         /// </value>
         public byte[] Data { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DataReceivedEventArgs"/> class.
-        /// </summary>
-        public DataReceivedEventArgs()
-        {
-            Timestamp = DateTime.Now;
-        }
     }
 }

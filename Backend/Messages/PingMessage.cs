@@ -16,7 +16,7 @@ namespace EnergonSoftware.Backend.Messages
         /// </summary>
         public const string MessageType = "ping";
 
-        public string Type { get { return MessageType; } }
+        public string Type => MessageType;
 
         public async Task SerializeAsync(IFormatter formatter)
         {

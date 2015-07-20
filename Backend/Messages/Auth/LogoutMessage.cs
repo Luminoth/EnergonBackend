@@ -16,20 +16,11 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// </summary>
         public const string MessageType = "logout";
 
-        public string Type { get { return MessageType; } }
+        public string Type => MessageType;
 
-        public string AccountName { get; set; }
+        public string AccountName { get; set; } = string.Empty;
 
-        public string SessionId { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LogoutMessage"/> class.
-        /// </summary>
-        public LogoutMessage()
-        {
-            AccountName = string.Empty;
-            SessionId = string.Empty;
-        }
+        public string SessionId { get; set; } = string.Empty;
 
         public async Task SerializeAsync(IFormatter formatter)
         {

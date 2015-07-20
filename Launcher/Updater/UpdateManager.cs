@@ -60,36 +60,24 @@ await Task.Delay(1000).ConfigureAwait(false);
                         //// TODO: check the updates and then update!
 
                         UpdateStatus = "Up to date!";
-                        if(null != OnUpdateFinished) {
-                            OnUpdateFinished(
-                                this,
-                                new UpdateFinishedEventArgs()
-                                {
-                                    Success = true,
-                                });
-                        }
+                        OnUpdateFinished?.Invoke(this, new UpdateFinishedEventArgs()
+                            {
+                                Success = true,
+                            });
                     } else {
                         UpdateStatus = "Error contacting update server: " + response.ReasonPhrase;
-                        if(null != OnUpdateFinished) {
-                            OnUpdateFinished(
-                                this,
-                                new UpdateFinishedEventArgs()
-                                {
-                                    Success = false,
-                                });
-                        }
+                        OnUpdateFinished?.Invoke(this, new UpdateFinishedEventArgs()
+                            {
+                                Success = false,
+                            });
                     }
                 }
             } catch(Exception e) {
                 UpdateStatus = "Error contacting update server: " + e.Message;
-                if(null != OnUpdateFinished) {
-                    OnUpdateFinished(
-                        this,
-                        new UpdateFinishedEventArgs()
-                        {
-                            Success = false,
-                        });
-                }
+                OnUpdateFinished?.Invoke(this, new UpdateFinishedEventArgs()
+                    {
+                        Success = false,
+                    });
             }
         }
 
@@ -97,9 +85,7 @@ await Task.Delay(1000).ConfigureAwait(false);
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string property = null)
         {
-            if(null != PropertyChanged) {
-                PropertyChanged(this, new PropertyChangedEventArgs(property));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 #endregion
 

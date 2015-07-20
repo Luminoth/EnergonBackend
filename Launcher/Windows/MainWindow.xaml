@@ -5,7 +5,6 @@
         Title="{x:Static launcherprops:Resources.MainWindowTitle}"
         Height="350" Width="525" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
-
     <DockPanel>
         <Menu DockPanel.Dock="Top" Name="MainMenu" IsMainMenu="True">
             <MenuItem Header="_File">

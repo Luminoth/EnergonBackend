@@ -16,20 +16,11 @@ namespace EnergonSoftware.Backend.Messages.Notification
         /// </summary>
         public const string MessageType = "shutdown";
 
-        public string Type { get { return MessageType; } }
+        public string Type => MessageType;
 
-        public string ServiceName { get; set; }
+        public string ServiceName { get; set; } = string.Empty;
 
-        public string ServiceId { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ShutdownMessage"/> class.
-        /// </summary>
-        public ShutdownMessage()
-        {
-            ServiceName = string.Empty;
-            ServiceId = string.Empty;
-        }
+        public string ServiceId { get; set; } = string.Empty;
 
         public async Task SerializeAsync(IFormatter formatter)
         {

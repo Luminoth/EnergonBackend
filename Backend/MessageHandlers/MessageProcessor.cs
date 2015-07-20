@@ -28,7 +28,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
         public event EventHandler<HandleMessageEventArgs> HandleMessageEvent;
 #endregion
 
-        public int QueueSize { get { return _messageQueue.Count; } }
+        public int QueueSize => _messageQueue.Count;
 
         private CancellationTokenSource _cancellationToken;
         private Task _task;
@@ -113,10 +113,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
         {
             IMessage message;
             while(!_cancellationToken.IsCancellationRequested && _messageQueue.TryDequeue(out message)) {
-                if(null != HandleMessageEvent) {
-                    HandleMessageEvent(this, new HandleMessageEventArgs() { Message = message });
-                }
-
+                HandleMessageEvent?.Invoke(this, new HandleMessageEventArgs { Message = message });
                 await Task.Delay(0).ConfigureAwait(false);
             }
         }

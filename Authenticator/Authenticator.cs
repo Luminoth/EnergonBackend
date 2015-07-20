@@ -40,10 +40,7 @@ namespace EnergonSoftware.Authenticator
         protected override void Dispose(bool disposing)
         {
             if(disposing) {
-                if(components != null) {
-                    components.Dispose();
-                }
-
+                components?.Dispose();
                 _diagnosticServer.Dispose();
             }
 
