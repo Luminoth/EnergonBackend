@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 // ReSharper disable once CheckNamespace
 namespace System.IO
 {
+    /// <summary>
+    /// Useful extensions to the System.IO.Stream class.
+    /// </summary>
     public static class StreamExtensions
     {
         /// <summary>
@@ -13,7 +16,9 @@ namespace System.IO
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="value">The value to look for.</param>
-        /// <returns>The index of the first occurrence of the given byte value</returns>
+        /// <returns>
+        /// The index of the first occurrence of the given byte value.
+        /// </returns>
         public static async Task<long> IndexOfAsync(this Stream stream, byte[] value)
         {
             if(null == value) {
@@ -45,15 +50,15 @@ namespace System.IO
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="count">The number of bytes to consume.</param>
+        /// <returns>The number of bytes actually consumed.</returns>
         public static async Task<int> ConsumeAsync(this Stream stream, int count)
         {
-            if(count < 0) {
+            if(count <= 0) {
                 return 0;
             }
 
             byte[] consumed = new byte[count];
-            int read = await stream.ReadAsync(consumed, 0, consumed.Length).ConfigureAwait(false);
-            return read;
+            return await stream.ReadAsync(consumed, 0, consumed.Length).ConfigureAwait(false);
         }
 
 #region Write
@@ -62,7 +67,6 @@ namespace System.IO
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="value">The byte to write.</param>
-        /// <returns></returns>
         public static Task WriteByteAsync(this Stream stream, byte value)
         {
             return Task.Run(() => stream.WriteByte(value));
@@ -73,7 +77,6 @@ namespace System.IO
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="value">The byte to write.</param>
-        /// <returns></returns>
         public static async Task WriteAsync(this Stream stream, byte value)
         {
             await stream.WriteByteAsync(value).ConfigureAwait(false);
@@ -84,7 +87,6 @@ namespace System.IO
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <param name="value">If set to <c>true</c> a 1 is written, otherwise a 0 is written.</param>
-        /// <returns></returns>
         public static async Task WriteAsync(this Stream stream, bool value)
         {
             await stream.WriteAsync((byte)(value ? 1 : 0)).ConfigureAwait(false);
@@ -99,7 +101,7 @@ namespace System.IO
         /// <param name="buffer">The buffer to write the bytes into.</param>
         /// <param name="offset">The offset into the buffer to start at.</param>
         /// <param name="count">The number of bytes to read.</param>
-        /// <returns>The number of bytes read.</returns>
+        /// <returns>The number of bytes actually peeked at.</returns>
         public static async Task<int> PeekAsync(this Stream stream, byte[] buffer, int offset, int count)
         {
             int read = await stream.ReadAsync(buffer, offset, count).ConfigureAwait(false);
@@ -177,12 +179,12 @@ namespace System.IO
 #endregion
 
 #region Network Peek
-    public static async Task<int> PeekNetworkIntAsync(this Stream stream)
-    {
-        byte[] bytes = new byte[4];
-        await stream.PeekAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
-        return IPAddress.NetworkToHostOrder(BitConverter.ToInt32(bytes, 0));
-    }
+        public static async Task<int> PeekNetworkIntAsync(this Stream stream)
+        {
+            byte[] bytes = new byte[4];
+            await stream.PeekAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
+            return IPAddress.NetworkToHostOrder(BitConverter.ToInt32(bytes, 0));
+        }
 #endregion
 
 #region Network Read

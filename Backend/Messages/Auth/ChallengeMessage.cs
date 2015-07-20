@@ -5,14 +5,30 @@ using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Messages.Auth
 {
+    /// <summary>
+    /// Authentication challenge
+    /// </summary>
     [Serializable]
     public sealed class ChallengeMessage : IMessage
     {
+        /// <summary>
+        /// The message type
+        /// </summary>
         public const string MessageType = "challenge";
+
         public string Type { get { return MessageType; } }
 
+        /// <summary>
+        /// Gets or sets the challenge.
+        /// </summary>
+        /// <value>
+        /// The challenge.
+        /// </value>
         public string Challenge { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ChallengeMessage"/> class.
+        /// </summary>
         public ChallengeMessage()
         {
             Challenge = string.Empty;

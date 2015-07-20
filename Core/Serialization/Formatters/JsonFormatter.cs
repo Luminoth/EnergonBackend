@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 namespace EnergonSoftware.Core.Serialization.Formatters
 {
     /// <summary>
-    /// Formats objects in Google's protocol buffer format.
+    /// Formats objects in a JSON format.
     /// </summary>
-    public class ProtoBufFormatter : IFormatter
+    public class JsonFormatter : IFormatter
     {
         /// <summary>
         /// The formatter type
         /// </summary>
-        public const string FormatterType = "ProtoBuf";
+        public const string FormatterType = "JSON";
 
         public string Type { get { return FormatterType; } }
 

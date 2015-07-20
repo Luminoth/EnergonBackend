@@ -2,6 +2,9 @@
 
 namespace EnergonSoftware.Backend.Messages
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface IMessage : IFormattable
     {
     }

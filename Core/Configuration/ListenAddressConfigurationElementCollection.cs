@@ -2,6 +2,9 @@
 
 namespace EnergonSoftware.Core.Configuration
 {
+    /// <summary>
+    /// A collection of ListenAddressConfigurationElements.
+    /// </summary>
     [ConfigurationCollection(typeof(ListenAddressConfigurationElement))]
     public class ListenAddressConfigurationElementCollection : ConfigurationElementCollection
     {

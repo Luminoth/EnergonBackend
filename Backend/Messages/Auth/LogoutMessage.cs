@@ -5,15 +5,26 @@ using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Messages.Auth
 {
+    /// <summary>
+    /// Logout request
+    /// </summary>
     [Serializable]
     public sealed class LogoutMessage : IAuthenticatedMessage
     {
+        /// <summary>
+        /// The message type
+        /// </summary>
         public const string MessageType = "logout";
+
         public string Type { get { return MessageType; } }
 
         public string AccountName { get; set; }
+
         public string SessionId { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogoutMessage"/> class.
+        /// </summary>
         public LogoutMessage()
         {
             AccountName = string.Empty;

@@ -5,15 +5,38 @@ using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Messages.Auth
 {
+    /// <summary>
+    /// Login request
+    /// </summary>
     [Serializable]
     public sealed class LoginMessage : IMessage
     {
+        /// <summary>
+        /// The message type
+        /// </summary>
         public const string MessageType = "login";
+
         public string Type { get { return MessageType; } }
 
+        /// <summary>
+        /// Gets or sets the name of the account.
+        /// </summary>
+        /// <value>
+        /// The name of the account.
+        /// </value>
         public string AccountName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the session identifier.
+        /// </summary>
+        /// <value>
+        /// The session identifier.
+        /// </value>
         public string SessionId { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LoginMessage"/> class.
+        /// </summary>
         public LoginMessage()
         {
             AccountName = string.Empty;

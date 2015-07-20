@@ -1,12 +1,20 @@
 ﻿using System;
 
-namespace EnergonSoftware.Core.Util
+namespace EnergonSoftware.Core.Net.Sessions
 {
     /// <summary>
-    /// Generic error event arguments
+    /// Session error event arguments
     /// </summary>
     public sealed class ErrorEventArgs : EventArgs
     {
+        /// <summary>
+        /// Gets or sets the event timestamp.
+        /// </summary>
+        /// <value>
+        /// The event timestamp.
+        /// </value>
+        public DateTime Timestamp { get; set; }
+
         private string _error;
 
         /// <summary>
@@ -28,5 +36,13 @@ namespace EnergonSoftware.Core.Util
         /// The exception associated with the error, if one exists.
         /// </value>
         public Exception Exception { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ErrorEventArgs"/> class.
+        /// </summary>
+        public ErrorEventArgs()
+        {
+            Timestamp = DateTime.Now;
+        }
     }
 }

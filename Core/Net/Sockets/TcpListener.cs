@@ -2,94 +2,118 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Configuration;
-using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Properties;
 
 using log4net;
 
-// TODO: decouple this from the session concept
-// and use events instead
-
 namespace EnergonSoftware.Core.Net.Sockets
 {
+    /// <summary>
+    /// Listens for new TCP connections.
+    /// </summary>
     public sealed class TcpListener
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(TcpListener));
 
-        private readonly object _lock = new object();
+#region Events
+        /// <summary>
+        /// Occurs when a new connection is accepted.
+        /// </summary>
+        public event EventHandler<NewConnectionEventArgs> NewConnectionEvent;
+#endregion
+
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
         private readonly List<Socket> _listenSockets = new List<Socket>();
-        private readonly INetworkSessionFactory _factory;
 
-        public int MaxConnections { get; set; }
+        /// <summary>
+        /// Gets or sets the socket backlog.
+        /// </summary>
+        /// <value>
+        /// The socket backlog.
+        /// </value>
         public int SocketBacklog { get; set; }
 
-        private TcpListener()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TcpListener"/> class.
+        /// </summary>
+        public TcpListener()
         {
-            MaxConnections = -1;
             SocketBacklog = 10;
         }
 
-        public TcpListener(INetworkSessionFactory factory) : this()
-        {
-            _factory = factory;
-        }
-
-        public void CreateSockets(ListenAddressConfigurationElementCollection listenAddresses)
+        /// <summary>
+        /// Creates the listen sockets.
+        /// </summary>
+        /// <param name="listenAddresses">The listen addresses.</param>
+        /// <exception cref="System.ArgumentNullException">listenAddresses</exception>
+        public async Task CreateSocketsAsync(ListenAddressConfigurationElementCollection listenAddresses)
         {
             if(null == listenAddresses) {
                 throw new ArgumentNullException("listenAddresses");
             }
 
-            lock(_lock) {
-                foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
-                    Logger.Info("Listening on address " + listenAddress + "...");
+            foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
+                Logger.Info("Listening on address " + listenAddress + "...");
 
-                    Socket socket = null;
-                    try {
-                        IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
-                        socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                        socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                        socket.Bind(endpoint);
-                        socket.Listen(SocketBacklog);
-                        _listenSockets.Add(socket);
-                    } catch(SocketException e) {
-                        if(null != socket) {
-                            socket.Dispose();
-                        }
-
-                        Logger.Error(Resources.ErrorCreatingSocket, e);
+                Socket socket = null;
+                try {
+                    IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
+                    socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    socket.Bind(endpoint);
+                    socket.Listen(SocketBacklog);
+                } catch(SocketException e) {
+                    if(null != socket) {
+                        socket.Dispose();
                     }
+
+                    Logger.Error(Resources.ErrorCreatingSocket, e);
+                    return;
+                }
+
+                await _lock.WaitAsync().ConfigureAwait(false);
+                try {
+                    _listenSockets.Add(socket);
+                } finally {
+                    _lock.Release();
                 }
             }
+
         }
 
-        public void CloseSockets()
+        /// <summary>
+        /// Closes the sockets.
+        /// </summary>
+        public async Task CloseSocketsAsync()
         {
-            lock(_lock) {
+            await _lock.WaitAsync().ConfigureAwait(false);
+            try {
                 Logger.Info("Closing listen sockets...");
                 _listenSockets.ForEach(socket => socket.Close());
                 _listenSockets.Clear();
+            } finally {
+                _lock.Release();
             }
         }
 
-        private async Task PollAsync(Socket socket, NetworkSessionManager manager)
+        private async Task PollAsync(Socket socket, int microSeconds)
         {
             try {
-                if(socket.Poll(100, SelectMode.SelectRead)) {
+                if(socket.Poll(microSeconds, SelectMode.SelectRead)) {
                     Socket remote = await socket.AcceptAsync().ConfigureAwait(false);
                     Logger.Info("New connection from " + remote.RemoteEndPoint);
 
-                    if(MaxConnections >= 0 && manager.Count >= MaxConnections) {
-                        Logger.Info("Max connections exceeded, denying new connection!");
-                        remote.Close();
-                    } else {
-                        Logger.Debug("Allowing new connection...");
-                        NetworkSession session = _factory.Create(remote);
-                        manager.Add(session);
+                    if(null != NewConnectionEvent) {
+                        NewConnectionEvent(this, new NewConnectionEventArgs
+                            {
+                                Socket = remote
+                            }
+                        );
                     }
                 }
             } catch(SocketException e) {
@@ -97,14 +121,21 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
-        public async Task PollAsync(NetworkSessionManager manager)
+        /// <summary>
+        /// Polls all of the sockets for new connections.
+        /// </summary>
+        /// <param name="microSeconds">The microsecond poll timeout.</param>
+        public async Task PollAsync(int microSeconds)
         {
-            List<Task> tasks = new List<Task>();
-            lock(_lock) {
-                _listenSockets.ForEach(socket => tasks.Add(PollAsync(socket, manager)));
-            }
+            await _lock.WaitAsync().ConfigureAwait(false);
+            try {
+                List<Task> tasks = new List<Task>();
+                _listenSockets.ForEach(socket => tasks.Add(PollAsync(socket, microSeconds)));
 
-            await Task.WhenAll(tasks).ConfigureAwait(false);
+                await Task.WhenAll(tasks).ConfigureAwait(false);
+            } finally {
+                _lock.Release();
+            }
         }
     }
 }

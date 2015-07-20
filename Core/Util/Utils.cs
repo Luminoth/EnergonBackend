@@ -3,8 +3,18 @@ using System.Text;
 
 namespace EnergonSoftware.Core.Util
 {
+    /// <summary>
+    /// Useful utility methods
+    /// </summary>
     public static class Utils
     {
+        /// <summary>
+        /// Dumps a buffer to a hexadecimal output string
+        /// </summary>
+        /// <param name="buffer">The buffer.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="count">The count.</param>
+        /// <returns>The buffer as a hexadecimal output string</returns>
         public static string HexDump(byte[] buffer, int offset, int count)
         {
             const int groupCount = 2;

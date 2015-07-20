@@ -53,16 +53,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Net\HttpServerResult.cs" />
+    <Compile Include="Net\Sessions\ErrorEventArgs.cs" />
+    <Compile Include="Net\Sockets\NewConnectionEventArgs.cs" />
     <Compile Include="Serialization\Formattable.cs" />
     <Compile Include="Serialization\Formatter.cs" />
     <Compile Include="Serialization\FormatterFactory.cs" />
     <Compile Include="Serialization\Formatters\BinaryNetworkFormatter.cs" />
+    <Compile Include="Serialization\Formatters\JsonFormatter.cs" />
     <Compile Include="Serialization\Formatters\ProtoBufFormatter.cs" />
     <Compile Include="Serialization\Formatters\XmlFormatter.cs" />
     <Compile Include="Util\AuthUtil.cs" />
     <Compile Include="Configuration\ListenAddressesConfigurationSection.cs" />
     <Compile Include="Configuration\ListenAddressConfigurationElement.cs" />
     <Compile Include="Configuration\ListenAddressConfigurationElementCollection.cs" />
+    <Compile Include="Util\DateTimeExtensions.cs" />
     <Compile Include="Util\ErrorEventArgs.cs" />
     <Compile Include="Net\Sessions\ConnectedEventArgs.cs" />
     <Compile Include="Net\Sessions\DataReceivedEventArgs.cs" />
@@ -99,7 +103,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Util\SessionId.cs" />
-    <Compile Include="Util\Time.cs" />
     <Compile Include="Util\Utils.cs" />
   </ItemGroup>
   <ItemGroup>

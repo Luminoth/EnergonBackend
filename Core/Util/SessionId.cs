@@ -5,6 +5,9 @@ using EnergonSoftware.Core.Util.Crypt;
 
 namespace EnergonSoftware.Core.Util
 {
+    /// <summary>
+    /// Represents a secure SessionId
+    /// </summary>
     [Serializable]
     public sealed class SessionId
     {
@@ -14,20 +17,45 @@ namespace EnergonSoftware.Core.Util
         private readonly byte[] _iv = new byte[IVLength];
         private readonly string _secret;
 
-        // ReSharper disable once InconsistentNaming
-        public int ExpiryMS { get; private set; }
+        /// <summary>
+        /// Gets the expiration in milliseconds.
+        /// </summary>
+        /// <value>
+        /// The expiration in milliseconds.
+        /// </value>
+        public int ExpiryMs { get; private set; }
+
+        /// <summary>
+        /// Gets the session identifier.
+        /// </summary>
+        /// <value>
+        /// The session identifier.
+        /// </value>
         // ReSharper disable once InconsistentNaming
         public string SessionID { get; private set; }
-        public long CreationTime { get; private set; }
-        public bool Expired { get { return ExpiryMS >= 0 && Time.CurrentTimeMs >= (CreationTime + ExpiryMS); } }
 
-        private SessionId()
-        {
-            ExpiryMS = -1;
-            CreationTime = Time.CurrentTimeMs;
-        }
+        /// <summary>
+        /// Gets the creation time.
+        /// </summary>
+        /// <value>
+        /// The creation time.
+        /// </value>
+        public DateTime CreationTime { get; private set; }
 
-        public SessionId(string secret) : this()
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="SessionId"/> is expired.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if expired; otherwise, <c>false</c>.
+        /// </value>
+        public bool Expired { get { return ExpiryMs >= 0 && (DateTime.Now.Subtract(CreationTime).Milliseconds > ExpiryMs); } }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SessionId"/> class.
+        /// </summary>
+        /// <param name="secret">The secret.</param>
+        public SessionId(string secret)
+            : this()
         {
             _secret = secret;
 
@@ -35,7 +63,7 @@ namespace EnergonSoftware.Core.Util
             long salt1 = random.Next(10000);
             long salt2 = random.Next(10000);
 
-            string value = salt1 + ":" + CreationTime + ":" + salt2;
+            string value = salt1 + ":" + CreationTime.GetTicksMs() + ":" + salt2;
             string secretHash = new Crypt.SHA512().HashHexAsync(_secret).Result;
 
             byte[] encrypted = null;
@@ -56,20 +84,46 @@ namespace EnergonSoftware.Core.Util
             }
         }
 
-        public SessionId(string secret, int expiry) : this(secret)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SessionId" /> class.
+        /// </summary>
+        /// <param name="secret">The secret.</param>
+        /// <param name="expiryMs">The expiration in milliseconds.</param>
+        public SessionId(string secret, int expiryMs)
+            : this(secret)
         {
-            ExpiryMS = expiry;
+            ExpiryMs = expiryMs;
         }
 
-        public SessionId(string password, string sessionId) : this()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SessionId"/> class.
+        /// </summary>
+        /// <param name="password">The password.</param>
+        /// <param name="sessionId">The session identifier.</param>
+        /// <exception cref="System.NotImplementedException"></exception>
+        public SessionId(string password, string sessionId)
+            : this()
         {
             SessionID = sessionId;
-            throw new NotImplementedException();
+throw new NotImplementedException();
         }
 
-        public SessionId(string password, string sessionId, int expiry) : this(password, sessionId)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SessionId"/> class.
+        /// </summary>
+        /// <param name="password">The password.</param>
+        /// <param name="sessionId">The session identifier.</param>
+        /// <param name="expiryMs">The expiration in milliseconds.</param>
+        public SessionId(string password, string sessionId, int expiryMs)
+            : this(password, sessionId)
         {
-            ExpiryMS = expiry;
+            ExpiryMs = expiryMs;
+        }
+
+        private SessionId()
+        {
+            ExpiryMs = -1;
+            CreationTime = DateTime.Now;
         }
     }
 }

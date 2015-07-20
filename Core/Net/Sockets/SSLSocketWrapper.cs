@@ -14,22 +14,55 @@ using log4net;
 
 namespace EnergonSoftware.Core.Net.Sockets
 {
+    /// <summary>
+    /// Wraps a socket to allow for mid-stream SSL handshakes.
+    /// </summary>
     // ReSharper disable once InconsistentNaming
     public sealed class SSLSocketWrapper : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SSLSocketWrapper));
 
-        public int Id { get { return null != _socket ? _socket.Handle.ToInt32() : -1; } }
+        /// <summary>
+        /// Gets the socket identifier.
+        /// </summary>
+        /// <value>
+        /// The socket identifier.
+        /// </value>
+        public int SocketId { get { return null != _socket ? _socket.Handle.ToInt32() : -1; } }
 
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
 #region Socket Properties
+        /// <summary>
+        /// Gets a value indicating whether this socket is connecting.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this socket is connecting; otherwise, <c>false</c>.
+        /// </value>
         public bool IsConnecting { get; private set; }
 
+        /// <summary>
+        /// Gets a value indicating whether this socket is connected.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instancesocket is connected; otherwise, <c>false</c>.
+        /// </value>
         public bool IsConnected { get { return null != _socket && _socket.Connected; } }
 
+        /// <summary>
+        /// Gets a value indicating whether this socket is encrypted.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this socket is encrypted; otherwise, <c>false</c>.
+        /// </value>
         public bool IsEncrypted { get { return null != _sslStream && _sslStream.IsEncrypted; } }
 
+        /// <summary>
+        /// Gets the socket remote end point.
+        /// </summary>
+        /// <value>
+        /// The socket remote end point.
+        /// </value>
         public EndPoint RemoteEndPoint { get { return null != _socket ? _socket.RemoteEndPoint : null; } }
 
         private Socket _socket;
@@ -43,11 +76,19 @@ namespace EnergonSoftware.Core.Net.Sockets
         private Stream Stream { get { return _sslStream ?? (Stream)_stream; } }
 #endregion
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SSLSocketWrapper"/> class.
+        /// </summary>
         public SSLSocketWrapper()
         {
         }
 
-        public SSLSocketWrapper(Socket socket) : this()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SSLSocketWrapper"/> class.
+        /// </summary>
+        /// <param name="socket">The socket to wrap.</param>
+        public SSLSocketWrapper(Socket socket)
+            : this()
         {
             _socket = socket;
             _stream = new NetworkStream(_socket);
@@ -68,6 +109,15 @@ namespace EnergonSoftware.Core.Net.Sockets
         }
 #endregion
 
+        /// <summary>
+        /// Connects the socket to the given host:port with the given socket properties.
+        /// </summary>
+        /// <param name="host">The host to connect to.</param>
+        /// <param name="port">The port to connect to.</param>
+        /// <param name="socketType">Type of the socket.</param>
+        /// <param name="protocolType">Type of the socket protocol.</param>
+        /// <param name="useIPv6">if set to <c>true</c> use IPv6, otherwise use IPv4.</param>
+        /// <returns></returns>
         public async Task ConnectAsync(string host, int port, SocketType socketType, ProtocolType protocolType, bool useIPv6)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
@@ -82,6 +132,12 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
+        /// <summary>
+        /// Connects the socket to the given multicast group (IP address).
+        /// </summary>
+        /// <param name="group">The multicast group to join.</param>
+        /// <param name="port">The port to connect to.</param>
+        /// <param name="ttl">The multicast time to live (TTL).</param>
         public async Task ConnectMulticastAsync(IPAddress group, int port, int ttl)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
@@ -96,6 +152,10 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
+        /// <summary>
+        /// Disconnects the socket.
+        /// </summary>
+        /// <param name="reuseSocket">The disconnect reuseSocket value.</param>
         public async Task DisconnectAsync(bool reuseSocket)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
@@ -106,6 +166,12 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
+        /// <summary>
+        /// Starts the client-side SSL handshake.
+        /// </summary>
+        /// <param name="serverName">Name of the server.</param>
+        /// <param name="userCertificateValidationCallback">The user certificate validation callback.</param>
+        /// <param name="enabledSslProtocols">The enabled SSL protocols.</param>
         public async Task StartClientSslAsync(string serverName, RemoteCertificateValidationCallback userCertificateValidationCallback, SslProtocols enabledSslProtocols)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
@@ -117,6 +183,12 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
+        /// <summary>
+        /// Starts the server-side SSL handshake.
+        /// </summary>
+        /// <param name="serverCertificate">The server certificate.</param>
+        /// <param name="enabledSslProtocols">The enabled SSL protocols.</param>
+        /// <returns></returns>
         public async Task StartServerSslAsync(X509Certificate serverCertificate, SslProtocols enabledSslProtocols)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
@@ -128,6 +200,12 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
+        /// <summary>
+        /// Polls the socket and reads all the available data.
+        /// </summary>
+        /// <param name="microSeconds">The microsecond poll timeout.</param>
+        /// <param name="stream">The stream to read into.</param>
+        /// <returns>The number of bytes read.</returns>
         public async Task<int> PollAndReadAllAsync(int microSeconds, Stream stream)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
@@ -155,27 +233,40 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
         }
 
-        public async Task WriteAsync(byte[] buffer, int offset, int count)
+        /// <summary>
+        /// Writes data to the socket.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="count">The count.</param>
+        public async Task WriteAsync(byte[] data, int offset, int count)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
             try {
-                Logger.Debug("Writing buffer to network stream:");
-                Logger.Debug(Utils.HexDump(buffer, offset, count));
+                Logger.Debug("Writing buffer to SSL socket:");
+                Logger.Debug(Utils.HexDump(data, offset, count));
 
-                await Stream.WriteAsync(buffer, offset, count).ConfigureAwait(false);
+                await Stream.WriteAsync(data, offset, count).ConfigureAwait(false);
                 await Stream.FlushAsync().ConfigureAwait(false);
             } finally {
                 _lock.Release();
             }
         }
 
+        /// <summary>
+        /// Writes data to the socket.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
         public async Task WriteAsync(MemoryStream stream)
         {
             byte[] buffer = stream.ToArray();
             await WriteAsync(buffer, 0, buffer.Length);
         }
 
-        // NOTE: does NOT lock the wrapper
+        /// <summary>
+        /// Closes this socket.
+        /// Does NOT lock it.
+        /// </summary>
         public void Close()
         {
             if(null != _sslStream) {

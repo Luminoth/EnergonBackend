@@ -5,15 +5,25 @@ using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Messages.Notification
 {
+    /// <summary>
+    /// Service startup
+    /// </summary>
     [Serializable]
     public sealed class StartupMessage : INotificationMessage
     {
+        /// <summary>
+        /// The message type
+        /// </summary>
         public const string MessageType = "startup";
+
         public string Type { get { return MessageType; } }
 
         public string ServiceName { get; set; }
         public string ServiceId { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StartupMessage"/> class.
+        /// </summary>
         public StartupMessage()
         {
             ServiceName = string.Empty;

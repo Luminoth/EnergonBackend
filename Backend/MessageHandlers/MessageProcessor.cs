@@ -11,6 +11,9 @@ using log4net;
 
 namespace EnergonSoftware.Backend.MessageHandlers
 {
+    /// <summary>
+    /// Processes messages
+    /// </summary>
     public sealed class MessageProcessor : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageProcessor));
@@ -19,6 +22,9 @@ namespace EnergonSoftware.Backend.MessageHandlers
         private /*readonly*/ ConcurrentQueue<IMessage> _messageQueue = new ConcurrentQueue<IMessage>();
 
 #region Events
+        /// <summary>
+        /// Occurs when a new message is available to be handled.
+        /// </summary>
         public event EventHandler<HandleMessageEventArgs> HandleMessageEvent;
 #endregion
 

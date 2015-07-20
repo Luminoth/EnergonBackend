@@ -5,24 +5,50 @@ using log4net.Core;
 
 namespace EnergonSoftware.WindowsUtil
 {
+    /// <summary>
+    /// Logger color utility methods.
+    /// </summary>
     public static class LoggerColor
     {
+        /// <summary>
+        /// Gets the log color associated with the given level.
+        /// </summary>
+        /// <param name="level">The level.</param>
+        /// <returns>The color</returns>
+        /// <exception cref="System.ArgumentNullException">level</exception>
         public static Color LogEntryColor(Level level)
         {
+            if(null == level) {
+                throw new ArgumentNullException("level");
+            }
+
             if(Level.Debug == level) {
                 return Colors.DarkCyan;
-            } else if(Level.Warn == level) {
+            }
+
+            if(Level.Warn == level) {
                 return Colors.Green;
-            } else if(Level.Error == level) {
+            }
+
+            if(Level.Error == level) {
                 return Colors.Orange;
-            } else if(Level.Fatal == level) {
+            }
+
+            if(Level.Fatal == level) {
                 return Colors.Red;
             }
 
             return Colors.Black;
         }
 
-        public static Color ParseColor(string logEntry)
+
+        /// <summary>
+        /// Gets the log color associated with the given log entry.
+        /// </summary>
+        /// <param name="logEntry">The log entry.</param>
+        /// <returns>The color</returns>
+        /// <exception cref="System.ArgumentNullException">logEntry</exception>
+        public static Color LogEntryColor(string logEntry)
         {
             if(null == logEntry) {
                 throw new ArgumentNullException("logEntry");
@@ -30,13 +56,21 @@ namespace EnergonSoftware.WindowsUtil
 
             if(logEntry.Contains("INFO")) {
                 return LogEntryColor(Level.Info);
-            } else if(logEntry.Contains("DEBUG")) {
+            }
+
+            if(logEntry.Contains("DEBUG")) {
                 return LogEntryColor(Level.Debug);
-            } else if(logEntry.Contains("WARN")) {
+            }
+
+            if(logEntry.Contains("WARN")) {
                 return LogEntryColor(Level.Warn);
-            } else if(logEntry.Contains("ERROR")) {
+            }
+
+            if(logEntry.Contains("ERROR")) {
                 return LogEntryColor(Level.Error);
-            } else if(logEntry.Contains("FATAL")) {
+            }
+
+            if(logEntry.Contains("FATAL")) {
                 return LogEntryColor(Level.Fatal);
             }
 

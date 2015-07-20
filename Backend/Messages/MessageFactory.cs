@@ -8,11 +8,23 @@ using EnergonSoftware.Backend.Properties;
 
 namespace EnergonSoftware.Backend.Messages
 {
+    /// <summary>
+    /// Creates new messages
+    /// </summary>
+    // TODO: move this into its own file
     public interface IMessageFactory
     {
+        /// <summary>
+        /// Creates the a message with the specified message type.
+        /// </summary>
+        /// <param name="messageType">Type of the message.</param>
+        /// <returns>The message</returns>
         IMessage Create(string messageType);
     }
 
+    /// <summary>
+    /// Creates new backend messages
+    /// </summary>
     public class MessageFactory : IMessageFactory
     {
         public IMessage Create(string messageType)

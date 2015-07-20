@@ -2,82 +2,93 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Configuration;
-using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Properties;
 
 using log4net;
 
-// TODO: decouple this from the session concept
-// and use events instead
-
 namespace EnergonSoftware.Core.Net.Sockets
 {
+    /// <summary>
+    /// Listens for new UDP connections.
+    /// </summary>
     public sealed class UdpListener
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(UdpListener));
 
-        private readonly object _lock = new object();
+#region Events
+        /// <summary>
+        /// Occurs when a new connection is accepted.
+        /// </summary>
+        public event EventHandler<NewConnectionEventArgs> NewConnectionEvent;
+#endregion
+
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
         private readonly List<Socket> _listenSockets = new List<Socket>();
-        private readonly INetworkSessionFactory _factory;
 
-        public int MaxConnections { get; set; }
-
-        private UdpListener()
-        {
-            MaxConnections = -1;
-        }
-
-        public UdpListener(INetworkSessionFactory factory) : this()
-        {
-            _factory = factory;
-        }
-
-        public void CreateSockets(ListenAddressConfigurationElementCollection listenAddresses)
+        /// <summary>
+        /// Creates the listen sockets.
+        /// </summary>
+        /// <param name="listenAddresses">The listen addresses.</param>
+        /// <exception cref="System.ArgumentNullException">listenAddresses</exception>
+        public async Task CreateSocketsAsync(ListenAddressConfigurationElementCollection listenAddresses)
         {
             if(null == listenAddresses) {
                 throw new ArgumentNullException("listenAddresses");
             }
 
-            lock(_lock) {
-                foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
-                    Logger.Info("Listening on address " + listenAddress + "...");
+            foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
+                Logger.Info("Listening on address " + listenAddress + "...");
 
-                    Socket socket = null;
-                    try {
-                        IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
-                        socket = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-                        socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                        socket.Bind(endpoint);
-                        _listenSockets.Add(socket);
-                    } catch(SocketException e) {
-                        if(null != socket) {
-                            socket.Dispose();
-                        }
-
-                        Logger.Error(Resources.ErrorCreatingSocket, e);
+                Socket socket = null;
+                try {
+                    IPEndPoint endpoint = new IPEndPoint(listenAddress.InterfaceAddress, listenAddress.Port);
+                    socket = new Socket(endpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    socket.Bind(endpoint);
+                } catch(SocketException e) {
+                    if(null != socket) {
+                        socket.Dispose();
                     }
+
+                    Logger.Error(Resources.ErrorCreatingSocket, e);
+                    return;
+                }
+
+                await _lock.WaitAsync().ConfigureAwait(false);
+                try {
+                    _listenSockets.Add(socket);
+                } finally {
+                    _lock.Release();
                 }
             }
         }
 
-        public void CloseSockets()
+        /// <summary>
+        /// Closes the sockets.
+        /// </summary>
+        public async Task CloseSockets()
         {
-            lock(_lock) {
+            await _lock.WaitAsync().ConfigureAwait(false);
+            try {
                 Logger.Info("Closing listen sockets...");
                 _listenSockets.ForEach(socket => socket.Close());
                 _listenSockets.Clear();
+            } finally {
+                _lock.Release();
             }
         }
 
-        private async Task PollAsync(Socket socket, NetworkSessionManager manager, int microSeconds)
+        private async Task PollAsync(Socket socket, int microSeconds)
         {
-            // TODO: this probably doesn't work correctly
+            // TODO: this is garbage
+#if false
             try {
-                if(socket.Poll(100, SelectMode.SelectRead)) {
+                if(socket.Poll(microSeconds, SelectMode.SelectRead)) {
                     Socket remote = await socket.AcceptFromAsync().ConfigureAwait(false);
                     if(manager.Contains(remote.RemoteEndPoint)) {
                         NetworkSession session = manager.Get(remote.RemoteEndPoint);
@@ -95,21 +106,34 @@ namespace EnergonSoftware.Core.Net.Sockets
                         NetworkSession session = _factory.Create(remote);
                         await session.PollAndReadAllAsync(microSeconds).ConfigureAwait(false);
                         manager.Add(session);
-                    }
+                    }*/
                 }
             } catch(SocketException e) {
                 Logger.Error("Exception polling sockets!", e);
             }
+#endif
+await Task.Delay(0).ConfigureAwait(false);
         }
 
-        public async Task PollAsync(NetworkSessionManager manager, int microSeconds)
+        /// <summary>
+        /// Polls all of the sockets for new connections.
+        /// </summary>
+        /// <param name="microSeconds">The poll microsecond timeout.</param>
+        public async Task PollAsync(int microSeconds)
         {
-            List<Task> tasks = new List<Task>();
-            lock(_lock) {
-                _listenSockets.ForEach(socket => tasks.Add(PollAsync(socket, manager, microSeconds)));
-            }
+#if false
+            await _lock.WaitAsync().ConfigureAwait(false);
+            try {
+                List<Task> tasks = new List<Task>();
+                _listenSockets.ForEach(socket => tasks.Add(PollAsync(socket, microSeconds)));
 
-            await Task.WhenAll(tasks).ConfigureAwait(false);
+                await Task.WhenAll(tasks).ConfigureAwait(false);
+            } finally {
+                _lock.Release();
+            }
+#endif
+await Task.Delay(0).ConfigureAwait(false);
+throw new NotImplementedException();
         }
     }
 }

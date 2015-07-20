@@ -9,20 +9,40 @@ using log4net;
 
 namespace EnergonSoftware.Backend.Net.Sessions
 {
+    /// <summary>
+    /// Extends the NetworkSession to associate an Account with the session
+    /// </summary>
     public abstract class AuthenticatedSession : MessageSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthenticatedSession));
 
+        /// <summary>
+        /// Gets or sets the account.
+        /// </summary>
+        /// <value>
+        /// The account.
+        /// </value>
         public Account Account { get; protected set; }
 
+        /// <summary>
+        /// Authenticates the specified account.
+        /// </summary>
+        /// <param name="account">The account.</param>
+        /// <returns>True if the account is authenticated</returns>
         public bool Authenticate(Account account)
         {
             return null != Account && null != account && Account.Equals(account);
         }
 
+        /// <summary>
+        /// Authenticates the specified account.
+        /// </summary>
+        /// <param name="accountName">Name of the account.</param>
+        /// <param name="sessionid">The sessionid.</param>
+        /// <returns>True if the account is authenticated</returns>
         public bool Authenticate(string accountName, string sessionid)
         {
-            return Authenticate(new Account()
+            return Authenticate(new Account
             {
                 AccountName = accountName,
                 SessionId = sessionid,
@@ -30,6 +50,12 @@ namespace EnergonSoftware.Backend.Net.Sessions
             });
         }
 
+        /// <summary>
+        /// Logs in the account
+        /// </summary>
+        /// <param name="accountName">Name of the account.</param>
+        /// <param name="sessionid">The sessionid.</param>
+        /// <returns>True if the login was successful</returns>
         public async Task<bool> LoginAsync(string accountName, string sessionid)
         {
             if(null != Account) {
@@ -66,6 +92,9 @@ namespace EnergonSoftware.Backend.Net.Sessions
             return true;
         }
 
+        /// <summary>
+        /// Logs the account out and disconnects the session.
+        /// </summary>
         public async Task LogoutAsync()
         {
             await SendMessageAsync(new LogoutMessage()).ConfigureAwait(false);
@@ -74,14 +103,11 @@ namespace EnergonSoftware.Backend.Net.Sessions
             Account = null;
         }
 
-        protected AuthenticatedSession()
-        {
-        }
-
-        protected AuthenticatedSession(Socket socket) : base(socket)
-        {
-        }
-
+        /// <summary>
+        /// Looks up the account.
+        /// </summary>
+        /// <param name="accountName">Name of the account.</param>
+        /// <returns>The account</returns>
         protected abstract Task<Account> LookupAccountAsync(string accountName);
     }
 }

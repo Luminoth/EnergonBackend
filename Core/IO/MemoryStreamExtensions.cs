@@ -3,6 +3,9 @@
 // ReSharper disable once CheckNamespace
 namespace System.IO
 {
+    /// <summary>
+    /// Useful extensions to the System.IO.MemoryStream class.
+    /// </summary>
     public static class MemoryStreamExtensions
     {
         /// <summary>

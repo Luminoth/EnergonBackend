@@ -8,14 +8,30 @@ using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Accounts
 {
+    /// <summary>
+    /// Represents an account in the system.
+    /// </summary>
     [Serializable]
     public sealed class Account : Core.Serialization.IFormattable, INotifyPropertyChanged
     {
         public string Type { get { return "account"; } }
 
+        /// <summary>
+        /// Gets or sets the account identifier.
+        /// </summary>
+        /// <value>
+        /// The account identifier.
+        /// </value>
         public long Id { get; set; }
 
         private string _accountName = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the name of the account.
+        /// </summary>
+        /// <value>
+        /// The name of the account.
+        /// </value>
         public string AccountName
         {
             get { return _accountName; }
@@ -27,16 +43,65 @@ namespace EnergonSoftware.Backend.Accounts
             }
         }
 
-        public string UserName { get; set; }
+        /// <summary>
+        /// Gets or sets the username.
+        /// </summary>
+        /// <value>
+        /// The username.
+        /// </value>
+        public string Username { get; set; }
+
+        /// <summary>
+        /// Gets or sets the password.
+        /// </summary>
+        /// <value>
+        /// The password.
+        /// </value>
         public string Password { get; set; }
+
+        /// <summary>
+        /// Gets or sets the session identifier.
+        /// </summary>
+        /// <value>
+        /// The session identifier.
+        /// </value>
         public string SessionId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the connection end point.
+        /// </summary>
+        /// <value>
+        /// The connection end point.
+        /// </value>
         public EndPoint EndPoint { get; set; }
 
+        /// <summary>
+        /// Gets or sets the account visibility.
+        /// </summary>
+        /// <value>
+        /// The account visibility.
+        /// </value>
         public Visibility Visibility { get; set; }
+
+        /// <summary>
+        /// Gets or sets the account status.
+        /// </summary>
+        /// <value>
+        /// The account status.
+        /// </value>
         public string Status { get; set; }
 
+        /// <summary>
+        /// Gets or sets the name of the group the account is in.
+        /// </summary>
+        /// <value>
+        /// The name of the group the account is in.
+        /// </value>
         public string GroupName { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Account"/> class.
+        /// </summary>
         public Account()
         {
             Id = -1;
@@ -46,7 +111,7 @@ namespace EnergonSoftware.Backend.Accounts
         public async Task SerializeAsync(IFormatter formatter)
         {
             // Id not serialized
-            await formatter.WriteAsync("UserName", UserName).ConfigureAwait(false);
+            await formatter.WriteAsync("Username", Username).ConfigureAwait(false);
             await formatter.WriteAsync("Visibility", (int)Visibility).ConfigureAwait(false);
             await formatter.WriteAsync("Status", Status ?? string.Empty).ConfigureAwait(false);
             await formatter.WriteAsync("GroupName", GroupName ?? string.Empty).ConfigureAwait(false);
@@ -55,7 +120,7 @@ namespace EnergonSoftware.Backend.Accounts
         public async Task DeserializeAsync(IFormatter formatter)
         {
             // Id not serialized
-            UserName = await formatter.ReadStringAsync("UserName").ConfigureAwait(false);
+            Username = await formatter.ReadStringAsync("Username").ConfigureAwait(false);
             Visibility = (Visibility)await formatter.ReadIntAsync("Visibility").ConfigureAwait(false);
             Status = await formatter.ReadStringAsync("Status").ConfigureAwait(false);
             GroupName = await formatter.ReadStringAsync("GroupName").ConfigureAwait(false);
@@ -78,12 +143,7 @@ namespace EnergonSoftware.Backend.Accounts
 
             IPEndPoint thisEndPoint = (IPEndPoint)EndPoint;
             IPEndPoint otherEndPoint = (IPEndPoint)account.EndPoint;
-
-            if((null == EndPoint && null != account.EndPoint) || (null != EndPoint && !thisEndPoint.Address.Equals(otherEndPoint.Address))) {
-                return false;
-            }
-
-            return true;
+            return (null != EndPoint || null == account.EndPoint) && (null == EndPoint || thisEndPoint.Address.Equals(otherEndPoint.Address));
         }
 
         public override int GetHashCode()
@@ -93,12 +153,16 @@ namespace EnergonSoftware.Backend.Accounts
 
         public override string ToString()
         {
-            return "Account(Id=" + Id + ", AccountName=" + AccountName + ", UserName=" + UserName + ", SessionId=" + SessionId + ", EndPoint=" + EndPoint + ", Visibility=" + Visibility + ", Status=" + Status + ", GroupName=" + GroupName + ")";
+            return "Account(Id=" + Id + ", AccountName=" + AccountName + ", Username=" + Username + ", SessionId=" + SessionId + ", EndPoint=" + EndPoint + ", Visibility=" + Visibility + ", Status=" + Status + ", GroupName=" + GroupName + ")";
         }
 
 #region Property Notifier
+        /// <summary>
+        /// Occurs when a property value changes.
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
-        public void NotifyPropertyChanged([CallerMemberName] string property = null)
+
+        private void NotifyPropertyChanged([CallerMemberName] string property = null)
         {
             if(null != PropertyChanged) {
                 PropertyChanged(this, new PropertyChangedEventArgs(property));

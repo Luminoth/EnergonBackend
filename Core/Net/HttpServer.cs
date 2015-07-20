@@ -25,6 +25,9 @@ namespace EnergonSoftware.Core.Net
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpServer));
 
+        /// <summary>
+        /// 
+        /// </summary>
         public delegate Task<HttpServerResult> HttpRequestDelegate();
 
         private readonly HttpListener _listener = new HttpListener();
@@ -50,6 +53,12 @@ namespace EnergonSoftware.Core.Net
         }
 #endregion
 
+        /// <summary>
+        /// Starts the server with the specified prefixes.
+        /// </summary>
+        /// <param name="prefixes">The prefixes.</param>
+        /// <exception cref="System.ArgumentNullException">prefixes</exception>
+        /// <exception cref="System.InvalidOperationException"></exception>
         public void Start(IReadOnlyCollection<string> prefixes)
         {
             if(null == prefixes) {
@@ -79,6 +88,9 @@ namespace EnergonSoftware.Core.Net
                 });
         }
 
+        /// <summary>
+        /// Stops the server.
+        /// </summary>
         public void Stop()
         {
             if(null == _task || _cancellationToken.IsCancellationRequested) {
@@ -97,11 +109,21 @@ namespace EnergonSoftware.Core.Net
             Logger.Debug("HTTP server finished!");
         }
 
+        /// <summary>
+        /// Registers a URL handler.
+        /// </summary>
+        /// <param name="url">The URL.</param>
+        /// <param name="handler">The handler.</param>
         protected void RegisterHandler(string url, HttpRequestDelegate handler)
         {
             _handlers[url] = handler;
         }
 
+        /// <summary>
+        /// Returns a view result.
+        /// </summary>
+        /// <param name="path">The view path.</param>
+        /// <returns>The result.</returns>
         protected async Task<HttpServerResult> ViewResultAsync(string path)
         {
             HttpServerResult result = new HttpServerResult()
@@ -115,6 +137,11 @@ await Task.Delay(0).ConfigureAwait(false);
             return result;
         }
 
+        /// <summary>
+        /// Returns a JSON result.
+        /// </summary>
+        /// <param name="obj">The object to serialize.</param>
+        /// <returns>The result.</returns>
         protected HttpServerResult JsonResult(object obj)
         {
             HttpServerResult result = new HttpServerResult()

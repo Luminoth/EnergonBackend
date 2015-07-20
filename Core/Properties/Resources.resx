@@ -141,4 +141,7 @@
   <data name="ErrorUnsupportedFormatter" xml:space="preserve">
     <value>Unsupported formatter type for construction: {0}</value>
   </data>
+  <data name="ErrorConnectionLimitExceeded" xml:space="preserve">
+    <value>Connection limit exceeded!</value>
+  </data>
 </root>

@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace EnergonSoftware.Core.IO
 {
+    /// <summary>
+    /// Adds a lock to the MemoryStream class.
+    /// </summary>
     public class LockingMemoryStream : MemoryStream
     {
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);

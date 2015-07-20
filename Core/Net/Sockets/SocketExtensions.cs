@@ -4,9 +4,17 @@ using System.Threading.Tasks;
 // ReSharper disable once CheckNamespace
 namespace System.Net.Sockets
 {
+    /// <summary>
+    /// Useful extensions to the System.Net.Sockets.Socket class.
+    /// </summary>
     public static class SocketExtensions
     {
 #region Dgram Helpers
+        /// <summary>
+        /// Calls connect on the remote socket to set the default provider.
+        /// </summary>
+        /// <param name="socket">The socket.</param>
+        /// <returns>The new socket.</returns>
         public static Socket AcceptFrom(this Socket socket)
         {
             IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
@@ -33,6 +41,11 @@ namespace System.Net.Sockets
             }
         }
 
+        /// <summary>
+        /// Calls connect on the remote socket to set the default provider.
+        /// </summary>
+        /// <param name="socket">The socket.</param>
+        /// <returns>The new socket.</returns>
         public static Task<Socket> AcceptFromAsync(this Socket socket)
         {
             return Task.Run(() => socket.AcceptFrom());
@@ -96,6 +109,12 @@ namespace System.Net.Sockets
 #endregion
 
 #region Misc Helpers
+        /// <summary>
+        /// Calls shutdown, disconnect, and close on the socket.
+        /// </summary>
+        /// <param name="socket">The socket.</param>
+        /// <param name="how">The shutdown how value.</param>
+        /// <param name="reuseSocket">The disconnect reuseSocket value.</param>
         public static async Task ShutdownDisconnectCloseAsync(this Socket socket, SocketShutdown how, bool reuseSocket)
         {
             socket.Shutdown(how);
@@ -109,6 +128,12 @@ namespace System.Net.Sockets
 #endregion
 
 #region Stream Helpers
+        /// <summary>
+        /// Receives data from the socket and palces it in the given stream.
+        /// </summary>
+        /// <param name="socket">The socket.</param>
+        /// <param name="stream">The stream.</param>
+        /// <returns>The number of bytes received.</returns>
         public static async Task<int> ReceiveAsync(this Socket socket, Stream stream)
         {
             byte[] data = new byte[socket.Available];
@@ -121,6 +146,13 @@ namespace System.Net.Sockets
             return len;
         }
 
+        /// <summary>
+        /// Polls the socket, receives all data from it, and places it in the given stream.
+        /// </summary>
+        /// <param name="socket">The socket.</param>
+        /// <param name="microSeconds">The microsecond poll timeout.</param>
+        /// <param name="stream">The stream.</param>
+        /// <returns>The number of bytes received.</returns>
         public static async Task<int> PollAndReceiveAllAsync(this Socket socket, int microSeconds, Stream stream)
         {
             int total = 0;

@@ -4,8 +4,14 @@ using System.Threading.Tasks;
 
 namespace EnergonSoftware.Core.Serialization.Formatters
 {
+    /// <summary>
+    /// Formats objects in a network byte order binary format.
+    /// </summary>
     public class BinaryNetworkFormatter : IFormatter
     {
+        /// <summary>
+        /// The formatter type.
+        /// </summary>
         public const string FormatterType = "BinaryNetwork";
 
         public string Type { get { return FormatterType; } }
@@ -17,7 +23,6 @@ namespace EnergonSoftware.Core.Serialization.Formatters
             _stream = stream;
         }
 
-#region Write
         public async Task FlushAsync()
         {
             await _stream.FlushAsync().ConfigureAwait(false);
@@ -43,6 +48,7 @@ namespace EnergonSoftware.Core.Serialization.Formatters
             await Task.Delay(0).ConfigureAwait(false);
         }
 
+#region Write
         public async Task WriteAsync(string name, string value)
         {
             await _stream.WriteNetworkAsync(value).ConfigureAwait(false);

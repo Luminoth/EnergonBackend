@@ -8,17 +8,34 @@ using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Messages.Chat
 {
+    /// <summary>
+    /// Friend list
+    /// </summary>
     [Serializable]
     public sealed class FriendListMessage : IAuthenticatedMessage
     {
+        /// <summary>
+        /// The message type
+        /// </summary>
         public const string MessageType = "friendlist";
+
         public string Type { get { return MessageType; } }
 
         public string AccountName { get; set; }
+
         public string SessionId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the friends.
+        /// </summary>
+        /// <value>
+        /// The friends.
+        /// </value>
         public List<Account> Friends { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FriendListMessage"/> class.
+        /// </summary>
         public FriendListMessage()
         {
             AccountName = string.Empty;

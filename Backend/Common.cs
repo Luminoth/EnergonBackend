@@ -1,18 +1,23 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-
-using log4net;
+﻿using log4net;
 
 namespace EnergonSoftware.Backend
 {
+    /// <summary>
+    /// Common backend/frontend data
+    /// </summary>
     public static class Common
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(Common));
 
 #region Auth Properties
-        public const int AuthVersion = 2;
+        /// <summary>
+        /// The authentication protocol version
+        /// </summary>
+        public const int AuthProtocolVersion = 2;
 #endregion
 
+        // TODO: all this garbage should be handled by the installer(s)
+#if false
         public const string AppDir = "EnergonSoftware";
 
         // TODO: read this from the registry/CLI/whatever
@@ -45,5 +50,6 @@ namespace EnergonSoftware.Backend
             await DirectoryExtensions.CreateDirectoryAsync(DataDir).ConfigureAwait(false);
             await DirectoryExtensions.CreateDirectoryAsync(LogDir).ConfigureAwait(false);
         }
+#endif
     }
 }

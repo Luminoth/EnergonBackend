@@ -7,8 +7,14 @@ using System.Xml;
 
 namespace EnergonSoftware.Core.Serialization.Formatters
 {
+    /// <summary>
+    /// Formats objects in an XML format.
+    /// </summary>
     public class XmlFormatter : IFormatter
     {
+        /// <summary>
+        /// The formatter type
+        /// </summary>
         public const string FormatterType = "Xml";
 
         private const string Prefix = "msg";
@@ -37,7 +43,6 @@ namespace EnergonSoftware.Core.Serialization.Formatters
             _reader = XmlReader.Create(_stream, readerSettings);
         }
 
-#region Write
         public async Task FlushAsync()
         {
             await _writer.FlushAsync().ConfigureAwait(false);
@@ -65,6 +70,7 @@ namespace EnergonSoftware.Core.Serialization.Formatters
             await _writer.WriteEndElementAsync().ConfigureAwait(false);
         }
 
+#region Write
         public async Task WriteAsync(string name, string value)
         {
             await _writer.WriteElementStringAsync(Prefix, name, Namespace, value).ConfigureAwait(false);

@@ -12,12 +12,25 @@ using log4net;
 
 namespace EnergonSoftware.Backend.Net.Sessions
 {
+    /// <summary>
+    /// Extends the NetworkSession to work with messages
+    /// </summary>
     public abstract class MessageSession : NetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageSession));
 
+        /// <summary>
+        /// Gets the type of the formatter to use.
+        /// </summary>
+        /// <value>
+        /// The type of the formatter to use.
+        /// </value>
         protected abstract string FormatterType { get; }
 
+        /// <summary>
+        /// Sends the message.
+        /// </summary>
+        /// <param name="message">The message.</param>
         public async Task SendMessageAsync(IMessage message)
         {
             try {
@@ -34,14 +47,11 @@ namespace EnergonSoftware.Backend.Net.Sessions
             }
         }
 
-        protected MessageSession()
-        {
-        }
-
-        protected MessageSession(Socket socket) : base(socket)
-        {
-        }
-
+        /// <summary>
+        /// Creates a packet from a message.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <returns>The packet</returns>
         protected abstract IPacket CreatePacket(IMessage message);
     }
 }

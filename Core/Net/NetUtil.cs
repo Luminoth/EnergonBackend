@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace EnergonSoftware.Core.Net
 {
+    /// <summary>
+    /// Useful network utility methods.
+    /// </summary>
     public static class NetUtil
     {
 #region Socket Connectors

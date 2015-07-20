@@ -7,17 +7,34 @@ using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Messages.Chat
 {
+    /// <summary>
+    /// Account visibility
+    /// </summary>
     [Serializable]
     public sealed class VisibilityMessage : IAuthenticatedMessage
     {
+        /// <summary>
+        /// The message type
+        /// </summary>
         public const string MessageType = "visibility";
+
         public string Type { get { return MessageType; } }
 
         public string AccountName { get; set; }
+
         public string SessionId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the visibility.
+        /// </summary>
+        /// <value>
+        /// The visibility.
+        /// </value>
         public Visibility Visibility { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VisibilityMessage"/> class.
+        /// </summary>
         public VisibilityMessage()
         {
             AccountName = string.Empty;

@@ -5,9 +5,20 @@ using System.Reflection;
 
 namespace EnergonSoftware.Core.Util
 {
-    // http://stackoverflow.com/questions/4367723/get-enum-from-description-attribute
+    /// <summary>
+    /// Enumeration description utilities
+    /// </summary>
+    /// <remarks>
+    /// Taken from http://stackoverflow.com/questions/4367723/get-enum-from-description-attribute
+    /// </remarks>
     public static class EnumDescription
     {
+        /// <summary>
+        /// Gets the description from an enum value.
+        /// </summary>
+        /// <param name="value">The enum value.</param>
+        /// <returns>The description of the enum value</returns>
+        /// <exception cref="System.ArgumentNullException">value</exception>
         public static string GetDescriptionFromEnumValue(Enum value)
         {
             if(null == value) {
@@ -21,9 +32,16 @@ namespace EnergonSoftware.Core.Util
             return attribute == null ? value.ToString() : attribute.Description;
         }
 
+        /// <summary>
+        /// Gets the enum value from the description.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="description">The enum value description.</param>
+        /// <returns>The enum value.</returns>
+        /// <exception cref="System.ArgumentException">Type is not an enum!</exception>
         public static T GetEnumValueFromDescription<T>(string description)
         {
-            var type = typeof(T);
+            Type type = typeof(T);
             if(!type.IsEnum) {
                 throw new ArgumentException("Type is not an enum!");
             }

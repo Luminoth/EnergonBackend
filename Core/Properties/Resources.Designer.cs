@@ -88,6 +88,15 @@ namespace EnergonSoftware.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connection limit exceeded!.
+        /// </summary>
+        internal static string ErrorConnectionLimitExceeded {
+            get {
+                return ResourceManager.GetString("ErrorConnectionLimitExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exception while creating socket!.
         /// </summary>
         internal static string ErrorCreatingSocket {
