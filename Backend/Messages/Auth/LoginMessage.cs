@@ -9,14 +9,14 @@ namespace EnergonSoftware.Backend.Messages.Auth
     /// Login request
     /// </summary>
     [Serializable]
-    public sealed class LoginMessage : IMessage
+    public sealed class LoginMessage : Message
     {
         /// <summary>
         /// The message type
         /// </summary>
         public const string MessageType = "login";
 
-        public string Type => MessageType;
+        public override string Type => MessageType;
 
         /// <summary>
         /// Gets or sets the name of the account.
@@ -34,13 +34,13 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// </value>
         public string SessionId { get; set; } = string.Empty;
 
-        public async Task SerializeAsync(IFormatter formatter)
+        public async override Task SerializeAsync(IFormatter formatter)
         {
             await formatter.WriteAsync("AccountName", AccountName).ConfigureAwait(false);
             await formatter.WriteAsync("Ticket", SessionId).ConfigureAwait(false);
         }
 
-        public async Task DeserializeAsync(IFormatter formatter)
+        public async override Task DeserializeAsync(IFormatter formatter)
         {
             AccountName = await formatter.ReadStringAsync("AccountName").ConfigureAwait(false);
             SessionId = await formatter.ReadStringAsync("Ticket").ConfigureAwait(false);

@@ -12,7 +12,7 @@ namespace EnergonSoftware.Chat.MessageHandlers
 {
     internal sealed class LoginMessageHandler : MessageHandler
     {
-        protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
+        protected async override Task OnHandleMessageAsync(Message message, NetworkSession session)
         {
             LoginMessage loginMessage = (LoginMessage)message;
             ChatSession chatSession = (ChatSession)session;

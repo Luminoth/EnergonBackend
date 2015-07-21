@@ -10,21 +10,21 @@ namespace EnergonSoftware.Backend.Messages.Network
     /// </summary>
     [Serializable]
     // ReSharper disable once InconsistentNaming
-    public sealed class StartTLSMessage : IMessage
+    public sealed class StartTLSMessage : Message
     {
         /// <summary>
         /// The message type
         /// </summary>
         public const string MessageType = "starttls";
 
-        public string Type => MessageType;
+        public override string Type => MessageType;
 
-        public async Task SerializeAsync(IFormatter formatter)
+        public async override Task SerializeAsync(IFormatter formatter)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }
 
-        public async Task DeserializeAsync(IFormatter formatter)
+        public async override Task DeserializeAsync(IFormatter formatter)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }

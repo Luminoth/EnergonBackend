@@ -11,7 +11,7 @@ namespace EnergonSoftware.Chat.MessageHandlers
 {
     internal sealed class PingMessageHandler : MessageHandler
     {
-        protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
+        protected async override Task OnHandleMessageAsync(Message message, NetworkSession session)
         {
             ChatSession chatSession = (ChatSession)session;
             await chatSession.PingAsync().ConfigureAwait(false);

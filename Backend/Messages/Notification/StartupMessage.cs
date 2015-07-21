@@ -9,26 +9,26 @@ namespace EnergonSoftware.Backend.Messages.Notification
     /// Service startup
     /// </summary>
     [Serializable]
-    public sealed class StartupMessage : INotificationMessage
+    public sealed class StartupMessage : NotificationMessage
     {
         /// <summary>
         /// The message type
         /// </summary>
         public const string MessageType = "startup";
 
-        public string Type => MessageType;
+        public override string Type => MessageType;
 
-        public string ServiceName { get; set; } = string.Empty;
+        public override string ServiceName { get; set; } = string.Empty;
 
-        public string ServiceId { get; set; } = string.Empty;
+        public override string ServiceId { get; set; } = string.Empty;
 
-        public async Task SerializeAsync(IFormatter formatter)
+        public async override Task SerializeAsync(IFormatter formatter)
         {
             await formatter.WriteAsync("Service", ServiceName).ConfigureAwait(false);
             await formatter.WriteAsync("Id", ServiceId).ConfigureAwait(false);
         }
 
-        public async Task DeserializeAsync(IFormatter formatter)
+        public async override Task DeserializeAsync(IFormatter formatter)
         {
             ServiceName = await formatter.ReadStringAsync("Service").ConfigureAwait(false);
             ServiceId = await formatter.ReadStringAsync("Id").ConfigureAwait(false);

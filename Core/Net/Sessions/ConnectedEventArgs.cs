@@ -2,6 +2,9 @@
 
 namespace EnergonSoftware.Core.Net.Sessions
 {
+    /// <summary>
+    /// Emitted when a NetworkSession is connected
+    /// </summary>
     public sealed class ConnectedEventArgs : EventArgs
     {
         /// <summary>

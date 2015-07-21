@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 
 namespace EnergonSoftware.Core.Util
@@ -46,6 +47,17 @@ namespace EnergonSoftware.Core.Util
             }
 
             return builder.ToString();
+        }
+
+        /// <summary>
+        /// Dumps a stream to a hexadecimal output string
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <returns>The stream as a hexadecimal output string</returns>
+        public static string HexDump(MemoryStream stream)
+        {
+            byte[] buffer = stream.ToArray();
+            return HexDump(buffer, 0, buffer.Length);
         }
     }
 }

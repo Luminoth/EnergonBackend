@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core.Packet;
+
 namespace EnergonSoftware.Backend.Packet
 {
     /// <summary>
@@ -10,7 +12,7 @@ namespace EnergonSoftware.Backend.Packet
     /// </summary>
     /// <remarks>
     /// Binary Packet Format:
-    ///     MARKER | ID | ENCODING | CONTENT TYPE | CONTENT LEN | CONTENT
+    ///     MARKER | ID | ENCODING | CONTENT TYPE | CONTENT LEN | SEPARATOR | CONTENT
     /// </remarks>
     [Serializable]
     public class NetworkPacket : IPacket
@@ -21,12 +23,19 @@ namespace EnergonSoftware.Backend.Packet
         #endregion
 
         /// <summary>
-        /// The packet type{CC2D43FA-BBC4-448A-9D0B-7B57ADF2655C}
+        /// The packet type
         /// </summary>
         public const string PacketType = "Network";
 
-        public static readonly byte[] Header = new byte[] { (byte)'E', (byte)'S', (byte)'N', (byte)'P' };
-        public static readonly byte[] Separator = new byte[] { (byte)'\r', (byte)'\n' };
+        /// <summary>
+        /// The packet header (ESNP)
+        /// </summary>
+        public static readonly byte[] Header = { (byte)'E', (byte)'S', (byte)'N', (byte)'P' };
+
+        /// <summary>
+        /// The separator between the packet header and the conten
+        /// </summary>
+        public static readonly byte[] Separator = { (byte)'\r', (byte)'\n' };
 
         public string Type => PacketType;
 

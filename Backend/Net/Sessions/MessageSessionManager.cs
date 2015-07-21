@@ -1,9 +1,10 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Backend.Packet;
+using EnergonSoftware.Backend.Messages;
 
 using EnergonSoftware.Core.Net.Sessions;
+using EnergonSoftware.Core.Serialization;
 
 namespace EnergonSoftware.Backend.Net.Sessions
 {
@@ -15,13 +16,14 @@ namespace EnergonSoftware.Backend.Net.Sessions
         /// <summary>
         /// Broadcasts the message.
         /// </summary>
-        /// <param name="packet">The packet.</param>
+        /// <param name="message">The message.</param>
         /// <param name="formatterType">Type of the formatter.</param>
-        public async Task BroadcastMessageAsync(IPacket packet, string formatterType)
+        /// <param name="packetType">Type of the packet.</param>
+        public async Task BroadcastMessageAsync(Message message, string formatterType, string packetType)
         {
-            using(MemoryStream buffer = new MemoryStream()) {
-                await packet.SerializeAsync(buffer, formatterType).ConfigureAwait(false);
-                await BroadcastAsync(buffer).ConfigureAwait(false);
+            using(MemoryStream packetStream = new MemoryStream()) {
+                await MessageSession.SerializeMessageToPacketStreamAsync(message, packetStream, FormatterFactory.Create(formatterType), packetType).ConfigureAwait(false);
+                await BroadcastAsync(packetStream).ConfigureAwait(false);
             }
         }
     }

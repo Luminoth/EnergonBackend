@@ -19,7 +19,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageProcessor));
 
         private readonly AutoResetEvent _messageQueueEvent = new AutoResetEvent(false);
-        private /*readonly*/ ConcurrentQueue<IMessage> _messageQueue = new ConcurrentQueue<IMessage>();
+        private /*readonly*/ ConcurrentQueue<Message> _messageQueue = new ConcurrentQueue<Message>();
 
 #region Events
         /// <summary>
@@ -59,7 +59,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
         }
 #endregion
 
-        public void QueueMessage(IMessage message)
+        public void QueueMessage(Message message)
         {
             _messageQueue.Enqueue(message);
             _messageQueueEvent.Set();
@@ -104,14 +104,14 @@ namespace EnergonSoftware.Backend.MessageHandlers
             _task = null;
             _cancellationToken = null;
 
-            _messageQueue = new ConcurrentQueue<IMessage>();
+            _messageQueue = new ConcurrentQueue<Message>();
 
             Logger.Debug("Message processor finished!");
         }
 
         private async Task RunAsync()
         {
-            IMessage message;
+            Message message;
             while(!_cancellationToken.IsCancellationRequested && _messageQueue.TryDequeue(out message)) {
                 HandleMessageEvent?.Invoke(this, new HandleMessageEventArgs { Message = message });
                 await Task.Delay(0).ConfigureAwait(false);

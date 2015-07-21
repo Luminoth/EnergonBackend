@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Messages;
@@ -7,6 +6,8 @@ using EnergonSoftware.Backend.Packet;
 using EnergonSoftware.Backend.Properties;
 
 using EnergonSoftware.Core.Net.Sessions;
+using EnergonSoftware.Core.Packet;
+using EnergonSoftware.Core.Serialization;
 
 using log4net;
 
@@ -19,39 +20,42 @@ namespace EnergonSoftware.Backend.Net.Sessions
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageSession));
 
-        /// <summary>
-        /// Gets the type of the formatter to use.
-        /// </summary>
-        /// <value>
-        /// The type of the formatter to use.
-        /// </value>
-        protected abstract string FormatterType { get; }
+        internal static async Task SerializeMessageToPacketStreamAsync(Message message, MemoryStream packetStream, IFormatter formatter, string packetType)
+        {
+            Logger.Debug("Serializing message:");
+            Logger.Debug(message.ToString());
+
+            IPacket packet = PacketFactory.Create(packetType);
+            using(MemoryStream messageStream = new MemoryStream()) {
+                formatter.Attach(messageStream);
+                await Message.SerializeAsync(message, formatter).ConfigureAwait(false);
+
+                packet.ContentType = message.ContentType;
+                packet.Encoding = formatter.Type;
+                packet.Content = messageStream.ToArray();
+            }
+
+            Logger.Debug("Serializing packet:");
+            Logger.Debug(packet.ToString());
+            await packet.SerializeAsync(packetStream).ConfigureAwait(false);
+        }
 
         /// <summary>
         /// Sends the message.
         /// </summary>
         /// <param name="message">The message.</param>
-        public async Task SendMessageAsync(IMessage message)
+        /// <param name="formatterType">Type of the formatter.</param>
+        /// <param name="packetType">Type of the packet.</param>
+        public async Task SendMessageAsync(Message message, string formatterType, string packetType)
         {
             try {
-                IPacket packet = CreatePacket(message);
-                packet.Content = message;
-                Logger.Debug($"Sending packet: {packet}");
-
-                using(MemoryStream buffer = new MemoryStream()) {
-                    await packet.SerializeAsync(buffer, FormatterType).ConfigureAwait(false);
-                    await SendAsync(buffer).ConfigureAwait(false);
+                using(MemoryStream packetStream = new MemoryStream()) {
+                    await SerializeMessageToPacketStreamAsync(message, packetStream, FormatterFactory.Create(formatterType), packetType).ConfigureAwait(false);
+                    await SendAsync(packetStream).ConfigureAwait(false);
                 }
             } catch(MessageException e) {
                 await InternalErrorAsync(Resources.ErrorSendingMessage, e).ConfigureAwait(false);
             }
         }
-
-        /// <summary>
-        /// Creates a packet from a message.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <returns>The packet</returns>
-        protected abstract IPacket CreatePacket(IMessage message);
     }
 }

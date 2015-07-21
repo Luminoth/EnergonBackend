@@ -10,14 +10,14 @@ namespace EnergonSoftware.Backend.Messages.Auth
     /// Authentication request
     /// </summary>
     [Serializable]
-    public sealed class AuthMessage : IMessage
+    public sealed class AuthMessage : Message
     {
         /// <summary>
         /// The message type
         /// </summary>
         public const string MessageType = "auth";
 
-        public string Type => MessageType;
+        public override string Type => MessageType;
 
         /// <summary>
         /// Gets or sets the authentication protocl version.
@@ -43,13 +43,13 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// </value>
         public string Mechanism => EnumDescription.GetDescriptionFromEnumValue(MechanismType);
 
-        public async Task SerializeAsync(IFormatter formatter)
+        public async override Task SerializeAsync(IFormatter formatter)
         {
             await formatter.WriteAsync("Version", ProtocolVersion).ConfigureAwait(false);
             await formatter.WriteAsync("Mechanism", (int)MechanismType).ConfigureAwait(false);
         }
 
-        public async Task DeserializeAsync(IFormatter formatter)
+        public async override Task DeserializeAsync(IFormatter formatter)
         {
             ProtocolVersion = await formatter.ReadIntAsync("Version").ConfigureAwait(false);
             MechanismType = (AuthType)await formatter.ReadIntAsync("Mechanism").ConfigureAwait(false);

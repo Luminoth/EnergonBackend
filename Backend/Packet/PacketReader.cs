@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core.Packet;
+
 namespace EnergonSoftware.Backend.Packet
 {
     /// <summary>

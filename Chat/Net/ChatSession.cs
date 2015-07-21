@@ -106,7 +106,7 @@ namespace EnergonSoftware.Chat.Net
             }
         }
 
-        protected override MessagePacket CreatePacket(IMessage message)
+        protected override MessagePacket CreatePacket(Message message)
         {
             return new NetworkPacket();
         }

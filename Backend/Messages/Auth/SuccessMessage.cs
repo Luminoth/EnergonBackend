@@ -9,14 +9,14 @@ namespace EnergonSoftware.Backend.Messages.Auth
     /// Authentication success
     /// </summary>
     [Serializable]
-    public sealed class SuccessMessage : IMessage
+    public sealed class SuccessMessage : Message
     {
         /// <summary>
         /// The message type
         /// </summary>
         public const string MessageType = "success";
 
-        public string Type => MessageType;
+        public override string Type => MessageType;
 
         /// <summary>
         /// Gets or sets the session identifier.
@@ -26,12 +26,12 @@ namespace EnergonSoftware.Backend.Messages.Auth
         /// </value>
         public string SessionId { get; set; } = string.Empty;
 
-        public async Task SerializeAsync(IFormatter formatter)
+        public async override Task SerializeAsync(IFormatter formatter)
         {
             await formatter.WriteAsync("Ticket", SessionId).ConfigureAwait(false);
         }
 
-        public async Task DeserializeAsync(IFormatter formatter)
+        public async override Task DeserializeAsync(IFormatter formatter)
         {
             SessionId = await formatter.ReadStringAsync("Ticket").ConfigureAwait(false);
         }

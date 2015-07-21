@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace EnergonSoftware.Backend.Packet
+namespace EnergonSoftware.Core.Packet
 {
     /// <summary>
     /// Represents a packet of data
@@ -69,6 +69,7 @@ namespace EnergonSoftware.Backend.Packet
         /// Deserializes the packet from a stream.
         /// </summary>
         /// <param name="stream">The stream.</param>
+        /// <returns>True if the packet was successfully deserialized</returns>
         Task<bool> DeserializeAsync(Stream stream);
     }
 }

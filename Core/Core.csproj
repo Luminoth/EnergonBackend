@@ -55,6 +55,8 @@
     <Compile Include="Net\HttpServerResult.cs" />
     <Compile Include="Net\Sessions\ErrorEventArgs.cs" />
     <Compile Include="Net\Sockets\NewConnectionEventArgs.cs" />
+    <Compile Include="Packet\Packet.cs" />
+    <Compile Include="Packet\PacketException.cs" />
     <Compile Include="Serialization\Formattable.cs" />
     <Compile Include="Serialization\Formatter.cs" />
     <Compile Include="Serialization\FormatterFactory.cs" />

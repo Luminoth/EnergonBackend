@@ -68,7 +68,6 @@
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessageException.cs" />
     <Compile Include="Messages\MessageFactory.cs" />
-    <Compile Include="Messages\MessageSerializer.cs" />
     <Compile Include="Messages\Network\StartTLSMessage.cs" />
     <Compile Include="Messages\Notification\NotificationMessage.cs" />
     <Compile Include="Messages\Notification\ShutdownMessage.cs" />
@@ -81,8 +80,6 @@
     <Compile Include="Net\Sessions\AuthenticatedSession.cs" />
     <Compile Include="Net\Sessions\MessageSession.cs" />
     <Compile Include="Net\Sessions\MessageSessionManager.cs" />
-    <Compile Include="Packet\Packet.cs" />
-    <Compile Include="Packet\PacketException.cs" />
     <Compile Include="Packet\PacketFactory.cs" />
     <Compile Include="Packet\PacketReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

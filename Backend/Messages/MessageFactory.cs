@@ -19,7 +19,7 @@ namespace EnergonSoftware.Backend.Messages
         /// </summary>
         /// <param name="messageType">Type of the message.</param>
         /// <returns>The message</returns>
-        IMessage Create(string messageType);
+        Message Create(string messageType);
     }
 
     /// <summary>
@@ -27,7 +27,7 @@ namespace EnergonSoftware.Backend.Messages
     /// </summary>
     public class MessageFactory : IMessageFactory
     {
-        public IMessage Create(string messageType)
+        public Message Create(string messageType)
         {
             switch(messageType)
             {

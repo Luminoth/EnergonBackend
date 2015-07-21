@@ -3,6 +3,8 @@ using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core.Packet;
+
 namespace EnergonSoftware.Backend.Packet
 {
     /// <summary>
@@ -27,6 +29,11 @@ namespace EnergonSoftware.Backend.Packet
             throw new ArgumentException("Invalid packet type", nameof(type));
         }
 
+        /// <summary>
+        /// Attempts to deduce the packet type from a stream and create a packet of that type.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <returns>A new packet of the deduced type or null if the type couldn't be deduced</returns>
         public static async Task<IPacket> CreateAsync(Stream stream)
         {
             if(stream.GetRemaining() >= NetworkPacket.Header.Length) {

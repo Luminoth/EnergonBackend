@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Net.Sockets;
 using EnergonSoftware.Core.Properties;
+using EnergonSoftware.Core.Util;
 
 using log4net;
 
@@ -307,7 +308,8 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <param name="count">The count.</param>
         protected void OnDataReceived(byte[] data, int offset, int count)
         {
-            Logger.Debug($"Session {Id} read {count} bytes");
+            Logger.Debug($"Session {Id} read {count} bytes:");
+            Logger.Debug(Utils.HexDump(data, offset, count));
 
             byte[] dataCopy = new byte[count];
             Array.Copy(data, offset, dataCopy, 0, count);
@@ -334,6 +336,9 @@ namespace EnergonSoftware.Core.Net.Sessions
                     return;
                 }
 
+                Logger.Debug("Sending buffer:");
+                Logger.Debug(Utils.HexDump(data, offset, count));
+
                 await _socket.WriteAsync(data, offset, count).ConfigureAwait(false);
                 LastSendTime = DateTime.Now;
             } catch(SocketException e) {
@@ -351,6 +356,9 @@ namespace EnergonSoftware.Core.Net.Sessions
                 if(!IsConnected) {
                     return;
                 }
+
+                Logger.Debug("Sending memory stream:");
+                Logger.Debug(Utils.HexDump(stream));
 
                 await _socket.WriteAsync(stream).ConfigureAwait(false);
                 LastSendTime = DateTime.Now;

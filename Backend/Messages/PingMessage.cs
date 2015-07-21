@@ -9,21 +9,21 @@ namespace EnergonSoftware.Backend.Messages
     /// Ping
     /// </summary>
     [Serializable]
-    public sealed class PingMessage : IMessage
+    public sealed class PingMessage : Message
     {
         /// <summary>
         /// The message type
         /// </summary>
         public const string MessageType = "ping";
 
-        public string Type => MessageType;
+        public override string Type => MessageType;
 
-        public async Task SerializeAsync(IFormatter formatter)
+        public async override Task SerializeAsync(IFormatter formatter)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }
 
-        public async Task DeserializeAsync(IFormatter formatter)
+        public async override Task DeserializeAsync(IFormatter formatter)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }

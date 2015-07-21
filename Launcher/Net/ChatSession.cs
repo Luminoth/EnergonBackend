@@ -126,7 +126,7 @@ namespace EnergonSoftware.Launcher.Net
             Logger.Debug($"Friends: {FriendListManager.Instance}");
         }
 
-        protected override MessagePacket CreatePacket(IMessage message)
+        protected override MessagePacket CreatePacket(Message message)
         {
             return new NetworkPacket();
         }

@@ -54,7 +54,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
         /// <param name="message">The message.</param>
         /// <param name="session">The session.</param>
         /// <exception cref="MessageHandlerException"></exception>
-        public async Task HandleMessageAsync(IMessage message, NetworkSession session)
+        public async Task HandleMessageAsync(Message message, NetworkSession session)
         {
             if(_running) {
                 throw new MessageHandlerException(Resources.ErrorMessageHandlerAlreadyRunning);
@@ -62,7 +62,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
 
             _running = true;
 
-            Authenticate(message as IAuthenticatedMessage, session as AuthenticatedSession);
+            Authenticate(message as AuthenticatedMessage, session as AuthenticatedSession);
 
             Finished = false;
             _startTime = DateTime.Now;
@@ -73,7 +73,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
             Finished = true;
         }
 
-        private static void Authenticate(IAuthenticatedMessage message, AuthenticatedSession session)
+        private static void Authenticate(AuthenticatedMessage message, AuthenticatedSession session)
         {
             if(null != message && null != session) {
                 if(!session.Authenticate(message.AccountName, message.SessionId)) {
@@ -87,7 +87,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="session">The session.</param>
-        protected async virtual Task OnHandleMessageAsync(IMessage message, NetworkSession session)
+        protected async virtual Task OnHandleMessageAsync(Message message, NetworkSession session)
         {
             await Task.Delay(0).ConfigureAwait(false);
         }

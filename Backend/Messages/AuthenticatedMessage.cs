@@ -3,7 +3,7 @@
     /// <summary>
     /// Authenticated message
     /// </summary>
-    public interface IAuthenticatedMessage : IMessage
+    public abstract class AuthenticatedMessage : Message
     {
         /// <summary>
         /// Gets or sets the name of the account.
@@ -11,7 +11,7 @@
         /// <value>
         /// The name of the account.
         /// </value>
-        string AccountName { get; set; }
+        public abstract string AccountName { get; set; }
 
         /// <summary>
         /// Gets or sets the session identifier.
@@ -19,6 +19,6 @@
         /// <value>
         /// The session identifier.
         /// </value>
-        string SessionId { get; set; }
+        public abstract string SessionId { get; set; }
     }
 }

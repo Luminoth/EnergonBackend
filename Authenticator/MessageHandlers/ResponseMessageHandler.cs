@@ -82,7 +82,7 @@ return;
             }
         }
 
-        protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
+        protected async override Task OnHandleMessageAsync(Message message, NetworkSession session)
         {
             AuthSession authSession = (AuthSession)session;
 

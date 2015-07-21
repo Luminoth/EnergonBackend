@@ -99,7 +99,7 @@ namespace EnergonSoftware.Launcher.Net
             LastPingTime = DateTime.Now;
         }
 
-        protected override MessagePacket CreatePacket(IMessage message)
+        protected override MessagePacket CreatePacket(Message message)
         {
             return new NetworkPacket();
         }

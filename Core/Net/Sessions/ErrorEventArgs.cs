@@ -3,7 +3,7 @@
 namespace EnergonSoftware.Core.Net.Sessions
 {
     /// <summary>
-    /// Session error event arguments
+    /// Emitted when a NetworkSession encounters an error
     /// </summary>
     public sealed class ErrorEventArgs : EventArgs
     {

@@ -2,6 +2,9 @@
 
 namespace EnergonSoftware.Core.Net.Sessions
 {
+    /// <summary>
+    /// Emitted when a NetworkSession disconnects
+    /// </summary>
     public sealed class DisconnectedEventArgs : EventArgs
     {
         /// <summary>

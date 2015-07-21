@@ -33,7 +33,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
             return $"realm=\"{ConfigurationManager.AppSettings["authRealm"]}\",nonce=\"{nonce.NonceHash}\",qop=\"auth\",charset=utf-8,algorithm=sha512-sess";
         }
 
-        protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
+        protected async override Task OnHandleMessageAsync(Message message, NetworkSession session)
         {
             AuthSession authSession = (AuthSession)session;
 

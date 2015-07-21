@@ -2,6 +2,9 @@
 
 namespace EnergonSoftware.Core.Net.Sessions
 {
+    /// <summary>
+    /// Emitted when a NetworkSession receives data
+    /// </summary>
     public sealed class DataReceivedEventArgs : EventArgs
     {
         /// <summary>

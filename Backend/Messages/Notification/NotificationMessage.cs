@@ -3,7 +3,7 @@
     /// <summary>
     /// Notification
     /// </summary>
-    public interface INotificationMessage : IMessage
+    public abstract class NotificationMessage : Message
     {
         /// <summary>
         /// Gets or sets the name of the service.
@@ -11,7 +11,7 @@
         /// <value>
         /// The name of the service.
         /// </value>
-        string ServiceName { get; set; }
+        public abstract string ServiceName { get; set; }
 
         /// <summary>
         /// Gets or sets the service identifier.
@@ -19,6 +19,6 @@
         /// <value>
         /// The service identifier.
         /// </value>
-        string ServiceId { get; set; }
+        public abstract string ServiceId { get; set; }
     }
 }
