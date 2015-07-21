@@ -68,7 +68,7 @@ namespace EnergonSoftware.Core.Util
         {
             Realm = realm;
             ExpiryMs = expiryMs;
-            NonceValue = CreationTime.GetTicksMs() + ":" + Realm;
+            NonceValue = $"{CreationTime.GetTicksMs()}:${Realm}";
             NonceHash = new SHA512().HashHexAsync(NonceValue).Result;
         }
 

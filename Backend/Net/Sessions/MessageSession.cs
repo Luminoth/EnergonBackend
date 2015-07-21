@@ -36,14 +36,14 @@ namespace EnergonSoftware.Backend.Net.Sessions
             try {
                 IPacket packet = CreatePacket(message);
                 packet.Content = message;
-                Logger.Debug("Sending packet: " + packet);
+                Logger.Debug($"Sending packet: {packet}");
 
                 using(MemoryStream buffer = new MemoryStream()) {
                     await packet.SerializeAsync(buffer, FormatterType).ConfigureAwait(false);
                     await SendAsync(buffer).ConfigureAwait(false);
                 }
             } catch(MessageException e) {
-                InternalErrorAsync(Resources.ErrorSendingMessage, e).Wait(); 
+                await InternalErrorAsync(Resources.ErrorSendingMessage, e).ConfigureAwait(false);
             }
         }
 

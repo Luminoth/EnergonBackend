@@ -57,7 +57,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
 
         public override string ToString()
         {
-            return "AuthMessage(Version=" + ProtocolVersion + ", Mechanism=" + Mechanism + ")";
+            return $"AuthMessage(Version={ProtocolVersion}, Mechanism={Mechanism})";
         }
     }
 }

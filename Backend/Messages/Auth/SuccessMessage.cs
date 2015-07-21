@@ -38,7 +38,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
 
         public override string ToString()
         {
-            return "SuccessMessage(SessionId=" + SessionId + ")";
+            return $"SuccessMessage(SessionId={SessionId})";
         }
     }
 }

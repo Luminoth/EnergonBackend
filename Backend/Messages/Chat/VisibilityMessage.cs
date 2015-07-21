@@ -48,7 +48,7 @@ namespace EnergonSoftware.Backend.Messages.Chat
 
         public override string ToString()
         {
-            return "VisibilityMessage(Visibility=" + Visibility + ")";
+            return $"VisibilityMessage(Visibility={Visibility})";
         }
     }
 }

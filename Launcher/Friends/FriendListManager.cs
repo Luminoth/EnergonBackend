@@ -59,7 +59,7 @@ namespace EnergonSoftware.Launcher.Friends
 
         private void AddFriendInternal(Account friend)
         {
-            Logger.Debug("Adding friend: " + friend);
+            Logger.Debug($"Adding friend: {friend}");
             _friendList[friend.Username] = friend;
 
             FriendGroupEntry group = RootGroupEntry;

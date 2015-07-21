@@ -25,7 +25,7 @@ namespace EnergonSoftware.DAL.Models.Accounts
 
         public override string ToString()
         {
-            return "AccountFriend(Id: " + Id + ", AccountId: " + AccountId + ", FriendAccountId: " + FriendAccountId + ", GroupId: " + GroupId + ")";
+            return $"AccountFriend(Id: {Id}, AccountId: {AccountId}, FriendAccountId: {FriendAccountId}, GroupId: {GroupId})";
         }
     }
 }

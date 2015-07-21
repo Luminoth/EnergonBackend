@@ -61,7 +61,7 @@ namespace EnergonSoftware.Launcher.Net
 
                 await LoginAsync().ConfigureAwait(false);
             } catch(SocketException e) {
-                ErrorAsync("Failed to connect to the overmind server: " + e.Message).Wait();
+                await ErrorAsync($"Failed to connect to the overmind server: {e.Message}").ConfigureAwait(false);
             }
         }
 

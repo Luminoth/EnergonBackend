@@ -38,7 +38,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
 
         public override string ToString()
         {
-            return "FailureMessage(Reason=" + Reason + ")";
+            return $"FailureMessage(Reason={Reason})";
         }
     }
 }

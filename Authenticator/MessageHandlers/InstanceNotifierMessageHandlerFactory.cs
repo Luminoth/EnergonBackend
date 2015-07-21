@@ -1,4 +1,6 @@
-﻿using EnergonSoftware.Backend.MessageHandlers;
+﻿using System;
+
+using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages.Notification;
 
 namespace EnergonSoftware.Authenticator.MessageHandlers
@@ -15,7 +17,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
                 return new MessageHandler();
             }
 
-            throw new MessageHandlerException("Unsupported message type: " + type);
+            throw new ArgumentException("Unsupported message type", nameof(type));
         }
     }
 }

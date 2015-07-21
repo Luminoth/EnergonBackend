@@ -48,7 +48,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
 
         public override string ToString()
         {
-            return "LoginMessage(AccountName=" + AccountName + ", SessionId=" + SessionId + ")";
+            return $"LoginMessage(AccountName={AccountName}, SessionId={SessionId})";
         }
     }
 }

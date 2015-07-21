@@ -40,34 +40,28 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 string realm = values["realm"].Trim('"');
                 Nonce cnonce = new Nonce(realm, -1);
                 string nc = "00000001";
-                string digestUri = realm + "/" + ConfigurationManager.AppSettings["authHost"];
+                string digestUri = $"{realm}/{ConfigurationManager.AppSettings["authHost"]}";
 
-                Logger.Debug("Authenticating " + App.Instance.UserAccount.AccountName + ":" + realm + ":***");
+                Logger.Debug($"Authenticating {App.Instance.UserAccount.AccountName}:{realm}:****");
                 string passwordHash = await new SHA512().DigestPasswordAsync(
                     App.Instance.UserAccount.AccountName,
                     realm,
                     App.Instance.UserAccount.Password).ConfigureAwait(false);
-                Logger.Debug("passwordHash=" + passwordHash);
+                Logger.Debug($"passwordHash={passwordHash}");
 
                 string nonce = values["nonce"].Trim('"');
                 string qop = values["qop"].Trim('"');
                 string rsp = await AuthUtil.DigestClientResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestUri).ConfigureAwait(false);
-            
-                string msg = "username=\"" + App.Instance.UserAccount.AccountName + "\","
-                    + "realm=" + realm + ","
-                        + "nonce=" + nonce + ","
-                        + "cnonce=\"" + cnonce.NonceHash + "\","
-                        + "nc=" + nc + ","
-                        + "qop=" + qop + ","
-                        + "digest-uri=\"" + digestUri + "\","
-                        + "response=" + rsp + ","
-                        + "charset=" + charset;
-                Logger.Debug("Generated response: " + msg);
+
+                string msg = $"username=\"{App.Instance.UserAccount.AccountName}\",realm={realm},"
+                    + $"nonce={nonce},cnonce=\"{cnonce.NonceHash}\",nc={nc},"
+                    + $"qop={qop},digest-uri=\"{digestUri}\",response={rsp},charset={charset}";
+                Logger.Debug($"Generated response: {msg}");
 
                 string rspAuth = await AuthUtil.DigestServerResponseAsync(new SHA512(), passwordHash, nonce, nc, qop, cnonce.NonceHash, digestUri).ConfigureAwait(false);
                 await session.AuthResponseAsync(Convert.ToBase64String(Encoding.UTF8.GetBytes(msg)), rspAuth).ConfigureAwait(false);
             } catch(KeyNotFoundException e) {
-                session.ErrorAsync("Invalid challenge: " + e.Message).Wait();
+                await session.ErrorAsync($"Invalid challenge: {e.Message}").ConfigureAwait(false);
             }
         }
 
@@ -82,13 +76,13 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             try {
                 string rspauth = values["rspauth"].Trim('"');
                 if(session.RspAuth != rspauth) {
-                    await session.ErrorAsync("rspauth mismatch, expected: '" + session.RspAuth + "', got: '" + rspauth + "'").ConfigureAwait(false);
+                    await session.ErrorAsync($"rspauth mismatch, expected: '{session.RspAuth}', got: '{rspauth}'").ConfigureAwait(false);
                     return;
                 }
 
                 await session.AuthFinalizeAsync().ConfigureAwait(false);
             } catch(KeyNotFoundException e) {
-                session.ErrorAsync("Invalid challenge: " + e.Message).Wait();
+                await session.ErrorAsync($"Invalid challenge: {e.Message}").ConfigureAwait(false);
             }
         }
 
@@ -98,7 +92,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
             AuthSession authSession = (AuthSession)session;
 
             string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(challengeMessage.Challenge));
-            Logger.Debug("Decoded challenge: " + decoded);
+            Logger.Debug($"Decoded challenge: {decoded}");
 
             switch(App.Instance.AuthStage)
             {
@@ -109,7 +103,7 @@ namespace EnergonSoftware.Launcher.MessageHandlers.Auth
                 await HandleResponseStateAsync(authSession, decoded).ConfigureAwait(false);
                 break;
             default:
-                await authSession.ErrorAsync("Unexpected auth stage: " + App.Instance.AuthStage).ConfigureAwait(false);
+                await authSession.ErrorAsync($"Unexpected auth stage: {App.Instance.AuthStage}").ConfigureAwait(false);
                 return;
             }
         }

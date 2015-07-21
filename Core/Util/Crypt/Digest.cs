@@ -16,7 +16,7 @@ namespace EnergonSoftware.Core.Util.Crypt
         /// <returns>The password digest</returns>
         public async Task<string> DigestPasswordAsync(string accountName, string realm, string password)
         {
-            return await HashHexAsync(accountName + ":" + realm + ":" + password).ConfigureAwait(false);
+            return await HashHexAsync($"{accountName}:{realm}:{password}").ConfigureAwait(false);
         }
     }
 }

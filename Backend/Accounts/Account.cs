@@ -144,7 +144,8 @@ namespace EnergonSoftware.Backend.Accounts
 
         public override string ToString()
         {
-            return "Account(Id=" + Id + ", AccountName=" + AccountName + ", Username=" + Username + ", SessionId=" + SessionId + ", EndPoint=" + EndPoint + ", Visibility=" + Visibility + ", Status=" + Status + ", GroupName=" + GroupName + ")";
+            return $"Account(Id={Id}, AccountName={AccountName}, Username={Username}, SessionId={SessionId}"
+                + $", EndPoint={EndPoint}, Visibility={Visibility}, Status={Status}, GroupName={GroupName})";
         }
 
 #region Property Notifier

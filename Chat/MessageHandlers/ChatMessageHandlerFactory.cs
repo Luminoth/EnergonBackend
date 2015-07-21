@@ -1,4 +1,6 @@
-﻿using EnergonSoftware.Backend.MessageHandlers;
+﻿using System;
+
+using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Messages.Chat;
@@ -21,7 +23,7 @@ namespace EnergonSoftware.Chat.MessageHandlers
                 return new VisibilityMessageHandler();
             }
 
-            throw new MessageHandlerException("Unsupported message type: " + type);
+            throw new ArgumentException("Unsupported message type", nameof(type));
         }
     }
 }

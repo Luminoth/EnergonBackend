@@ -79,14 +79,14 @@ namespace EnergonSoftware.Core.Util
         /// <returns>The digest</returns>
         public static async Task<string> DigestClientResponseAsync(Digest digest, string passwordHash, string nonce, string nc, string qop, string cnonce, string digestUri)
         {
-            string a1 = passwordHash + ":" + nonce + ":" + cnonce;
+            string a1 = $"{passwordHash}:{nonce}:{cnonce}";
             string ha1 = await digest.HashHexAsync(a1).ConfigureAwait(false);
 
-            string a2 = "AUTHENTICATE:" + digestUri;
+            string a2 = $"AUTHENTICATE:{digestUri}";
             string ha2 = await digest.HashHexAsync(a2).ConfigureAwait(false);
 
-            string s = nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2;
-            string k = ha1 + ":" + s;
+            string s = $"{nonce}:{nc}:{cnonce}:{qop}:{ha2}";
+            string k = $"{ha1}:{s}";
 
             return await digest.HashHexAsync(k).ConfigureAwait(false);
         }
@@ -104,14 +104,14 @@ namespace EnergonSoftware.Core.Util
         /// <returns>The digest</returns>
         public static async Task<string> DigestServerResponseAsync(Digest digest, string passwordHash, string nonce, string nc, string qop, string cnonce, string digestUri)
         {
-            string a1 = passwordHash + ":" + nonce + ":" + cnonce;
+            string a1 = $"{passwordHash}:{nonce}:{cnonce}";
             string ha1 = await digest.HashHexAsync(a1).ConfigureAwait(false);
 
-            string a2 = ":" + digestUri;
+            string a2 = ":{digestUri}";
             string ha2 = await digest.HashHexAsync(a2).ConfigureAwait(false);
 
-            string s = nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2;
-            string k = ha1 + ":" + s;
+            string s = $"{nonce}:{nc}:{cnonce}:{qop}:{ha2}";
+            string k = $"{ha1}:{s}";
 
             return await digest.HashHexAsync(k).ConfigureAwait(false);
         }

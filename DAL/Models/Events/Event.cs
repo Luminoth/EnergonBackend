@@ -14,7 +14,7 @@ namespace EnergonSoftware.DAL.Models.Events
 
         public override string ToString()
         {
-            return "Event(Id: " + Id + ", Timestamp: " + Timestamp + ")";
+            return $"Event(Id: {Id}, Timestamp: {Timestamp})";
         }
     }
 }

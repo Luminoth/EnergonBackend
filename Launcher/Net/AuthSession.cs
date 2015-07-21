@@ -50,13 +50,13 @@ namespace EnergonSoftware.Launcher.Net
 
                 await BeginAuthAsync().ConfigureAwait(false);
             } catch(SocketException e) {
-                AuthFailedAsync("Failed to connect to the authentication server: " + e.Message).Wait();
+                await AuthFailedAsync($"Failed to connect to the authentication server: {e.Message}").ConfigureAwait(false);
             }
         }
 
         private async Task BeginAuthAsync()
         {
-            Logger.Info("Authenticating as user '" + App.Instance.UserAccount.AccountName + "'...");
+            Logger.Info($"Authenticating as user '{App.Instance.UserAccount.AccountName}'...");
 
             await SendMessageAsync(new AuthMessage()
                 {
@@ -87,7 +87,7 @@ namespace EnergonSoftware.Launcher.Net
         public async Task AuthSuccessAsync(string ticket)
         {
             Logger.Info("Authentication successful!");
-            Logger.Debug("Ticket=" + ticket);
+            Logger.Debug($"Ticket={ticket}");
 
             App.Instance.AuthStage = AuthenticationStage.Authenticated;
             App.Instance.UserAccount.SessionId = ticket;
@@ -100,7 +100,7 @@ namespace EnergonSoftware.Launcher.Net
 
         public async Task AuthFailedAsync(string reason)
         {
-            Logger.Warn("Authentication failed: " + reason);
+            Logger.Warn($"Authentication failed: {reason}");
 
             App.Instance.AuthStage = AuthenticationStage.NotAuthenticated;
             App.Instance.UserAccount.Password = null;

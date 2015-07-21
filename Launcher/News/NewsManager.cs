@@ -62,14 +62,14 @@ await Task.Delay(1000).ConfigureAwait(false);
                             news = (List<NewsContract>)serializer.ReadObject(stream);
                         }
 
-                        Logger.Debug("Read news: " + string.Join(",", (object[])news.ToArray()));
+                        Logger.Debug($"Read news: {string.Join(",", (object[])news.ToArray())}");
                         News = news.Count < 1 ? "No news updates!" : news[0].NewsValue;
                     } else {
-                        News = "Error contacting news server: " + response.ReasonPhrase;
+                        News = $"Error contacting news server: {response.ReasonPhrase}";
                     }
                 }
             } catch(Exception e) {
-                News = "Error contacting news server: " + e.Message;
+                News = $"Error contacting news server: {e.Message}";
             }
         }
 

@@ -74,9 +74,9 @@ namespace EnergonSoftware.Core.Configuration
 
         public override string ToString()
         {
-            StringBuilder builder = new StringBuilder("ListenAddress(Name=" + Name + ", Interface=" + Interface + ":" + Port);
+            StringBuilder builder = new StringBuilder($"ListenAddress(Name={Name}, Interface={Interface}:{Port}");
             if(!string.IsNullOrEmpty(MulticastGroup)) {
-                builder.Append(", MulticastGroup=" + MulticastGroup + ", MulticastTTL=" + MulticastTTL);
+                builder.Append($", MulticastGroup={MulticastGroup}, MulticastTTL={MulticastTTL}");
             }
 
             builder.Append(")");

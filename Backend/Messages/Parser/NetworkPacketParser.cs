@@ -46,7 +46,7 @@ namespace EnergonSoftware.Backend.Messages.Parser
         {
             await _streamLock.WaitAsync().ConfigureAwait(false);
             try {
-                Logger.Debug("Read network data (" + e.Count + "):");
+                Logger.Debug($"Read network data ({e.Count}):");
                 Logger.Debug(Utils.HexDump(e.Data, 0, e.Count));
 
                 await _stream.WriteAsync(e.Data, 0, e.Count);

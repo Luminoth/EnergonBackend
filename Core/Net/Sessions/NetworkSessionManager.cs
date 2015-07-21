@@ -94,7 +94,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
             await _lock.WaitAsync().ConfigureAwait(false);
             try {
-                Logger.Info("Managing new session: " + session.Id);
+                Logger.Info($"Managing new session: {session.Id}");
                 _sessions.Add(session);
             } finally {
                 _lock.Release();
@@ -162,7 +162,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             try {
                 int count = _sessions.RemoveAll(session => !session.IsConnecting && !session.IsConnected);
                 if(count > 0) {
-                    Logger.Info("Removed " + count + " disconnected sessions");
+                    Logger.Info($"Removed {count} disconnected sessions");
                 }
             } finally {
                 _lock.Release();

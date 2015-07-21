@@ -55,7 +55,7 @@ await Task.Delay(1000).ConfigureAwait(false);
                             updates = (List<UpdateContract>)serializer.ReadObject(stream);
                         }
 
-                        Logger.Debug("Read updates: " + string.Join(",", (object[])updates.ToArray()));
+                        Logger.Debug($"Read updates: {string.Join(",", (object[])updates.ToArray())}");
 
                         //// TODO: check the updates and then update!
 
@@ -65,7 +65,7 @@ await Task.Delay(1000).ConfigureAwait(false);
                                 Success = true,
                             });
                     } else {
-                        UpdateStatus = "Error contacting update server: " + response.ReasonPhrase;
+                        UpdateStatus = $"Error contacting update server: {response.ReasonPhrase}";
                         OnUpdateFinished?.Invoke(this, new UpdateFinishedEventArgs()
                             {
                                 Success = false,
@@ -73,7 +73,7 @@ await Task.Delay(1000).ConfigureAwait(false);
                     }
                 }
             } catch(Exception e) {
-                UpdateStatus = "Error contacting update server: " + e.Message;
+                UpdateStatus = $"Error contacting update server: {e.Message}";
                 OnUpdateFinished?.Invoke(this, new UpdateFinishedEventArgs()
                     {
                         Success = false,

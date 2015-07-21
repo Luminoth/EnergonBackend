@@ -27,7 +27,7 @@ namespace EnergonSoftware.DAL.Models.Events
 
         public override string ToString()
         {
-            return "AuthenticateEvent(Id: " + Id + ", Timestamp: " + Timestamp + ", Type: " + Type + ", Origin: " + Origin + ", AccountName: " + AccountName + ", Reason: " + Reason + ")";
+            return $"AuthenticateEvent(Id: {Id}, Timestamp: {Timestamp}, Type: {Type}, Origin: {Origin}, AccountName: {AccountName}, Reason: {Reason})";
         }
     }
 }

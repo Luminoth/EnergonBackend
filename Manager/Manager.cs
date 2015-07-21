@@ -44,7 +44,7 @@ namespace EnergonSoftware.Manager
 
         protected override void OnStart(string[] args)
         {
-            Logger.Info("Starting " + ServiceName + " with guid=" + UniqueId + "...");
+            Logger.Info($"Starting {ServiceName} with guid={UniqueId}...");
 
             ListenAddressesConfigurationSection instanceNotifierListenAddresses = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("instanceNotifierAddresses");
             if(null == instanceNotifierListenAddresses || instanceNotifierListenAddresses.ListenAddresses.Count < 1) {
@@ -69,7 +69,7 @@ namespace EnergonSoftware.Manager
 
         protected override void OnStop()
         {
-            Logger.Info("Stopping " + ServiceName + " with guid=" + UniqueId + "...");
+            Logger.Info($"Stopping {ServiceName} with guid={UniqueId}...");
             Running = false;
         }
 

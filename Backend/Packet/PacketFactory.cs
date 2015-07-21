@@ -5,8 +5,17 @@ using System.Threading.Tasks;
 
 namespace EnergonSoftware.Backend.Packet
 {
+    /// <summary>
+    /// Creates packets.
+    /// </summary>
     public static class PacketFactory
     {
+        /// <summary>
+        /// Creates a packet of the specified type.
+        /// </summary>
+        /// <param name="type">The packet type.</param>
+        /// <returns>A new packet of the specified type.</returns>
+        /// <exception cref="System.ArgumentException">Invalid packet type</exception>
         public static IPacket Create(string type)
         {
             switch(type)

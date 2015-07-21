@@ -50,7 +50,7 @@ namespace EnergonSoftware.Chat
 
         protected override void OnStart(string[] args)
         {
-            Logger.Info("Starting " + ServiceName + " with guid=" + UniqueId + "...");
+            Logger.Info($"Starting {ServiceName} with guid={UniqueId}...");
 
             ListenAddressesConfigurationSection listenAddresses = (ListenAddressesConfigurationSection)ConfigurationManager.GetSection("listenAddresses");
             if(null == listenAddresses || listenAddresses.ListenAddresses.Count < 1) {
@@ -88,7 +88,7 @@ namespace EnergonSoftware.Chat
 
         protected override void OnStop()
         {
-            Logger.Info("Stopping " + ServiceName + " with guid=" + UniqueId + "...");
+            Logger.Info($"Stopping {ServiceName} with guid={UniqueId}...");
             Running = false;
         }
 

@@ -1,4 +1,5 @@
-﻿using EnergonSoftware.Backend.MessageHandlers;
+﻿using System;
+using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages.Notification;
 
 namespace EnergonSoftware.Chat.MessageHandlers
@@ -15,7 +16,7 @@ namespace EnergonSoftware.Chat.MessageHandlers
                 return new MessageHandler();
             }
 
-            throw new MessageHandlerException("Unsupported message type: " + type);
+            throw new ArgumentException("Unsupported message type", nameof(type));
         }
     }
 }

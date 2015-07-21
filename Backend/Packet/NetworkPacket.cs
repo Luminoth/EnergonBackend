@@ -18,8 +18,11 @@ namespace EnergonSoftware.Backend.Packet
 #region Id Generator
         private static int _nextId;
         private static int NextId => ++_nextId;
-#endregion
+        #endregion
 
+        /// <summary>
+        /// The packet type{CC2D43FA-BBC4-448A-9D0B-7B57ADF2655C}
+        /// </summary>
         public const string PacketType = "Network";
 
         public static readonly byte[] Header = new byte[] { (byte)'E', (byte)'S', (byte)'N', (byte)'P' };
@@ -110,8 +113,7 @@ namespace EnergonSoftware.Backend.Packet
 
         public override string ToString()
         {
-            return "NetworkPacket(Type: " + Type + ", Id: " + Id + ", ContentType: " + ContentType
-                + ", Encoding: " + Encoding + ", ContentLength: " + ContentLength + ")";
+            return $"NetworkPacket(Type: {Type}, Id: {Id}, ContentType: {ContentType}, Encoding: {Encoding}, ContentLength: {ContentLength})";
         }
     }
 }

@@ -36,7 +36,7 @@ namespace EnergonSoftware.Backend.Messages.Notification
 
         public override string ToString()
         {
-            return "ShutdownMessage(ServiceName=" + ServiceName + ", ServiceId=" + ServiceId + ")";
+            return $"ShutdownMessage(ServiceName={ServiceName}, ServiceId={ServiceId})";
         }
     }
 }

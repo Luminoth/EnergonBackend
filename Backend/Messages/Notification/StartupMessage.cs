@@ -36,7 +36,7 @@ namespace EnergonSoftware.Backend.Messages.Notification
 
         public override string ToString()
         {
-            return "StartupMessage(ServiceName=" + ServiceName + ", ServiceId=" + ServiceId + ")";
+            return $"StartupMessage(ServiceName={ServiceName}, ServiceId={ServiceId})";
         }
     }
 }

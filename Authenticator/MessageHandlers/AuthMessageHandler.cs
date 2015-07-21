@@ -23,20 +23,14 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
         private static string BuildDigestMD5Challenge(Nonce nonce)
         {
             Logger.Debug("Building MD5 challenge...");
-
-            return "realm=\"" + ConfigurationManager.AppSettings["authRealm"] + "\""
-                + ",nonce=\"" + nonce.NonceHash + "\""
-                + ",qop=\"auth\",charset=utf-8,algorithm=md5-sess";
+            return $"realm=\"{ConfigurationManager.AppSettings["authRealm"]}\",nonce=\"{nonce.NonceHash}\",qop=\"auth\",charset=utf-8,algorithm=md5-sess";
         }
 
         // ReSharper disable once InconsistentNaming
         private static string BuildDigestSHA512Challenge(Nonce nonce)
         {
             Logger.Debug("Building SHA512 challenge...");
-
-            return "realm=\"" + ConfigurationManager.AppSettings["authRealm"] + "\""
-                + ",nonce=\"" + nonce.NonceHash + "\""
-                + ",qop=\"auth\",charset=utf-8,algorithm=sha512-sess";
+            return $"realm=\"{ConfigurationManager.AppSettings["authRealm"]}\",nonce=\"{nonce.NonceHash}\",qop=\"auth\",charset=utf-8,algorithm=sha512-sess";
         }
 
         protected async override Task OnHandleMessageAsync(IMessage message, NetworkSession session)
@@ -52,7 +46,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
 
             AuthMessage authMessage = (AuthMessage)message;
             if(Common.AuthProtocolVersion != authMessage.ProtocolVersion) {
-                Logger.Debug("Bad version, expected: " + Common.AuthProtocolVersion + ", got: " + authMessage.ProtocolVersion);
+                Logger.Debug($"Bad version, expected: {Common.AuthProtocolVersion}, got: {authMessage.ProtocolVersion}");
                 await authSession.FailureAsync("Bad Version").ConfigureAwait(false);
                 return;
             }
@@ -75,7 +69,7 @@ return;
                 return;
             }
 
-            Logger.Debug("Session " + authSession.Id + " generated challenge: " + challenge);
+            Logger.Debug($"Session {authSession.Id} generated challenge: {challenge}");
             await authSession.ChallengeAsync(authMessage.MechanismType, nonce, challenge).ConfigureAwait(false);
         }
     }

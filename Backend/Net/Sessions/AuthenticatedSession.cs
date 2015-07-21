@@ -63,7 +63,7 @@ namespace EnergonSoftware.Backend.Net.Sessions
                 return false;
             }
 
-            Logger.Info("Login request from accountName=" + accountName + ", with sessionid=" + sessionid);
+            Logger.Info($"Login request from accountName={accountName}, with sessionid={sessionid}");
 
             Account lookupAccount = await LookupAccountAsync(accountName).ConfigureAwait(false);
             if(null == lookupAccount) {
@@ -80,13 +80,13 @@ namespace EnergonSoftware.Backend.Net.Sessions
                 EndPoint = RemoteEndPoint
             };
 
-            Logger.Debug("Authenticating login account: " + loginAccount);
+            Logger.Debug($"Authenticating login account: {loginAccount}");
             if(!Authenticate(loginAccount)) {
                 await ErrorAsync(string.Format(Resources.ErrorInvalidLoginAccount, loginAccount, Account)).ConfigureAwait(false);
                 return false;
             }
 
-            Logger.Info("Login for accountName=" + accountName + " successful!");
+            Logger.Info($"Login for accountName={accountName} successful!");
             await SendMessageAsync(new LoginMessage()).ConfigureAwait(false);
 
             return true;

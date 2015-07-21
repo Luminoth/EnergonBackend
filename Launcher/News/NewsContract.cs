@@ -17,11 +17,11 @@ namespace EnergonSoftware.Launcher.News
         [DataMember(Name = "NewsUpdate")]
         public /*DateTime*/string NewsUpdate { get; set; }
 
-        public string NewsValue => Headline + "\r\n" + Date + "\r\n\r\n" + NewsUpdate;
+        public string NewsValue => $"{Headline}\r\n{Date}\r\n\r\n{NewsUpdate}";
 
         public override string ToString()
         {
-            return "NewsContract(Id=" + Id + ", Date=" + Date + ", Headline=" + Headline + ", NewsUpdate=" + NewsUpdate + ")";
+            return $"NewsContract(Id={Id}, Date={Date}, Headline={Headline}, NewsUpdate={NewsUpdate})";
         }
     }
 }

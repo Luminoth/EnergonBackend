@@ -164,7 +164,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         {
             // TODO: disconnect first?
 
-            Logger.Info("Session " + Id + " connecting to " + host + ":" + port + "...");
+            Logger.Info($"Session {Id} connecting to {host}:{port}...");
 
             Socket socket = await NetUtil.ConnectAsync(host, port, socketType, protocolType, useIPv6).ConfigureAwait(false);
             _socket = new SSLSocketWrapper(socket);
@@ -186,7 +186,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         {
             // TODO: disconnect first?
 
-            Logger.Info("Session " + Id + " connecting to multicast group " + group + ":" + port + "...");
+            Logger.Info($"Session {Id} connecting to multicast group {group}:{port}...");
 
             Socket socket = await NetUtil.ConnectMulticastAsync(group, port, ttl).ConfigureAwait(false);
             _socket = new SSLSocketWrapper(socket);
@@ -203,7 +203,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// </summary>
         public async Task DisconnectAsync()
         {
-            Logger.Info("Session " + Id + " disconnecting...");
+            Logger.Info($"Session {Id} disconnecting...");
             await DisconnectAsync(string.Empty).ConfigureAwait(false);
         }
 
@@ -218,7 +218,7 @@ namespace EnergonSoftware.Core.Net.Sessions
                     return;
                 }
 
-                Logger.Info("Session " + Id + " disconnecting: " + reason);
+                Logger.Info($"Session {Id} disconnecting: {reason}");
                 await _socket.DisconnectAsync(false).ConfigureAwait(false);
 
                 DisconnectedEvent?.Invoke(this, new DisconnectedEventArgs
@@ -239,12 +239,12 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <param name="enabledSslProtocols">The enabled SSL protocols.</param>
         public async Task StartClientSslAsync(string serverName, RemoteCertificateValidationCallback userCertificateValidationCallback, SslProtocols enabledSslProtocols)
         {
-            Logger.Info("Session " + Id + " starting client SSL handshake with serverName=" + serverName + "...");
+            Logger.Info($"Session {Id} starting client SSL handshake with serverName={serverName}...");
 
             await _socket.StartClientSslAsync(serverName, userCertificateValidationCallback, enabledSslProtocols).ConfigureAwait(false);
 
             if(IsEncrypted) {
-                Logger.Info("Session " + Id + " SSL handshake success!");
+                Logger.Info($"Session {Id} SSL handshake success!");
             } else {
                 await DisconnectAsync(Resources.ErrorSSLHandshakeFailed).ConfigureAwait(false);
             }
@@ -257,12 +257,12 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <param name="enabledSslProtocols">The enabled SSL protocols.</param>
         public async Task StartServerSslAsync(X509Certificate serverCertificate, SslProtocols enabledSslProtocols)
         {
-            Logger.Info("Session " + Id + " starting server SSL handshake...");
+            Logger.Info($"Session {Id} starting server SSL handshake...");
 
             await _socket.StartServerSslAsync(serverCertificate, enabledSslProtocols).ConfigureAwait(false);
 
             if(IsEncrypted) {
-                Logger.Info("Session " + Id + " SSL handshake success!");
+                Logger.Info($"Session {Id} SSL handshake success!");
             } else {
                 await DisconnectAsync(Resources.ErrorSSLHandshakeFailed).ConfigureAwait(false);
             }
@@ -281,7 +281,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             using(MemoryStream stream = new MemoryStream()) {
                 int count = await _socket.PollAndReadAllAsync(microSeconds, stream).ConfigureAwait(false);
                 if(count < 0) {
-                    Logger.Warn("Session " + Id + " remote disconnected!");
+                    Logger.Warn($"Session {Id} remote disconnected!");
                     DisconnectedEvent?.Invoke(this, new DisconnectedEventArgs
                         {
                             Reason = Resources.DisconnectSocketClosed
@@ -307,7 +307,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <param name="count">The count.</param>
         protected void OnDataReceived(byte[] data, int offset, int count)
         {
-            Logger.Debug("Session " + Id + " read " + count + " bytes");
+            Logger.Debug($"Session {Id} read {count} bytes");
 
             byte[] dataCopy = new byte[count];
             Array.Copy(data, offset, dataCopy, 0, count);
@@ -337,7 +337,7 @@ namespace EnergonSoftware.Core.Net.Sessions
                 await _socket.WriteAsync(data, offset, count).ConfigureAwait(false);
                 LastSendTime = DateTime.Now;
             } catch(SocketException e) {
-                InternalErrorAsync(Resources.ErrorSendingSessionData, e).Wait();
+                await InternalErrorAsync(Resources.ErrorSendingSessionData, e).ConfigureAwait(false);
             }
         }
 
@@ -355,7 +355,7 @@ namespace EnergonSoftware.Core.Net.Sessions
                 await _socket.WriteAsync(stream).ConfigureAwait(false);
                 LastSendTime = DateTime.Now;
             } catch(SocketException e) {
-                InternalErrorAsync(Resources.ErrorSendingSessionData, e).Wait();
+                await InternalErrorAsync(Resources.ErrorSendingSessionData, e).ConfigureAwait(false);
             }
         }
 
@@ -366,7 +366,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <param name="error">The error.</param>
         public async Task InternalErrorAsync(string error)
         {
-            Logger.Error("Session " + Id + " encountered an internal error: " + error);
+            Logger.Error($"Session {Id} encountered an internal error: {error}");
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
             ErrorEvent?.Invoke(this, new ErrorEventArgs
@@ -383,7 +383,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <param name="ex">The exception.</param>
         public async Task InternalErrorAsync(string error, Exception ex)
         {
-            Logger.Error("Session " + Id + " encountered an internal error: " + error, ex);
+            Logger.Error($"Session {Id} encountered an internal error: {error}", ex);
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
             ErrorEvent?.Invoke(this, new ErrorEventArgs
@@ -400,7 +400,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <param name="ex">The exception.</param>
         public async Task InternalErrorAsync(Exception ex)
         {
-            Logger.Error("Session " + Id + " encountered an internal error", ex);
+            Logger.Error($"Session {Id} encountered an internal error", ex);
             await DisconnectAsync(Resources.DisconnectInternalError).ConfigureAwait(false);
 
             ErrorEvent?.Invoke(this, new ErrorEventArgs
@@ -418,7 +418,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <param name="error">The error.</param>
         public async Task ErrorAsync(string error)
         {
-            Logger.Error("Session " + Id + " encountered an error: " + error);
+            Logger.Error($"Session {Id} encountered an error: {error}");
             await DisconnectAsync(error).ConfigureAwait(false);
 
             ErrorEvent?.Invoke(this, new ErrorEventArgs
@@ -435,7 +435,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <param name="ex">The exception.</param>
         public async Task ErrorAsync(string error, Exception ex)
         {
-            Logger.Error("Session " + Id + " encountered an error: " + error, ex);
+            Logger.Error($"Session {Id} encountered an error: {error}", ex);
             await DisconnectAsync(error).ConfigureAwait(false);
 
             ErrorEvent?.Invoke(this, new ErrorEventArgs
@@ -453,7 +453,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <returns></returns>
         public async Task ErrorAsync(Exception ex)
         {
-            Logger.Error("Session " + Id + " encountered an error", ex);
+            Logger.Error($"Session {Id} encountered an error", ex);
             await DisconnectAsync(ex.Message).ConfigureAwait(false);
 
             ErrorEvent?.Invoke(this, new ErrorEventArgs

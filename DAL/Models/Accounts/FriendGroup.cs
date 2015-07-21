@@ -23,7 +23,7 @@ namespace EnergonSoftware.DAL.Models.Accounts
 
         public override string ToString()
         {
-            return "FriendGroup(Id: " + Id + ", AccountId: " + AccountId + ", GroupName: " + GroupName + ", ParentGroupId: " + ParentGroupId + ")";
+            return $"FriendGroup(Id: {Id}, AccountId: {AccountId}, GroupName: {GroupName}, ParentGroupId: {ParentGroupId})";
         }
     }
 }

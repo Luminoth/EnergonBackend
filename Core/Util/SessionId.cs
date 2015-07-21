@@ -63,7 +63,7 @@ namespace EnergonSoftware.Core.Util
             long salt1 = random.Next(10000);
             long salt2 = random.Next(10000);
 
-            string value = salt1 + ":" + CreationTime.GetTicksMs() + ":" + salt2;
+            string value = $"{salt1}:{CreationTime.GetTicksMs()}:{salt2}";
             string secretHash = new Crypt.SHA512().HashHexAsync(_secret).Result;
 
             byte[] encrypted = null;

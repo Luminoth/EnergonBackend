@@ -75,7 +75,7 @@ namespace EnergonSoftware.Launcher
                     Sessions.Cleanup();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
-                    Instance.OnErrorAsync(e.Message, "Unhandled Exception!").Wait();
+                    await Instance.OnErrorAsync(e.Message, "Unhandled Exception!").ConfigureAwait(false);
                 }
 
                 await Task.Delay(0).ConfigureAwait(false);
@@ -138,7 +138,7 @@ namespace EnergonSoftware.Launcher
 #region Event Handlers
         private async void AuthFailedEventHandler(object sender, AuthFailedEventArgs e)
         {
-            await OnErrorAsync("Authentication failed: " + e.Reason, "Authentication Failed").ConfigureAwait(false);
+            await OnErrorAsync($"Authentication failed: {e.Reason}", "Authentication Failed").ConfigureAwait(false);
         }
 
         private async void AuthSuccessEventHandler(object sender, AuthSuccessEventArgs e)
@@ -171,7 +171,7 @@ namespace EnergonSoftware.Launcher
             }
 
             NetworkSession session = (NetworkSession)sender;
-            Logger.Debug("Session " + session.Name + " disconnected: " + e.Reason);
+            Logger.Debug($"Session {session.Name} disconnected: {e.Reason}");
             await OnErrorAsync(e.Reason, "Disconnected!").ConfigureAwait(false);
         }
 

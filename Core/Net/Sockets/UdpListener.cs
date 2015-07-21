@@ -42,7 +42,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
 
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
-                Logger.Info("Listening on address " + listenAddress + "...");
+                Logger.Info($"Listening on address {listenAddress}...");
 
                 Socket socket = null;
                 try {
@@ -93,7 +93,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                         return;
                     }
 
-                    Logger.Info("New connection from " + remote.RemoteEndPoint);
+                    Logger.Info($"New connection from {remote.RemoteEndPoint}");
 
                     if(MaxConnections >= 0 && manager.Count >= MaxConnections) {
                         Logger.Info("Max connections exceeded, denying new connection!");

@@ -50,7 +50,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             }
 
             foreach(ListenAddressConfigurationElement listenAddress in listenAddresses) {
-                Logger.Info("Listening on address " + listenAddress + "...");
+                Logger.Info($"Listening on address {listenAddress}...");
 
                 Socket socket = null;
                 try {
@@ -95,7 +95,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             try {
                 if(socket.Poll(microSeconds, SelectMode.SelectRead)) {
                     Socket remote = await socket.AcceptAsync().ConfigureAwait(false);
-                    Logger.Info("New connection from " + remote.RemoteEndPoint);
+                    Logger.Info($"New connection from {remote.RemoteEndPoint}");
 
                     NewConnectionEvent?.Invoke(this, new NewConnectionEventArgs
                         {

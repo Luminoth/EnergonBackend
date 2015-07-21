@@ -59,7 +59,7 @@ namespace EnergonSoftware.Chat.Net
 
         protected async override Task<Account> LookupAccountAsync(string accountName)
         {
-            Logger.Debug("Looking up account for accountName=" + accountName);
+            Logger.Debug($"Looking up account for accountName={accountName}");
             using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
                 var accounts = from a in context.Accounts where a.AccountName == accountName select a;
                 if(accounts.Any()) {
@@ -81,13 +81,13 @@ namespace EnergonSoftware.Chat.Net
             using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
                 var accounts = from a in context.Accounts where a.Id == Account.Id select a;
                 if(accounts.Any()) {
-                    Logger.Warn("No such account Id=" + Account.Id + "!");
+                    Logger.Warn($"No such account Id={Account.Id}!");
                     await SendMessageAsync(new FriendListMessage()).ConfigureAwait(false);
                     return;
                 }
 
                 AccountInfo account = accounts.First();
-                Logger.Debug("Read " + account.Friends.Count + " friends...");
+                Logger.Debug($"Read {account.Friends.Count} friends...");
 
                 List<Account> friends = new List<Account>();
                 foreach(AccountFriend friend in account.Friends) {

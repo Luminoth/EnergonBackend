@@ -66,7 +66,7 @@ namespace EnergonSoftware.Launcher.Net
                 await LoginAsync().ConfigureAwait(false);
                 await SetVisibilityAsync(Visibility.Online).ConfigureAwait(false);
             } catch(SocketException e) {
-                ErrorAsync("Failed to connect to the chat server: " + e.Message).Wait();
+                await ErrorAsync($"Failed to connect to the chat server: {e.Message}").ConfigureAwait(false);
             }
         }
 
@@ -106,7 +106,7 @@ namespace EnergonSoftware.Launcher.Net
 
         public async Task SetVisibilityAsync(Visibility visibility)
         {
-            Logger.Info("Setting chat visibility=" + visibility);
+            Logger.Info($"Setting chat visibility={visibility}");
 
             await SendMessageAsync(new VisibilityMessage()
                 {
@@ -118,12 +118,12 @@ namespace EnergonSoftware.Launcher.Net
 
         public void SetFriendList(IReadOnlyCollection<Account> friendList)
         {
-            Logger.Info("Received " + friendList.Count + " friends!");
+            Logger.Info($"Received {friendList.Count} friends!");
 
             FriendListManager.Instance.Clear();
             FriendListManager.Instance.AddAll(friendList);
 
-            Logger.Debug("Friends: " + FriendListManager.Instance);
+            Logger.Debug($"Friends: {FriendListManager.Instance}");
         }
 
         protected override MessagePacket CreatePacket(IMessage message)

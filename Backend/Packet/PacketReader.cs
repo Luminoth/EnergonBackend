@@ -3,9 +3,20 @@ using System.Threading.Tasks;
 
 namespace EnergonSoftware.Backend.Packet
 {
-    public static class PacketReader
+    /// <summary>
+    /// Reads packets from a stream.
+    /// </summary>
+    public class PacketReader
     {
-        public static async Task<IPacket> ReadAsync(MemoryStream stream)
+        /// <summary>
+        /// Reads a single packet from a string.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
+        /// <returns>
+        /// The parsed packet.
+        /// Returns null if a full packet could not be read.
+        /// </returns>
+        public async Task<IPacket> ReadAsync(MemoryStream stream)
         {
             IPacket packet = null;
 

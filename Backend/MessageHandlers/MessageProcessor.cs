@@ -52,7 +52,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
 #region Event Handlers
         public void MessageParsedEventHandler(object sender, MessageParsedEventArgs e)
         {
-            Logger.Debug("Queueing message: " + e.Message);
+            Logger.Debug($"Queueing message: {e.Message}");
 
             _messageQueue.Enqueue(e.Message);
             _messageQueueEvent.Set();

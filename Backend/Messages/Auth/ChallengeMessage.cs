@@ -38,7 +38,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
 
         public override string ToString()
         {
-            return "ChallengeMessage(Challenge=" + Challenge + ")";
+            return $"ChallengeMessage(Challenge={Challenge})";
         }
     }
 }

@@ -85,10 +85,9 @@ namespace EnergonSoftware.DAL.Models.Accounts
 
         public override string ToString()
         {
-            return "Account(Id: " + Id + ", IsActive: " + IsActive
-                + ", AccountName: " + AccountName + ", EmailAddress: " + EmailAddress + ", UserName: " + UserName
-                + ", PasswordMD5: " + PasswordMD5 + ", PasswordSHA512: " + PasswordSHA512
-                + ", EndPoint: " + EndPoint + ", SessionId: " + SessionId + ", Visibility: " + Visibility + ", Status: " + Status + ")";
+            return $"AccountInfo(Id: {Id}, IsActive: {IsActive}, AccountName: {AccountName}, EmailAddress: {EmailAddress}"
+                + $", UserName: {UserName}, PasswordMD5: {PasswordMD5}, PasswordSHA512: {PasswordSHA512}"
+                + $", EndPoint: {EndPoint}, SessionId: {SessionId}, Visibility: {Visibility}, Status: {Status})";
         }
     }
 }

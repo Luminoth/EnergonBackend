@@ -19,7 +19,7 @@ namespace EnergonSoftware.Launcher.Updater
 
         public override string ToString()
         {
-            return "UpdateContract(Id=" + Id + ", Version=" + Version + ", ReleaseDate=" + ReleaseDate + ", Url=" + Url + ")";
+            return $"UpdateContract(Id={Id}, Version={Version}, ReleaseDate={ReleaseDate}, Url={Url})";
         }
     }
 }

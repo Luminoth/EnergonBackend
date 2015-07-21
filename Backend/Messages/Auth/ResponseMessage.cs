@@ -38,7 +38,7 @@ namespace EnergonSoftware.Backend.Messages.Auth
 
         public override string ToString()
         {
-            return "ResponseMessage(Response=" + Response + ")";
+            return $"ResponseMessage(Response={Response})";
         }
     }
 }

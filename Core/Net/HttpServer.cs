@@ -183,7 +183,7 @@ await Task.Delay(0).ConfigureAwait(false);
 
         private async Task HandleRequestAsync(HttpListenerRequest request, HttpListenerResponse response)
         {
-            Logger.Debug("New HttpListenerRequest: " + request.Url);
+            Logger.Debug($"New HttpListenerRequest: {request.Url}");
 
             if(!_handlers.ContainsKey(request.RawUrl)) {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
