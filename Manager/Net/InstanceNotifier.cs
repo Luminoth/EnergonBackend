@@ -32,7 +32,7 @@ namespace EnergonSoftware.Manager.Net
 
                 NetworkSession sender = new InstanceNotifierSession(listener);
                 await sender.ConnectMulticastAsync(listenAddress.MulticastGroupIPAddress, listenAddress.Port, listenAddress.MulticastTTL).ConfigureAwait(false);
-                _sessions.Add(sender);
+                _sessions.AddAsync(sender).ConfigureAwait(false);
             }
         }
 
@@ -44,8 +44,8 @@ namespace EnergonSoftware.Manager.Net
 
         public async Task RunAsync()
         {
-            await _sessions.PollAndReadAllAsync(100).ConfigureAwait(false);
-            _sessions.Cleanup();
+            await _sessions.PollAndReceiveAllAsync(100).ConfigureAwait(false);
+            await _sessions.CleanupAsync().ConfigureAwait(false);
         }
 
         public async Task StartupAsync()

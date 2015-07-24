@@ -44,8 +44,8 @@ namespace EnergonSoftware.Overmind.Net
 
         public async Task RunAsync()
         {
-            await _sessions.PollAndReadAllAsync(100).ConfigureAwait(false);
-            _sessions.Cleanup();
+            await _sessions.PollAndReceiveAllAsync(100).ConfigureAwait(false);
+            await _sessions.CleanupAsync().ConfigureAwait(false);
         }
 
         public async Task StartupAsync()

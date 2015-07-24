@@ -89,7 +89,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                     Socket remote = await socket.AcceptFromAsync().ConfigureAwait(false);
                     if(manager.Contains(remote.RemoteEndPoint)) {
                         NetworkSession session = manager.Get(remote.RemoteEndPoint);
-                        await session.PollAndReadAllAsync(microSeconds).ConfigureAwait(false);
+                        await session.PollAndReceiveAllAsync(microSeconds).ConfigureAwait(false);
                         return;
                     }
 
@@ -101,7 +101,7 @@ namespace EnergonSoftware.Core.Net.Sockets
                     } else {
                         Logger.Debug("Allowing new connection...");
                         NetworkSession session = _factory.Create(remote);
-                        await session.PollAndReadAllAsync(microSeconds).ConfigureAwait(false);
+                        await session.PollAndReceiveAllAsync(microSeconds).ConfigureAwait(false);
                         manager.Add(session);
                     }*/
                 }

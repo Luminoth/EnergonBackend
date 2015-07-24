@@ -71,8 +71,8 @@ namespace EnergonSoftware.Launcher
             Logger.Debug("**Idle mark**");
             while(!_cancellationToken.IsCancellationRequested) {
                 try {
-                    await Sessions.PollAndReadAllAsync(100).ConfigureAwait(false);
-                    Sessions.Cleanup();
+                    await Sessions.PollAndReceiveAllAsync(100).ConfigureAwait(false);
+                    await Sessions.CleanupAsync().ConfigureAwait(false);
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     await Instance.OnErrorAsync(e.Message, "Unhandled Exception!").ConfigureAwait(false);

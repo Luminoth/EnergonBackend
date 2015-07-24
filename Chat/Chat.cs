@@ -98,7 +98,7 @@ namespace EnergonSoftware.Chat
             InstanceNotifier.Instance.ShutdownAsync().Wait();
 
             Logger.Debug("Closing listener sockets...");
-            _listener.CloseSockets();
+            _listener.CloseSocketsAsync().Wait();
 
             Logger.Debug("Disconnecting sessions...");
             _sessions.DisconnectAllAsync().Wait();
@@ -112,19 +112,19 @@ namespace EnergonSoftware.Chat
             EventLogger.Instance.ShutdownEventAsync().Wait();
         }
 
-        private async Task PollAndReadAllAsync()
+        private async Task PollAndReceiveAllAsync()
         {
             await _listener.PollAsync(_sessions).ConfigureAwait(false);
 
-            await _sessions.PollAndReadAllAsync(100).ConfigureAwait(false);
-            _sessions.Cleanup();
+            await _sessions.PollAndReceiveAllAsync(100).ConfigureAwait(false);
+            await _sessions.CleanupAsync().ConfigureAwait(false);
         }
 
         private void Run()
         {
             while(Running) {
                 try {
-                    Task.WhenAll(InstanceNotifier.Instance.RunAsync(), PollAndReadAllAsync()).Wait();
+                    Task.WhenAll(InstanceNotifier.Instance.RunAsync(), PollAndReceiveAllAsync()).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();

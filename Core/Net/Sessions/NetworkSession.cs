@@ -305,7 +305,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// Polls the session socket and reads all of the available data.
         /// </summary>
         /// <param name="microSeconds">The microsecond poll timeout.</param>
-        public async Task PollAndReadAllAsync(int microSeconds)
+        public async Task PollAndReceiveAllAsync(int microSeconds)
         {
             if(!IsConnected) {
                 return;

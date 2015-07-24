@@ -173,12 +173,12 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// Polls each session and reads all available data.
         /// </summary>
         /// <param name="microSeconds">The microsecond poll timeout.</param>
-        public async Task PollAndReadAllAsync(int microSeconds)
+        public async Task PollAndReceiveAllAsync(int microSeconds)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
             try {
                 List<Task> tasks = new List<Task>();
-                _sessions.ForEach(session => tasks.Add(session.PollAndReadAllAsync(microSeconds)));
+                _sessions.ForEach(session => tasks.Add(session.PollAndReceiveAllAsync(microSeconds)));
 
                 await Task.WhenAll(tasks).ConfigureAwait(false);
             } finally {

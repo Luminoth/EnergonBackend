@@ -29,7 +29,7 @@ namespace EnergonSoftware.Authenticator
         private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
 
         private readonly TcpListener _listener = new TcpListener();
-        private readonly MessageSessionManager _sessions = new MessageSessionManager();
+        private readonly MessageSessionManager _sessionManager = new MessageSessionManager();
 
         public Authenticator()
         {
@@ -72,9 +72,12 @@ namespace EnergonSoftware.Authenticator
             Logger.Info("Starting instance notifier...");
             InstanceNotifier.Instance.StartAsync(instanceNotifierListenAddresses.ListenAddresses).Wait();
 
+            _sessionManager.SessionFactory = new AuthSessionFactory();
+            _sessionManager.MaxSessions = listenAddresses.MaxConnections;
+
             Logger.Debug("Opening listener sockets...");
-            _sessions.MaxSessions = listenAddresses.MaxConnections;
             _listener.SocketBacklog = listenAddresses.Backlog;
+            _listener.NewConnectionEvent += _sessionManager.NewConnectionEventHandlerAsync;
             _listener.CreateSocketsAsync(listenAddresses.ListenAddresses).Wait();
 
             Logger.Info("Running...");
@@ -98,10 +101,11 @@ namespace EnergonSoftware.Authenticator
             InstanceNotifier.Instance.ShutdownAsync().Wait();
 
             Logger.Debug("Closing listener sockets...");
+            _listener.NewConnectionEvent -= _sessionManager.NewConnectionEventHandlerAsync;
             _listener.CloseSocketsAsync().Wait();
 
             Logger.Debug("Disconnecting sessions...");
-            _sessions.DisconnectAllAsync().Wait();
+            _sessionManager.DisconnectAllAsync().Wait();
 
             Logger.Debug("Stopping instance notifier...");
             InstanceNotifier.Instance.Stop();
@@ -112,19 +116,19 @@ namespace EnergonSoftware.Authenticator
             EventLogger.Instance.ShutdownEventAsync().Wait();
         }
 
-        private async Task PollAndReadAllAsync()
+        private async Task PollAndReceiveAllAsync()
         {
             await _listener.PollAsync(100).ConfigureAwait(false);
 
-            await _sessions.PollAndReadAllAsync(100).ConfigureAwait(false);
-            await _sessions.CleanupAsync().ConfigureAwait(false);
+            await _sessionManager.PollAndReceiveAllAsync(100).ConfigureAwait(false);
+            await _sessionManager.CleanupAsync().ConfigureAwait(false);
         }
 
         private void Run()
         {
             while(Running) {
                 try {
-                    Task.WhenAll(InstanceNotifier.Instance.RunAsync(), PollAndReadAllAsync()).Wait();
+                    Task.WhenAll(InstanceNotifier.Instance.RunAsync(), PollAndReceiveAllAsync()).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();

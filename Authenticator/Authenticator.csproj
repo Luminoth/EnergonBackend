@@ -86,6 +86,7 @@
     <Compile Include="Diagnostics\DiagnosticsServer.cs" />
     <Compile Include="EventLogger.cs" />
     <Compile Include="MessageHandlers\InstanceNotifierMessageHandlerFactory.cs" />
+    <Compile Include="Net\AuthSessionFactory.cs" />
     <Compile Include="Net\InstanceNotifier.cs" />
     <Compile Include="MessageHandlers\AuthMessageHandler.cs" />
     <Compile Include="MessageHandlers\AuthMessageHandlerFactory.cs" />

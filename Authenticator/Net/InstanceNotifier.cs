@@ -39,8 +39,7 @@ namespace EnergonSoftware.Authenticator.Net
 
                 NetworkSession sender = new InstanceNotifierSession(listener);
                 await sender.ConnectMulticastAsync(listenAddress.MulticastGroupIPAddress, listenAddress.Port, listenAddress.MulticastTTL).ConfigureAwait(false);
-//// TODO: fucking add this shit back dude
-                ////_sessions.Add(sender);
+                await _sessions.AddAsync(sender).ConfigureAwait(false);
             }
         }
 
@@ -52,7 +51,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public async Task RunAsync()
         {
-            await _sessions.PollAndReadAllAsync(100).ConfigureAwait(false);
+            await _sessions.PollAndReceiveAllAsync(100).ConfigureAwait(false);
             await _sessions.CleanupAsync().ConfigureAwait(false);
         }
 

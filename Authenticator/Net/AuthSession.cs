@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Net.Sessions;
 using EnergonSoftware.Backend.Packet;
 
-using EnergonSoftware.Core.Net.Sessions;
 using EnergonSoftware.Core.Serialization.Formatters;
 using EnergonSoftware.Core.Util;
 
@@ -18,25 +16,6 @@ using EnergonSoftware.DAL.Models.Accounts;
 
 namespace EnergonSoftware.Authenticator.Net
 {
-    // TODO: move this into its own file
-    internal sealed class AuthSessionFactory : INetworkSessionFactory
-    {
-        public NetworkSession Create(Socket socket)
-        {
-            AuthSession session = null;
-            try {
-                session = new AuthSession(socket)
-                {
-                    Timeout = TimeSpan.FromMilliseconds(Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeoutMs"])),
-                };
-                return session;
-            } catch(Exception) {
-                session?.Dispose();
-                throw;
-            }
-        }
-    }
-
     internal sealed class AuthSession : MessageSession
     {
         public AuthType AuthType { get; private set; } = AuthType.None;
