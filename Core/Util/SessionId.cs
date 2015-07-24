@@ -18,12 +18,12 @@ namespace EnergonSoftware.Core.Util
         private readonly string _secret;
 
         /// <summary>
-        /// Gets the expiration in milliseconds.
+        /// Gets the expiration time.
         /// </summary>
         /// <value>
-        /// The expiration in milliseconds.
+        /// The expiration time.
         /// </value>
-        public int ExpiryMs { get; } = -1;
+        public TimeSpan Expiry { get; } = TimeSpan.MinValue;
 
         /// <summary>
         /// Gets the session identifier.
@@ -48,7 +48,7 @@ namespace EnergonSoftware.Core.Util
         /// <value>
         ///   <c>true</c> if expired; otherwise, <c>false</c>.
         /// </value>
-        public bool Expired => ExpiryMs >= 0 && (DateTime.Now.Subtract(CreationTime).Milliseconds > ExpiryMs);
+        public bool Expired => Expiry > TimeSpan.Zero && (DateTime.Now - CreationTime) > Expiry;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionId"/> class.
@@ -92,7 +92,7 @@ namespace EnergonSoftware.Core.Util
         public SessionId(string secret, int expiryMs)
             : this(secret)
         {
-            ExpiryMs = expiryMs;
+            Expiry = TimeSpan.FromMilliseconds(expiryMs);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ throw new NotImplementedException();
         public SessionId(string password, string sessionId, int expiryMs)
             : this(password, sessionId)
         {
-            ExpiryMs = expiryMs;
+            Expiry = TimeSpan.FromMilliseconds(expiryMs);
         }
 
         private SessionId()

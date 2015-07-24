@@ -190,14 +190,12 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// Broadcasts data to all sessions.
         /// </summary>
         /// <param name="data">The data.</param>
-        /// <param name="offset">The offset.</param>
-        /// <param name="count">The count.</param>
-        public async Task BroadcastAsync(byte[] data, int offset, int count)
+        public async Task BroadcastAsync(byte[] data)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
             try {
                 List<Task> tasks = new List<Task>();
-                _sessions.ForEach(session => tasks.Add(session.SendAsync(data, offset, count)));
+                _sessions.ForEach(session => tasks.Add(session.SendAsync(data)));
 
                 await Task.WhenAll(tasks).ConfigureAwait(false);
             } finally {

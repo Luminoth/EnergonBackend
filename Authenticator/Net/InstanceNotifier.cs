@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Messages.Notification;
 using EnergonSoftware.Backend.Net.Sessions;
+using EnergonSoftware.Backend.Packet;
 
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
+using EnergonSoftware.Core.Serialization.Formatters;
 
 using log4net;
 
@@ -21,6 +23,10 @@ namespace EnergonSoftware.Authenticator.Net
 
         private readonly MessageSessionManager _sessions = new MessageSessionManager();
 
+        private string MessageFormatterType => BinaryNetworkFormatter.FormatterType;
+
+        private string PacketType => NetworkPacket.PacketType;
+
         public async Task StartAsync(ListenAddressConfigurationElementCollection listenAddresses)
         {
             Logger.Debug("Opening instance notifier sockets...");
@@ -33,7 +39,8 @@ namespace EnergonSoftware.Authenticator.Net
 
                 NetworkSession sender = new InstanceNotifierSession(listener);
                 await sender.ConnectMulticastAsync(listenAddress.MulticastGroupIPAddress, listenAddress.Port, listenAddress.MulticastTTL).ConfigureAwait(false);
-                _sessions.Add(sender);
+//// TODO: fucking add this shit back dude
+                ////_sessions.Add(sender);
             }
         }
 
@@ -46,7 +53,7 @@ namespace EnergonSoftware.Authenticator.Net
         public async Task RunAsync()
         {
             await _sessions.PollAndReadAllAsync(100).ConfigureAwait(false);
-            _sessions.Cleanup();
+            await _sessions.CleanupAsync().ConfigureAwait(false);
         }
 
         public async Task StartupAsync()
@@ -55,7 +62,7 @@ namespace EnergonSoftware.Authenticator.Net
                 {
                     ServiceName = Authenticator.ServiceId,
                     ServiceId = Authenticator.UniqueId.ToString(),
-                }).ConfigureAwait(false);
+                }, MessageFormatterType, PacketType).ConfigureAwait(false);
         }
 
         public async Task ShutdownAsync()
@@ -64,7 +71,7 @@ namespace EnergonSoftware.Authenticator.Net
                 {
                     ServiceName = Authenticator.ServiceId,
                     ServiceId = Authenticator.UniqueId.ToString(),
-                }).ConfigureAwait(false);
+                }, MessageFormatterType, PacketType).ConfigureAwait(false);
         }
 
         public async Task AuthenticatingAsync(string accountName, EndPoint endpoint)

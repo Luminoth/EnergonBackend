@@ -19,12 +19,12 @@ namespace EnergonSoftware.Core.Util
         public string Realm { get; }
 
         /// <summary>
-        /// Gets the expiration in milliseconds.
+        /// Gets the expiration time.
         /// </summary>
         /// <value>
-        /// The expiration in milliseconds.
+        /// The expiration time.
         /// </value>
-        public int ExpiryMs { get; }
+        public TimeSpan Expiry { get; } = TimeSpan.MinValue;
 
         /// <summary>
         /// Gets the nonce value.
@@ -56,7 +56,7 @@ namespace EnergonSoftware.Core.Util
         /// <value>
         ///   <c>true</c> if expired; otherwise, <c>false</c>.
         /// </value>
-        public bool Expired => ExpiryMs >= 0 && (DateTime.Now.Subtract(CreationTime).Milliseconds > ExpiryMs);
+        public bool Expired => Expiry > TimeSpan.Zero && (DateTime.Now - CreationTime) > Expiry;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Nonce" /> class.
@@ -67,7 +67,7 @@ namespace EnergonSoftware.Core.Util
             : this()
         {
             Realm = realm;
-            ExpiryMs = expiryMs;
+            Expiry = TimeSpan.FromMilliseconds(expiryMs);
             NonceValue = $"{CreationTime.GetTicksMs()}:${Realm}";
             NonceHash = new SHA512().HashHexAsync(NonceValue).Result;
         }
@@ -82,7 +82,7 @@ namespace EnergonSoftware.Core.Util
             : this()
         {
             Realm = realm;
-            ExpiryMs = expiryMs;
+            Expiry = TimeSpan.FromMilliseconds(expiryMs);
             NonceValue = nonce;
             NonceHash = new SHA512().HashHexAsync(NonceValue).Result;
 

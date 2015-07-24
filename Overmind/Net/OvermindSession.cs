@@ -28,7 +28,7 @@ namespace EnergonSoftware.Overmind.Net
             try {
                 session = new OvermindSession(socket)
                 {
-                    TimeoutMs = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
+                    Timeout = TimeSpan.FromMilliseconds(Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeoutMs"])),
                 };
                 return session;
             } catch(Exception) {

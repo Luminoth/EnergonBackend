@@ -10,7 +10,7 @@ namespace EnergonSoftware.DAL.Models.Events
         public int Id { get; set; }
 
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public DateTimeOffset Timestamp { get; set; } = DateTime.Now;
+        public DateTime Timestamp { get; set; } = DateTime.Now;
 
         public override string ToString()
         {

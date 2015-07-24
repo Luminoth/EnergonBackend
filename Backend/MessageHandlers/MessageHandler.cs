@@ -10,20 +10,6 @@ using EnergonSoftware.Core.Net.Sessions;
 namespace EnergonSoftware.Backend.MessageHandlers
 {
     /// <summary>
-    /// Creates message handlers
-    /// </summary>
-    // TODO: move this into its own file
-    public interface IMessageHandlerFactory
-    {
-        /// <summary>
-        /// Creates a message handler of the specified type.
-        /// </summary>
-        /// <param name="type">The message handler type.</param>
-        /// <returns>The message handler</returns>
-        MessageHandler Create(string type);
-    }
-
-    /// <summary>
     /// Handles messages
     /// </summary>
     public class MessageHandler

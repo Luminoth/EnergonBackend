@@ -57,6 +57,8 @@
     <Compile Include="Net\Sockets\NewConnectionEventArgs.cs" />
     <Compile Include="Packet\Packet.cs" />
     <Compile Include="Packet\PacketException.cs" />
+    <Compile Include="Packet\PacketFactory.cs" />
+    <Compile Include="Packet\PacketReader.cs" />
     <Compile Include="Serialization\Formattable.cs" />
     <Compile Include="Serialization\Formatter.cs" />
     <Compile Include="Serialization\FormatterFactory.cs" />

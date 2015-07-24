@@ -1,24 +1,23 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Core.Packet;
-
-namespace EnergonSoftware.Backend.Packet
+namespace EnergonSoftware.Core.Packet
 {
     /// <summary>
-    /// Reads packets from a stream.
+    /// Utility class for reading packets from a stream
     /// </summary>
     public class PacketReader
     {
         /// <summary>
         /// Reads a single packet from a string.
         /// </summary>
+        /// <param name="packetFactory">The factory.</param>
         /// <param name="stream">The stream.</param>
         /// <returns>
         /// The parsed packet.
         /// Returns null if a full packet could not be read.
         /// </returns>
-        public async Task<IPacket> ReadAsync(MemoryStream stream)
+        public async Task<IPacket> ReadAsync(IPacketFactory packetFactory, MemoryStream stream)
         {
             IPacket packet = null;
 
@@ -28,7 +27,7 @@ namespace EnergonSoftware.Backend.Packet
                     return null;
                 }
 
-                packet = await PacketFactory.CreateAsync(stream).ConfigureAwait(false);
+                packet = await packetFactory.CreateAsync(stream).ConfigureAwait(false);
                 if(null == packet) {
                     return null;
                 }

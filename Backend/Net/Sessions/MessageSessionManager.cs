@@ -22,7 +22,7 @@ namespace EnergonSoftware.Backend.Net.Sessions
         public async Task BroadcastMessageAsync(Message message, string formatterType, string packetType)
         {
             using(MemoryStream packetStream = new MemoryStream()) {
-                await MessageSession.SerializeMessageToPacketStreamAsync(message, packetStream, FormatterFactory.Create(formatterType), packetType).ConfigureAwait(false);
+                await MessageSession.SerializeMessageToPacketStreamAsync(message, packetStream, new FormatterFactory().Create(formatterType), packetType).ConfigureAwait(false);
                 await BroadcastAsync(packetStream).ConfigureAwait(false);
             }
         }

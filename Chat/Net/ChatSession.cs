@@ -31,7 +31,7 @@ namespace EnergonSoftware.Chat.Net
             try {
                 session = new ChatSession(socket)
                 {
-                    TimeoutMs = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
+                    Timeout = TimeSpan.FromMilliseconds(Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeoutMs"])),
                 };
                 return session;
             } catch(Exception) {

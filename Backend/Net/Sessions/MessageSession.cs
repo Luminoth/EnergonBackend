@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Messages;
@@ -25,7 +26,7 @@ namespace EnergonSoftware.Backend.Net.Sessions
             Logger.Debug("Serializing message:");
             Logger.Debug(message.ToString());
 
-            IPacket packet = PacketFactory.Create(packetType);
+            IPacket packet = new BackendPacketFactory().Create(packetType);
             using(MemoryStream messageStream = new MemoryStream()) {
                 formatter.Attach(messageStream);
                 await Message.SerializeAsync(message, formatter).ConfigureAwait(false);
@@ -41,21 +42,51 @@ namespace EnergonSoftware.Backend.Net.Sessions
         }
 
         /// <summary>
+        /// Gets the type of the message formatter to use.
+        /// </summary>
+        /// <value>
+        /// The type of the message formatter to use.
+        /// </value>
+        protected abstract string MessageFormatterType { get; }
+
+        /// <summary>
+        /// Gets the type of the packet to use.
+        /// </summary>
+        /// <value>
+        /// The type of the packet to use.
+        /// </value>
+        protected abstract string PacketType { get; }
+
+        /// <summary>
         /// Sends the message.
         /// </summary>
         /// <param name="message">The message.</param>
-        /// <param name="formatterType">Type of the formatter.</param>
-        /// <param name="packetType">Type of the packet.</param>
-        public async Task SendMessageAsync(Message message, string formatterType, string packetType)
+        public async Task SendMessageAsync(Message message)
         {
             try {
                 using(MemoryStream packetStream = new MemoryStream()) {
-                    await SerializeMessageToPacketStreamAsync(message, packetStream, FormatterFactory.Create(formatterType), packetType).ConfigureAwait(false);
+                    await SerializeMessageToPacketStreamAsync(message, packetStream, new FormatterFactory().Create(MessageFormatterType), PacketType).ConfigureAwait(false);
                     await SendAsync(packetStream).ConfigureAwait(false);
                 }
             } catch(MessageException e) {
                 await InternalErrorAsync(Resources.ErrorSendingMessage, e).ConfigureAwait(false);
             }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MessageSession"/> class.
+        /// </summary>
+        protected MessageSession()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MessageSession"/> class.
+        /// </summary>
+        /// <param name="socket">The already connected socket to wrap.</param>
+        protected MessageSession(Socket socket)
+            : base(socket)
+        {
         }
     }
 }

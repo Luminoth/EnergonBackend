@@ -10,15 +10,9 @@ namespace EnergonSoftware.Backend.Packet
     /// <summary>
     /// Creates packets.
     /// </summary>
-    public static class PacketFactory
+    public class BackendPacketFactory : IPacketFactory
     {
-        /// <summary>
-        /// Creates a packet of the specified type.
-        /// </summary>
-        /// <param name="type">The packet type.</param>
-        /// <returns>A new packet of the specified type.</returns>
-        /// <exception cref="System.ArgumentException">Invalid packet type</exception>
-        public static IPacket Create(string type)
+        public IPacket Create(string type)
         {
             switch(type)
             {
@@ -29,12 +23,7 @@ namespace EnergonSoftware.Backend.Packet
             throw new ArgumentException("Invalid packet type", nameof(type));
         }
 
-        /// <summary>
-        /// Attempts to deduce the packet type from a stream and create a packet of that type.
-        /// </summary>
-        /// <param name="stream">The stream.</param>
-        /// <returns>A new packet of the deduced type or null if the type couldn't be deduced</returns>
-        public static async Task<IPacket> CreateAsync(Stream stream)
+        public async Task<IPacket> CreateAsync(Stream stream)
         {
             if(stream.GetRemaining() >= NetworkPacket.Header.Length) {
                 byte[] header = new byte[NetworkPacket.Header.Length];

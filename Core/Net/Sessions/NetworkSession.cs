@@ -67,13 +67,15 @@ namespace EnergonSoftware.Core.Net.Sessions
         public abstract string Name { get; }
 
 #region Network Properties
+        private bool _socketConnecting;
+
         /// <summary>
         /// Gets a value indicating whether this session is connecting.
         /// </summary>
         /// <value>
         /// <c>true</c> if this session is connecting; otherwise, <c>false</c>.
         /// </value>
-        public bool IsConnecting => _socket.IsConnecting;
+        public bool IsConnecting => (null != _socket && _socketConnecting) || (null != _sslSocket && _sslSocket.IsConnecting);
 
         /// <summary>
         /// Gets a value indicating whether this session is connected.
@@ -81,7 +83,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// <c>true</c> if this session is connected; otherwise, <c>false</c>.
         /// </value>
-        public bool IsConnected => _socket.IsConnected;
+        public bool IsConnected => (null != _socket && _socket.Connected) || (null != _sslSocket && _sslSocket.IsConnected);
 
         /// <summary>
         /// Gets a value indicating whether this session is encrypted.
@@ -89,7 +91,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// <c>true</c> if this session is encrypted; otherwise, <c>false</c>.
         /// </value>
-        public bool IsEncrypted => _socket.IsEncrypted;
+        public bool IsEncrypted => null == _socket && null != _sslSocket && _sslSocket.IsEncrypted;
 
         /// <summary>
         /// Gets the remote end point associated with this session.
@@ -97,7 +99,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         /// The remote end point associated with this session.
         /// </value>
-        public EndPoint RemoteEndPoint => _socket.RemoteEndPoint;
+        public EndPoint RemoteEndPoint => null != _socket ? _socket.RemoteEndPoint : _sslSocket?.RemoteEndPoint;
 
         /// <summary>
         /// Gets the last time this session sent data.
@@ -116,12 +118,12 @@ namespace EnergonSoftware.Core.Net.Sessions
         public DateTime LastRecvTime { get; private set; } = DateTime.MaxValue;
 
         /// <summary>
-        /// Gets or sets the session timeout in milliseconds.
+        /// Gets or sets the timeout.
         /// </summary>
         /// <value>
-        /// The session timeout in milliseconds.
+        /// The timeout.
         /// </value>
-        public long TimeoutMs { get; set; } = -1;
+        public TimeSpan Timeout { get; set; } = TimeSpan.MinValue;
 
         /// <summary>
         /// Gets a value indicating whether the session has timed out.
@@ -129,9 +131,11 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <value>
         ///   <c>true</c> if the session timed out; otherwise, <c>false</c>.
         /// </value>
-        public bool TimedOut => TimeoutMs >= 0 && (DateTime.Now.Subtract(LastRecvTime).Milliseconds > TimeoutMs);
+        public bool TimedOut => Timeout > TimeSpan.Zero && (DateTime.Now - LastRecvTime) > Timeout;
 
-        private SSLSocketWrapper _socket = new SSLSocketWrapper();
+        private Socket _socket;
+
+        private SSLSocketWrapper _sslSocket;
 #endregion
 
 #region Dispose
@@ -148,7 +152,8 @@ namespace EnergonSoftware.Core.Net.Sessions
         protected virtual void Dispose(bool disposing)
         {
             if(disposing) {
-                _socket.Dispose();
+                _socket?.Dispose();
+                _sslSocket?.Dispose();
             }
         }
 #endregion
@@ -167,8 +172,18 @@ namespace EnergonSoftware.Core.Net.Sessions
 
             Logger.Info($"Session {Id} connecting to {host}:{port}...");
 
-            Socket socket = await NetUtil.ConnectAsync(host, port, socketType, protocolType, useIPv6).ConfigureAwait(false);
-            _socket = new SSLSocketWrapper(socket);
+            try {
+                _socketConnecting = true;
+
+                Socket socket = await NetUtil.ConnectAsync(host, port, socketType, protocolType, useIPv6).ConfigureAwait(false);
+                if(SocketType.Stream == socketType) {
+                    _sslSocket = new SSLSocketWrapper(socket);
+                } else {
+                    _socket = socket;
+                }
+            } finally {
+                _socketConnecting = false;
+            }
 
             if(IsConnected) {
                 ConnectedEvent?.Invoke(this, new ConnectedEventArgs());
@@ -189,8 +204,12 @@ namespace EnergonSoftware.Core.Net.Sessions
 
             Logger.Info($"Session {Id} connecting to multicast group {group}:{port}...");
 
-            Socket socket = await NetUtil.ConnectMulticastAsync(group, port, ttl).ConfigureAwait(false);
-            _socket = new SSLSocketWrapper(socket);
+            try {
+                _socketConnecting = true;
+                _socket = await NetUtil.ConnectMulticastAsync(group, port, ttl).ConfigureAwait(false);
+            } finally {
+                _socketConnecting = false;
+            }
 
             if(IsConnected) {
                 ConnectedEvent?.Invoke(this, new ConnectedEventArgs());
@@ -220,7 +239,12 @@ namespace EnergonSoftware.Core.Net.Sessions
                 }
 
                 Logger.Info($"Session {Id} disconnecting: {reason}");
-                await _socket.DisconnectAsync(false).ConfigureAwait(false);
+
+                if(null != _socket) {
+                    await _socket.DisconnectAsync(false).ConfigureAwait(false);
+                } else if(null != _sslSocket) {
+                    await _sslSocket.DisconnectAsync(false).ConfigureAwait(false);
+                }
 
                 DisconnectedEvent?.Invoke(this, new DisconnectedEventArgs
                     {
@@ -240,9 +264,13 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <param name="enabledSslProtocols">The enabled SSL protocols.</param>
         public async Task StartClientSslAsync(string serverName, RemoteCertificateValidationCallback userCertificateValidationCallback, SslProtocols enabledSslProtocols)
         {
+            if(null == _sslSocket) {
+                return;
+            }
+
             Logger.Info($"Session {Id} starting client SSL handshake with serverName={serverName}...");
 
-            await _socket.StartClientSslAsync(serverName, userCertificateValidationCallback, enabledSslProtocols).ConfigureAwait(false);
+            await _sslSocket.StartClientSslAsync(serverName, userCertificateValidationCallback, enabledSslProtocols).ConfigureAwait(false);
 
             if(IsEncrypted) {
                 Logger.Info($"Session {Id} SSL handshake success!");
@@ -258,9 +286,13 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <param name="enabledSslProtocols">The enabled SSL protocols.</param>
         public async Task StartServerSslAsync(X509Certificate serverCertificate, SslProtocols enabledSslProtocols)
         {
+            if(null == _sslSocket) {
+                return;
+            }
+
             Logger.Info($"Session {Id} starting server SSL handshake...");
 
-            await _socket.StartServerSslAsync(serverCertificate, enabledSslProtocols).ConfigureAwait(false);
+            await _sslSocket.StartServerSslAsync(serverCertificate, enabledSslProtocols).ConfigureAwait(false);
 
             if(IsEncrypted) {
                 Logger.Info($"Session {Id} SSL handshake success!");
@@ -280,7 +312,13 @@ namespace EnergonSoftware.Core.Net.Sessions
             }
 
             using(MemoryStream stream = new MemoryStream()) {
-                int count = await _socket.PollAndReadAllAsync(microSeconds, stream).ConfigureAwait(false);
+                int count = -1;
+                if(null != _socket) {
+                    count = await _socket.PollAndReceiveAllAsync(microSeconds, stream).ConfigureAwait(false);
+                } else if(null != _sslSocket) {
+                    count = await _sslSocket.PollAndReceiveAllAsync(microSeconds, stream).ConfigureAwait(false);
+                }
+
                 if(count < 0) {
                     Logger.Warn($"Session {Id} remote disconnected!");
                     DisconnectedEvent?.Invoke(this, new DisconnectedEventArgs
@@ -327,19 +365,22 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// Sends data.
         /// </summary>
         /// <param name="data">The data.</param>
-        /// <param name="offset">The offset.</param>
-        /// <param name="count">The count.</param>
-        public async Task SendAsync(byte[] data, int offset, int count)
+        public async Task SendAsync(byte[] data)
         {
             try {
                 if(!IsConnected) {
                     return;
                 }
 
-                Logger.Debug("Sending buffer:");
-                Logger.Debug(Utils.HexDump(data, offset, count));
+                if(null != _socket) {
+                    Logger.Debug("Sending buffer:");
+                    Logger.Debug(Utils.HexDump(data, 0, data.Length));
 
-                await _socket.WriteAsync(data, offset, count).ConfigureAwait(false);
+                    await _socket.SendAsync(data).ConfigureAwait(false);
+                } else if(null != _sslSocket) {
+                    await _sslSocket.SendAsync(data).ConfigureAwait(false);
+                }
+
                 LastSendTime = DateTime.Now;
             } catch(SocketException e) {
                 await InternalErrorAsync(Resources.ErrorSendingSessionData, e).ConfigureAwait(false);
@@ -357,10 +398,16 @@ namespace EnergonSoftware.Core.Net.Sessions
                     return;
                 }
 
-                Logger.Debug("Sending memory stream:");
-                Logger.Debug(Utils.HexDump(stream));
+                if(null != _socket) {
+                    Logger.Debug("Sending memory stream:");
+                    Logger.Debug(Utils.HexDump(stream));
 
-                await _socket.WriteAsync(stream).ConfigureAwait(false);
+                    byte[] data = stream.ToArray();
+                    await _socket.SendAsync(data).ConfigureAwait(false);
+                } else if(null != _sslSocket) {
+                    await _sslSocket.SendAsync(stream).ConfigureAwait(false);
+                }
+
                 LastSendTime = DateTime.Now;
             } catch(SocketException e) {
                 await InternalErrorAsync(Resources.ErrorSendingSessionData, e).ConfigureAwait(false);
@@ -486,7 +533,11 @@ namespace EnergonSoftware.Core.Net.Sessions
         protected NetworkSession(Socket socket)
             : this()
         {
-            _socket = new SSLSocketWrapper(socket);
+            if(SocketType.Stream == socket.SocketType) {
+                _socket = socket;
+            } else {
+                _sslSocket = new SSLSocketWrapper(socket);
+            }
         }
     }
 }

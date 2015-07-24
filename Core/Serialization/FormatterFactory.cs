@@ -8,7 +8,7 @@ namespace EnergonSoftware.Core.Serialization
     /// <summary>
     /// Factory for formatters.
     /// </summary>
-    public static class FormatterFactory
+    public class FormatterFactory
     {
         /// <summary>
         /// Creates a new formatter of the specified type.
@@ -16,7 +16,7 @@ namespace EnergonSoftware.Core.Serialization
         /// <param name="type">The formatter type.</param>
         /// <returns>The new formatter.</returns>
         /// <exception cref="System.ArgumentException">type</exception>
-        public static IFormatter Create(string type)
+        public IFormatter Create(string type)
         {
             switch(type)
             {

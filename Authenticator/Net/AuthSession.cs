@@ -4,15 +4,12 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-using EnergonSoftware.Authenticator.MessageHandlers;
-
-using EnergonSoftware.Backend.MessageHandlers;
-using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Auth;
-using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
+using EnergonSoftware.Backend.Packet;
 
 using EnergonSoftware.Core.Net.Sessions;
+using EnergonSoftware.Core.Serialization.Formatters;
 using EnergonSoftware.Core.Util;
 
 using EnergonSoftware.DAL;
@@ -30,7 +27,7 @@ namespace EnergonSoftware.Authenticator.Net
             try {
                 session = new AuthSession(socket)
                 {
-                    TimeoutMs = Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeout"]),
+                    Timeout = TimeSpan.FromMilliseconds(Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeoutMs"])),
                 };
                 return session;
             } catch(Exception) {
@@ -42,7 +39,7 @@ namespace EnergonSoftware.Authenticator.Net
 
     internal sealed class AuthSession : MessageSession
     {
-        public AuthType AuthType { get; private set; }
+        public AuthType AuthType { get; private set; } = AuthType.None;
 
         public Nonce AuthNonce { get; private set; }
 
@@ -54,15 +51,13 @@ namespace EnergonSoftware.Authenticator.Net
 
         public override string Name => "auth";
 
-        private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
-        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
-        private readonly IMessageHandlerFactory _messageHandlerFactory = new AuthMessageHandlerFactory();
+        protected override string MessageFormatterType => BinaryNetworkFormatter.FormatterType;
 
-        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
+        protected override string PacketType => NetworkPacket.PacketType;
 
-        public AuthSession(Socket socket) : base(socket)
+        public AuthSession(Socket socket) 
+            : base(socket)
         {
-            AuthType = AuthType.None;
         }
 
         public async Task ChallengeAsync(AuthType type, Nonce nonce, string challenge)
@@ -132,11 +127,6 @@ namespace EnergonSoftware.Authenticator.Net
                 }).ConfigureAwait(false);
 
             await DisconnectAsync().ConfigureAwait(false);
-        }
-
-        protected override MessagePacket CreatePacket(Message message)
-        {
-            return new NetworkPacket();
         }
     }
 }

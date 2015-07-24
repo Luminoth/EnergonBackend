@@ -3,6 +3,9 @@ using System.Net.Sockets;
 
 namespace EnergonSoftware.Core.Net.Sockets
 {
+    /// <summary>
+    /// Emitted when a new connection arrives at a listener
+    /// </summary>
     public sealed class NewConnectionEventArgs : EventArgs
     {
         /// <summary>

@@ -118,33 +118,13 @@ namespace EnergonSoftware.Core.Net.Sockets
         /// <param name="protocolType">Type of the socket protocol.</param>
         /// <param name="useIPv6">if set to <c>true</c> use IPv6, otherwise use IPv4.</param>
         /// <returns></returns>
-        public async Task ConnectAsync(string host, int port, SocketType socketType, ProtocolType protocolType, bool useIPv6)
+        public async Task ConnectAsync(string host, int port, ProtocolType protocolType, bool useIPv6)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
             try {
                 IsConnecting = true;
 
-                _socket = await NetUtil.ConnectAsync(host, port, socketType, protocolType, useIPv6).ConfigureAwait(false);
-                _stream = new NetworkStream(_socket);
-            } finally {
-                IsConnecting = false;
-                _lock.Release();
-            }
-        }
-
-        /// <summary>
-        /// Connects the socket to the given multicast group (IP address).
-        /// </summary>
-        /// <param name="group">The multicast group to join.</param>
-        /// <param name="port">The port to connect to.</param>
-        /// <param name="ttl">The multicast time to live (TTL).</param>
-        public async Task ConnectMulticastAsync(IPAddress group, int port, int ttl)
-        {
-            await _lock.WaitAsync().ConfigureAwait(false);
-            try {
-                IsConnecting = true;
-
-                _socket = await NetUtil.ConnectMulticastAsync(group, port, ttl).ConfigureAwait(false);
+                _socket = await NetUtil.ConnectAsync(host, port, SocketType.Stream, protocolType, useIPv6).ConfigureAwait(false);
                 _stream = new NetworkStream(_socket);
             } finally {
                 IsConnecting = false;
@@ -201,12 +181,12 @@ namespace EnergonSoftware.Core.Net.Sockets
         }
 
         /// <summary>
-        /// Polls the socket and reads all the available data.
+        /// Polls the socket and receives all the available data.
         /// </summary>
         /// <param name="microSeconds">The microsecond poll timeout.</param>
         /// <param name="stream">The stream to read into.</param>
         /// <returns>The number of bytes read.</returns>
-        public async Task<int> PollAndReadAllAsync(int microSeconds, Stream stream)
+        public async Task<int> PollAndReceiveAllAsync(int microSeconds, Stream stream)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
             try {
@@ -234,19 +214,17 @@ namespace EnergonSoftware.Core.Net.Sockets
         }
 
         /// <summary>
-        /// Writes data to the socket.
+        /// Sends data to the socket.
         /// </summary>
         /// <param name="data">The data.</param>
-        /// <param name="offset">The offset.</param>
-        /// <param name="count">The count.</param>
-        public async Task WriteAsync(byte[] data, int offset, int count)
+        public async Task SendAsync(byte[] data)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
             try {
                 Logger.Debug("Writing buffer to SSL socket:");
-                Logger.Debug(Utils.HexDump(data, offset, count));
+                Logger.Debug(Utils.HexDump(data, 0, data.Length));
 
-                await Stream.WriteAsync(data, offset, count).ConfigureAwait(false);
+                await Stream.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
                 await Stream.FlushAsync().ConfigureAwait(false);
             } finally {
                 _lock.Release();
@@ -254,13 +232,13 @@ namespace EnergonSoftware.Core.Net.Sockets
         }
 
         /// <summary>
-        /// Writes data to the socket.
+        /// Sends data to the socket.
         /// </summary>
         /// <param name="stream">The stream.</param>
-        public async Task WriteAsync(MemoryStream stream)
+        public async Task SendAsync(MemoryStream stream)
         {
             byte[] buffer = stream.ToArray();
-            await WriteAsync(buffer, 0, buffer.Length);
+            await SendAsync(buffer);
         }
 
         /// <summary>

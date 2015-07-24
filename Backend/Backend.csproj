@@ -54,7 +54,7 @@
     <Compile Include="MessageHandlers\HandleMessageEventArgs.cs" />
     <Compile Include="MessageHandlers\MessageHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandlerException.cs" />
-    <Compile Include="MessageHandlers\MessageProcessor.cs" />
+    <Compile Include="MessageHandlers\MessageHandlerFactory.cs" />
     <Compile Include="Messages\AuthenticatedMessage.cs" />
     <Compile Include="Messages\Auth\AuthMessage.cs" />
     <Compile Include="Messages\Auth\ChallengeMessage.cs" />
@@ -67,21 +67,19 @@
     <Compile Include="Messages\Auth\LogoutMessage.cs" />
     <Compile Include="Messages\Message.cs" />
     <Compile Include="Messages\MessageException.cs" />
+    <Compile Include="Messages\BackendMessageFactory.cs" />
     <Compile Include="Messages\MessageFactory.cs" />
     <Compile Include="Messages\Network\StartTLSMessage.cs" />
     <Compile Include="Messages\Notification\NotificationMessage.cs" />
     <Compile Include="Messages\Notification\ShutdownMessage.cs" />
     <Compile Include="Messages\Notification\StartupMessage.cs" />
+    <Compile Include="Messages\MessageParser.cs" />
     <Compile Include="Packet\NetworkPacket.cs" />
-    <Compile Include="Messages\Parser\MessagePacketParser.cs" />
-    <Compile Include="Messages\Parser\MessageParsedEventArgs.cs" />
-    <Compile Include="Messages\Parser\NetworkPacketParser.cs" />
     <Compile Include="Messages\PingMessage.cs" />
     <Compile Include="Net\Sessions\AuthenticatedSession.cs" />
     <Compile Include="Net\Sessions\MessageSession.cs" />
     <Compile Include="Net\Sessions\MessageSessionManager.cs" />
-    <Compile Include="Packet\PacketFactory.cs" />
-    <Compile Include="Packet\PacketReader.cs" />
+    <Compile Include="Packet\BackendPacketFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

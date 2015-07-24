@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net.Sockets;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Accounts;
 using EnergonSoftware.Backend.Messages.Auth;
@@ -108,5 +109,21 @@ namespace EnergonSoftware.Backend.Net.Sessions
         /// <param name="accountName">Name of the account.</param>
         /// <returns>The account</returns>
         protected abstract Task<Account> LookupAccountAsync(string accountName);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthenticatedSession"/> class.
+        /// </summary>
+        protected AuthenticatedSession()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthenticatedSession"/> class.
+        /// </summary>
+        /// <param name="socket">The already connected socket to wrap.</param>
+        protected AuthenticatedSession(Socket socket)
+            : base(socket)
+        {
+        }
     }
 }

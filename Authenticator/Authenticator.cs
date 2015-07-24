@@ -28,7 +28,7 @@ namespace EnergonSoftware.Authenticator
 
         private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
 
-        private readonly TcpListener _listener = new TcpListener(new AuthSessionFactory());
+        private readonly TcpListener _listener = new TcpListener();
         private readonly MessageSessionManager _sessions = new MessageSessionManager();
 
         public Authenticator()
@@ -73,9 +73,9 @@ namespace EnergonSoftware.Authenticator
             InstanceNotifier.Instance.StartAsync(instanceNotifierListenAddresses.ListenAddresses).Wait();
 
             Logger.Debug("Opening listener sockets...");
-            _listener.MaxConnections = listenAddresses.MaxConnections;
+            _sessions.MaxSessions = listenAddresses.MaxConnections;
             _listener.SocketBacklog = listenAddresses.Backlog;
-            _listener.CreateSockets(listenAddresses.ListenAddresses);
+            _listener.CreateSocketsAsync(listenAddresses.ListenAddresses).Wait();
 
             Logger.Info("Running...");
             Running = true;
@@ -98,7 +98,7 @@ namespace EnergonSoftware.Authenticator
             InstanceNotifier.Instance.ShutdownAsync().Wait();
 
             Logger.Debug("Closing listener sockets...");
-            _listener.CloseSockets();
+            _listener.CloseSocketsAsync().Wait();
 
             Logger.Debug("Disconnecting sessions...");
             _sessions.DisconnectAllAsync().Wait();
@@ -114,10 +114,10 @@ namespace EnergonSoftware.Authenticator
 
         private async Task PollAndReadAllAsync()
         {
-            await _listener.PollAsync(_sessions).ConfigureAwait(false);
+            await _listener.PollAsync(100).ConfigureAwait(false);
 
             await _sessions.PollAndReadAllAsync(100).ConfigureAwait(false);
-            _sessions.Cleanup();
+            await _sessions.CleanupAsync().ConfigureAwait(false);
         }
 
         private void Run()
