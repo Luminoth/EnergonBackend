@@ -29,7 +29,7 @@ namespace EnergonSoftware.Authenticator
         private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
 
         private readonly TcpListener _listener = new TcpListener();
-        private readonly MessageSessionManager _sessionManager = new MessageSessionManager();
+        private readonly MessageNetworkSessionManager _sessionManager = new MessageNetworkSessionManager();
 
         public Authenticator()
         {

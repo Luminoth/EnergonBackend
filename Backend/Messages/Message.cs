@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Serialization;
 
@@ -55,6 +56,25 @@ namespace EnergonSoftware.Backend.Messages
             await message.SerializeAsync(formatter).ConfigureAwait(false);
             await formatter.FinishAsync().ConfigureAwait(false);
             await formatter.FlushAsync().ConfigureAwait(false);
+        }
+
+        public static async Task<Message> DeSerializeAsync(string contentType, string formatterType, byte[] buffer, int offset, int count, IMessageFactory factory)
+        {
+            if(!IsMessageContentType(contentType)) {
+                return null;
+            }
+
+            Message message = factory.Create(GetMessageType(contentType));
+            IFormatter formatter = new FormatterFactory().Create(formatterType);
+
+            using(MemoryStream messageStream = new MemoryStream()) {
+                await messageStream.WriteAsync(buffer, 0, count).ConfigureAwait(false);
+                messageStream.Flip();
+
+                formatter.Attach(messageStream);
+                await message.DeserializeAsync(formatter).ConfigureAwait(false);
+                return message;
+            }
         }
 
         public string ContentType => MetaContentType + "/" + Type;

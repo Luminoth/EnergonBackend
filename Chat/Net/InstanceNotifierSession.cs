@@ -9,7 +9,7 @@ using EnergonSoftware.Chat.MessageHandlers;
 
 namespace EnergonSoftware.Chat.Net
 {
-    internal sealed class InstanceNotifierSession : MessageSession
+    internal sealed class InstanceNotifierSession : MessageNetworkSession
     {
         public override string Name => "instanceNotifier";
 

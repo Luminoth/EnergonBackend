@@ -48,7 +48,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
 
             _running = true;
 
-            Authenticate(message as AuthenticatedMessage, session as AuthenticatedSession);
+            Authenticate(message as AuthenticatedMessage, session as AuthenticatedNetworkSession);
 
             Finished = false;
             _startTime = DateTime.Now;
@@ -59,7 +59,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
             Finished = true;
         }
 
-        private static void Authenticate(AuthenticatedMessage message, AuthenticatedSession session)
+        private static void Authenticate(AuthenticatedMessage message, AuthenticatedNetworkSession session)
         {
             if(null != message && null != session) {
                 if(!session.Authenticate(message.AccountName, message.SessionId)) {

@@ -54,6 +54,8 @@
   <ItemGroup>
     <Compile Include="Net\HttpServerResult.cs" />
     <Compile Include="Net\Sessions\ErrorEventArgs.cs" />
+    <Compile Include="Net\Sessions\PacketNetworkSession.cs" />
+    <Compile Include="Net\Sessions\PacketNetworkSessionManager.cs" />
     <Compile Include="Net\Sockets\NewConnectionEventArgs.cs" />
     <Compile Include="Packet\Packet.cs" />
     <Compile Include="Packet\PacketException.cs" />

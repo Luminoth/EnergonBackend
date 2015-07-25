@@ -55,6 +55,7 @@
     <Compile Include="MessageHandlers\MessageHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandlerException.cs" />
     <Compile Include="MessageHandlers\MessageHandlerFactory.cs" />
+    <Compile Include="MessageHandlers\MessageProcessor.cs" />
     <Compile Include="Messages\AuthenticatedMessage.cs" />
     <Compile Include="Messages\Auth\AuthMessage.cs" />
     <Compile Include="Messages\Auth\ChallengeMessage.cs" />
@@ -76,9 +77,9 @@
     <Compile Include="Messages\MessageParser.cs" />
     <Compile Include="Packet\NetworkPacket.cs" />
     <Compile Include="Messages\PingMessage.cs" />
-    <Compile Include="Net\Sessions\AuthenticatedSession.cs" />
-    <Compile Include="Net\Sessions\MessageSession.cs" />
-    <Compile Include="Net\Sessions\MessageSessionManager.cs" />
+    <Compile Include="Net\Sessions\AuthenticatedNetworkSession.cs" />
+    <Compile Include="Net\Sessions\MessageNetworkSession.cs" />
+    <Compile Include="Net\Sessions\MessageNetworkSessionManager.cs" />
     <Compile Include="Packet\BackendPacketFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

@@ -19,7 +19,7 @@ using log4net;
 
 namespace EnergonSoftware.Launcher.Net
 {
-    internal sealed class ChatSession : MessageSession
+    internal sealed class ChatSession : MessageNetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ChatSession));
 

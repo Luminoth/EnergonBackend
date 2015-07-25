@@ -38,7 +38,7 @@ namespace EnergonSoftware.Overmind.Net
         }
     }
 
-    internal sealed class OvermindSession : AuthenticatedSession
+    internal sealed class OvermindSession : AuthenticatedNetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(OvermindSession));
 

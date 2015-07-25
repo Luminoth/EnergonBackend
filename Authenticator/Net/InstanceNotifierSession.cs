@@ -6,9 +6,12 @@ using EnergonSoftware.Core.Serialization.Formatters;
 
 namespace EnergonSoftware.Authenticator.Net
 {
-    internal sealed class InstanceNotifierSession : MessageSession
+    internal sealed class InstanceNotifierSession : MessageNetworkSession
     {
         public override string Name => "instanceNotifier";
+
+        // TODO: make this configurable
+        public override int MaxSessionReadBufferSize => 1024 * 1000 * 10;
 
         protected override string MessageFormatterType => BinaryNetworkFormatter.FormatterType;
 

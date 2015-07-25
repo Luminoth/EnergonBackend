@@ -15,7 +15,7 @@ using log4net;
 
 namespace EnergonSoftware.Launcher.Net
 {
-    internal sealed class OvermindSession : MessageSession
+    internal sealed class OvermindSession : MessageNetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(OvermindSession));
 

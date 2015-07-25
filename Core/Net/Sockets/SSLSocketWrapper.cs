@@ -222,7 +222,7 @@ namespace EnergonSoftware.Core.Net.Sockets
             await _lock.WaitAsync().ConfigureAwait(false);
             try {
                 Logger.Debug("Writing buffer to SSL socket:");
-                Logger.Debug(Utils.HexDump(data, 0, data.Length));
+                Logger.Debug(Environment.NewLine + Utils.HexDump(data, 0, data.Length));
 
                 await Stream.WriteAsync(data, 0, data.Length).ConfigureAwait(false);
                 await Stream.FlushAsync().ConfigureAwait(false);

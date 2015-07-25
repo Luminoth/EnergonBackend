@@ -41,7 +41,7 @@ namespace EnergonSoftware.Chat.Net
         }
     }
 
-    internal sealed class ChatSession : AuthenticatedSession
+    internal sealed class ChatSession : AuthenticatedNetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ChatSession));
 

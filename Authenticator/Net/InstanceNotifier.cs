@@ -21,7 +21,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public static readonly InstanceNotifier Instance = new InstanceNotifier();
 
-        private readonly MessageSessionManager _sessions = new MessageSessionManager();
+        private readonly MessageNetworkSessionManager _sessions = new MessageNetworkSessionManager();
 
         private string MessageFormatterType => BinaryNetworkFormatter.FormatterType;
 
@@ -57,7 +57,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public async Task StartupAsync()
         {
-            await _sessions.BroadcastMessageAsync(new StartupMessage()
+            await _sessions.BroadcastAsync(new StartupMessage()
                 {
                     ServiceName = Authenticator.ServiceId,
                     ServiceId = Authenticator.UniqueId.ToString(),
@@ -66,7 +66,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public async Task ShutdownAsync()
         {
-            await _sessions.BroadcastMessageAsync(new ShutdownMessage()
+            await _sessions.BroadcastAsync(new ShutdownMessage()
                 {
                     ServiceName = Authenticator.ServiceId,
                     ServiceId = Authenticator.UniqueId.ToString(),

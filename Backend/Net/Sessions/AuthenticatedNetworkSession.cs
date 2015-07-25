@@ -12,9 +12,9 @@ namespace EnergonSoftware.Backend.Net.Sessions
     /// <summary>
     /// Extends the NetworkSession to associate an Account with the session
     /// </summary>
-    public abstract class AuthenticatedSession : MessageSession
+    public abstract class AuthenticatedNetworkSession : MessageNetworkSession
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthenticatedSession));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthenticatedNetworkSession));
 
         /// <summary>
         /// Gets or sets the account.
@@ -87,7 +87,7 @@ namespace EnergonSoftware.Backend.Net.Sessions
             }
 
             Logger.Info($"Login for accountName={accountName} successful!");
-            await SendMessageAsync(new LoginMessage()).ConfigureAwait(false);
+            await SendAsync(new LoginMessage()).ConfigureAwait(false);
 
             return true;
         }
@@ -97,7 +97,7 @@ namespace EnergonSoftware.Backend.Net.Sessions
         /// </summary>
         public async Task LogoutAsync()
         {
-            await SendMessageAsync(new LogoutMessage()).ConfigureAwait(false);
+            await SendAsync(new LogoutMessage()).ConfigureAwait(false);
             await DisconnectAsync().ConfigureAwait(false);
 
             Account = null;
@@ -111,17 +111,17 @@ namespace EnergonSoftware.Backend.Net.Sessions
         protected abstract Task<Account> LookupAccountAsync(string accountName);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthenticatedSession"/> class.
+        /// Initializes a new instance of the <see cref="AuthenticatedNetworkSession"/> class.
         /// </summary>
-        protected AuthenticatedSession()
+        protected AuthenticatedNetworkSession()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthenticatedSession"/> class.
+        /// Initializes a new instance of the <see cref="AuthenticatedNetworkSession"/> class.
         /// </summary>
         /// <param name="socket">The already connected socket to wrap.</param>
-        protected AuthenticatedSession(Socket socket)
+        protected AuthenticatedNetworkSession(Socket socket)
             : base(socket)
         {
         }

@@ -41,7 +41,7 @@ namespace EnergonSoftware.Launcher
 #endregion
 
 #region Network Properties
-        private static readonly MessageSessionManager Sessions = new MessageSessionManager();
+        private static readonly MessageNetworkSessionManager Sessions = new MessageNetworkSessionManager();
         private static OvermindSession _overmindSession;
         private static ChatSession _chatSession;
 #endregion

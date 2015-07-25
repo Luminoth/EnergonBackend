@@ -18,7 +18,7 @@ namespace EnergonSoftware.Chat.Net
 
         public static readonly InstanceNotifier Instance = new InstanceNotifier();
 
-        private readonly MessageSessionManager _sessions = new MessageSessionManager();
+        private readonly MessageNetworkSessionManager _sessions = new MessageNetworkSessionManager();
 
         public async Task StartAsync(ListenAddressConfigurationElementCollection listenAddresses)
         {

@@ -10,7 +10,7 @@ using EnergonSoftware.Manager.MessageHandlers;
 
 namespace EnergonSoftware.Manager.Net
 {
-    internal sealed class InstanceNotifierSession : MessageSession
+    internal sealed class InstanceNotifierSession : MessageNetworkSession
     {
         public override string Name => "instanceNotifier";
 

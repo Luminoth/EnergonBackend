@@ -17,7 +17,7 @@ using log4net;
 
 namespace EnergonSoftware.Launcher.Net
 {
-    internal sealed class AuthSession : MessageSession
+    internal sealed class AuthSession : MessageNetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthSession));
 

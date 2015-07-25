@@ -138,6 +138,21 @@ namespace EnergonSoftware.Core.Net.Sessions
         private SSLSocketWrapper _sslSocket;
 #endregion
 
+#region Read Buffer
+        /// <summary>
+        /// Gets the maximum size of the session read buffer in bytes.
+        /// </summary>
+        /// <value>
+        /// The maximum size of the session read buffer in bytes.
+        /// </value>
+        public abstract int MaxSessionReadBufferSize { get; }
+
+        /// <summary>
+        /// The session read buffer
+        /// </summary>
+        protected readonly MemoryStream SessionReadBuffer = new MemoryStream();
+#endregion
+
 #region Dispose
         public void Dispose()
         {
@@ -154,6 +169,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             if(disposing) {
                 _socket?.Dispose();
                 _sslSocket?.Dispose();
+                SessionReadBuffer.Dispose();
             }
         }
 #endregion
@@ -334,7 +350,7 @@ namespace EnergonSoftware.Core.Net.Sessions
                 }
 
                 byte[] data = stream.ToArray();
-                OnDataReceived(data, 0, data.Length);
+                await OnDataReceivedAsync(data, 0, data.Length).ConfigureAwait(false);
             }
         }
 
@@ -344,15 +360,25 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <param name="data">The data that was received.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="count">The count.</param>
-        protected void OnDataReceived(byte[] data, int offset, int count)
+        protected async Task OnDataReceivedAsync(byte[] data, int offset, int count)
         {
             Logger.Debug($"Session {Id} read {count} bytes:");
-            Logger.Debug(Utils.HexDump(data, offset, count));
+            Logger.Debug(Environment.NewLine + Utils.HexDump(data, offset, count));
 
-            byte[] dataCopy = new byte[count];
-            Array.Copy(data, offset, dataCopy, 0, count);
+            // save it to the session read buffer
+            await SessionReadBuffer.WriteAsync(data, offset, count).ConfigureAwait(false);
+
+            // ensure we don't overflow our max buffer
+            if(SessionReadBuffer.Length > MaxSessionReadBufferSize) {
+                await ErrorAsync("Session buffer overflow!").ConfigureAwait(false);
+                return;
+            }
 
             LastRecvTime = DateTime.Now;
+
+            // push out a copy in the event
+            byte[] dataCopy = new byte[count];
+            Array.Copy(data, offset, dataCopy, 0, count);
             DataReceivedEvent?.Invoke(this, new DataReceivedEventArgs
                 {
                     Count = count,
@@ -374,7 +400,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
                 if(null != _socket) {
                     Logger.Debug("Sending buffer:");
-                    Logger.Debug(Utils.HexDump(data, 0, data.Length));
+                    Logger.Debug(Environment.NewLine + Utils.HexDump(data, 0, data.Length));
 
                     await _socket.SendAsync(data).ConfigureAwait(false);
                 } else if(null != _sslSocket) {
@@ -400,7 +426,7 @@ namespace EnergonSoftware.Core.Net.Sessions
 
                 if(null != _socket) {
                     Logger.Debug("Sending memory stream:");
-                    Logger.Debug(Utils.HexDump(stream));
+                    Logger.Debug(Environment.NewLine + Utils.HexDump(stream));
 
                     byte[] data = stream.ToArray();
                     await _socket.SendAsync(data).ConfigureAwait(false);
@@ -529,7 +555,7 @@ namespace EnergonSoftware.Core.Net.Sessions
         /// <summary>
         /// Initializes a new instance of the <see cref="NetworkSession"/> class.
         /// </summary>
-        /// <param name="socket">The already connected socket to wrap.</param>
+        /// <param name="socket">The socket to wrap.</param>
         protected NetworkSession(Socket socket)
             : this()
         {

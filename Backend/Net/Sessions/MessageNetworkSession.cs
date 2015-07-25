@@ -15,30 +15,28 @@ using log4net;
 namespace EnergonSoftware.Backend.Net.Sessions
 {
     /// <summary>
-    /// Extends the NetworkSession to work with messages
+    /// Extends the PacketNetworkSession to work with messages
     /// </summary>
-    public abstract class MessageSession : NetworkSession
+    public abstract class MessageNetworkSession : PacketNetworkSession
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageSession));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageNetworkSession));
 
-        internal static async Task SerializeMessageToPacketStreamAsync(Message message, MemoryStream packetStream, IFormatter formatter, string packetType)
+        internal static async Task<IPacket> CreatePacketAsync(Message message, IFormatter formatter, string packetType)
         {
             Logger.Debug("Serializing message:");
             Logger.Debug(message.ToString());
 
             IPacket packet = new BackendPacketFactory().Create(packetType);
-            using(MemoryStream messageStream = new MemoryStream()) {
-                formatter.Attach(messageStream);
+            using(MemoryStream stream = new MemoryStream()) {
+                formatter.Attach(stream);
                 await Message.SerializeAsync(message, formatter).ConfigureAwait(false);
 
                 packet.ContentType = message.ContentType;
                 packet.Encoding = formatter.Type;
-                packet.Content = messageStream.ToArray();
-            }
+                packet.Content = stream.ToArray();
 
-            Logger.Debug("Serializing packet:");
-            Logger.Debug(packet.ToString());
-            await packet.SerializeAsync(packetStream).ConfigureAwait(false);
+                return packet;
+            }
         }
 
         /// <summary>
@@ -61,30 +59,28 @@ namespace EnergonSoftware.Backend.Net.Sessions
         /// Sends the message.
         /// </summary>
         /// <param name="message">The message.</param>
-        public async Task SendMessageAsync(Message message)
+        public async Task SendAsync(Message message)
         {
             try {
-                using(MemoryStream packetStream = new MemoryStream()) {
-                    await SerializeMessageToPacketStreamAsync(message, packetStream, new FormatterFactory().Create(MessageFormatterType), PacketType).ConfigureAwait(false);
-                    await SendAsync(packetStream).ConfigureAwait(false);
-                }
+                IPacket packet = await CreatePacketAsync(message, new FormatterFactory().Create(MessageFormatterType), PacketType).ConfigureAwait(false);
+                await SendAsync(packet).ConfigureAwait(false);
             } catch(MessageException e) {
                 await InternalErrorAsync(Resources.ErrorSendingMessage, e).ConfigureAwait(false);
             }
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MessageSession"/> class.
+        /// Initializes a new instance of the <see cref="MessageNetworkSession"/> class.
         /// </summary>
-        protected MessageSession()
+        protected MessageNetworkSession()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MessageSession"/> class.
+        /// Initializes a new instance of the <see cref="MessageNetworkSession"/> class.
         /// </summary>
-        /// <param name="socket">The already connected socket to wrap.</param>
-        protected MessageSession(Socket socket)
+        /// <param name="socket">The socket to wrap.</param>
+        protected MessageNetworkSession(Socket socket)
             : base(socket)
         {
         }

@@ -9,7 +9,7 @@ using EnergonSoftware.Overmind.MessageHandlers;
 
 namespace EnergonSoftware.Overmind.Net
 {
-    internal sealed class InstanceNotifierSession : MessageSession
+    internal sealed class InstanceNotifierSession : MessageNetworkSession
     {
         public override string Name => "instanceNotifier";
 

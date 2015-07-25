@@ -29,7 +29,7 @@ namespace EnergonSoftware.Chat
         private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
 
         private readonly TcpListener _listener = new TcpListener(new ChatSessionFactory());
-        private readonly MessageSessionManager _sessions = new MessageSessionManager();
+        private readonly MessageNetworkSessionManager _sessions = new MessageNetworkSessionManager();
 
         public Chat()
         {
