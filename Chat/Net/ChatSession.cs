@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -9,12 +7,12 @@ using EnergonSoftware.Backend.Accounts;
 using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Chat;
-using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
+using EnergonSoftware.Backend.Packet;
 
 using EnergonSoftware.Chat.MessageHandlers;
 
-using EnergonSoftware.Core.Net.Sessions;
+using EnergonSoftware.Core.Serialization.Formatters;
 
 using EnergonSoftware.DAL;
 using EnergonSoftware.DAL.Models.Accounts;
@@ -23,38 +21,25 @@ using log4net;
 
 namespace EnergonSoftware.Chat.Net
 {
-    internal sealed class ChatSessionFactory : INetworkSessionFactory
-    {
-        public NetworkSession Create(Socket socket)
-        {
-            ChatSession session = null;
-            try {
-                session = new ChatSession(socket)
-                {
-                    Timeout = TimeSpan.FromMilliseconds(Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeoutMs"])),
-                };
-                return session;
-            } catch(Exception) {
-                session?.Dispose();
-                throw;
-            }
-        }
-    }
-
     internal sealed class ChatSession : AuthenticatedNetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ChatSession));
 
         public override string Name => "chat";
 
-        private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
-        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
-        private readonly IMessageHandlerFactory _messageHandlerFactory = new ChatMessageHandlerFactory();
+        // TODO: make this configurable
+        public override int MaxSessionReceiveBufferSize => 1024 * 1000 * 10;
 
-        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
+        protected override string MessageFormatterType => BinaryNetworkFormatter.FormatterType;
 
-        public ChatSession(Socket socket) : base(socket)
+        protected override string PacketType => NetworkPacket.PacketType;
+
+        public override IMessageHandlerFactory MessageHandlerFactory => new ChatMessageHandlerFactory();
+
+        public ChatSession(Socket socket)
+            : base(socket)
         {
+            MessageReceivedEvent += Chat.Instance.MessageProcessor.MessageReceivedEventHandler;
         }
 
         protected async override Task<Account> LookupAccountAsync(string accountName)
@@ -73,7 +58,7 @@ namespace EnergonSoftware.Chat.Net
 
         public async Task PingAsync()
         {
-            await SendMessageAsync(new PingMessage()).ConfigureAwait(false);
+            await SendAsync(new PingMessage()).ConfigureAwait(false);
         }
 
         public async Task SyncFriends()
@@ -82,7 +67,7 @@ namespace EnergonSoftware.Chat.Net
                 var accounts = from a in context.Accounts where a.Id == Account.Id select a;
                 if(accounts.Any()) {
                     Logger.Warn($"No such account Id={Account.Id}!");
-                    await SendMessageAsync(new FriendListMessage()).ConfigureAwait(false);
+                    await SendAsync(new FriendListMessage()).ConfigureAwait(false);
                     return;
                 }
 
@@ -99,16 +84,11 @@ namespace EnergonSoftware.Chat.Net
                     friends.Add(friendAccount);
                 }
 
-                await SendMessageAsync(new FriendListMessage()
+                await SendAsync(new FriendListMessage()
                     {
                         Friends = friends,
                     }).ConfigureAwait(false);
             }
-        }
-
-        protected override MessagePacket CreatePacket(Message message)
-        {
-            return new NetworkPacket();
         }
     }
 }

@@ -18,7 +18,7 @@ namespace EnergonSoftware.Core.Net.Sockets
     /// Wraps a socket to allow for mid-stream SSL handshakes.
     /// </summary>
     // ReSharper disable once InconsistentNaming
-    public sealed class SSLSocketWrapper : IDisposable
+    public class SSLSocketWrapper : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SSLSocketWrapper));
 
@@ -86,7 +86,7 @@ namespace EnergonSoftware.Core.Net.Sockets
         /// <summary>
         /// Initializes a new instance of the <see cref="SSLSocketWrapper"/> class.
         /// </summary>
-        /// <param name="socket">The socket to wrap.</param>
+        /// <param name="socket">The already connected socket to wrap.</param>
         public SSLSocketWrapper(Socket socket)
             : this()
         {

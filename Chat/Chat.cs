@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Net.Sessions;
 
 using EnergonSoftware.Chat.Diagnostics;
@@ -24,17 +25,16 @@ namespace EnergonSoftware.Chat
         public const string ServiceId = "chat";
         public static readonly Guid UniqueId = Guid.NewGuid();
 
+        public static readonly Chat Instance = new Chat();
+
         public bool Running { get; private set; }
 
         private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
 
-        private readonly TcpListener _listener = new TcpListener(new ChatSessionFactory());
-        private readonly MessageNetworkSessionManager _sessions = new MessageNetworkSessionManager();
+        private readonly TcpListener _listener = new TcpListener();
+        private readonly MessageNetworkSessionManager _sessionManager = new MessageNetworkSessionManager();
 
-        public Chat()
-        {
-            InitializeComponent();
-        }
+        public MessageProcessor MessageProcessor  { get; } = new MessageProcessor();
 
 #region Dispose
         protected override void Dispose(bool disposing)
@@ -72,10 +72,13 @@ namespace EnergonSoftware.Chat
             Logger.Info("Starting instance notifier...");
             InstanceNotifier.Instance.StartAsync(instanceNotifierListenAddresses.ListenAddresses).Wait();
 
+            _sessionManager.SessionFactory = new ChatSessionFactory();
+            _sessionManager.MaxSessions = listenAddresses.MaxConnections;
+
             Logger.Debug("Opening listener sockets...");
-            _listener.MaxConnections = listenAddresses.MaxConnections;
             _listener.SocketBacklog = listenAddresses.Backlog;
-            _listener.CreateSockets(listenAddresses.ListenAddresses);
+            _listener.NewConnectionEvent += _sessionManager.NewConnectionEventHandlerAsync;
+            _listener.CreateSocketsAsync(listenAddresses.ListenAddresses).Wait();
 
             Logger.Info("Running...");
             Running = true;
@@ -98,10 +101,11 @@ namespace EnergonSoftware.Chat
             InstanceNotifier.Instance.ShutdownAsync().Wait();
 
             Logger.Debug("Closing listener sockets...");
+            _listener.NewConnectionEvent -= _sessionManager.NewConnectionEventHandlerAsync;
             _listener.CloseSocketsAsync().Wait();
 
             Logger.Debug("Disconnecting sessions...");
-            _sessions.DisconnectAllAsync().Wait();
+            _sessionManager.DisconnectAllAsync().Wait();
 
             Logger.Debug("Stopping instance notifier...");
             InstanceNotifier.Instance.Stop();
@@ -114,17 +118,21 @@ namespace EnergonSoftware.Chat
 
         private async Task PollAndReceiveAllAsync()
         {
-            await _listener.PollAsync(_sessions).ConfigureAwait(false);
+            await _listener.PollAsync(100).ConfigureAwait(false);
 
-            await _sessions.PollAndReceiveAllAsync(100).ConfigureAwait(false);
-            await _sessions.CleanupAsync().ConfigureAwait(false);
+            await _sessionManager.PollAndReceiveAllAsync(100).ConfigureAwait(false);
+            await _sessionManager.CleanupAsync().ConfigureAwait(false);
         }
 
         private void Run()
         {
             while(Running) {
                 try {
-                    Task.WhenAll(InstanceNotifier.Instance.RunAsync(), PollAndReceiveAllAsync()).Wait();
+                    Task.WhenAll(
+                        InstanceNotifier.Instance.RunAsync(),
+                        PollAndReceiveAllAsync(),
+                        MessageProcessor.RunAsync()
+                    ).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();
@@ -134,6 +142,11 @@ namespace EnergonSoftware.Chat
             }
 
             Cleanup();
+        }
+
+        private Chat()
+        {
+            InitializeComponent();
         }
     }
 }

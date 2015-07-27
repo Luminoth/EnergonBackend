@@ -7,6 +7,7 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core.IO;
 using EnergonSoftware.Core.Net.Sockets;
 using EnergonSoftware.Core.Properties;
 using EnergonSoftware.Core.Util;
@@ -138,19 +139,22 @@ namespace EnergonSoftware.Core.Net.Sessions
         private SSLSocketWrapper _sslSocket;
 #endregion
 
-#region Read Buffer
+#region Receive Buffer
         /// <summary>
-        /// Gets the maximum size of the session read buffer in bytes.
+        /// Gets the maximum size of the session receive buffer in bytes.
         /// </summary>
         /// <value>
         /// The maximum size of the session read buffer in bytes.
         /// </value>
-        public abstract int MaxSessionReadBufferSize { get; }
+        public abstract int MaxSessionReceiveBufferSize { get; }
 
         /// <summary>
-        /// The session read buffer
+        /// The session receive buffer
         /// </summary>
-        protected readonly MemoryStream SessionReadBuffer = new MemoryStream();
+        /// <remarks>
+        /// This should be locked before using
+        /// </remarks>
+        protected readonly LockingMemoryStream SessionReceiveBuffer = new LockingMemoryStream();
 #endregion
 
 #region Dispose
@@ -169,7 +173,7 @@ namespace EnergonSoftware.Core.Net.Sessions
             if(disposing) {
                 _socket?.Dispose();
                 _sslSocket?.Dispose();
-                SessionReadBuffer.Dispose();
+                SessionReceiveBuffer.Dispose();
             }
         }
 #endregion
@@ -366,12 +370,17 @@ namespace EnergonSoftware.Core.Net.Sessions
             Logger.Debug(Environment.NewLine + Utils.HexDump(data, offset, count));
 
             // save it to the session read buffer
-            await SessionReadBuffer.WriteAsync(data, offset, count).ConfigureAwait(false);
+            await SessionReceiveBuffer.LockAsync().ConfigureAwait(false);
+            try {
+                await SessionReceiveBuffer.WriteAsync(data, offset, count).ConfigureAwait(false);
 
-            // ensure we don't overflow our max buffer
-            if(SessionReadBuffer.Length > MaxSessionReadBufferSize) {
-                await ErrorAsync("Session buffer overflow!").ConfigureAwait(false);
-                return;
+                // ensure we don't overflow our max buffer
+                if(SessionReceiveBuffer.Length > MaxSessionReceiveBufferSize) {
+                    await ErrorAsync("Session buffer overflow!").ConfigureAwait(false);
+                    return;
+                }
+            } finally {
+                SessionReceiveBuffer.Release();
             }
 
             LastRecvTime = DateTime.Now;

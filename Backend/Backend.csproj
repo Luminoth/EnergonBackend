@@ -51,11 +51,11 @@
     <Compile Include="Accounts\Account.cs" />
     <Compile Include="Accounts\Visibility.cs" />
     <Compile Include="Common.cs" />
-    <Compile Include="MessageHandlers\HandleMessageEventArgs.cs" />
     <Compile Include="MessageHandlers\MessageHandler.cs" />
     <Compile Include="MessageHandlers\MessageHandlerException.cs" />
     <Compile Include="MessageHandlers\MessageHandlerFactory.cs" />
     <Compile Include="MessageHandlers\MessageProcessor.cs" />
+    <Compile Include="MessageHandlers\MessageProcessorItem.cs" />
     <Compile Include="Messages\AuthenticatedMessage.cs" />
     <Compile Include="Messages\Auth\AuthMessage.cs" />
     <Compile Include="Messages\Auth\ChallengeMessage.cs" />
@@ -74,7 +74,7 @@
     <Compile Include="Messages\Notification\NotificationMessage.cs" />
     <Compile Include="Messages\Notification\ShutdownMessage.cs" />
     <Compile Include="Messages\Notification\StartupMessage.cs" />
-    <Compile Include="Messages\MessageParser.cs" />
+    <Compile Include="Net\Sessions\MessageReceivedEventArgs.cs" />
     <Compile Include="Packet\NetworkPacket.cs" />
     <Compile Include="Messages\PingMessage.cs" />
     <Compile Include="Net\Sessions\AuthenticatedNetworkSession.cs" />

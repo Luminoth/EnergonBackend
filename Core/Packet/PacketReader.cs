@@ -6,7 +6,7 @@ namespace EnergonSoftware.Core.Packet
     /// <summary>
     /// Utility class for reading packets from a stream
     /// </summary>
-    public class PacketReader
+    public sealed class PacketReader
     {
         /// <summary>
         /// Reads a single packet from a string.

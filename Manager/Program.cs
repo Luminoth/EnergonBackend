@@ -28,15 +28,14 @@ namespace EnergonSoftware.Manager
         {
             ConfigureLogging();
 
-            Manager manager = new Manager();
-            Console.Title = manager.ServiceName;
+            Console.Title = Manager.Instance.ServiceName;
             Console.CancelKeyPress += (sender, e) =>
                 {
                     Logger.Info("Caught CancelKeyPress, stopping...");
-                    manager.Stop();
+                    Manager.Instance.Stop();
                     e.Cancel = true;
                 };
-            manager.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
+            Manager.Instance.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
         }
     }
 }

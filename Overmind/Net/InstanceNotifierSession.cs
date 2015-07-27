@@ -1,9 +1,10 @@
 ﻿using System.Net.Sockets;
 
 using EnergonSoftware.Backend.MessageHandlers;
-using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
+using EnergonSoftware.Backend.Packet;
+
+using EnergonSoftware.Core.Serialization.Formatters;
 
 using EnergonSoftware.Overmind.MessageHandlers;
 
@@ -13,28 +14,23 @@ namespace EnergonSoftware.Overmind.Net
     {
         public override string Name => "instanceNotifier";
 
-        private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
-        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
-        private readonly IMessageHandlerFactory _messageHandlerFactory = new InstanceNotifierMessageHandlerFactory();
+        // TODO: make this configurable
+        public override int MaxSessionReceiveBufferSize => 1024 * 1000 * 10;
 
-        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
+        protected override string MessageFormatterType => BinaryNetworkFormatter.FormatterType;
 
-        public InstanceNotifierSession(Socket socket) : base(socket)
+        protected override string PacketType => NetworkPacket.PacketType;
+
+        public override IMessageHandlerFactory MessageHandlerFactory => new InstanceNotifierMessageHandlerFactory();
+
+// TODO: this needs to override the poll methods or something
+// so that we listen to the listener and not the sender
+
+        private Socket _listener;
+
+        public InstanceNotifierSession(Socket listener)
         {
-            DataReceivedEvent += _messageParser.DataReceivedEventHandlerAsync;
-            _messageParser.MessageParsedEvent += _messageProcessor.MessageParsedEventHandler;
-            _messageProcessor.HandleMessageEvent += HandleMessageEventHandler;
-        }
-
-        protected override MessagePacket CreatePacket(Message message)
-        {
-            return new NetworkPacket();
-        }
-
-        private async void HandleMessageEventHandler(object sender, HandleMessageEventArgs e)
-        {
-            MessageHandler handler = _messageHandlerFactory.Create(e.Message.Type);
-            await handler.HandleMessageAsync(e.Message, this).ConfigureAwait(false);
+            _listener = listener;
         }
     }
 }

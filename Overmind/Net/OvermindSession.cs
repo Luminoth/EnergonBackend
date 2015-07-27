@@ -1,17 +1,13 @@
-﻿using System;
-using System.Configuration;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.Accounts;
 using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
-
-using EnergonSoftware.Core.Net.Sessions;
-
+using EnergonSoftware.Backend.Packet;
+using EnergonSoftware.Core.Serialization.Formatters;
 using EnergonSoftware.DAL;
 
 using EnergonSoftware.Overmind.MessageHandlers;
@@ -20,38 +16,25 @@ using log4net;
 
 namespace EnergonSoftware.Overmind.Net
 {
-    internal sealed class OvermindSessionFactory : INetworkSessionFactory
-    {
-        public NetworkSession Create(Socket socket)
-        {
-            OvermindSession session = null;
-            try {
-                session = new OvermindSession(socket)
-                {
-                    Timeout = TimeSpan.FromMilliseconds(Convert.ToInt32(ConfigurationManager.AppSettings["sessionTimeoutMs"])),
-                };
-                return session;
-            } catch(Exception) {
-                session?.Dispose();
-                throw;
-            }
-        }
-    }
-
     internal sealed class OvermindSession : AuthenticatedNetworkSession
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(OvermindSession));
 
         public override string Name => "overmind";
 
-        private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
-        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
-        private readonly IMessageHandlerFactory _messageHandlerFactory = new OvermindMessageHandlerFactory();
+        // TODO: make this configurable
+        public override int MaxSessionReceiveBufferSize => 1024 * 1000 * 10;
 
-        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
+        protected override string MessageFormatterType => BinaryNetworkFormatter.FormatterType;
 
-        public OvermindSession(Socket socket) : base(socket)
+        protected override string PacketType => NetworkPacket.PacketType;
+
+        public override IMessageHandlerFactory MessageHandlerFactory => new OvermindMessageHandlerFactory();
+
+        public OvermindSession(Socket socket)
+            : base(socket)
         {
+            MessageReceivedEvent += Overmind.Instance.MessageProcessor.MessageReceivedEventHandler;
         }
 
         protected async override Task<Account> LookupAccountAsync(string accountName)
@@ -68,14 +51,9 @@ namespace EnergonSoftware.Overmind.Net
             }
         }
 
-        protected override MessagePacket CreatePacket(Message message)
-        {
-            return new NetworkPacket();
-        }
-
         public async Task PingAsync()
         {
-            await SendMessageAsync(new PingMessage()).ConfigureAwait(false);
+            await SendAsync(new PingMessage()).ConfigureAwait(false);
         }
     }
 }

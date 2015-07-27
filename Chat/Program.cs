@@ -28,15 +28,14 @@ namespace EnergonSoftware.Chat
         {
             ConfigureLogging();
 
-            Chat chat = new Chat();
-            Console.Title = chat.ServiceName;
+            Console.Title = Chat.Instance.ServiceName;
             Console.CancelKeyPress += (sender, e) =>
                 {
                     Logger.Info("Caught CancelKeyPress, stopping...");
-                    chat.Stop();
+                    Chat.Instance.Stop();
                     e.Cancel = true;
                 };
-            chat.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
+            Chat.Instance.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
         }
     }
 }

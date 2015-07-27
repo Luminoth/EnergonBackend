@@ -21,7 +21,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public static readonly InstanceNotifier Instance = new InstanceNotifier();
 
-        private readonly MessageNetworkSessionManager _sessions = new MessageNetworkSessionManager();
+        private readonly MessageNetworkSessionManager _sessionManager = new MessageNetworkSessionManager();
 
         private string MessageFormatterType => BinaryNetworkFormatter.FormatterType;
 
@@ -39,25 +39,25 @@ namespace EnergonSoftware.Authenticator.Net
 
                 NetworkSession sender = new InstanceNotifierSession(listener);
                 await sender.ConnectMulticastAsync(listenAddress.MulticastGroupIPAddress, listenAddress.Port, listenAddress.MulticastTTL).ConfigureAwait(false);
-                await _sessions.AddAsync(sender).ConfigureAwait(false);
+                await _sessionManager.AddAsync(sender).ConfigureAwait(false);
             }
         }
 
         public void Stop()
         {
             Logger.Debug("Disconnecting instance notifier sessions...");
-            _sessions.DisconnectAllAsync().Wait();
+            _sessionManager.DisconnectAllAsync().Wait();
         }
 
         public async Task RunAsync()
         {
-            await _sessions.PollAndReceiveAllAsync(100).ConfigureAwait(false);
-            await _sessions.CleanupAsync().ConfigureAwait(false);
+            await _sessionManager.PollAndReceiveAllAsync(100).ConfigureAwait(false);
+            await _sessionManager.CleanupAsync().ConfigureAwait(false);
         }
 
         public async Task StartupAsync()
         {
-            await _sessions.BroadcastAsync(new StartupMessage()
+            await _sessionManager.BroadcastAsync(new StartupMessage()
                 {
                     ServiceName = Authenticator.ServiceId,
                     ServiceId = Authenticator.UniqueId.ToString(),
@@ -66,7 +66,7 @@ namespace EnergonSoftware.Authenticator.Net
 
         public async Task ShutdownAsync()
         {
-            await _sessions.BroadcastAsync(new ShutdownMessage()
+            await _sessionManager.BroadcastAsync(new ShutdownMessage()
                 {
                     ServiceName = Authenticator.ServiceId,
                     ServiceId = Authenticator.UniqueId.ToString(),

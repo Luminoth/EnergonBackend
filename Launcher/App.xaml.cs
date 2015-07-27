@@ -4,11 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-using EnergonSoftware.Backend;
 using EnergonSoftware.Backend.Accounts;
 using EnergonSoftware.Backend.Net.Sessions;
 
-using EnergonSoftware.Core.Net;
 using EnergonSoftware.Core.Net.Sessions;
 
 using EnergonSoftware.Launcher.Friends;
@@ -51,7 +49,9 @@ namespace EnergonSoftware.Launcher
 #region Auth Properties
         // TODO: move these into a model object
         public AuthenticationStage AuthStage { get; set; }
+
         public bool Authenticating => AuthStage > AuthenticationStage.NotAuthenticated && AuthStage < AuthenticationStage.Authenticated;
+
         public bool Authenticated => AuthenticationStage.Authenticated == AuthStage;
 #endregion
 
@@ -112,7 +112,6 @@ namespace EnergonSoftware.Launcher
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
             ConfigureLogging();
-            await Common.InitFilesystemAsync();
 
             // have to run this in a separate thread
             // so that we don't lock up the UI
@@ -153,13 +152,13 @@ namespace EnergonSoftware.Launcher
             _overmindSession.DisconnectedEvent += DisconnectEventHandler;
             _overmindSession.ErrorEvent += ErrorEventHandler;
             await _overmindSession.ConnectAsync(ConfigurationManager.AppSettings["overmindHost"], Convert.ToInt32(ConfigurationManager.AppSettings["overmindPort"])).ConfigureAwait(false);
-            Sessions.Add(_overmindSession);
+            await Sessions.AddAsync(_overmindSession).ConfigureAwait(false);
 
             _chatSession = new ChatSession();
             _chatSession.DisconnectedEvent += DisconnectEventHandler;
             _chatSession.ErrorEvent += ErrorEventHandler;
             await _chatSession.ConnectAsync(ConfigurationManager.AppSettings["chatHost"], Convert.ToInt32(ConfigurationManager.AppSettings["chatPort"])).ConfigureAwait(false);
-            Sessions.Add(_chatSession);
+            await Sessions.AddAsync(_chatSession).ConfigureAwait(false);
         }
 
         private async void DisconnectEventHandler(object sender, DisconnectedEventArgs e)
@@ -204,7 +203,7 @@ namespace EnergonSoftware.Launcher
             }
 
             await session.BeginConnectAsync(ConfigurationManager.AppSettings["authHost"], Convert.ToInt32(ConfigurationManager.AppSettings["authPort"])).ConfigureAwait(false);
-            Sessions.Add(session);
+            await Sessions.AddAsync(session).ConfigureAwait(false);
         }
 
         public async Task LogoutAsync()

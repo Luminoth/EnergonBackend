@@ -4,6 +4,8 @@ using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Backend.MessageHandlers;
+
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Util;
 
@@ -21,14 +23,13 @@ namespace EnergonSoftware.Manager
         public const string ServiceId = "manager";
         public static readonly Guid UniqueId = Guid.NewGuid();
 
+        public static readonly Manager Instance = new Manager();
+
         public bool Running { get; private set; }
 
         private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
 
-        public Manager()
-        {
-            InitializeComponent();
-        }
+        public MessageProcessor MessageProcessor  { get; } = new MessageProcessor();
 
 #region Dispose
         protected override void Dispose(bool disposing)
@@ -89,7 +90,10 @@ namespace EnergonSoftware.Manager
         {
             while(Running) {
                 try {
-                    Task.WhenAll(InstanceNotifier.Instance.RunAsync()).Wait();
+                    Task.WhenAll(
+                        InstanceNotifier.Instance.RunAsync(),
+                        MessageProcessor.RunAsync()
+                    ).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();
@@ -100,5 +104,11 @@ namespace EnergonSoftware.Manager
 
             Cleanup();
         }
+
+        private Manager()
+        {
+            InitializeComponent();
+        }
+
     }
 }

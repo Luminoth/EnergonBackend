@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Messages.Auth;
-using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Net.Sessions;
+using EnergonSoftware.Backend.Packet;
+
+using EnergonSoftware.Core.Serialization.Formatters;
 
 using EnergonSoftware.Launcher.MessageHandlers;
 
@@ -36,11 +38,14 @@ namespace EnergonSoftware.Launcher.Net
 
         public override string Name => "overmind";
 
-        private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
-        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
-        private readonly IMessageHandlerFactory _messageHandlerFactory = new MessageHandlerFactory();
+        // TODO: make this configurable
+        public override int MaxSessionReceiveBufferSize => 1024 * 1000 * 10;
 
-        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
+        protected override string MessageFormatterType => BinaryNetworkFormatter.FormatterType;
+
+        protected override string PacketType => NetworkPacket.PacketType;
+
+        public override IMessageHandlerFactory MessageHandlerFactory => new MessageHandlerFactory();
 
         /*protected async override Task OnRunAsync()
         {
@@ -69,7 +74,7 @@ namespace EnergonSoftware.Launcher.Net
         {
             Logger.Info("Logging in to overmind server...");
 
-            await SendMessageAsync(new LoginMessage()
+            await SendAsync(new LoginMessage()
                 {
                     AccountName = App.Instance.UserAccount.AccountName,
                     SessionId = App.Instance.UserAccount.SessionId,
@@ -80,7 +85,7 @@ namespace EnergonSoftware.Launcher.Net
         {
             Logger.Info("Logging out of overmind server...");
 
-            await SendMessageAsync(new LogoutMessage()
+            await SendAsync(new LogoutMessage()
                 {
                     AccountName = App.Instance.UserAccount.AccountName,
                     SessionId = App.Instance.UserAccount.SessionId,
@@ -95,13 +100,8 @@ namespace EnergonSoftware.Launcher.Net
                 return;
             }
 
-            await SendMessageAsync(new PingMessage()).ConfigureAwait(false);
+            await SendAsync(new PingMessage()).ConfigureAwait(false);
             LastPingTime = DateTime.Now;
-        }
-
-        protected override MessagePacket CreatePacket(Message message)
-        {
-            return new NetworkPacket();
         }
     }
 }

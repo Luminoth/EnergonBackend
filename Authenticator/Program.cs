@@ -28,15 +28,14 @@ namespace EnergonSoftware.Authenticator
         {
             ConfigureLogging();
 
-            Authenticator authenticator = new Authenticator();
-            Console.Title = authenticator.ServiceName;
+            Console.Title = Authenticator.Instance.ServiceName;
             Console.CancelKeyPress += (sender, e) =>
                 {
                     Logger.Info("Caught CancelKeyPress, stopping...");
-                    authenticator.Stop();
+                    Authenticator.Instance.Stop();
                     e.Cancel = true;
                 };
-            authenticator.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
+            Authenticator.Instance.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
         }
     }
 }

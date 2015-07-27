@@ -16,7 +16,7 @@ namespace EnergonSoftware.Core.Serialization
         /// <param name="type">The formatter type.</param>
         /// <returns>The new formatter.</returns>
         /// <exception cref="System.ArgumentException">type</exception>
-        public IFormatter Create(string type)
+        public virtual IFormatter Create(string type)
         {
             switch(type)
             {
@@ -30,7 +30,7 @@ namespace EnergonSoftware.Core.Serialization
                 return new XmlFormatter();
             }
 
-            throw new ArgumentException(string.Format(Resources.ErrorUnsupportedFormatter, type), "type");
+            throw new ArgumentException(string.Format(Resources.ErrorUnsupportedFormatter, type), nameof(type));
         }
     }
 }

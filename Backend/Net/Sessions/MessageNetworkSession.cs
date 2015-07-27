@@ -1,7 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-
+using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Messages;
 using EnergonSoftware.Backend.Packet;
 using EnergonSoftware.Backend.Properties;
@@ -39,6 +40,13 @@ namespace EnergonSoftware.Backend.Net.Sessions
             }
         }
 
+#region Events
+        /// <summary>
+        /// Occurs when a message is received.
+        /// </summary>
+        public event EventHandler<MessageReceivedEventArgs> MessageReceivedEvent;
+#endregion
+
         /// <summary>
         /// Gets the type of the message formatter to use.
         /// </summary>
@@ -56,6 +64,24 @@ namespace EnergonSoftware.Backend.Net.Sessions
         protected abstract string PacketType { get; }
 
         /// <summary>
+        /// Gets the message handler factory.
+        /// </summary>
+        /// <value>
+        /// The message handler factory.
+        /// </value>
+        public abstract IMessageHandlerFactory MessageHandlerFactory { get; }
+
+        protected override IPacketFactory PacketFactory => new BackendPacketFactory();
+
+        /// <summary>
+        /// Gets the message factory.
+        /// </summary>
+        /// <value>
+        /// The message factory.
+        /// </value>
+        protected virtual IMessageFactory MessageFactory => new BackendMessageFactory();
+
+        /// <summary>
         /// Sends the message.
         /// </summary>
         /// <param name="message">The message.</param>
@@ -69,11 +95,34 @@ namespace EnergonSoftware.Backend.Net.Sessions
             }
         }
 
+        private async void PacketReceivedEventHandler(object sender, PacketReceivedEventArgs e)
+        {
+            if(!Message.IsMessageContentType(e.Packet.ContentType)) {
+                await ErrorAsync("Packet content is not a message!").ConfigureAwait(false);
+                return;
+            }
+
+// TODO: exceptions here?
+
+            Message message = await Message.DeSerializeAsync(e.Packet.ContentType, e.Packet.Encoding, e.Packet.Content, 0, e.Packet.ContentLength, MessageFactory).ConfigureAwait(false);
+            if(null == message) {
+                await ErrorAsync("Failed to parse a message!").ConfigureAwait(false);
+                return;
+            }
+
+            MessageReceivedEvent?.Invoke(this, new MessageReceivedEventArgs
+                {
+                    Message = message
+                }
+            );
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MessageNetworkSession"/> class.
         /// </summary>
         protected MessageNetworkSession()
         {
+            PacketReceivedEvent += PacketReceivedEventHandler;
         }
 
         /// <summary>
@@ -83,6 +132,7 @@ namespace EnergonSoftware.Backend.Net.Sessions
         protected MessageNetworkSession(Socket socket)
             : base(socket)
         {
+            PacketReceivedEvent += PacketReceivedEventHandler;
         }
     }
 }

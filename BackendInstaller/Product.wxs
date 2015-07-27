@@ -7,7 +7,7 @@
         <MediaTemplate />
 
         <Feature Id="ProductFeature" Title="BackendInstaller" Level="1">
-            <ComponentGroupRef Id="ProductComponents" />
+            <ComponentGroupRef Id="BackendComponents" />
         </Feature>
     </Product>
 
@@ -20,11 +20,17 @@
     </Fragment>
 
     <Fragment>
-        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-            <Component Id="ProductComponent">
+        <ComponentGroup Id="BackendComponents" Directory="INSTALLFOLDER">
+            <Component Id="AuthenticatorComponent">
                 <File Source="$(var.Authenticator.TargetPath)" />
+            </Component>
+            <Component Id="ChatComponent">
                 <File Source="$(var.Chat.TargetPath)" />
+            </Component>
+            <Component Id="ManagerComponent">
                 <File Source="$(var.Manager.TargetPath)" />
+            </Component>
+            <Component Id="OvermindComponent">
                 <File Source="$(var.Overmind.TargetPath)" />
             </Component>
         </ComponentGroup>

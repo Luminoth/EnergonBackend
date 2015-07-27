@@ -28,15 +28,14 @@ namespace EnergonSoftware.Overmind
         {
             ConfigureLogging();
 
-            Overmind overmind = new Overmind();
-            Console.Title = overmind.ServiceName;
+            Console.Title = Overmind.Instance.ServiceName;
             Console.CancelKeyPress += (sender, e) =>
                 {
                     Logger.Info("Caught CancelKeyPress, stopping...");
-                    overmind.Stop();
+                    Overmind.Instance.Stop();
                     e.Cancel = true;
                 };
-            overmind.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
+            Overmind.Instance.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
         }
     }
 }

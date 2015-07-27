@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Authenticator.Diagnostics;
 using EnergonSoftware.Authenticator.Net;
-
+using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Net.Sessions;
 
 using EnergonSoftware.Core.Configuration;
@@ -24,6 +24,8 @@ namespace EnergonSoftware.Authenticator
         public const string ServiceId = "authenticator";
         public static readonly Guid UniqueId = Guid.NewGuid();
 
+        public static readonly Authenticator Instance = new Authenticator();
+
         public bool Running { get; private set; }
 
         private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
@@ -31,10 +33,7 @@ namespace EnergonSoftware.Authenticator
         private readonly TcpListener _listener = new TcpListener();
         private readonly MessageNetworkSessionManager _sessionManager = new MessageNetworkSessionManager();
 
-        public Authenticator()
-        {
-            InitializeComponent();
-        }
+        public MessageProcessor MessageProcessor  { get; } = new MessageProcessor();
 
 #region Dispose
         protected override void Dispose(bool disposing)
@@ -128,7 +127,11 @@ namespace EnergonSoftware.Authenticator
         {
             while(Running) {
                 try {
-                    Task.WhenAll(InstanceNotifier.Instance.RunAsync(), PollAndReceiveAllAsync()).Wait();
+                    Task.WhenAll(
+                        InstanceNotifier.Instance.RunAsync(),
+                        PollAndReceiveAllAsync(),
+                        MessageProcessor.RunAsync()
+                    ).Wait();
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);
                     Stop();
@@ -138,6 +141,11 @@ namespace EnergonSoftware.Authenticator
             }
 
             Cleanup();
+        }
+
+        private Authenticator()
+        {
+            InitializeComponent();
         }
     }
 }

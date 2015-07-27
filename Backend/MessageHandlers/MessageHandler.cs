@@ -40,7 +40,7 @@ namespace EnergonSoftware.Backend.MessageHandlers
         /// <param name="message">The message.</param>
         /// <param name="session">The session.</param>
         /// <exception cref="MessageHandlerException"></exception>
-        public async Task HandleMessageAsync(Message message, NetworkSession session)
+        public async Task HandleMessageAsync(Message message, MessageNetworkSession session)
         {
             if(_running) {
                 throw new MessageHandlerException(Resources.ErrorMessageHandlerAlreadyRunning);

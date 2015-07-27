@@ -4,11 +4,11 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 
 using EnergonSoftware.Backend.MessageHandlers;
-using EnergonSoftware.Backend.Messages;
-using EnergonSoftware.Backend.Messages.Parser;
 using EnergonSoftware.Backend.Messages.Auth;
 using EnergonSoftware.Backend.Net.Sessions;
+using EnergonSoftware.Backend.Packet;
 
+using EnergonSoftware.Core.Serialization.Formatters;
 using EnergonSoftware.Core.Util;
 
 using EnergonSoftware.Launcher.MessageHandlers;
@@ -30,11 +30,14 @@ namespace EnergonSoftware.Launcher.Net
 
         public override string Name => "auth";
 
-        private readonly NetworkPacketParser _messageParser = new NetworkPacketParser();
-        private readonly MessageProcessor _messageProcessor = new MessageProcessor();
-        private readonly IMessageHandlerFactory _messageHandlerFactory = new MessageHandlerFactory();
+        // TODO: make this configurable
+        public override int MaxSessionReceiveBufferSize => 1024 * 1000 * 10;
 
-        protected override string FormatterType => BinaryMessageFormatter.FormatterType;
+        protected override string MessageFormatterType => BinaryNetworkFormatter.FormatterType;
+
+        protected override string PacketType => NetworkPacket.PacketType;
+
+        public override IMessageHandlerFactory MessageHandlerFactory => new MessageHandlerFactory();
 
         public async Task BeginConnectAsync(string host, int port)
         {
@@ -58,7 +61,7 @@ namespace EnergonSoftware.Launcher.Net
         {
             Logger.Info($"Authenticating as user '{App.Instance.UserAccount.AccountName}'...");
 
-            await SendMessageAsync(new AuthMessage()
+            await SendAsync(new AuthMessage()
                 {
                     MechanismType = AuthType.DigestSHA512,
                 }).ConfigureAwait(false);
@@ -70,7 +73,7 @@ namespace EnergonSoftware.Launcher.Net
         {
             RspAuth = rspAuth;
 
-            await SendMessageAsync(new ResponseMessage()
+            await SendAsync(new ResponseMessage()
                 {
                     Response = response,
                 }).ConfigureAwait(false);
@@ -80,7 +83,7 @@ namespace EnergonSoftware.Launcher.Net
 
         public async Task AuthFinalizeAsync()
         {
-            await SendMessageAsync(new ResponseMessage()).ConfigureAwait(false);
+            await SendAsync(new ResponseMessage()).ConfigureAwait(false);
             App.Instance.AuthStage = AuthenticationStage.Finalize;
         }
 
@@ -108,11 +111,6 @@ namespace EnergonSoftware.Launcher.Net
             AuthFailedEvent?.Invoke(this, new AuthFailedEventArgs() { Reason = reason });
 
             await DisconnectAsync().ConfigureAwait(false);
-        }
-
-        protected override MessagePacket CreatePacket(Message message)
-        {
-            return new NetworkPacket();
         }
     }
 }
