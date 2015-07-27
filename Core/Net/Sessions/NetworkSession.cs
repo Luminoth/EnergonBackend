@@ -196,6 +196,11 @@ namespace EnergonSoftware.Core.Net.Sessions
                 _socketConnecting = true;
 
                 Socket socket = await NetUtil.ConnectAsync(host, port, socketType, protocolType, useIPv6).ConfigureAwait(false);
+                if(null == socket) {
+                    await ErrorAsync($"Could not connect to {host}:{port}!").ConfigureAwait(false);
+                    return;
+                }
+
                 if(SocketType.Stream == socketType) {
                     _sslSocket = new SSLSocketWrapper(socket);
                 } else {
@@ -227,6 +232,10 @@ namespace EnergonSoftware.Core.Net.Sessions
             try {
                 _socketConnecting = true;
                 _socket = await NetUtil.ConnectMulticastAsync(group, port, ttl).ConfigureAwait(false);
+                if(null == _socket) {
+                    await ErrorAsync($"Could not connect to multicast group {group}:{port}!").ConfigureAwait(false);
+                    return;
+                }
             } finally {
                 _socketConnecting = false;
             }
