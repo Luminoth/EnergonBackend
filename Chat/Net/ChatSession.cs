@@ -47,7 +47,7 @@ namespace EnergonSoftware.Chat.Net
             Logger.Debug($"Looking up account for accountName={accountName}");
             using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
                 var accounts = from a in context.Accounts where a.AccountName == accountName select a;
-                if(accounts.Any()) {
+                if(!accounts.Any()) {
                     return null;
                 }
 
@@ -65,7 +65,7 @@ namespace EnergonSoftware.Chat.Net
         {
             using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
                 var accounts = from a in context.Accounts where a.Id == Account.Id select a;
-                if(accounts.Any()) {
+                if(!accounts.Any()) {
                     Logger.Warn($"No such account Id={Account.Id}!");
                     await SendAsync(new FriendListMessage()).ConfigureAwait(false);
                     return;

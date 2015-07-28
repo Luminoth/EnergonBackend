@@ -21,7 +21,6 @@ namespace EnergonSoftware.Core.Packet
         {
             IPacket packet = null;
 
-            stream.Flip();
             try {
                 if(!stream.HasRemaining()) {
                     return null;

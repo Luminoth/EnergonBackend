@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 
 using EnergonSoftware.Backend.Accounts;
+using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Net.Sessions;
 
 using EnergonSoftware.Core.Net.Sessions;
@@ -46,6 +47,8 @@ namespace EnergonSoftware.Launcher
 
         public Account UserAccount { get; }
 
+        public MessageProcessor MessageProcessor  { get; } = new MessageProcessor();
+
 #region Auth Properties
         // TODO: move these into a model object
         public AuthenticationStage AuthStage { get; set; }
@@ -71,7 +74,11 @@ namespace EnergonSoftware.Launcher
             Logger.Debug("**Idle mark**");
             while(!_cancellationToken.IsCancellationRequested) {
                 try {
-                    await Sessions.PollAndReceiveAllAsync(100).ConfigureAwait(false);
+                    await Task.WhenAll(
+                        Sessions.PollAndReceiveAllAsync(100),
+                        Instance.MessageProcessor.RunAsync()
+                    ).ConfigureAwait(false);
+
                     await Sessions.CleanupAsync().ConfigureAwait(false);
                 } catch(Exception e) {
                     Logger.Fatal("Unhandled Exception!", e);

@@ -104,12 +104,14 @@ namespace EnergonSoftware.Backend.Net.Sessions
 
 // TODO: exceptions here?
 
+            Logger.Debug("Attempting to parse a message...");
             Message message = await Message.DeSerializeAsync(e.Packet.ContentType, e.Packet.Encoding, e.Packet.Content, 0, e.Packet.ContentLength, MessageFactory).ConfigureAwait(false);
             if(null == message) {
                 await ErrorAsync("Failed to parse a message!").ConfigureAwait(false);
                 return;
             }
 
+            Logger.Debug($"{message.Type} message parsed!");
             MessageReceivedEvent?.Invoke(this, new MessageReceivedEventArgs
                 {
                     Message = message

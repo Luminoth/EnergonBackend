@@ -47,6 +47,11 @@ namespace EnergonSoftware.Launcher.Net
 
         public override IMessageHandlerFactory MessageHandlerFactory => new MessageHandlerFactory();
 
+        public OvermindSession() 
+        {
+            MessageReceivedEvent += App.Instance.MessageProcessor.MessageReceivedEventHandler;
+        }
+
         /*protected async override Task OnRunAsync()
         {
             await PingAsync().ConfigureAwait(false);

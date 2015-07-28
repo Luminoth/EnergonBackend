@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 using EnergonSoftware.Core.Packet;
 
+using log4net;
+
 namespace EnergonSoftware.Core.Net.Sessions
 {
     /// <summary>
@@ -12,6 +14,8 @@ namespace EnergonSoftware.Core.Net.Sessions
     /// </summary>
     public abstract class PacketNetworkSession : NetworkSession
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(PacketNetworkSession));
+
 #region Events
         /// <summary>
         /// Occurs when a message is received.
@@ -52,8 +56,10 @@ namespace EnergonSoftware.Core.Net.Sessions
             try {
                 SessionReceiveBuffer.Flip();
 
+                Logger.Debug("Attempting to parse a packet...");
                 packet = await new PacketReader().ReadAsync(PacketFactory, SessionReceiveBuffer).ConfigureAwait(false);
                 if(null == packet) {
+                    Logger.Debug("No packet available!");
                     SessionReceiveBuffer.Reset();
                     return;
                 }
@@ -63,6 +69,7 @@ namespace EnergonSoftware.Core.Net.Sessions
                 SessionReceiveBuffer.Release();
             }
 
+            Logger.Debug($"{packet.Type} packet successfully parsed with ContentType={packet.ContentType}");
             PacketReceivedEvent?.Invoke(this, new PacketReceivedEventArgs
                 {
                     Packet = packet

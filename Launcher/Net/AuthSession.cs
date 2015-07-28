@@ -39,6 +39,11 @@ namespace EnergonSoftware.Launcher.Net
 
         public override IMessageHandlerFactory MessageHandlerFactory => new MessageHandlerFactory();
 
+        public AuthSession() 
+        {
+            MessageReceivedEvent += App.Instance.MessageProcessor.MessageReceivedEventHandler;
+        }
+
         public async Task BeginConnectAsync(string host, int port)
         {
             bool useIPv6 = Convert.ToBoolean(ConfigurationManager.AppSettings["useIPv6"]);

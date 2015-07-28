@@ -39,7 +39,7 @@ namespace EnergonSoftware.Authenticator.MessageHandlers
         {
             using(AccountsDatabaseContext context = new AccountsDatabaseContext()) {
                 var accounts = from a in context.Accounts where a.AccountName == accountName select a;
-                if(accounts.Any()) {
+                if(!accounts.Any()) {
                     await session.FailureAsync("Bad Username or Password").ConfigureAwait(false);
                     return;
                 }
