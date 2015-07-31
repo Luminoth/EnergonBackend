@@ -29,7 +29,11 @@ namespace EnergonSoftware.Manager
 
         private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
 
+        private readonly CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+
+#region Message Processing
         public MessageProcessor MessageProcessor  { get; } = new MessageProcessor();
+#endregion
 
 #region Dispose
         protected override void Dispose(bool disposing)
@@ -37,6 +41,7 @@ namespace EnergonSoftware.Manager
             if(disposing) {
                 components?.Dispose();
                 _diagnosticServer.Dispose();
+                _cancellationToken.Dispose();
             }
 
             base.Dispose(disposing);
@@ -60,9 +65,6 @@ namespace EnergonSoftware.Manager
             Logger.Info("Starting instance notifier...");
             InstanceNotifier.Instance.StartAsync(instanceNotifierListenAddresses.ListenAddresses).Wait();
 
-            Logger.Info("Running...");
-            Running = true;
-
             InstanceNotifier.Instance.StartupAsync().Wait();
 
             Run();
@@ -71,7 +73,8 @@ namespace EnergonSoftware.Manager
         protected override void OnStop()
         {
             Logger.Info($"Stopping {ServiceName} with guid={UniqueId}...");
-            Running = false;
+
+            _cancellationToken.Cancel();
         }
 
         private void Cleanup()
@@ -88,7 +91,10 @@ namespace EnergonSoftware.Manager
 
         private void Run()
         {
-            while(Running) {
+            Running = true;
+            Logger.Info("Running...");
+
+            while(!_cancellationToken.IsCancellationRequested) {
                 try {
                     Task.WhenAll(
                         InstanceNotifier.Instance.RunAsync(),
@@ -102,6 +108,7 @@ namespace EnergonSoftware.Manager
                 Thread.Sleep(0);
             }
 
+            Running = false;
             Cleanup();
         }
 

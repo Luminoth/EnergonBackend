@@ -31,10 +31,17 @@ namespace EnergonSoftware.Chat
 
         private readonly DiagnosticsServer _diagnosticServer = new DiagnosticsServer();
 
-        private readonly TcpListener _listener = new TcpListener();
-        private readonly MessageNetworkSessionManager _sessionManager = new MessageNetworkSessionManager();
+        private readonly CancellationTokenSource _cancellationToken = new CancellationTokenSource();
 
+#region Network Sessions
+        private readonly TcpListener _listener = new TcpListener();
+
+        private readonly MessageNetworkSessionManager _sessionManager = new MessageNetworkSessionManager();
+#endregion
+
+#region Message Processing
         public MessageProcessor MessageProcessor  { get; } = new MessageProcessor();
+#endregion
 
 #region Dispose
         protected override void Dispose(bool disposing)
@@ -42,6 +49,7 @@ namespace EnergonSoftware.Chat
             if(disposing) {
                 components?.Dispose();
                 _diagnosticServer.Dispose();
+                _cancellationToken.Dispose();
             }
 
             base.Dispose(disposing);
@@ -80,9 +88,6 @@ namespace EnergonSoftware.Chat
             _listener.NewConnectionEvent += _sessionManager.NewConnectionEventHandlerAsync;
             _listener.CreateSocketsAsync(listenAddresses.ListenAddresses).Wait();
 
-            Logger.Info("Running...");
-            Running = true;
-
             EventLogger.Instance.StartupEventAsync().Wait();
             InstanceNotifier.Instance.StartupAsync().Wait();
 
@@ -92,7 +97,8 @@ namespace EnergonSoftware.Chat
         protected override void OnStop()
         {
             Logger.Info($"Stopping {ServiceName} with guid={UniqueId}...");
-            Running = false;
+
+            _cancellationToken.Cancel();
         }
 
         private void Cleanup()
@@ -126,7 +132,10 @@ namespace EnergonSoftware.Chat
 
         private void Run()
         {
-            while(Running) {
+            Running = true;
+            Logger.Info("Running...");
+
+            while(!_cancellationToken.IsCancellationRequested) {
                 try {
                     Task.WhenAll(
                         InstanceNotifier.Instance.RunAsync(),
@@ -141,6 +150,7 @@ namespace EnergonSoftware.Chat
                 Thread.Sleep(0);
             }
 
+            Running = false;
             Cleanup();
         }
 
