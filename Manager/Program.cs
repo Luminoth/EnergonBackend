@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Configuration;
 using System.Diagnostics;
+
+using EnergonSoftware.Manager.Configuration;
 
 using log4net;
 using log4net.Config;
@@ -35,7 +36,12 @@ namespace EnergonSoftware.Manager
                     Manager.Instance.Stop();
                     e.Cancel = true;
                 };
-            Manager.Instance.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
+
+            if(null == Manager.ServiceConfigurationSection) {
+                throw new InvalidOperationException($"Missing {ManagerServiceConfigurationSection.ConfigurationSectionName} configuration section!");
+            }
+
+            Manager.Instance.Start(Manager.ServiceConfigurationSection.RunAsService, args);
         }
     }
 }

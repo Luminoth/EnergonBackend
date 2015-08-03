@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Configuration;
 using System.Diagnostics;
+
+using EnergonSoftware.Authenticator.Configuration;
 
 using log4net;
 using log4net.Config;
@@ -35,7 +36,12 @@ namespace EnergonSoftware.Authenticator
                     Authenticator.Instance.Stop();
                     e.Cancel = true;
                 };
-            Authenticator.Instance.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
+
+            if(null == Authenticator.ServiceConfigurationSection) {
+                throw new InvalidOperationException($"Missing {AuthenticatorServiceConfigurationSection.ConfigurationSectionName} configuration section!");
+            }
+
+            Authenticator.Instance.Start(Authenticator.ServiceConfigurationSection.RunAsService, args);
         }
     }
 }

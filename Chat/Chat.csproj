@@ -85,6 +85,7 @@
     <Compile Include="Chat.Designer.cs">
       <DependentUpon>Chat.cs</DependentUpon>
     </Compile>
+    <Compile Include="Configuration\ChatServiceConfigurationSection.cs" />
     <Compile Include="Diagnostics\DiagnosticsServer.cs" />
     <Compile Include="EventLogger.cs" />
     <Compile Include="MessageHandlers\ChatMessageHandlerFactory.cs" />

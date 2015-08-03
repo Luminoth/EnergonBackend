@@ -2,6 +2,8 @@
 using System.Configuration;
 using System.Diagnostics;
 
+using EnergonSoftware.Overmind.Configuration;
+
 using log4net;
 using log4net.Config;
 
@@ -35,7 +37,12 @@ namespace EnergonSoftware.Overmind
                     Overmind.Instance.Stop();
                     e.Cancel = true;
                 };
-            Overmind.Instance.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
+
+            if(null == Overmind.ServiceConfigurationSection) {
+                throw new InvalidOperationException($"Missing {OvermindServiceConfigurationSection.ConfigurationSectionName} configuration section!");
+            }
+
+            Overmind.Instance.Start(Overmind.ServiceConfigurationSection.RunAsService, args);
         }
     }
 }

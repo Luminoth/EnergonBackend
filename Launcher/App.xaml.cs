@@ -10,6 +10,7 @@ using EnergonSoftware.Backend.Net.Sessions;
 
 using EnergonSoftware.Core.Net.Sessions;
 
+using EnergonSoftware.Launcher.Configuration;
 using EnergonSoftware.Launcher.Friends;
 using EnergonSoftware.Launcher.Net;
 using EnergonSoftware.Launcher.Updater;
@@ -28,6 +29,9 @@ namespace EnergonSoftware.Launcher
         private static readonly ILog Logger = LogManager.GetLogger(typeof(App));
 
         public static App Instance => (App)Current;
+
+        public static LauncherConfigurationSection ConfigurationSection => ConfigurationManager.GetSection(LauncherConfigurationSection.ConfigurationSectionName) as LauncherConfigurationSection;
+
 
 #region Debug Properties
         public static bool UseDummyNetwork => Convert.ToBoolean(ConfigurationManager.AppSettings["dummyNetwork"]);
@@ -119,6 +123,10 @@ namespace EnergonSoftware.Launcher
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
             ConfigureLogging();
+
+            if(null == ConfigurationSection) {
+                throw new InvalidOperationException($"Missing {LauncherConfigurationSection.ConfigurationSectionName} configuration section!");
+            }
 
             // have to run this in a separate thread
             // so that we don't lock up the UI

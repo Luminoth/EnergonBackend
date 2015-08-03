@@ -11,6 +11,7 @@ using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Net.Sockets;
 using EnergonSoftware.Core.Util;
 
+using EnergonSoftware.Overmind.Configuration;
 using EnergonSoftware.Overmind.Diagnostics;
 using EnergonSoftware.Overmind.Net;
 
@@ -26,6 +27,8 @@ namespace EnergonSoftware.Overmind
         public static readonly Guid UniqueId = Guid.NewGuid();
 
         public static readonly Overmind Instance = new Overmind();
+
+        public static OvermindServiceConfigurationSection ServiceConfigurationSection => ConfigurationManager.GetSection(OvermindServiceConfigurationSection.ConfigurationSectionName) as OvermindServiceConfigurationSection;
 
         public bool Running { get; private set; }
 

@@ -9,6 +9,7 @@ using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Core.Configuration;
 using EnergonSoftware.Core.Util;
 
+using EnergonSoftware.Manager.Configuration;
 using EnergonSoftware.Manager.Diagnostics;
 using EnergonSoftware.Manager.Net;
 
@@ -24,6 +25,8 @@ namespace EnergonSoftware.Manager
         public static readonly Guid UniqueId = Guid.NewGuid();
 
         public static readonly Manager Instance = new Manager();
+
+        public static ManagerServiceConfigurationSection ServiceConfigurationSection => ConfigurationManager.GetSection(ManagerServiceConfigurationSection.ConfigurationSectionName) as ManagerServiceConfigurationSection;
 
         public bool Running { get; private set; }
 

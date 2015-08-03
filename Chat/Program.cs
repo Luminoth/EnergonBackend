@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Configuration;
 using System.Diagnostics;
+
+using EnergonSoftware.Chat.Configuration;
 
 using log4net;
 using log4net.Config;
@@ -35,7 +36,12 @@ namespace EnergonSoftware.Chat
                     Chat.Instance.Stop();
                     e.Cancel = true;
                 };
-            Chat.Instance.Start(Convert.ToBoolean(ConfigurationManager.AppSettings["runAsService"]), args);
+
+            if(null == Chat.ServiceConfigurationSection) {
+                throw new InvalidOperationException($"Missing {ChatServiceConfigurationSection.ConfigurationSectionName} configuration section!");
+            }
+
+            Chat.Instance.Start(Chat.ServiceConfigurationSection.RunAsService, args);
         }
     }
 }

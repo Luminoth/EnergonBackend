@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using EnergonSoftware.Backend.MessageHandlers;
 using EnergonSoftware.Backend.Net.Sessions;
 
+using EnergonSoftware.Chat.Configuration;
 using EnergonSoftware.Chat.Diagnostics;
 using EnergonSoftware.Chat.Net;
 
@@ -26,6 +27,8 @@ namespace EnergonSoftware.Chat
         public static readonly Guid UniqueId = Guid.NewGuid();
 
         public static readonly Chat Instance = new Chat();
+
+        public static ChatServiceConfigurationSection ServiceConfigurationSection => ConfigurationManager.GetSection(ChatServiceConfigurationSection.ConfigurationSectionName) as ChatServiceConfigurationSection;
 
         public bool Running { get; private set; }
 

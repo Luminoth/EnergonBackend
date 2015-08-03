@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\ServiceConfigurationSection.cs" />
     <Compile Include="Net\HttpServerResult.cs" />
     <Compile Include="Net\Sessions\ErrorEventArgs.cs" />
     <Compile Include="Net\Sessions\PacketNetworkSession.cs" />

@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\ManagerServiceConfigurationSection.cs" />
     <Compile Include="Diagnostics\DiagnosticsServer.cs" />
     <Compile Include="Manager.cs">
       <SubType>Component</SubType>

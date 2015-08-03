@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Authenticator.Configuration;
 using EnergonSoftware.Authenticator.Diagnostics;
 using EnergonSoftware.Authenticator.Net;
 
@@ -26,6 +27,8 @@ namespace EnergonSoftware.Authenticator
         public static readonly Guid UniqueId = Guid.NewGuid();
 
         public static readonly Authenticator Instance = new Authenticator();
+
+        public static AuthenticatorServiceConfigurationSection ServiceConfigurationSection => ConfigurationManager.GetSection(AuthenticatorServiceConfigurationSection.ConfigurationSectionName) as AuthenticatorServiceConfigurationSection;
 
         public bool Running { get; private set; }
 
