@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using EnergonSoftware.Core.Net.Sockets;
 
 namespace EnergonSoftware.Core.Net
 {

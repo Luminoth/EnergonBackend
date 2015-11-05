@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
-// ReSharper disable once CheckNamespace
-namespace System.Net.Sockets
+namespace EnergonSoftware.Core.Net.Sockets
 {
     /// <summary>
     /// Useful extensions to the System.Net.Sockets.Socket class.

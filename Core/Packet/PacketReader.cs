@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using EnergonSoftware.Core.IO;
 
 namespace EnergonSoftware.Core.Packet
 {

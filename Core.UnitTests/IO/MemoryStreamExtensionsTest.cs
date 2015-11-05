@@ -2,6 +2,8 @@
 using System.Text;
 using System.Threading.Tasks;
 
+using EnergonSoftware.Core.IO;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EnergonSoftware.Core.UnitTests.IO

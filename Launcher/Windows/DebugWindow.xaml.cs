@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 
 using EnergonSoftware.WindowsUtil;
+using EnergonSoftware.WindowsUtil.Windows;
 
 namespace EnergonSoftware.Launcher.Windows
 {

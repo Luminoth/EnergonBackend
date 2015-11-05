@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 
-// ReSharper disable once CheckNamespace
-namespace System.IO
+namespace EnergonSoftware.Core.IO
 {
     /// <summary>
     /// Useful extensions to the System.IO.File class.

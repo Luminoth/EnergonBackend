@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using EnergonSoftware.Core.IO;
 
 namespace EnergonSoftware.Core.Serialization.Formatters
 {

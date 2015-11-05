@@ -1,5 +1,6 @@
-﻿// ReSharper disable once CheckNamespace
-namespace System
+﻿using System;
+
+namespace EnergonSoftware.Core.Util
 {
     /// <summary>
     /// Useful DateTime extensions

@@ -107,10 +107,12 @@
     <Compile Include="IO\MemoryStreamExtensions.cs" />
     <Compile Include="IO\StreamExtensions.cs" />
     <Compile Include="Util\Nonce.cs" />
+    <Compile Include="Util\ObjectExtensions.cs" />
     <Compile Include="Util\ServiceWrapper.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Util\SessionId.cs" />
+    <Compile Include="Util\TypeExtensions.cs" />
     <Compile Include="Util\Utils.cs" />
   </ItemGroup>
   <ItemGroup>

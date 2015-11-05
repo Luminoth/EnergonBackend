@@ -1,10 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-// ReSharper disable once CheckNamespace
-namespace System.IO
+namespace EnergonSoftware.Core.IO
 {
     /// <summary>
     /// Useful extensions to the System.IO.Stream class.

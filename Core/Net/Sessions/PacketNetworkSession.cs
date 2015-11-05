@@ -2,7 +2,7 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-
+using EnergonSoftware.Core.IO;
 using EnergonSoftware.Core.Packet;
 
 using log4net;

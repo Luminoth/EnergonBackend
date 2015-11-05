@@ -1,8 +1,9 @@
-﻿using System.Windows.Documents;
+﻿using System;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 
-// ReSharper disable once CheckNamespace
-namespace System.Windows.Controls
+namespace EnergonSoftware.WindowsUtil.Windows
 {
     /// <summary>
     /// Useful extension so the ystem.Windows.Controls.RichTextBox class
