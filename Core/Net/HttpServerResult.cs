@@ -6,7 +6,7 @@ namespace EnergonSoftware.Core.Net
     /// <summary>
     /// An HTTP server result.
     /// </summary>
-    [Obsolete]
+    [Obsolete("What is this supposed to be replaced with?")]
     public class HttpServerResult
     {
         /// <summary>

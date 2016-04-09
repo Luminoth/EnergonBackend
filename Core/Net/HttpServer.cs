@@ -21,7 +21,7 @@ namespace EnergonSoftware.Core.Net
     /// and should be used as a replacement for this when available. The MVC design is much
     /// cleaner and has a lot more tools available for rapid development.
     /// </remarks>
-    [Obsolete]
+    [Obsolete("Replace with embedding MVC from ASP.NET 5")]
     public class HttpServer : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpServer));
