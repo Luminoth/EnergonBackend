@@ -109,6 +109,11 @@ namespace EnergonSoftware.Core.Net.Sockets
         }
 #endregion
 
+        ~SSLSocketWrapper()
+        {
+            Dispose(false);
+        }
+
         /// <summary>
         /// Connects the socket to the given host:port with the given socket properties.
         /// </summary>

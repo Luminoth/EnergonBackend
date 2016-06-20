@@ -54,6 +54,11 @@ namespace EnergonSoftware.Core.Net
         }
 #endregion
 
+        ~HttpServer()
+        {
+            Dispose(false);
+        }
+
         /// <summary>
         /// Starts the server with the specified prefixes.
         /// </summary>

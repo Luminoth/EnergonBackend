@@ -178,6 +178,11 @@ namespace EnergonSoftware.Core.Net.Sessions
         }
 #endregion
 
+        ~NetworkSession()
+        {
+            Dispose(false);
+        }
+
         /// <summary>
         /// Connects the session to the given host:port using the given socket properties.
         /// </summary>
